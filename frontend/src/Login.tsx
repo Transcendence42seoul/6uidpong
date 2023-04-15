@@ -5,7 +5,12 @@ interface LoginProps {
 }
 
 const Login: React.FC<LoginProps> = ({ onLogin }) => {
-  return <button onClick={onLogin}>Login</button>;
+  return (
+    <div>
+      <h1>6uidpong</h1>
+      <button onClick={onLogin}>42 Login</button>
+    </div>
+  );
 };
 
 export default Login;

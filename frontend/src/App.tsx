@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import Login from './Login';
 
 const client_id = 'CLIENT_ID';
 const client_secret = 'CLIENT_SECRET';
@@ -38,12 +39,7 @@ function App() {
     window.location.href = url;
   };
 
-  return (
-    <div>
-      <h1>6uidpong</h1>
-      <button onClick={handleLogin}>42 Login</button>
-    </div>
-  );
+  return <Login onLogin={handleLogin} />;
 }
 
 export default App;

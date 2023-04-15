@@ -44,8 +44,8 @@ services:
     depends_on:
       - database
 
-  volumes:
-    postgres:
+volumes:
+  postgres:
   
-  networks:
-    transcendence:
+networks:
+  transcendence:

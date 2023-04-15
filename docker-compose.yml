@@ -1,0 +1,51 @@
+version: "3"
+
+services:
+  frontend:
+    container_name: frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: client
+    ports:
+      - "3000:3000"
+    # environment:
+    #   - name=value
+    volumes:
+      - ./frontend/src:/app/src
+    # networks:
+    #   - transcendence
+  
+  database:
+    image: postgres:latest
+    restart: always
+    # environment:
+    #   - name=value
+    container_name: postgres
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    networks:
+      - transcendence
+
+  backend:
+    container_name: backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: server
+    # environment:
+    #   - name=value
+    networks:
+      - transcendence
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./backend/src:/app/src
+    depends_on:
+      - database
+
+  volumes:
+    postgres:
+  
+  networks:
+    transcendence:

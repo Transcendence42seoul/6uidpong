@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Login from './Login';
 
 const client_id = 'CLIENT_ID';
 const client_secret = 'CLIENT_SECRET';
 const redirect_uri = 'REDIRECT_URI';
 
-function App() {
+const App: React.FC = () => {
   useEffect(() => {
     // 쿼리 문자열에 인증 코드가 있는지 확인
     const urlParams = new URLSearchParams(window.location.search);
@@ -39,7 +40,13 @@ function App() {
     window.location.href = url;
   };
 
-  return <Login onLogin={handleLogin} />;
-}
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<Login onLogin={handleLogin} />} />
+      </Routes>
+    </BrowserRouter>
+  );
+};
 
 export default App;

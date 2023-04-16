@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Login from './Login';
+import Nickname from "./Nickname";
+import ProfilePicture from "./Profilepicture";
 
 const client_id = 'CLIENT_ID';
 const client_secret = 'CLIENT_SECRET';

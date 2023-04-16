@@ -1,17 +1,17 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
 import { FortyTwoAuthGuard } from './auth.guard';
 
-@Controller('auth')
+@Controller('api/v1/auth')
 export class AuthController {
   @UseGuards(FortyTwoAuthGuard)
-  @Get('/login/forty-two')
-  async loginFortyTwo() {
+  @Get('/social/redirect/forty-two')
+  async redirectFortyTwo() {
     return 'success';
   }
 
   @UseGuards(FortyTwoAuthGuard)
-  @Get('/login/forty-two/callback')
-  async loginFortyTwoCallback() {
+  @Get('/social/callback/forty-two')
+  async callbackFortyTwo() {
     return 'success';
   }
 }

@@ -16,16 +16,16 @@ services:
     # networks:
     #   - transcendence
 
-  database:
-    image: postgres:latest
-    restart: always
-    # environment:
-    #   - name=value
-    container_name: postgres
-    volumes:
-      - postgres:/var/lib/postgresql/data
-    networks:
-      - transcendence
+  # database:
+  #   image: postgres:latest
+  #   restart: always
+  #   environment:
+  #     - name=value
+  #   container_name: postgres
+  #   volumes:
+  #     - postgres:/var/lib/postgresql/data
+  #   networks:
+  #     - transcendence
 
   backend:
     container_name: backend
@@ -40,12 +40,17 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./backend:/app
-    depends_on:
-      - database
+      - backend-volume:/app
+    # depends_on:
+    #   - database
 
 volumes:
   postgres:
+  backend-volume:
+    driver_opts:
+      o: bind
+      type: none
+      device: /Users/son-yeong-won/Desktop/tsen/backend
 
 networks:
   transcendence:

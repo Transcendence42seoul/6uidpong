@@ -1,5 +1,12 @@
+.idea
+.DS_Store
+.git
+.gitignore
+.dockerignore
+.prettierrc
 dist
 node_modules
-.gitignore
-.prettierrc
 Dockerfile
+*.md
+*.sh
+*.yml

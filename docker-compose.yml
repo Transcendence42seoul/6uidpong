@@ -11,10 +11,8 @@ services:
       - "3000:3000"
     # environment:
     #   - name=value
-    volumes:
-      - ./frontend/src:/app/src
-    # networks:
-    #   - transcendence
+    networks:
+      - transcendence
 
   # database:
   #   image: postgres:latest
@@ -39,18 +37,12 @@ services:
       - transcendence
     ports:
       - "8080:8080"
-    volumes:
-      - backend-volume:/app
     # depends_on:
     #   - database
 
 volumes:
   postgres:
-  backend-volume:
-    driver_opts:
-      o: bind
-      type: none
-      device: /Users/son-yeong-won/Desktop/tsen/backend
 
 networks:
   transcendence:
+    driver: bridge

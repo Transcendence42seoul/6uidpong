@@ -37,7 +37,7 @@ const App: React.FC = () => {
 
   const handleLogin = () => {
     // 사용자를 인증 서버로 리다이렉션
-    const url = `https://localhost:8080/auth/login/forty-two`;
+    const url = `http://localhost:8080/auth/login/forty-two`;
     window.location.href = url;
   };
 

@@ -1,8 +1,7 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Login from './Login';
-import Nickname from "./Nickname";
-import ProfilePicture from "./Profilepicture";
+import Profile from './Profile';
 
 const client_id = 'CLIENT_ID';
 const client_secret = 'CLIENT_SECRET';
@@ -38,7 +37,7 @@ const App: React.FC = () => {
 
   const handleLogin = () => {
     // 사용자를 인증 서버로 리다이렉션
-    const url = `https://api.intra.42.fr/oauth/authorize?client_id=${client_id}&redirect_uri=${redirect_uri}&response_type=code`;
+    const url = `https://localhost:8080/auth/login/forty-two`;
     window.location.href = url;
   };
 
@@ -46,6 +45,7 @@ const App: React.FC = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<Login onLogin={handleLogin} />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
     </BrowserRouter>
   );

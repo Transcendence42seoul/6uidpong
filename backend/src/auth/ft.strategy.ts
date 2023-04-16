@@ -6,7 +6,7 @@ import { Strategy } from 'passport-oauth2';
 export class FortyTwoAuthGuard extends PassportStrategy(Strategy, 'forty-two') {
   constructor() {
     super({
-      authorizationURL: ``,
+      authorizationURL: '',
       tokenURL: '',
       clientID: '',
       clientSecret: '',

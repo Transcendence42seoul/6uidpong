@@ -8,4 +8,10 @@ export class AuthController {
   async loginFortyTwo() {
     return 'success';
   }
+
+  @UseGuards(FortyTwoAuthGuard)
+  @Get('/login/forty-two/callback')
+  async loginFortyTwoCallback() {
+    return 'success';
+  }
 }

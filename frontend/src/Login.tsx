@@ -1,4 +1,5 @@
 import React from 'react';
+import Settings from './Settings';
 
 interface LoginProps {
   onLogin: () => void;
@@ -6,7 +7,10 @@ interface LoginProps {
 
 const Login: React.FC<LoginProps> = ({ onLogin }) => {
   return (
-    <div className="h-screen w-screen bg-[url('https://i.chzbgr.com/full/8475769600/hA75A6322/funny-animated-gifs-cats-playing-laser-pong')] bg-cover bg-bottom bg-no-repeat">
+    <div
+      className="h-screen w-screen bg-cover bg-bottom bg-no-repeat"
+      style={{ backgroundImage: `url(${Settings.LOGIN_BACKGROUND})` }}
+    >
       <h1 className="mt-0 pt-14 text-center font-press-start-2p text-3xl text-white">
         6u!dpong
       </h1>

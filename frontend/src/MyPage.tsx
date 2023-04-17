@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import Settings from './Settings';
 
 interface Profile {
@@ -19,6 +20,12 @@ interface MyPageProps {
 }
 
 const MyPage: React.FC<MyPageProps> = ({ profile, stats }) => {
+  const navigate = useNavigate();
+
+  const onChangeProfile = () => {
+    navigate('/profile');
+  };
+
   return (
     <div
       className="flex min-h-screen w-screen flex-col items-center bg-cover bg-bottom bg-no-repeat p-4 font-press-start-2p text-white"
@@ -32,7 +39,10 @@ const MyPage: React.FC<MyPageProps> = ({ profile, stats }) => {
           alt="Profile Picture"
         />
       </div>
-      <button className="mb-4 w-full max-w-md rounded border border-white bg-black p-2.5 text-white text-white hover:bg-white hover:text-black">
+      <button
+        className="mb-4 w-full max-w-md rounded border border-white bg-black p-2.5 text-white text-white hover:bg-white hover:text-black"
+        onClick={onChangeProfile}
+      >
         Change Profile
       </button>
       <div className="mb-4 flex w-full max-w-md flex-col items-center rounded border border-white bg-black p-4">

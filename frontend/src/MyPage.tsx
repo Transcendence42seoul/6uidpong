@@ -43,9 +43,14 @@ const MyPage: React.FC<MyPageProps> = ({ profile, stats }) => {
       </div>
       <div className="flex w-full max-w-md flex-col items-center rounded border border-white bg-black p-4">
         <h3 className="mb-3 text-xl font-bold">Recent History</h3>
-        <ul>
+        <ul className="flex">
           {stats.recentHistory.map((history, index) => (
-            <li key={index} className="mb-1">
+            <li
+              key={index}
+              className={`mb-1 px-2 ${
+                history === 'Win' ? 'text-blue-500' : 'text-red-500'
+              }`}
+            >
               {history}
             </li>
           ))}

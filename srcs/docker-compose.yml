@@ -1,0 +1,38 @@
+version: "3"
+
+services:
+  nginx:
+    container_name: nginx
+    build:
+      context: requirements/nginx/
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - transcendence
+
+  backend:
+    container_name: backend
+    build:
+      context: requirements/backend/
+      dockerfile: Dockerfile
+    networks:
+      - transcendence
+    depends_on:
+      - nginx
+
+  # database:
+  #   image: postgres:latest
+  #   restart: always
+  #   environment:
+  #     - name=value
+  #   container_name: postgres
+  #   volumes:
+  #     - postgres:/var/lib/postgresql/data
+  #   networks:
+  #     - transcendence
+
+networks:
+  transcendence:
+    driver: bridge

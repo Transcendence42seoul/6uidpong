@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
 function Nickname() {
-  const [nickname, setNickname] = useState("");
+  const [nickname, setNickname] = useState('');
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setNickname(event.target.value);

@@ -21,10 +21,10 @@ const MyPage: React.FC<MyPageProps> = ({ profile, stats }) => {
   return (
     <div className="flex flex-col items-center bg-black p-4 font-press-start-2p text-white">
       <div className="mb-4 flex w-full max-w-md flex-col items-center rounded border border-white p-4">
-        <h2 className="mb-2 text-2xl font-bold">Profile</h2>
-        <p className="mb-2">Nickname: {profile.nickname}</p>
+        <h2 className="mb-2.5 text-2xl font-bold">Profile</h2>
+        <p>Nickname: {profile.nickname}</p>
         <img
-          className="rounded-full"
+          className="rounded-full p-4"
           src={profile.picture}
           alt="Profile Picture"
         />
@@ -34,12 +34,12 @@ const MyPage: React.FC<MyPageProps> = ({ profile, stats }) => {
       </button>
       <div className="mb-4 flex w-full max-w-md flex-col items-center rounded border border-white p-4">
         <h3 className="mb-2 text-xl font-bold">Stats</h3>
-        <p className="mb-2">Wins: {stats.wins}</p>
-        <p className="mb-2">Losses: {stats.losses}</p>
+        <p className="mb-1.5">Wins: {stats.wins}</p>
+        <p className="mb-1.5">Losses: {stats.losses}</p>
         <p>Ladder Score: {stats.ladderScore}</p>
       </div>
       <div className="flex w-full max-w-md flex-col items-center rounded border border-white p-4">
-        <h3 className="mb-2 text-xl font-bold">Recent History</h3>
+        <h3 className="mb-3 text-xl font-bold">Recent History</h3>
         <ul>
           {stats.recentHistory.map((history, index) => (
             <li key={index} className="mb-1">

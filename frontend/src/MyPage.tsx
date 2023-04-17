@@ -22,10 +22,6 @@ interface MyPageProps {
 const MyPage: React.FC<MyPageProps> = ({ profile, stats }) => {
   const navigate = useNavigate();
 
-  const onChangeProfile = () => {
-    navigate('/profile');
-  };
-
   return (
     <div
       className="flex min-h-screen w-screen flex-col items-center bg-cover bg-bottom bg-no-repeat p-4 font-press-start-2p text-white"
@@ -41,7 +37,7 @@ const MyPage: React.FC<MyPageProps> = ({ profile, stats }) => {
       </div>
       <button
         className="mb-4 w-full max-w-md rounded border border-white bg-black p-2.5 text-white text-white hover:bg-white hover:text-black"
-        onClick={onChangeProfile}
+        onClick={() => navigate('/profile')}
       >
         Change Profile
       </button>

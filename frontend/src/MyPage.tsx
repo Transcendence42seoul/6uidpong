@@ -21,10 +21,9 @@ const MyPage: React.FC<MyPageProps> = ({ profile, stats }) => {
   return (
     <div className="flex flex-col items-center bg-black p-4 font-press-start-2p text-white">
       <div className="mb-4 flex w-full max-w-md flex-col items-center rounded border border-white p-4">
-        <h2 className="mb-2.5 text-2xl font-bold">Profile</h2>
-        <p>Nickname: {profile.nickname}</p>
+        <h2 className="mt-2 text-2xl font-bold">{profile.nickname}</h2>
         <img
-          className="rounded-full p-4"
+          className="rounded-full p-7"
           src={profile.picture}
           alt="Profile Picture"
         />

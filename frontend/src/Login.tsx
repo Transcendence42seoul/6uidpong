@@ -9,7 +9,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
   return (
     <div
       className="h-screen w-screen bg-cover bg-bottom bg-no-repeat"
-      style={{ backgroundImage: `url(${Settings.LOGIN_BACKGROUND})` }}
+      style={{ backgroundImage: `url(${Settings.BACKGROUND_IMAGE})` }}
     >
       <h1 className="mt-0 pt-14 text-center font-press-start-2p text-3xl text-white">
         6u!dpong

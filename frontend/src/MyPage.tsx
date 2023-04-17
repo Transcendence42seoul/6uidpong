@@ -22,7 +22,7 @@ const MyPage: React.FC<MyPageProps> = ({ profile, stats }) => {
   return (
     <div
       className="flex h-screen w-screen flex-col items-center bg-cover bg-bottom bg-no-repeat p-4 font-press-start-2p text-white"
-      style={{ backgroundImage: `url(${Settings.LOGIN_BACKGROUND})` }}
+      style={{ backgroundImage: `url(${Settings.BACKGROUND_IMAGE})` }}
     >
       <div className="mb-4 flex w-full max-w-md flex-col items-center rounded border border-white bg-black p-4">
         <h2 className="mt-2 text-2xl font-bold">{profile.nickname}</h2>

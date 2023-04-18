@@ -40,7 +40,7 @@ const MyPage: React.FC<MyPageProps> = ({ profile, stats }) => {
         />
       </div>
       <button
-        className="mb-4 w-full max-w-md rounded border border-white bg-black p-2.5 text-white text-white hover:bg-white hover:text-black"
+        className="mb-4 w-full max-w-md rounded border border-white bg-black p-2.5 text-white hover:bg-white hover:text-black"
         onClick={onChangeProfile}
       >
         Change Profile

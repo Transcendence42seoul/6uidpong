@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import MainPage from './MainPage';
 import Login from './Login';
 import Profile from './Profile';
 import MyPage from './MyPage';
@@ -26,6 +27,7 @@ const App: React.FC = () => {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/" element={<MainPage />} />
         <Route path="/login" element={<Login onLogin={handleLogin} />} />
         <Route path="/profile" element={<Profile />} />
         <Route

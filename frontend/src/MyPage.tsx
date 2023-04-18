@@ -1,6 +1,5 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import Settings from './Settings';
 
 interface Profile {
   nickname: string;
@@ -23,10 +22,7 @@ const MyPage: React.FC<MyPageProps> = ({ profile, stats }) => {
   const navigate = useNavigate();
 
   return (
-    <div
-      className="flex min-h-screen w-screen flex-col items-center bg-cover bg-bottom bg-no-repeat p-4 font-press-start-2p text-white"
-      style={{ backgroundImage: `url(${Settings.BACKGROUND_IMAGE})` }}
-    >
+    <div className="flex flex-col items-center p-4 text-white">
       <div className="mb-4 flex w-full max-w-md flex-col items-center rounded border border-white bg-black p-4">
         <h2 className="mt-2 text-2xl font-bold">{profile.nickname}</h2>
         <img

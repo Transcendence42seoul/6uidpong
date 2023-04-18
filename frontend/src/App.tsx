@@ -1,9 +1,9 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import MainPage from './MainPage';
-import Login from './Login';
-import Profile from './Profile';
-import MyPage from './MyPage';
+import Main from './pages/Main';
+import Login from './pages/Login';
+import Profile from './pages/Profile';
+import MyPage from './pages/MyPage';
 
 const App: React.FC = () => {
   const handleLogin = () => {
@@ -27,7 +27,7 @@ const App: React.FC = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<MainPage />} />
+        <Route path="/" element={<Main />} />
         <Route path="/login" element={<Login onLogin={handleLogin} />} />
         <Route path="/profile" element={<Profile />} />
         <Route

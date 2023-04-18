@@ -1,6 +1,6 @@
 import React from 'react';
-import Nickname from './Nickname';
-import ProfilePicture from './ProfilePicture';
+import Nickname from '../components/custom/Nickname';
+import ProfilePicture from '../components/custom/ProfilePicture';
 
 const Profile: React.FC = () => {
   return (

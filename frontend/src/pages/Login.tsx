@@ -1,16 +1,18 @@
 import React from 'react';
 import HoverButton from '../components/button/HoverButton';
 
-interface LoginProps {
-  onLogin: () => void;
-}
-
-const Login: React.FC<LoginProps> = ({ onLogin }) => {
+const Login: React.FC = () => {
   return (
     <div>
       <h1 className="mt-0 pt-14 text-center text-3xl text-white">6u!dpong</h1>
       <div className="flex items-center justify-center">
-        <HoverButton onClick={onLogin} className="mt-5 border-2 px-5 py-2.5">
+        <HoverButton
+          onClick={() =>
+            (window.location.href =
+              'https://localhost/api/v1/auth/social/callback/forty-two')
+          }
+          className="mt-5 border-2 px-5 py-2.5"
+        >
           42 LOGIN
         </HoverButton>
       </div>

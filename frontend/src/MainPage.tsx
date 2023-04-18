@@ -7,9 +7,15 @@ const MainPage: React.FC = () => {
 
   return (
     <div
-      className="flex min-h-screen w-screen items-center justify-center bg-black bg-cover bg-bottom bg-no-repeat"
+      className="flex min-h-screen w-screen items-center justify-center bg-black bg-cover bg-bottom bg-no-repeat font-press-start-2p text-white"
       style={{ backgroundImage: `url(${Settings.BACKGROUND_IMAGE})` }}
     >
+      <button
+        className="absolute right-0 top-0 m-4 rounded border border-white bg-black p-2.5 hover:bg-white hover:text-black"
+        onClick={() => navigate('/my-page')}
+      >
+        My Page
+      </button>
       <div className="group relative mx-10 w-1/3 text-center">
         <div className="border-8 border-white bg-black p-7 group-hover:scale-105 group-hover:border-pink-300 group-hover:bg-pink-300">
           <img

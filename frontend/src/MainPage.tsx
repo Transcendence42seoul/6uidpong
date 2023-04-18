@@ -7,7 +7,7 @@ const MainPage: React.FC = () => {
 
   return (
     <div
-      className="flex min-h-screen w-screen items-center justify-center bg-black bg-cover bg-bottom bg-no-repeat font-press-start-2p text-white"
+      className="flex min-h-screen w-screen items-center justify-center bg-cover bg-bottom bg-no-repeat font-press-start-2p text-white"
       style={{ backgroundImage: `url(${Settings.BACKGROUND_IMAGE})` }}
     >
       <button
@@ -23,9 +23,7 @@ const MainPage: React.FC = () => {
             alt="GAME"
             onClick={() => navigate('/game')}
           />
-          <h1 className="mt-7 font-press-start-2p text-4xl text-white group-hover:text-black">
-            GAME
-          </h1>
+          <h1 className="mt-7 text-4xl group-hover:text-black">GAME</h1>
         </div>
       </div>
       <div className="group relative mx-10 w-1/3 text-center">
@@ -35,9 +33,7 @@ const MainPage: React.FC = () => {
             alt="CHAT"
             onClick={() => navigate('/chat')}
           />
-          <h1 className="mt-7 font-press-start-2p text-4xl text-white group-hover:text-black">
-            CHAT
-          </h1>
+          <h1 className="mt-7 text-4xl group-hover:text-black">CHAT</h1>
         </div>
       </div>
     </div>

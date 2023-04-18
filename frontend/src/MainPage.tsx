@@ -1,15 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import Settings from './Settings';
 
 const MainPage: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div
-      className="flex min-h-screen w-screen items-center justify-center bg-cover bg-bottom bg-no-repeat font-press-start-2p text-white"
-      style={{ backgroundImage: `url(${Settings.BACKGROUND_IMAGE})` }}
-    >
+    <div className="flex min-h-screen items-center justify-center text-white">
       <button
         className="absolute right-0 top-0 m-4 rounded border border-white bg-black p-2.5 hover:bg-white hover:text-black"
         onClick={() => navigate('/my-page')}

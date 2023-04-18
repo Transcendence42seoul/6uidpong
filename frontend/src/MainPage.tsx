@@ -10,7 +10,7 @@ const MainPage: React.FC = () => {
       className="flex min-h-screen w-screen items-center justify-center bg-black bg-cover bg-bottom bg-no-repeat"
       style={{ backgroundImage: `url(${Settings.BACKGROUND_IMAGE})` }}
     >
-      <div className="group relative mx-10 text-center">
+      <div className="group relative mx-10 w-1/3 text-center">
         <div className="border-8 border-white bg-black p-7 group-hover:scale-105 group-hover:border-pink-300 group-hover:bg-pink-300">
           <img
             src="https://cdn-icons-png.flaticon.com/512/746/746020.png"
@@ -22,7 +22,7 @@ const MainPage: React.FC = () => {
           </h1>
         </div>
       </div>
-      <div className="group relative mx-10 text-center">
+      <div className="group relative mx-10 w-1/3 text-center">
         <div className="border-8 border-white bg-black p-7 group-hover:scale-105 group-hover:border-pink-300 group-hover:bg-pink-300">
           <img
             src="https://cdn-icons-png.flaticon.com/512/465/465227.png"

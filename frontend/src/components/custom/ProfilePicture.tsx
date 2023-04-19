@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
-function ProfilePicture() {
-  const [picture, setPicture] = useState("");
+const ProfilePicture = () => {
+  const [picture, setPicture] = useState('');
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setPicture(event.target.value);
@@ -21,6 +21,6 @@ function ProfilePicture() {
       </form>
     </div>
   );
-}
+};
 
 export default ProfilePicture;

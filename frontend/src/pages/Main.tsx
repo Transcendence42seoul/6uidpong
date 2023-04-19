@@ -15,18 +15,18 @@ const Main: React.FC = () => {
       >
         My Page
       </HoverButton>
-      <div className="group mx-10 w-1/3">
+      <button className="group mx-10 w-1/3" onClick={() => navigate('/game')}>
         <ContentBox className="border-8 p-7 group-hover:scale-105 group-hover:border-pink-300 group-hover:bg-pink-300">
-          <img src={Image.GAME} alt="GAME" onClick={() => navigate('/game')} />
+          <img src={Image.GAME} alt="GAME" />
           <h1 className="mt-7 text-4xl group-hover:text-black">GAME</h1>
         </ContentBox>
-      </div>
-      <div className="group mx-10 w-1/3">
+      </button>
+      <button className="group mx-10 w-1/3" onClick={() => navigate('/game')}>
         <ContentBox className="border-8 p-7 group-hover:scale-105 group-hover:border-pink-300 group-hover:bg-pink-300">
-          <img src={Image.CHAT} alt="CHAT" onClick={() => navigate('/chat')} />
+          <img src={Image.CHAT} alt="CHAT" />
           <h1 className="mt-7 text-4xl group-hover:text-black">CHAT</h1>
         </ContentBox>
-      </div>
+      </button>
     </div>
   );
 };

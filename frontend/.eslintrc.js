@@ -32,5 +32,5 @@ module.exports = {
     ],
     'react/require-default-props': 'off',
   },
-  overrides: [{}],
+  ignorePatterns: ['.eslintrc.js', 'tailwind.config.js'],
 };

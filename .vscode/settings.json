@@ -1,11 +1,11 @@
 {
   /* Settings */
+  "editor.codeActionsOnSave": {
+    "source.fixAll": true
+  },
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true,
 
   /* TypeScript */
-  "typescript.updateImportsOnFileMove.enabled": "always",
-
-  /* Prettier */
-  "prettier.singleQuote": true
+  "typescript.updateImportsOnFileMove.enabled": "always"
 }

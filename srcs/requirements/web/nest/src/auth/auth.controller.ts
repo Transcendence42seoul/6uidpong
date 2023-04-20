@@ -22,6 +22,11 @@ export class AuthController {
     @Req() req: any,
     @Res({ passthrough: true }) res: Response
   ): void {
-    res.status(HttpStatus.FOUND).redirect("/profile");
+    const user = req.user;
+    if (user.nickname == undefined) {
+      res.status(HttpStatus.FOUND).redirect("/profile");
+    } else {
+      res.status(HttpStatus.FOUND).redirect("/profile");
+    }
   }
 }

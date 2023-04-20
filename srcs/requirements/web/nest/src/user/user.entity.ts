@@ -1,17 +1,21 @@
-import { BaseEntity, Column, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
-export class UserEntity extends BaseEntity {
+@Entity("users")
+export class UserEntity {
+  constructor(token_id?: number, email?: string, profile_image?: string) {
+    this.token_id = token_id;
+    this.email = email;
+    this.profile_image = profile_image;
+  }
+
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ unique: true })
+  @Column({ unique: true, nullable: true })
   nickname: string;
 
-  @Column()
-  token_id: string;
-
-  @Column()
-  password: string;
+  @Column({ unique: true })
+  token_id: number;
 
   @Column()
   email: string;
@@ -29,6 +33,10 @@ export class UserEntity extends BaseEntity {
   })
   updated_at: Date;
 
-  @Column({ type: "timestamp", nullable: true })
+  @Column({
+    type: "timestamp",
+    default: () => "CURRENT_TIMESTAMP",
+    onUpdate: "CURRENT_TIMESTAMP",
+  })
   last_login_at: Date;
 }

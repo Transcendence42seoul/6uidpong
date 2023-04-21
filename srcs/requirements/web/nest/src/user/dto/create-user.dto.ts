@@ -1,15 +1,20 @@
 import { IsNotEmpty, IsEmail, IsUrl } from "class-validator";
 import { UserEntity } from "../user.entity";
+import { v4 as uuidv4 } from "uuid";
 
 export class CreateUserDto {
-  constructor(token_id: number, email: string, profile_image: string) {
-    this.token_id = token_id;
+  constructor(id: number, email: string, profileImage: string) {
+    this.id = id;
+    this.nickname = uuidv4();
     this.email = email;
-    this.profile_image = profile_image;
+    this.profileImage = profileImage;
   }
 
   @IsNotEmpty()
-  token_id: number;
+  id: number;
+
+  @IsNotEmpty()
+  nickname: string;
 
   @IsNotEmpty()
   @IsEmail()
@@ -17,9 +22,14 @@ export class CreateUserDto {
 
   @IsNotEmpty()
   @IsUrl()
-  profile_image: string;
+  profileImage: string;
 
   toEntity(): UserEntity {
-    return new UserEntity(this.token_id, this.email, this.profile_image);
+    return new UserEntity(
+      this.id,
+      this.nickname,
+      this.email,
+      this.profileImage
+    );
   }
 }

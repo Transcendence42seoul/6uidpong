@@ -1,42 +1,54 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity("users")
 export class UserEntity {
-  constructor(token_id?: number, email?: string, profile_image?: string) {
-    this.token_id = token_id;
+  constructor(
+    id?: number,
+    nickname?: string,
+    email?: string,
+    profileImage?: string
+  ) {
+    this.id = id;
+    this.nickname = nickname;
     this.email = email;
-    this.profile_image = profile_image;
+    this.profileImage = profileImage;
   }
 
-  @PrimaryGeneratedColumn()
+  @PrimaryColumn()
   id: number;
 
-  @Column({ unique: true, nullable: true })
-  nickname: string;
-
   @Column({ unique: true })
-  token_id: number;
+  nickname: string;
 
   @Column()
   email: string;
 
-  @Column()
-  profile_image: string;
+  @Column({ name: "profile_image" })
+  profileImage: string;
 
-  @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
-  created_at: Date;
+  @Column({ name: "is_two_factor", type: "boolean", default: false })
+  isTwoFactor: boolean;
 
   @Column({
+    name: "created_at",
+    type: "timestamp",
+    default: () => "CURRENT_TIMESTAMP",
+  })
+  createdAt: Date;
+
+  @Column({
+    name: "updateAt",
     type: "timestamp",
     default: () => "CURRENT_TIMESTAMP",
     onUpdate: "CURRENT_TIMESTAMP",
   })
-  updated_at: Date;
+  updatedAt: Date;
 
   @Column({
+    name: "last_login_at",
     type: "timestamp",
     default: () => "CURRENT_TIMESTAMP",
     onUpdate: "CURRENT_TIMESTAMP",
   })
-  last_login_at: Date;
+  lastLoginAt: Date;
 }

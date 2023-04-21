@@ -11,8 +11,8 @@ export class UserService {
     private readonly userRepository: Repository<UserEntity>
   ) {}
 
-  async findUser(token_id: number): Promise<UserEntity> {
-    const user = await this.userRepository.findOne({ where: { token_id } });
+  async findUser(id: number): Promise<UserEntity> {
+    const user = await this.userRepository.findOne({ where: { id } });
     return user;
   }
 

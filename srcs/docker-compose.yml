@@ -45,10 +45,6 @@ services:
     restart: always
 volumes:
   db-volume:
-    driver_opts:
-      o: bind
-      type: none
-      device: ${HOME}/data/postgres
 networks:
   transcendence:
     driver: bridge

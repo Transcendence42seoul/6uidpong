@@ -7,7 +7,7 @@ import HoverButton from '../components/button/HoverButton';
 
 interface Profile {
   nickname: string;
-  picture: string;
+  image: string;
 }
 
 interface Stats {
@@ -41,11 +41,7 @@ const MyPage: React.FC<MyPageProps> = ({ stats }) => {
         <h2 className="mt-2 text-2xl font-bold">
           {profile?.nickname ?? 'Loading...'}
         </h2>
-        <img
-          className="rounded-full p-7"
-          src={profile?.picture}
-          alt="Profile"
-        />
+        <img className="rounded-full p-7" src={profile?.image} alt="Profile" />
       </ContentBox>
       <HoverButton
         onClick={() => navigate('/profile')}

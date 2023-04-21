@@ -48,7 +48,7 @@ volumes:
     driver_opts:
       o: bind
       type: none
-      device: /Users/son-yeong-won/data/postgres
+      device: /Users/wocheon/data/postgres
 networks:
   transcendence:
     driver: bridge

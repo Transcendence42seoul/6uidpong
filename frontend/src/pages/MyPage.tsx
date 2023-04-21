@@ -1,4 +1,5 @@
-import React from 'react';
+import axios from 'axios';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import ContentBox from '../components/box/ContentBox';
@@ -17,18 +18,34 @@ interface Stats {
 }
 
 interface MyPageProps {
-  profile: Profile;
   stats: Stats;
 }
 
-const MyPage: React.FC<MyPageProps> = ({ profile, stats }) => {
+const MyPage: React.FC<MyPageProps> = ({ stats }) => {
   const navigate = useNavigate();
+  const [profile, setProfile] = useState<Profile | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await axios.get<Profile>(
+        'https://localhost/api/v1/users/id',
+      );
+      setProfile(response.data);
+    };
+    fetchData();
+  }, []);
 
   return (
     <div className="flex flex-col items-center p-4">
       <ContentBox className="mb-4 w-full max-w-md border p-4">
-        <h2 className="mt-2 text-2xl font-bold">{profile.nickname}</h2>
-        <img className="rounded-full p-7" src={profile.picture} alt="Profile" />
+        <h2 className="mt-2 text-2xl font-bold">
+          {profile?.nickname ?? 'Loading...'}
+        </h2>
+        <img
+          className="rounded-full p-7"
+          src={profile?.picture}
+          alt="Profile"
+        />
       </ContentBox>
       <HoverButton
         onClick={() => navigate('/profile')}

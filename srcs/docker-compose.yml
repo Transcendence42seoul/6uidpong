@@ -48,7 +48,7 @@ volumes:
     driver_opts:
       o: bind
       type: none
-      device: /Users/wocheon/data/postgres
+      device: ${HOME}/data/postgres
 networks:
   transcendence:
     driver: bridge

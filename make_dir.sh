@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [ ! -d "~/data" ]; then
-        mkdir ~/data
-        mkdir ~/data/postgres
+if [ ! -d "$HOME/data" ]; then
+        mkdir -p $HOME/data
+        mkdir -p $HOME/data/postgres
 fi

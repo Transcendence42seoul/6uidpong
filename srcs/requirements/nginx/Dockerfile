@@ -10,7 +10,7 @@ COPY react .
 RUN npm install && \
     npm run build
 
-FROM nginx:stable-alpine3.17 
+FROM nginx:stable-alpine3.17
 
 EXPOSE 80 443
 
@@ -23,4 +23,4 @@ RUN apk update && \
 RUN rm /etc/nginx/conf.d/default.conf
 COPY conf/nginx.conf /etc/nginx/conf.d/
 
-COPY --from=builder app/build  /usr/share/nginx/html
+COPY --from=builder app/build /usr/share/nginx/html

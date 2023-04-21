@@ -1,5 +1,12 @@
 version: "3"
 
+networks:
+  transcendence:
+    driver: bridge
+
+volumes:
+  db-volume:
+
 services:
   postgres:
     container_name: postgres
@@ -43,12 +50,3 @@ services:
     networks:
       - transcendence
     restart: always
-volumes:
-  db-volume:
-    driver_opts:
-      o: bind
-      type: none
-      device: ${HOME}/data/postgres
-networks:
-  transcendence:
-    driver: bridge

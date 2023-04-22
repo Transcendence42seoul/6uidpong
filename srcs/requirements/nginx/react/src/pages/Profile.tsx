@@ -4,7 +4,7 @@ import HoverButton from "../components/button/HoverButton";
 import Nickname from "../components/custom/Nickname";
 import ContentBox from "../components/box/ContentBox";
 import ProfilePicture from "../components/custom/ProfilePicture";
-import EmailVerification from "../components/auth/EmailVerification";
+import TwoFactorAuth from "../components/auth/TwoFactorAuth";
 
 const Profile: React.FC = () => {
   const navigate = useNavigate();
@@ -18,7 +18,7 @@ const Profile: React.FC = () => {
         <ProfilePicture />
       </ContentBox>
       <ContentBox className="mb-4 w-full max-w-md flex-col border p-4">
-        <EmailVerification />
+        <TwoFactorAuth />
       </ContentBox>
       <HoverButton
         onClick={() => navigate("/")}

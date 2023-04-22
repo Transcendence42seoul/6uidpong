@@ -2,10 +2,11 @@ import { Injectable } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
 import { Strategy, VerifyCallBack } from "passport-42";
 import { CreateUserDto } from "src/user/dto/create-user.dto";
+import { UserService } from "src/user/user.service";
 
 @Injectable()
 export class FtStrategy extends PassportStrategy(Strategy, "42") {
-  constructor() {
+  constructor(private readonly userService: UserService) {
     super({
       clientID: process.env.OAUTH_42_CLIENT_ID,
       clientSecret: process.env.OAUTH_42_CLIENT_SECRET,
@@ -19,11 +20,16 @@ export class FtStrategy extends PassportStrategy(Strategy, "42") {
     profile: any,
     done: VerifyCallBack
   ): Promise<void> {
-    const user: CreateUserDto = {
-      token_id: profile.id,
-      email: profile.emails[0].value,
-      profile_image: profile.profileUrl,
-    };
+    let user = await this.userService.findUser(profile.id);
+    if (!user) {
+      user = await this.userService.createUser(
+        new CreateUserDto(
+          profile.id,
+          profile.emails[0].value,
+          profile._json.image.link
+        )
+      );
+    }
     done(null, user);
   }
 }

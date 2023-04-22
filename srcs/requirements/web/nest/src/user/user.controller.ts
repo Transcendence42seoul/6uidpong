@@ -17,7 +17,7 @@ export class UserController {
     return this.userService.verifyTwoFactorAuth(email, isTwoFactor);
   }
 
-  @Post("/verifyVerificationCode")
+  @Post("/:verifyVerificationCode")
   async verifyVerificationCode(@Body() { email, code }: { email: string, code: string }): Promise<boolean> {
     return this.userService.verifyVerificationCode(email, code);
   }

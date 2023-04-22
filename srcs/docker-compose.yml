@@ -1,12 +1,5 @@
 version: "3"
 
-networks:
-  transcendence:
-    driver: bridge
-
-volumes:
-  db-volume:
-
 services:
   postgres:
     container_name: postgres
@@ -54,3 +47,10 @@ services:
       - "80:80"
       - "443:443"
     restart: always
+
+networks:
+  transcendence:
+    driver: bridge
+
+volumes:
+  db-volume:

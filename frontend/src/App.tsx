@@ -53,7 +53,10 @@ const App: React.FC = () => {
         <Route path="/" element={<Main />} />
         <Route path="/login" element={<Login />} />
         <Route path="/profile" element={<Profile />} />
-        <Route path="/my-page" element={<MyPage stats={stats} />} />
+        <Route
+          path="/my-page"
+          element={<MyPage id={accessToken?.id} stats={stats} />}
+        />
       </Routes>
     </BrowserRouter>
   );

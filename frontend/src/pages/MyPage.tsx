@@ -18,16 +18,17 @@ interface Stats {
 }
 
 interface MyPageProps {
+  id: string | undefined;
   stats: Stats;
 }
 
-const MyPage: React.FC<MyPageProps> = ({ stats }) => {
+const MyPage: React.FC<MyPageProps> = ({ id, stats }) => {
   const navigate = useNavigate();
   const [profile, setProfile] = useState<Profile | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await axios.get<Profile>('/api/v1/users/id');
+      const response = await axios.get<Profile>(`/api/v1/users/${id}`);
       setProfile(response.data);
     };
     fetchData();

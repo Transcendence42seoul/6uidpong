@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import axios from 'axios';
 import Main from './pages/Main';
 import Login from './pages/Login';
 import Profile from './pages/Profile';
@@ -12,6 +13,25 @@ const App: React.FC = () => {
     ladderScore: 4242,
     recentHistory: ['Win', 'Loss', 'Win', 'Win', 'Loss'],
   };
+
+  useEffect(() => {
+    async function sendAuthCode() {
+      const url = new URL(window.location.href);
+      const code = url.searchParams.get('code');
+      await axios.get('/api/v1/auth/social/callback/forty-two', {
+        params: {
+          code,
+        },
+      });
+    }
+
+    if (
+      window.location.href ===
+      'https://localhost/auth/social/callback/forty-two'
+    ) {
+      sendAuthCode();
+    }
+  }, []);
 
   return (
     <BrowserRouter>

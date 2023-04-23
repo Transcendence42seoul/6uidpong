@@ -54,10 +54,7 @@ const App: React.FC = () => {
       }
     };
 
-    if (
-      window.location.href ===
-      'https://localhost/auth/social/callback/forty-two'
-    ) {
+    if (url.pathname === '/auth/social/callback/forty-two') {
       fetchToken();
       return;
     }

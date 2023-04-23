@@ -31,7 +31,7 @@ const App: React.FC = () => {
     ) {
       sendAuthCode();
     }
-  }, []);
+  }, [window.location.href]);
 
   return (
     <BrowserRouter>

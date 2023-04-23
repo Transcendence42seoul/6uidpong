@@ -4,6 +4,7 @@ import { Strategy, VerifyCallBack } from "passport-42";
 import { CreateUserDto } from "src/user/dto/create-user.dto";
 import { UserService } from "src/user/user.service";
 
+
 @Injectable()
 export class FtStrategy extends PassportStrategy(Strategy, "42") {
   constructor(private readonly userService: UserService) {

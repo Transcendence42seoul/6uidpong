@@ -3,7 +3,7 @@ DOCKER_COMPOSE_FILE	:=	srcs/docker-compose.yml
 PROJECT_NAME	:=	transcendence
 
 all:
-	$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) up --build -d
+	$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) up --build
 
 up:
 	$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) up

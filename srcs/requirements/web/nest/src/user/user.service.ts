@@ -62,11 +62,13 @@ export class UserService {
 
   private async sendVerificationCodeByEmail(email: string, verificationCode: string): Promise<void> {
     // Nodemailer를 사용하여 이메일 전송 설정
-    const emailUser = process.env.EMAIL_USER;
-    const emailPass = process.env.EMAIL_PASS;
+    const emailUser:string = process.env.EMAIL_USER;
+    const emailPass:string = process.env.EMAIL_PASS;
+    console.log(emailUser + " " + emailPass);
+
     const transporter = nodemailer.createTransport({
       host: 'smtp.gmail.com',
-      port: 465,
+      port: 587,
       secure: false, // SSL 사용
       service: 'gmail',
       auth: {
@@ -74,13 +76,21 @@ export class UserService {
         pass: emailPass, // 발신자 이메일 비밀번호
       },
     });
-    // 이메일 전송
-    await transporter.sendMail({
-      from: emailUser, // 발신자 이메일 주소
+    const mailOptions = {
+      from: "6uidpong@42seoul.kr", // 발신자 이메일 주소
       to: email, // 수신자 이메일 주소
       subject: 'Verification Code', // 이메일 제목
       text: `Your verification code is: ${verificationCode}`, // 이메일 본문
+    };
+
+    // 이메일 전송
+    await transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error(error);
+      }
+      else {
+        console.log('Email sent: ' + info.response);
+      }
     });
-    console.log(`Verification code sent to ${email}`); // 성공적으로 전송되었을 경우 로그 출력
   }
 }

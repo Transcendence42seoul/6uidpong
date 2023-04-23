@@ -20,11 +20,13 @@ const App: React.FC = () => {
     ladderScore: 4242,
     recentHistory: ['Win', 'Loss', 'Win', 'Win', 'Loss'],
   };
+  const [jwt, setJwt] = useState<string | null>(null);
   const [accessToken, setAccessToken] = useState<AccessToken | null>(null);
 
   useEffect(() => {
+    const url = new URL(window.location.href);
+
     const fetchToken = async () => {
-      const url = new URL(window.location.href);
       const code = url.searchParams.get('code');
       const response = await axios.get(
         '/api/v1/auth/social/callback/forty-two',
@@ -34,9 +36,22 @@ const App: React.FC = () => {
           },
         },
       );
-      const { accessToken: jwt } = response.data;
-      const payload = jwt_decode<AccessToken>(jwt);
+      const { accessToken: token } = response.data;
+      const payload = jwt_decode<AccessToken>(token);
+      setJwt(token);
       setAccessToken(payload);
+    };
+
+    const callAPI = async () => {
+      try {
+        await axios.get(url.pathname, {
+          headers: {
+            Authorization: `Bearer ${jwt}`,
+          },
+        });
+      } catch (error) {
+        setAccessToken(null);
+      }
     };
 
     if (
@@ -44,7 +59,9 @@ const App: React.FC = () => {
       'https://localhost/auth/social/callback/forty-two'
     ) {
       fetchToken();
+      return;
     }
+    callAPI();
   }, [window.location.href]);
 
   return (

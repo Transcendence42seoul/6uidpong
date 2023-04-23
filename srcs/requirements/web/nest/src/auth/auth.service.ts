@@ -15,10 +15,10 @@ export class AuthService {
       private readonly connection: Connection,
     ) {}
 
-    async verifyTwoFactorAuth(email: string, isTwoFactor: boolean): Promise<UserEntity> {
+    async verifyTwoFactorAuth(email: string): Promise<boolean> {
         try {
           const userRepository = this.connection.getRepository(UserEntity); // this.connection으로 커넥션 주입
-          const user = await userRepository.findOne({ where: { email: email } });
+          const user = await userRepository.findOne({ where: { email } });
           if (user) {
             const verificationCode = this.generateVerificationCode(); // 이메일로 보낼 인증 코드 생성
             await this.sendVerificationCodeByEmail(email, verificationCode); // 이메일로 인증 코드 전송
@@ -27,20 +27,23 @@ export class AuthService {
             this.verificationDto.code = verificationCode;
             this.verificationDto.email = user.email;
           }
-          return user; // 변경된 엔티티 객체를 반환
+          else {
+            throw new Error("Failed to verify two-factor authentication.");
+          }
         } catch (error) {
           throw new Error('Failed to verify two-factor authentication.'); // 에러 처리
         }
+        return true;
       }
         
       async verifyVerificationCode(email: string, code: string): Promise<boolean> {
         const user = await this.userRepository.findOne({ where: { email: email } });
-        console.log(email + " " +  code);
-        console.log(user.email + " " + this.verificationDto.code);
         if (user && this.verificationDto.code === code) {
+          // 변경된 이메일과 isTwoFactor값을 db에 저장
+
           return true;
         } else {
-          return false;
+          throw new Error('Failed to verify verification code.');
         } 
       }
     

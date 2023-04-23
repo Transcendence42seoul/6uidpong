@@ -18,8 +18,7 @@ const TwoFactorAuth = () => {
   const [openModal, setOpenModal] = useState(false);
   const [email, setEmail] = useState("");
   const [sendmail, setSendmail] = useState(false);
-  const [verificationCode, setVerificationCode] = useState("");
-  const [isTwoFactorVerified, setIsTwoFactorVerified] = useState(false);
+  const [code, setCode] = useState("");
 
   const handleOpenModal = () => {
     setOpenModal(true);
@@ -32,15 +31,13 @@ const TwoFactorAuth = () => {
   const handleSetIsTwoFactorVerified = () => {
     // 이메일 보내는 POST 요청 처리
     axios
-      .post("/api/v1/auth/isTwoFactor", { email, isTwoFactorVerified })
-      .then((response: AxiosResponse<UserEntity>) => {
+      .post("/api/v1/auth/isTwoFactor", { email })
+      .then((response: AxiosResponse<boolean>) => {
         // 이메일이 성공적으로 보내진 경우, 인증코드 작성 창이 나타나도록 상태 변경
-        const userData: UserEntity = response.data;
         setSendmail(true);
       })
       .catch((error: AxiosError) => {
-        // 이메일 보내기 실패 시, 에러 처리
-        console.error("Failed to send email:", error);
+        alert("이메일 잘못된듯");
       });
   };
 
@@ -49,16 +46,14 @@ const TwoFactorAuth = () => {
     axios
       .post("/api/v1/auth/verifyVerificationCode", {
         email,
-        verificationCode,
+        code,
       })
-      .then((response: AxiosResponse<UserEntity>) => {
+      .then((response: AxiosResponse<boolean>) => {
         // 인증코드가 올바른 경우, 추가 로직 처리
-        const userData: UserEntity = response.data;
         alert("2차 인증 완료!");
       })
       .catch((error: AxiosError) => {
-        // 인증코드가 올바르지 않은 경우, 에러 처리
-        console.error("Failed to verify verification code:", error);
+        alert("인증번호 틀렸음");
       });
   };
 
@@ -86,11 +81,9 @@ const TwoFactorAuth = () => {
                   <h1>Verification Code</h1>
                   <input
                     type="text"
-                    name="verificationCode"
-                    value={verificationCode}
-                    onChange={(event) =>
-                      setVerificationCode(event.target.value)
-                    }
+                    name="code"
+                    value={code}
+                    onChange={(event) => setCode(event.target.value)}
                     style={{ color: "black" }}
                   />
                   <button onClick={handleVerifyVerificationCode}>Submit</button>

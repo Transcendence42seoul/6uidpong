@@ -14,7 +14,8 @@
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.10.0",
     "typescript": "^4.9.5",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "@headlessui/react": "1.7.14"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -41,6 +42,7 @@
     ]
   },
   "devDependencies": {
+    "@headlessui/react": "1.7.14",
     "axios": "^0.24.0",
     "axios-mock-adapter": "^1.19.1",
     "prettier-plugin-tailwindcss": "^0.2.7",

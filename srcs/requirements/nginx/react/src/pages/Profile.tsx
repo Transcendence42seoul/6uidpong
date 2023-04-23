@@ -4,7 +4,7 @@ import HoverButton from "../components/button/HoverButton";
 import Nickname from "../components/custom/Nickname";
 import ContentBox from "../components/box/ContentBox";
 import ProfilePicture from "../components/custom/ProfilePicture";
-import TwoFactorAuth from "../components/auth/TwoFactorAuth";
+import TwoFactorAuth from "../components/custom/TwoFactorAuth";
 
 const Profile: React.FC = () => {
   const navigate = useNavigate();

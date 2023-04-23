@@ -35,15 +35,16 @@ export class AuthService {
         
       async verifyVerificationCode(email: string, code: string): Promise<boolean> {
         const user = await this.userRepository.findOne({ where: { email: email } });
-    
+        console.log(email + " " +  code);
+        console.log(user.email + " " + this.verificationDto.code);
         if (user && this.verificationDto.code === code) {
           return true;
         } else {
           return false;
-        }
+        } 
       }
     
-      private generateVerificationCode(): string {
+      private generateVerificationCode() {
         const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
         return verificationCode;
       }
@@ -52,7 +53,6 @@ export class AuthService {
         // Nodemailer를 사용하여 이메일 전송 설정
         const emailUser:string = process.env.EMAIL_USER;
         const emailPass:string = process.env.EMAIL_PASS;
-        console.log(emailUser + " " + emailPass);
     
         const transporter = nodemailer.createTransport({
           host: 'smtp.gmail.com',

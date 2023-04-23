@@ -59,7 +59,7 @@ const App: React.FC = () => {
       return;
     }
     callAPI();
-  }, [window.location.href]);
+  });
 
   return (
     <BrowserRouter>

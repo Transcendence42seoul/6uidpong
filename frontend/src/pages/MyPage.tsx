@@ -27,9 +27,7 @@ const MyPage: React.FC<MyPageProps> = ({ stats }) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await axios.get<Profile>(
-        'https://localhost/api/v1/users/id',
-      );
+      const response = await axios.get<Profile>('/api/v1/users/id');
       setProfile(response.data);
     };
     fetchData();

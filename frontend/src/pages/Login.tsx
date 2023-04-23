@@ -9,7 +9,7 @@ const Login: React.FC = () => {
         <HoverButton
           onClick={() => {
             window.location.href =
-              'https://localhost/api/v1/auth/social/callback/forty-two';
+              'https://localhost/api/v1/auth/social/redirect/forty-two';
           }}
           className="mt-5 border-2 px-5 py-2.5"
         >

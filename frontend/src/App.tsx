@@ -49,15 +49,20 @@ const App: React.FC = () => {
 
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Main />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route
-          path="/my-page"
-          element={<MyPage id={accessToken?.id} stats={stats} />}
-        />
-      </Routes>
+      {accessToken ? (
+        <Routes>
+          <Route path="/" element={<Main />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route
+            path="/my-page"
+            element={<MyPage id={accessToken.id} stats={stats} />}
+          />
+        </Routes>
+      ) : (
+        <Routes>
+          <Route path="*" element={<Login />} />
+        </Routes>
+      )}
     </BrowserRouter>
   );
 };

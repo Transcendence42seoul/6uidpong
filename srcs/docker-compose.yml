@@ -25,6 +25,7 @@ services:
       DB_NAME: ${DB_NAME}
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
     depends_on:
       - postgres
     networks:

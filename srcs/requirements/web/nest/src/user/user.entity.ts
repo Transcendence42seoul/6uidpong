@@ -2,14 +2,8 @@ import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity("users")
 export class UserEntity {
-  constructor(
-    id?: number,
-    nickname?: string,
-    email?: string,
-    profileImage?: string
-  ) {
+  constructor(id?: number, email?: string, profileImage?: string) {
     this.id = id;
-    this.nickname = nickname;
     this.email = email;
     this.profileImage = profileImage;
   }
@@ -17,7 +11,7 @@ export class UserEntity {
   @PrimaryColumn()
   id: number;
 
-  @Column({ unique: true })
+  @Column({ unique: true, nullable: true })
   nickname: string;
 
   @Column()

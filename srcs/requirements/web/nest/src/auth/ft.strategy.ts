@@ -10,7 +10,7 @@ export class FtStrategy extends PassportStrategy(Strategy, "42") {
     super({
       clientID: process.env.OAUTH_42_CLIENT_ID,
       clientSecret: process.env.OAUTH_42_CLIENT_SECRET,
-      callbackURL: `https://${process.env.HOST_NAME}/api/v1/auth/social/callback/forty-two`,
+      callbackURL: `https://${process.env.HOST_NAME}/auth/social/callback/forty-two`,
     });
   }
 

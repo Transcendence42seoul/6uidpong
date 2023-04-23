@@ -8,17 +8,9 @@ export class CreateUserDto {
     this.profileImage = profileImage;
   }
 
-  @IsNotEmpty()
   id: number;
-
   nickname: string;
-
-  @IsNotEmpty()
-  @IsEmail()
   email: string;
-
-  @IsNotEmpty()
-  @IsUrl()
   profileImage: string;
 
   toEntity(): UserEntity {

@@ -12,8 +12,6 @@ export class AuthService {
       nickname: user.nickname,
       isTwoFactor: user.isTwoFactor,
     };
-    return {
-      accessToken: await this.jwtService.signAsync(payload),
-    };
+    return await this.jwtService.signAsync(payload);
   }
 }

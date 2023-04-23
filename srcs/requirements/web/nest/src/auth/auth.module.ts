@@ -2,7 +2,6 @@ import { forwardRef, Module } from "@nestjs/common";
 import { JwtModule } from "@nestjs/jwt";
 import { UserModule } from "src/user/user.module";
 import { AuthController } from "./auth.controller";
-import { FtAuthGuard } from "./ft.guard";
 import { AuthService } from "./auth.service";
 import { FtStrategy } from "./ft.strategy";
 import { JwtGuard } from "./jwt.guard";
@@ -17,6 +16,6 @@ import { JwtGuard } from "./jwt.guard";
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, FtStrategy, FtAuthGuard, JwtGuard],
+  providers: [AuthService, FtStrategy, JwtGuard],
 })
 export class AuthModule {}

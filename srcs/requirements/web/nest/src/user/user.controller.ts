@@ -10,11 +10,11 @@ import { UserEntity } from "./user.entity";
 import { JwtGuard } from "src/auth/jwt.guard";
 
 @Controller("api/v1/users")
+@UseGuards(JwtGuard)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get("/:id")
-  @UseGuards(JwtGuard)
   async getUser(@Req() req: any): Promise<UserEntity> {
     if (req.user.id != req.params.id) {
       throw new UnauthorizedException();

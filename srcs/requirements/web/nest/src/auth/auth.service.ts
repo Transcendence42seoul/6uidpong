@@ -18,7 +18,9 @@ export class AuthService {
     async verifyTwoFactorAuth(email: string): Promise<boolean> {
         try {
           const userRepository = this.connection.getRepository(UserEntity); // this.connection으로 커넥션 주입
-          const user = await userRepository.findOne({ where: { email } });
+          const user = await userRepository.findOne({ where: { email:email } });
+
+          console.log(user.email + " " + email);
           if (user) {
             const verificationCode = this.generateVerificationCode(); // 이메일로 보낼 인증 코드 생성
             await this.sendVerificationCodeByEmail(email, verificationCode); // 이메일로 인증 코드 전송
@@ -40,7 +42,6 @@ export class AuthService {
         const user = await this.userRepository.findOne({ where: { email: email } });
         if (user && this.verificationDto.code === code) {
           // 변경된 이메일과 isTwoFactor값을 db에 저장
-
           return true;
         } else {
           throw new Error('Failed to verify verification code.');
@@ -56,7 +57,7 @@ export class AuthService {
         // Nodemailer를 사용하여 이메일 전송 설정
         const emailUser:string = process.env.EMAIL_USER;
         const emailPass:string = process.env.EMAIL_PASS;
-    
+
         const transporter = nodemailer.createTransport({
           host: 'smtp.gmail.com',
           port: 587,

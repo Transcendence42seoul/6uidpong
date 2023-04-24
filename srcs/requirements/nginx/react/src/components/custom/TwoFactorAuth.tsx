@@ -61,11 +61,13 @@ const TwoFactorAuth = () => {
     <div>
       <HoverButton onClick={handleOpenModal}>인증 활성화</HoverButton>
       <Modal isOpen={openModal} onClose={handleCloseModal}>
-        <div className="h-screen">
+        <div style={{ pointerEvents: "auto" }}>
           {openModal ? (
             <>
-              <h1>Verify Two-Factor Authentication</h1>
-              <p>
+              <h1 className="text-2xl font-bold text-white">
+                Verify Two-Factor Authentication
+              </h1>
+              <p className="mt-5 text-white">
                 Please enter your email address to receive a verification code.
               </p>
               <input
@@ -73,20 +75,32 @@ const TwoFactorAuth = () => {
                 name="email"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
-                style={{ color: "black" }}
+                className="w-full my-4 max-w-md py-2 px-4 border border-gray-400 rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
               />
-              <button onClick={handleSetIsTwoFactorVerified}>Verify</button>
+              <HoverButton
+                onClick={handleSetIsTwoFactorVerified}
+                className="w-full my-2 max-w-md rounded border p-2.5"
+              >
+                Verify
+              </HoverButton>
               {sendmail && (
                 <>
-                  <h1>Verification Code</h1>
+                  <h1 className="text-2xl mt-5 font-bold text-white">
+                    Verification Code
+                  </h1>
                   <input
                     type="text"
                     name="code"
                     value={code}
                     onChange={(event) => setCode(event.target.value)}
-                    style={{ color: "black" }}
+                    className="w-full my-4 max-w-md py-2 px-4 border border-gray-400 rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                   />
-                  <button onClick={handleVerifyVerificationCode}>Submit</button>
+                  <HoverButton
+                    onClick={handleVerifyVerificationCode}
+                    className="my-2 w-full max-w-md rounded border p-2.5"
+                  >
+                    Submit
+                  </HoverButton>
                 </>
               )}
             </>

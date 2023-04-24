@@ -24,7 +24,7 @@ const Profile: React.FC = () => {
         onClick={() => navigate("/")}
         className="mb-4 w-full max-w-md rounded border p-2.5"
       >
-        홈으로
+        Home
       </HoverButton>
     </div>
   );

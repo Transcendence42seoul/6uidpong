@@ -7,7 +7,6 @@ import {
   HttpStatus,
   Post,
   Body,
-  Param
 } from "@nestjs/common";
 
 import express, { Response } from "express";
@@ -37,7 +36,7 @@ export class AuthController {
   }
 
   @Post("/isTwoFactor")
-  async verifyTwoFactorAuth(@Param("email") email: string ): Promise<boolean> {
+  async verifyTwoFactorAuth(@Body() {email} ): Promise<boolean> {
     return this.authService.verifyTwoFactorAuth(email);
   }
 

@@ -9,7 +9,6 @@ import {
 import { Response } from "express";
 import { AuthService } from "./auth.service";
 import { UserService } from "src/user/user.service";
-import { CreateUserDto } from "src/user/dto/create-user.dto";
 
 const OAUTH_42_LOGIN_URL = `https://api.intra.42.fr/oauth/authorize?client_id=${process.env.OAUTH_42_CLIENT_ID}&redirect_uri=https://${process.env.HOST_NAME}/auth/social/callback/forty-two&response_type=code&scope=public`;
 
@@ -35,9 +34,7 @@ export class AuthController {
     const profile = await this.authService.receiveOAuthProfile(code);
     let user = await this.userService.findUser(profile.id);
     if (!user) {
-      user = await this.userService.createUser(
-        new CreateUserDto(profile.id, profile.email, profile.image)
-      );
+      user = await this.userService.createUser(profile);
     }
     const refreshToken = await this.authService.generateRefreshToken(user.id);
     res.cookie("REF-TOKEN", refreshToken, {

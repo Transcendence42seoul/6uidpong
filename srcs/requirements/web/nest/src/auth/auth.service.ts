@@ -2,6 +2,7 @@ import { HttpService } from "@nestjs/axios";
 import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { lastValueFrom } from "rxjs";
+import { CreateUserDto } from "src/user/dto/create-user.dto";
 import { UserEntity } from "src/user/user.entity";
 
 @Injectable()
@@ -32,7 +33,7 @@ export class AuthService {
     }
   }
 
-  async receiveOAuthProfile(code: string): Promise<any> {
+  async receiveOAuthProfile(code: string): Promise<CreateUserDto> {
     const accessToken = await this.receiveOauthAccessToken(code);
     const headers = { Authorization: `Bearer ${accessToken}` };
     const { data } = await lastValueFrom(
@@ -40,11 +41,7 @@ export class AuthService {
         headers,
       })
     );
-    return {
-      id: data.id,
-      email: data.email,
-      image: data.image.link,
-    };
+    return new CreateUserDto(data.id, data.email, data.image.link);
   }
 
   async generateAccessToken(user: UserEntity): Promise<any> {

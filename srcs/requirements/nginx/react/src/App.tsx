@@ -1,52 +1,82 @@
-import React, { useEffect } from 'react';
+import axios from 'axios';
+import jwt_decode from 'jwt-decode';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Login from './Login';
-import Profile from './Profile';
+import Main from './pages/Main';
+import Login from './pages/Login';
+import Profile from './pages/Profile';
+import MyPage from './pages/MyPage';
 
-const client_id = 'CLIENT_ID';
-const client_secret = 'CLIENT_SECRET';
-const redirect_uri = 'REDIRECT_URI';
+interface AccessToken {
+  id: string;
+  nickname: string;
+  isTwoFactor: string;
+}
 
 const App: React.FC = () => {
-  useEffect(() => {
-    // 쿼리 문자열에 인증 코드가 있는지 확인
-    const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get('code');
-    if (code) {
-      // 인증 코드로부터 액세스 토큰 요청
-      fetch('https://api.intra.42.fr/oauth/token', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-          grant_type: 'authorization_code',
-          client_id,
-          client_secret,
-          code,
-          redirect_uri,
-        }),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          // 액세스 토큰 저장
-          localStorage.setItem('access_token', data.access_token);
-        });
-    }
-  }, []);
-
-  const handleLogin = () => {
-    // 사용자를 인증 서버로 리다이렉션
-    const url = `https://localhost/api/v1/auth/social/redirect/forty-two`;
-    window.location.href = url;
+  const stats = {
+    wins: 4,
+    losses: 2,
+    ladderScore: 4242,
+    recentHistory: ['Win', 'Loss', 'Win', 'Win', 'Loss'],
   };
+  const [jwt, setJwt] = useState<string | null>(null);
+  const [accessToken, setAccessToken] = useState<AccessToken | null>(null);
+
+  useEffect(() => {
+    const url = new URL(window.location.href);
+
+    const fetchToken = async () => {
+      const code = url.searchParams.get('code');
+      const response = await axios.get(
+        '/api/v1/auth/social/callback/forty-two',
+        {
+          params: {
+            code,
+          },
+        },
+      );
+      const { accessToken: token } = response.data;
+      const payload = jwt_decode<AccessToken>(token);
+      setJwt(token);
+      setAccessToken(payload);
+    };
+
+    const callAPI = async () => {
+      try {
+        await axios.get(url.pathname, {
+          headers: {
+            Authorization: `Bearer ${jwt}`,
+          },
+        });
+      } catch (error) {
+        setAccessToken(null);
+      }
+    };
+
+    if (url.pathname === '/auth/social/callback/forty-two') {
+      fetchToken();
+      return;
+    }
+    callAPI();
+  });
 
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<Login onLogin={handleLogin} />} />
-        <Route path="/profile" element={<Profile />} />
-      </Routes>
+      {accessToken ? (
+        <Routes>
+          <Route path="/" element={<Main />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route
+            path="/my-page"
+            element={<MyPage id={accessToken.id} stats={stats} />}
+          />
+        </Routes>
+      ) : (
+        <Routes>
+          <Route path="*" element={<Login />} />
+        </Routes>
+      )}
     </BrowserRouter>
   );
 };

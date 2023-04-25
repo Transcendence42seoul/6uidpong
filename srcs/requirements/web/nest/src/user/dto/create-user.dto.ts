@@ -12,6 +12,10 @@ export class CreateUserDto {
   profileImage: string; 
 
   toEntity(): UserEntity {
-    return new UserEntity(this.id, this.email, this.profileImage);
+    return new UserEntity(
+      this.id,
+      this.email,
+      this.profileImage
+    );
   }
 }

@@ -8,9 +8,9 @@ import Profile from './pages/Profile';
 import MyPage from './pages/MyPage';
 
 interface AccessToken {
-  id: string;
+  id: number;
   nickname: string;
-  isTwoFactor: string;
+  isTwoFactor: boolean;
 }
 
 const App: React.FC = () => {

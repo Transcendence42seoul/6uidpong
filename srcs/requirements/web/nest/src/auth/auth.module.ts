@@ -1,6 +1,9 @@
 import { HttpModule } from "@nestjs/axios";
 import { forwardRef, Module } from "@nestjs/common";
 import { JwtModule } from "@nestjs/jwt";
+import { Module } from "@nestjs/common";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { UserEntity } from "src/user/user.entity";
 import { UserModule } from "src/user/user.module";
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
@@ -13,6 +16,7 @@ import { JwtRefreshGuard } from "./jwt-refresh.guard";
     JwtModule.register({
       global: true,
     }),
+    TypeOrmModule.forFeature([UserEntity]),
     HttpModule,
   ],
   controllers: [AuthController],

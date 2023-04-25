@@ -8,6 +8,8 @@ import {
   BadRequestException,
   HttpStatus,
   UseGuard,
+  Post,
+  Body,
 } from "@nestjs/common";
 import { Request, Response } from "express";
 import { AuthService } from "./auth.service";
@@ -23,6 +25,10 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly userService: UserService
   ) {}
+
+@Controller("api/v1/auth")
+export class AuthController {
+  constructor(private readonly authService: AuthService) {}
   @Get("/social/redirect/forty-two")
   redirect42LoginPage(@Res() res: Response): void {
     res.status(HttpStatus.FOUND).redirect(OAUTH_42_LOGIN_URL);
@@ -62,5 +68,22 @@ export class AuthController {
     }
     const accessToken = await this.authService.generateAccessToken(user);
     return {accessToken: accessToken};
+  ): void {
+    const user = req.user;
+    if (user.nickname == undefined) {
+      res.status(HttpStatus.FOUND).redirect("/profile");
+    } else {
+      res.status(HttpStatus.FOUND).redirect("/profile");
+    }
+  }
+
+  @Post("/isTwoFactor")
+  async verifyTwoFactorAuth(@Body() {email} ): Promise<boolean> {
+    return this.authService.verifyTwoFactorAuth(email);
+  }
+
+  @Post("/verifyVerificationCode")
+  async verifyVerificationCode(@Body() { email, code }: { email: string, code: string }): Promise<boolean> {
+    return this.authService.verifyVerificationCode(email, code);
   }
 }

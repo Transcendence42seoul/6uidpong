@@ -17,6 +17,8 @@ clean: down
 fclean: clean
 	$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) down --volumes --rmi all
 
-re: fclean all
+re:
+	make fclean
+	make all
 
 .PHONY: all up down clean fclean re

@@ -49,7 +49,7 @@ export class AuthController {
       maxAge: 60 * 60 * 24 * 7,
       secure: true,
       sameSite: "strict",
-      path: "api/v1/auth/token/refresh",
+      path: "/api/v1/auth/token/refresh"
     });
     const accessToken = await this.authService.generateAccessToken(user);
     res.json({ accessToken: accessToken });

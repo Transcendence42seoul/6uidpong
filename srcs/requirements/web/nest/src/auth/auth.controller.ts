@@ -1,14 +1,19 @@
 import {
   Controller,
   Get,
+  Post,
+  Req,
   Res,
   Query,
   BadRequestException,
   HttpStatus,
+  UseGuard,
 } from "@nestjs/common";
-import { Response } from "express";
+import { Request, Response } from "express";
 import { AuthService } from "./auth.service";
 import { UserService } from "src/user/user.service";
+import { JwtRefreshGuard } from "./jwt-refresh.guard";
+import { CreateUserDto } from "src/user/dto/create-user.dto";
 
 const OAUTH_42_LOGIN_URL = `https://api.intra.42.fr/oauth/authorize?client_id=${process.env.OAUTH_42_CLIENT_ID}&redirect_uri=https://${process.env.HOST_NAME}/auth/social/callback/forty-two&response_type=code&scope=public`;
 
@@ -19,12 +24,12 @@ export class AuthController {
     private readonly userService: UserService
   ) {}
   @Get("/social/redirect/forty-two")
-  redirectFortyTwo(@Res() res: Response): void {
+  redirect42LoginPage(@Res() res: Response): void {
     res.status(HttpStatus.FOUND).redirect(OAUTH_42_LOGIN_URL);
   }
 
   @Get("/social/callback/forty-two")
-  async callbackFortyTwo(
+  async login(
     @Query("code") code: string,
     @Res({ passthrough: true }) res: Response
   ): Promise<void> {
@@ -34,7 +39,7 @@ export class AuthController {
     const profile = await this.authService.receiveOAuthProfile(code);
     let user = await this.userService.findUser(profile.id);
     if (!user) {
-      user = await this.userService.createUser(profile);
+      user = await this.userService.createUser(new CreateUserDto(profile.id, profile.email, profile.profileImage));
     }
     const refreshToken = await this.authService.generateRefreshToken(user.id);
     res.cookie("REF-TOKEN", refreshToken, {
@@ -46,5 +51,16 @@ export class AuthController {
     });
     const accessToken = await this.authService.generateAccessToken(user);
     res.json({ accessToken: accessToken });
+  }
+
+  @Get("/token/refresh")
+  @UseGuard(JwtRefreshGuard)
+  async refreshToken(@Req() req: Request): Promise<any> {
+    const user = await this.userService.findUser(req.user.id);
+    if (!user) {
+      throw new BadRequestException();
+    }
+    const accessToken = await this.authService.generateAccessToken(user);
+    return {accessToken: accessToken};
   }
 }

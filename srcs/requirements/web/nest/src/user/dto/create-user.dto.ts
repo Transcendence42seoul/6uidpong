@@ -1,4 +1,3 @@
-import { IsNotEmpty, IsEmail, IsUrl } from "class-validator";
 import { UserEntity } from "../user.entity";
 
 export class CreateUserDto {
@@ -10,7 +9,7 @@ export class CreateUserDto {
 
   id: number;
   email: string;
-  profileImage: string;
+  profileImage: string; 
 
   toEntity(): UserEntity {
     return new UserEntity(this.id, this.email, this.profileImage);

@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 interface ContentBoxProps {
   className?: string;
@@ -8,7 +8,7 @@ interface ContentBoxProps {
 const ContentBox: React.FC<ContentBoxProps> = ({ className, children }) => {
   return (
     <div
-      className={`items-center rounded border-white bg-black text-center text-white ${className}`}
+      className={`flex flex-col items-center rounded border-white bg-black text-center text-white ${className}`}
     >
       {children}
     </div>

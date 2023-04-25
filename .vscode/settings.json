@@ -1,7 +1,11 @@
 {
-  "editor.formatOnSave": true,
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  /* Settings */
   "editor.codeActionsOnSave": {
     "source.fixAll": true
-  }
+  },
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+
+  /* TypeScript */
+  "typescript.updateImportsOnFileMove.enabled": "always"
 }

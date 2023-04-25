@@ -5,6 +5,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P');
 
 body {
-  @apply min-h-screen bg-cover bg-bottom font-press-start-2p;
-  background-image: url('https://i.chzbgr.com/full/8475769600/hA75A6322/funny-animated-gifs-cats-playing-laser-pong');
+  @apply min-h-screen bg-cover bg-center font-press-start-2p;
+  background-image: url('https://i.imgur.com/0w2jJxu.gif');
 }

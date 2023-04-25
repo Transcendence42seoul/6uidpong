@@ -1,40 +1,82 @@
-import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Main from "./pages/Main";
-import Login from "./pages/Login";
-import Profile from "./pages/Profile";
-import MyPage from "./pages/MyPage";
+import axios from 'axios';
+import jwt_decode from 'jwt-decode';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Main from './pages/Main';
+import Login from './pages/Login';
+import Profile from './pages/Profile';
+import MyPage from './pages/MyPage';
+
+interface AccessToken {
+  id: string;
+  nickname: string;
+  isTwoFactor: string;
+}
 
 const App: React.FC = () => {
-  const handleLogin = () => {
-    // 사용자를 인증 서버로 리다이렉션
-    const url = `https://localhost/api/v1/auth/social/redirect/forty-two`;
-    window.location.href = url;
-  };
-
-  const profile = {
-    nickname: "wocheon",
-    picture: "https://ca.slack-edge.com/T039P7U66-U049ZSEBJJC-3f8c94153ce0-512",
-  };
-
   const stats = {
     wins: 4,
     losses: 2,
     ladderScore: 4242,
-    recentHistory: ["Win", "Loss", "Win", "Win", "Loss"],
+    recentHistory: ['Win', 'Loss', 'Win', 'Win', 'Loss'],
   };
+  const [jwt, setJwt] = useState<string | null>(null);
+  const [accessToken, setAccessToken] = useState<AccessToken | null>(null);
+
+  useEffect(() => {
+    const url = new URL(window.location.href);
+
+    const fetchToken = async () => {
+      const code = url.searchParams.get('code');
+      const response = await axios.get(
+        '/api/v1/auth/social/callback/forty-two',
+        {
+          params: {
+            code,
+          },
+        },
+      );
+      const { accessToken: token } = response.data;
+      const payload = jwt_decode<AccessToken>(token);
+      setJwt(token);
+      setAccessToken(payload);
+    };
+
+    const callAPI = async () => {
+      try {
+        await axios.get(url.pathname, {
+          headers: {
+            Authorization: `Bearer ${jwt}`,
+          },
+        });
+      } catch (error) {
+        setAccessToken(null);
+      }
+    };
+
+    if (url.pathname === '/auth/social/callback/forty-two') {
+      fetchToken();
+      return;
+    }
+    callAPI();
+  });
 
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Main />} />
-        <Route path="/login" element={<Login onLogin={handleLogin} />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route
-          path="/my-page"
-          element={<MyPage profile={profile} stats={stats} />}
-        />
-      </Routes>
+      {accessToken ? (
+        <Routes>
+          <Route path="/" element={<Main />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route
+            path="/my-page"
+            element={<MyPage id={accessToken.id} stats={stats} />}
+          />
+        </Routes>
+      ) : (
+        <Routes>
+          <Route path="*" element={<Login />} />
+        </Routes>
+      )}
     </BrowserRouter>
   );
 };

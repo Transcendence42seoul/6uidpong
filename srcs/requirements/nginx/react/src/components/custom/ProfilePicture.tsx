@@ -18,7 +18,6 @@ function ProfilePicture() {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
     // 가상의 DB 요청 처리
     const mock = new MockAdapter(axios);
     // GET 요청에 대한 응답 설정

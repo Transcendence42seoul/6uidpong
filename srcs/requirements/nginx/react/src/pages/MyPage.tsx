@@ -18,7 +18,7 @@ interface Stats {
 }
 
 interface MyPageProps {
-  id: string;
+  id: number;
   stats: Stats;
 }
 

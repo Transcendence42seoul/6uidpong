@@ -75,11 +75,13 @@ const TwoFactorAuth = () => {
                 name="email"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
+                disabled={sendmail}
                 className="w-full my-4 max-w-md py-2 px-4 border border-gray-400 rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
               />
               <HoverButton
                 onClick={handleSetIsTwoFactorVerified}
                 className="w-full my-2 max-w-md rounded border p-2.5"
+                disabled={sendmail}
               >
                 Verify
               </HoverButton>

@@ -61,7 +61,7 @@ export class AuthService {
     };
     const accessToken = await this.jwtService.signAsync(payload, {
       secret: process.env.JWT_ACCESS_SECRET_KEY,
-      expiresIn: "2m",
+      expiresIn: "10s",
     });
     return accessToken;
   }
@@ -82,7 +82,6 @@ export class AuthService {
       const userRepository = this.connection.getRepository(UserEntity); // this.connection으로 커넥션 주입
       const user = await userRepository.findOne({ where: { email:email } });
 
-      console.log(user.email + " " + email);
       if (user) {
         const verificationCode = this.generateVerificationCode(); // 이메일로 보낼 인증 코드 생성
         await this.sendVerificationCodeByEmail(email, verificationCode); // 이메일로 인증 코드 전송

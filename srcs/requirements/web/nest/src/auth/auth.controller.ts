@@ -10,7 +10,7 @@ import {
   Post,
   Body,
 } from "@nestjs/common";
-import { Request, Response } from "express";
+import { Response } from "express";
 import { AuthService } from "./auth.service";
 import { UserService } from "src/user/user.service";
 import { JwtRefreshGuard } from "./jwt-refresh.guard";
@@ -44,7 +44,7 @@ export class AuthController {
       user = await this.userService.createUser(new CreateUserDto(profile.id, profile.email, profile.profileImage));
     }
     const refreshToken = await this.authService.generateRefreshToken(user.id);
-    res.cookie("REF-TOKEN", refreshToken, {
+    res.cookie("refresh", refreshToken, {
       httpOnly: true,
       maxAge: 60 * 60 * 24 * 7,
       secure: true,
@@ -53,19 +53,18 @@ export class AuthController {
     });
     const accessToken = await this.authService.generateAccessToken(user);
     res.json({ accessToken: accessToken });
-    console.log(user);
   }
 
-  // @Get("/token/refresh")
-  // @UseGuards(JwtRefreshGuard)
-  // async refreshToken(@Req() req: Request): Promise<any> {
-  //   const user = await this.userService.findUser(req.user.id);
-  //   if (!user) {
-  //     throw new BadRequestException();
-  //   }
-  //   const accessToken = await this.authService.generateAccessToken(user);
-  //   return {accessToken: accessToken};
-  // }
+  @Get("/token/refresh")
+  @UseGuards(JwtRefreshGuard)
+  async refreshToken(@Req() req: any): Promise<any> {
+    const user = await this.userService.findUser(req.user.id);
+    if (!user) {
+      throw new BadRequestException();
+    }
+    const accessToken = await this.authService.generateAccessToken(user);
+    return {accessToken: accessToken};
+  }
 
   @Post("/isTwoFactor")
   async verifyTwoFactorAuth(@Body() {email} ): Promise<boolean> {

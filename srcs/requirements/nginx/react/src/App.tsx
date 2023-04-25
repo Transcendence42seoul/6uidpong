@@ -2,7 +2,7 @@ import axios from 'axios';
 import jwt_decode from 'jwt-decode';
 import React, { useEffect } from 'react';
 // import React, { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Main from './pages/Main';
 import Login from './pages/Login';
 import Profile from './pages/Profile';
@@ -21,7 +21,6 @@ const App: React.FC = () => {
     ladderScore: 4242,
     recentHistory: ['Win', 'Loss', 'Win', 'Win', 'Loss'],
   };
-  const navigate = useNavigate();
   // const [jwt, setJwt] = useState<string | null>(null);
   // const [accessToken, setAccessToken] = useState<AccessToken | null>(null);
 
@@ -60,7 +59,7 @@ const App: React.FC = () => {
     const fetchData = async () => {
       if (url.pathname === '/auth/social/callback/forty-two') {
         await fetchToken();
-        navigate('/profile');
+        window.location.href = 'https://localhost/';
         return;
       }
       await callAPI();

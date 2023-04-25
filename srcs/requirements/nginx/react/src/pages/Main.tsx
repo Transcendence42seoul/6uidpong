@@ -1,3 +1,4 @@
+import axios from 'axios';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import ContentBox from '../components/box/ContentBox';
@@ -6,11 +7,25 @@ import Image from '../constants/Image';
 
 const Main: React.FC = () => {
   const navigate = useNavigate();
+  const callAPI = async () => {
+    const url = new URL('https://localhost/api/v1/users/110729');
+    try {
+      await axios.get(url.pathname, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+      });
+    } catch (error) {
+      localStorage.removeItem('accessToken');
+      axios.get('/api/v1/auth/token/refresh');
+    }
+  };
 
   return (
     <div className="flex min-h-screen items-center justify-center text-white">
       <HoverButton
-        onClick={() => navigate('/my-page')}
+        onClick={() => callAPI()}
+        // onClick={() => navigate('/my-page')}
         className="absolute right-0 top-0 m-4 rounded border-2 p-2.5"
       >
         My Page

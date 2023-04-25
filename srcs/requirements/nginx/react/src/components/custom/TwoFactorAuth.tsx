@@ -1,24 +1,13 @@
-import React, { useState } from "react";
-import axios, { AxiosResponse, AxiosError } from "axios";
-import HoverButton from "../button/HoverButton";
-import Modal from "../modal/Modal";
-
-interface UserEntity {
-  id: number;
-  nickname: string;
-  email: string;
-  profileImage: string;
-  isTwoFactor: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-  lastLoginAt: Date;
-}
+import React, { useState } from 'react';
+import axios, { AxiosResponse, AxiosError } from 'axios';
+import HoverButton from '../button/HoverButton';
+import Modal from '../modal/Modal';
 
 const TwoFactorAuth = () => {
   const [openModal, setOpenModal] = useState(false);
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState('');
   const [sendmail, setSendmail] = useState(false);
-  const [code, setCode] = useState("");
+  const [code, setCode] = useState('');
 
   const handleOpenModal = () => {
     setOpenModal(true);
@@ -31,29 +20,29 @@ const TwoFactorAuth = () => {
   const handleSetIsTwoFactorVerified = () => {
     // 이메일 보내는 POST 요청 처리
     axios
-      .post("/api/v1/auth/isTwoFactor", { email })
+      .post('/api/v1/auth/isTwoFactor', { email })
       .then((response: AxiosResponse<boolean>) => {
         // 이메일이 성공적으로 보내진 경우, 인증코드 작성 창이 나타나도록 상태 변경
         setSendmail(true);
       })
       .catch((error: AxiosError) => {
-        alert("이메일 잘못된듯");
+        alert('이메일 잘못된듯');
       });
   };
 
   const handleVerifyVerificationCode = () => {
     // 인증코드를 서버로 보내는 POST 요청 처리
     axios
-      .post("/api/v1/auth/verifyVerificationCode", {
+      .post('/api/v1/auth/verifyVerificationCode', {
         email,
         code,
       })
       .then((response: AxiosResponse<boolean>) => {
         // 인증코드가 올바른 경우, 추가 로직 처리
-        alert("2차 인증 완료!");
+        alert('2차 인증 완료!');
       })
       .catch((error: AxiosError) => {
-        alert("인증번호 틀렸음");
+        alert('인증번호 틀렸음');
       });
   };
 
@@ -61,8 +50,8 @@ const TwoFactorAuth = () => {
     <div>
       <HoverButton onClick={handleOpenModal}>인증 활성화</HoverButton>
       <Modal isOpen={openModal} onClose={handleCloseModal}>
-        <div style={{ pointerEvents: "auto" }}>
-          {openModal ? (
+        <div style={{ pointerEvents: 'auto' }}>
+          {openModal && (
             <>
               <h1 className="text-2xl font-bold text-white">
                 Verify Two-Factor Authentication
@@ -76,18 +65,18 @@ const TwoFactorAuth = () => {
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
                 disabled={sendmail}
-                className="w-full my-4 max-w-md py-2 px-4 border border-gray-400 rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                className="my-4 w-full max-w-md rounded-md border border-gray-400 px-4 py-2 text-gray-900 placeholder-gray-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-pink-500"
               />
               <HoverButton
                 onClick={handleSetIsTwoFactorVerified}
-                className="w-full my-2 max-w-md rounded border p-2.5"
+                className="my-2 w-full max-w-md rounded border p-2.5"
                 disabled={sendmail}
               >
                 Verify
               </HoverButton>
               {sendmail && (
                 <>
-                  <h1 className="text-2xl mt-5 font-bold text-white">
+                  <h1 className="mt-5 text-2xl font-bold text-white">
                     Verification Code
                   </h1>
                   <input
@@ -95,7 +84,7 @@ const TwoFactorAuth = () => {
                     name="code"
                     value={code}
                     onChange={(event) => setCode(event.target.value)}
-                    className="w-full my-4 max-w-md py-2 px-4 border border-gray-400 rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                    className="my-4 w-full max-w-md rounded-md border border-gray-400 px-4 py-2 text-gray-900 placeholder-gray-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-pink-500"
                   />
                   <HoverButton
                     onClick={handleVerifyVerificationCode}
@@ -106,8 +95,6 @@ const TwoFactorAuth = () => {
                 </>
               )}
             </>
-          ) : (
-            <></>
           )}
         </div>
       </Modal>

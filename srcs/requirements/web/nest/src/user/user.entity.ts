@@ -6,10 +6,12 @@ import { Column, Entity, PrimaryColumn } from "typeorm";
 export class UserEntity {
   constructor(
     id?: number,
+    nickname?: string,
     email?: string,
     profileImage?: string,
   ) {
     this.id = id;
+    this.nickname = nickname;
     this.email = email;
     this.profileImage = profileImage;
   }
@@ -17,7 +19,7 @@ export class UserEntity {
   @PrimaryColumn()
   id: number;
 
-  @Column({ unique: true, nullable: true })
+  @Column({ unique: true})
   nickname: string;
 
   @Column()

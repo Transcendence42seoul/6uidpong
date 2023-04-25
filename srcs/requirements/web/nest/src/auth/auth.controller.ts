@@ -1,13 +1,12 @@
 import {
   Controller,
   Get,
-  Post,
   Req,
   Res,
   Query,
   BadRequestException,
   HttpStatus,
-  UseGuard,
+  UseGuards,
   Post,
   Body,
 } from "@nestjs/common";
@@ -26,9 +25,6 @@ export class AuthController {
     private readonly userService: UserService
   ) {}
 
-@Controller("api/v1/auth")
-export class AuthController {
-  constructor(private readonly authService: AuthService) {}
   @Get("/social/redirect/forty-two")
   redirect42LoginPage(@Res() res: Response): void {
     res.status(HttpStatus.FOUND).redirect(OAUTH_42_LOGIN_URL);
@@ -57,25 +53,19 @@ export class AuthController {
     });
     const accessToken = await this.authService.generateAccessToken(user);
     res.json({ accessToken: accessToken });
+    console.log(user);
   }
 
-  @Get("/token/refresh")
-  @UseGuard(JwtRefreshGuard)
-  async refreshToken(@Req() req: Request): Promise<any> {
-    const user = await this.userService.findUser(req.user.id);
-    if (!user) {
-      throw new BadRequestException();
-    }
-    const accessToken = await this.authService.generateAccessToken(user);
-    return {accessToken: accessToken};
-  ): void {
-    const user = req.user;
-    if (user.nickname == undefined) {
-      res.status(HttpStatus.FOUND).redirect("/profile");
-    } else {
-      res.status(HttpStatus.FOUND).redirect("/profile");
-    }
-  }
+  // @Get("/token/refresh")
+  // @UseGuards(JwtRefreshGuard)
+  // async refreshToken(@Req() req: Request): Promise<any> {
+  //   const user = await this.userService.findUser(req.user.id);
+  //   if (!user) {
+  //     throw new BadRequestException();
+  //   }
+  //   const accessToken = await this.authService.generateAccessToken(user);
+  //   return {accessToken: accessToken};
+  // }
 
   @Post("/isTwoFactor")
   async verifyTwoFactorAuth(@Body() {email} ): Promise<boolean> {

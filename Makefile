@@ -3,7 +3,7 @@ DOCKER_COMPOSE_FILE	:=	srcs/docker-compose.yml
 PROJECT_NAME	:=	transcendence
 
 all:
-	$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) up --build -d
+	$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) up --build
 
 up:
 	$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) up
@@ -21,4 +21,8 @@ re:
 	make fclean
 	make all
 
-.PHONY: all up down clean fclean re
+dev:
+	make fclean
+	make up
+
+.PHONY: all up down clean fclean re dev

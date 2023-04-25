@@ -1,7 +1,8 @@
 import axios from 'axios';
 import jwt_decode from 'jwt-decode';
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import React, { useEffect } from 'react';
+// import React, { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import Main from './pages/Main';
 import Login from './pages/Login';
 import Profile from './pages/Profile';
@@ -20,8 +21,9 @@ const App: React.FC = () => {
     ladderScore: 4242,
     recentHistory: ['Win', 'Loss', 'Win', 'Win', 'Loss'],
   };
-  const [jwt, setJwt] = useState<string | null>(null);
-  const [accessToken, setAccessToken] = useState<AccessToken | null>(null);
+  const navigate = useNavigate();
+  // const [jwt, setJwt] = useState<string | null>(null);
+  // const [accessToken, setAccessToken] = useState<AccessToken | null>(null);
 
   useEffect(() => {
     const url = new URL(window.location.href);
@@ -37,39 +39,54 @@ const App: React.FC = () => {
         },
       );
       const { accessToken: token } = response.data;
-      const payload = jwt_decode<AccessToken>(token);
-      setJwt(token);
-      setAccessToken(payload);
+      localStorage.setItem('accessToken', token);
+      // const payload = jwt_decode<AccessToken>(token);
+      // setAccessToken(payload);
     };
 
     const callAPI = async () => {
       try {
         await axios.get(url.pathname, {
           headers: {
-            Authorization: `Bearer ${jwt}`,
+            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
           },
         });
       } catch (error) {
-        setAccessToken(null);
+        localStorage.removeItem('accessToken');
+        // setAccessToken(null);
       }
     };
 
-    if (url.pathname === '/auth/social/callback/forty-two') {
-      fetchToken();
-      return;
-    }
-    callAPI();
-  });
+    const fetchData = async () => {
+      if (url.pathname === '/auth/social/callback/forty-two') {
+        await fetchToken();
+        navigate('/profile');
+        return;
+      }
+      await callAPI();
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <BrowserRouter>
-      {accessToken ? (
+      {localStorage.getItem('accessToken') ? (
         <Routes>
           <Route path="/" element={<Main />} />
           <Route path="/profile" element={<Profile />} />
           <Route
             path="/my-page"
-            element={<MyPage id={accessToken.id} stats={stats} />}
+            element={
+              <MyPage
+                id={
+                  jwt_decode<AccessToken>(
+                    localStorage.getItem('accessToken') ?? '',
+                  ).id
+                }
+                stats={stats}
+              />
+            }
           />
         </Routes>
       ) : (

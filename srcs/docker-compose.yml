@@ -30,6 +30,7 @@ services:
       JWT_REFRESH_SECRET_KEY: ${JWT_REFRESH_SECRET_KEY}
       EMAIL_USER: ${EMAIL_USER}
       EMAIL_PASS: ${EMAIL_PASS}
+      SESSION_SECRET: ${SESSION_SECRET}
     depends_on:
       - postgres
     networks:

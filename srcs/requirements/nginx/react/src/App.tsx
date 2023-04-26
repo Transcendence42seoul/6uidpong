@@ -60,7 +60,7 @@ const App: React.FC = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Main />} />
-        <Route path="/profile" element={<Profile />} />
+        <Route path="/profile" element={<Profile id={tokenInfo.id} />} />
         <Route
           path="/my-page"
           element={<MyPage id={tokenInfo.id} stats={stats} />}

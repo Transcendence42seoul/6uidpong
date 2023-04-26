@@ -82,12 +82,23 @@ export class AuthController {
   }
 
   @Post("/isTwoFactor")
-  async verifyTwoFactorAuth(@Body() {email} ): Promise<boolean> {
-    return this.authService.verifyTwoFactorAuth(email);
+  async verifyTwoFactorAuth(@Body() body: {id: number, email:string }, @Req() req:any ): Promise<boolean> {
+    const {id, email} = body;
+    req.session.user = {id, email};
+    const verificationCode = this.authService.generateVerificationCode();
+    req.session.verificationCode = verificationCode;
+    await this.authService.sendVerificationCodeByEmail(req.session.user.email, req.session.verificationCode);
+    return true;
   }
 
   @Post("/verifyVerificationCode")
-  async verifyVerificationCode(@Body() { email, code }: { email: string, code: string }): Promise<boolean> {
-    return this.authService.verifyVerificationCode(email, code);
+  async verifyVerificationCode(@Body() body: {code:string}, @Req() req: any): Promise<boolean> {
+    const {code} = body;
+    const storedVerificationCode = req.session.verificationCode;
+    if (code === storedVerificationCode) {
+      return true;
+    } else {
+      throw new Error('Failed to verify verification code.');
+    }
   }
 }

@@ -7,8 +7,6 @@ import * as nodemailer from 'nodemailer';
 import { UserEntity } from "../user/user.entity";
 import { VerificationDto } from "./dto/verification.dto";
 
-type Tuple = [number, string, string];
-
 @Injectable()
 export class AuthService {
   private verificationDto: VerificationDto;
@@ -76,12 +74,12 @@ export class AuthService {
     } 
   }
 
-  private generateVerificationCode() {
+  public generateVerificationCode() {
     const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
     return verificationCode;
   }
 
-  private async sendVerificationCodeByEmail(email: string, verificationCode: string): Promise<void> {
+  public async sendVerificationCodeByEmail(email: string, verificationCode: string): Promise<void> {
     // Nodemailer를 사용하여 이메일 전송 설정
     const emailUser:string = process.env.EMAIL_USER;
     const emailPass:string = process.env.EMAIL_PASS;

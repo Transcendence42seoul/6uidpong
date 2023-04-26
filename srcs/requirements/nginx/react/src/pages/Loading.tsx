@@ -1,10 +1,15 @@
 import React from 'react';
 import Image from '../constants/Image';
+import '../components/css/loading.css';
 
 const Loading: React.FC = () => {
   return (
-    <div className="infinite-rotation bg-black">
-      <img src={Image.LOADING} alt="LOADING" />
+    <div className="flex h-screen items-center justify-center bg-gray-900">
+      <img
+        src={Image.LOADING}
+        alt="LOADING"
+        className="infinite-rotation h-80 w-80"
+      />
     </div>
   );
 };

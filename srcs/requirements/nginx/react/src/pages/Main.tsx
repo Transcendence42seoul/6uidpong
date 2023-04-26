@@ -1,6 +1,6 @@
 import React from 'react';
 import useCallAPI from '../api';
-import ContentBox from '../components/box/ContentBox';
+import ContentBox from '../components/container/ContentBox';
 import HoverButton from '../components/button/HoverButton';
 import Image from '../constants/Image';
 

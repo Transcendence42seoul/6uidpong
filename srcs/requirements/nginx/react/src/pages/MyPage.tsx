@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import useCallAPI from '../api';
-import ContentBox from '../components/box/ContentBox';
 import HoverButton from '../components/button/HoverButton';
+import CircularImage from '../components/container/CircularImage';
+import ContentBox from '../components/container/ContentBox';
 
 interface User {
   nickname: string;
@@ -39,10 +40,10 @@ const MyPage: React.FC<MyPageProps> = ({ id, stats }) => {
         <h2 className="mt-2 text-2xl font-bold">
           {user?.nickname ?? 'Loading...'}
         </h2>
-        <img
-          className="rounded-full p-7"
+        <CircularImage
           src={user?.profileImage}
           alt="Profile"
+          className="m-7 h-80 w-80"
         />
       </ContentBox>
       <HoverButton

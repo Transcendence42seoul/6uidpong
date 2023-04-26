@@ -59,7 +59,7 @@ const App: React.FC = () => {
     const fetchData = async () => {
       if (url.pathname === '/auth/social/callback/forty-two') {
         await fetchToken();
-        window.location.href = 'https://localhost/';
+        window.location.href = 'https://localhost/profile';
         return;
       }
       await callAPI();

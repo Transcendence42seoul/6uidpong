@@ -6,6 +6,8 @@ class Image {
     'https://cdn-icons-png.flaticon.com/512/465/465227.png';
 
   static readonly MODAL_IMAGE = 'https://i.imgur.com/lfaWNsI.png';
+
+  static readonly LOADING = 'https://imgur.com/a/Vu5rtiT.png';
 }
 
 export default Image;

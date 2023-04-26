@@ -14,6 +14,7 @@ import { Response } from "express";
 import { AuthService } from "./auth.service";
 import { UserService } from "src/user/user.service";
 import { JwtRefreshGuard } from "./jwt-refresh.guard";
+import { OauthGuard } from "./oauth.guard";
 import { CreateUserDto } from "src/user/dto/create-user.dto";
 
 const OAUTH_42_LOGIN_URL = `https://api.intra.42.fr/oauth/authorize?client_id=${process.env.OAUTH_42_CLIENT_ID}&redirect_uri=https://${process.env.HOST_NAME}/auth/social/callback/forty-two&response_type=code&scope=public`;
@@ -31,18 +32,18 @@ export class AuthController {
   }
 
   @Get("/social/callback/forty-two")
+  @UseGuards(OauthGuard)
   async login(
-    @Query("code") code: string,
+    @Req() req: any,
     @Res({ passthrough: true }) res: Response
-  ): Promise<void> {
-    if (!code) {
-      throw new BadRequestException();
-    }
-    const profile = await this.authService.receiveOAuthProfile(code);
-    let user = await this.userService.findUser(profile.id);
+  ): Promise<any> {
+    let user = await this.userService.findUser(req.user.id);
     if (!user) {
-      user = await this.userService.createUser(new CreateUserDto(profile.id, profile.email, profile.profileImage));
+      user = await this.userService.createUser(new CreateUserDto(req.user.id, req.user.email, req.user.image.link));
     }
+    // else if (user.isTwoFactor) {
+    //   return {isTwoFactor: "true"};
+    // }
     const refreshToken = await this.authService.generateRefreshToken(user.id);
     res.cookie("refresh", refreshToken, {
       httpOnly: true,

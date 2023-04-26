@@ -6,6 +6,7 @@ import { UserEntity } from "src/user/user.entity";
 import { UserModule } from "src/user/user.module";
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
+import { OauthGuard } from "./oauth.guard";
 import { JwtAccessGuard } from "./jwt-access.guard";
 import { JwtRefreshGuard } from "./jwt-refresh.guard";
 
@@ -19,6 +20,6 @@ import { JwtRefreshGuard } from "./jwt-refresh.guard";
     HttpModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtAccessGuard, JwtRefreshGuard],
+  providers: [AuthService, JwtAccessGuard, JwtRefreshGuard, OauthGuard],
 })
 export class AuthModule {}

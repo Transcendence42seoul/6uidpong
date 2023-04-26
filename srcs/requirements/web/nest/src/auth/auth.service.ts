@@ -1,7 +1,5 @@
-import { HttpService } from "@nestjs/axios";
 import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
-import { lastValueFrom } from "rxjs";
 import { UserDto } from "src/user/dto/user.dto";
 import { InjectConnection , InjectRepository } from "@nestjs/typeorm";
 import { Connection, Repository } from "typeorm";
@@ -18,40 +16,7 @@ export class AuthService {
       @InjectConnection()
       private readonly connection: Connection,
     private readonly jwtService: JwtService,
-    private readonly httpService: HttpService
   ) {}
-
-  async receiveOauthAccessToken(code: string): Promise<string> {
-    const headers = { "Content-Type": "application/json" };
-    const body = {
-      grant_type: "authorization_code",
-      client_id: process.env.OAUTH_42_CLIENT_ID,
-      client_secret: process.env.OAUTH_42_CLIENT_SECRET,
-      code: code,
-      redirect_uri: `https://${process.env.HOST_NAME}/auth/social/callback/forty-two`,
-    };
-    try {
-      const { data } = await lastValueFrom(
-        this.httpService.post("https://api.intra.42.fr/oauth/token", body, {
-          headers,
-        })
-      );
-      return data.access_token;
-    } catch (error) {
-      throw new UnauthorizedException();
-    }
-  }
-
-  async receiveOAuthProfile(code: string): Promise<any> {
-    const accessToken = await this.receiveOauthAccessToken(code);
-    const headers = { Authorization: `Bearer ${accessToken}` };
-    const { data } = await lastValueFrom(
-      this.httpService.get("https://api.intra.42.fr/v2/me", {
-        headers,
-      })
-    );
-    return {id: data.id, email: data.email, profileImage: data.image.link};
-  }
 
   async generateAccessToken(user: UserDto): Promise<any> {
     const payload = {

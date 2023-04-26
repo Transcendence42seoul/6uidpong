@@ -1,10 +1,12 @@
 import React from 'react';
-import callAPI from '../api';
+import useCallAPI from '../api';
 import ContentBox from '../components/box/ContentBox';
 import HoverButton from '../components/button/HoverButton';
 import Image from '../constants/Image';
 
 const Main: React.FC = () => {
+  const callAPI = useCallAPI();
+
   return (
     <div className="flex min-h-screen items-center justify-center text-white">
       <HoverButton

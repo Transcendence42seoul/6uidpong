@@ -1,13 +1,12 @@
-import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import callAPI from '../api';
+import useCallAPI from '../api';
 import ContentBox from '../components/box/ContentBox';
 import HoverButton from '../components/button/HoverButton';
 
-interface Profile {
+interface User {
   nickname: string;
-  image: string;
+  profileImage: string;
 }
 
 interface Stats {
@@ -23,12 +22,13 @@ interface MyPageProps {
 }
 
 const MyPage: React.FC<MyPageProps> = ({ id, stats }) => {
-  const [profile, setProfile] = useState<Profile | null>(null);
+  const [user, setUser] = useState<User | undefined>(undefined);
+  const callAPI = useCallAPI();
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await axios.get<Profile>(`/api/v1/users/${id}`);
-      setProfile(response.data);
+      const data = await callAPI(`/api/v1/users/${id}`, false);
+      setUser(data);
     };
     fetchData();
   }, []);
@@ -37,9 +37,13 @@ const MyPage: React.FC<MyPageProps> = ({ id, stats }) => {
     <div className="flex flex-col items-center p-4">
       <ContentBox className="mb-4 w-full max-w-md border p-4">
         <h2 className="mt-2 text-2xl font-bold">
-          {profile?.nickname ?? 'Loading...'}
+          {user?.nickname ?? 'Loading...'}
         </h2>
-        <img className="rounded-full p-7" src={profile?.image} alt="Profile" />
+        <img
+          className="rounded-full p-7"
+          src={user?.profileImage}
+          alt="Profile"
+        />
       </ContentBox>
       <HoverButton
         onClick={() => callAPI('/profile')}

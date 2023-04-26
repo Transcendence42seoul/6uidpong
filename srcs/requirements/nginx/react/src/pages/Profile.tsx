@@ -1,5 +1,5 @@
 import React from 'react';
-import callAPI from '../api';
+import useCallAPI from '../api';
 import HoverButton from '../components/button/HoverButton';
 import Nickname from '../components/custom/Nickname';
 import ContentBox from '../components/box/ContentBox';
@@ -7,6 +7,8 @@ import ProfilePicture from '../components/custom/ProfilePicture';
 import TwoFactorAuth from '../components/custom/TwoFactorAuth';
 
 const Profile: React.FC = () => {
+  const callAPI = useCallAPI();
+
   return (
     <div className="flex flex-col items-center p-4">
       <ContentBox className="mb-4 w-full max-w-md flex-col border p-4">

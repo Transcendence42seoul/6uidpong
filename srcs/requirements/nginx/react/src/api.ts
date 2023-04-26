@@ -4,21 +4,28 @@ import { useNavigate } from 'react-router-dom';
 import { setAccessToken } from './authSlice';
 import { RootState } from './store';
 
-const callAPI = async (pathname: string) => {
+const useCallAPI = () => {
   const accessToken = useSelector((state: RootState) => state.auth.accessToken);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  try {
-    await axios.get(pathname, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    navigate(pathname);
-  } catch (error) {
-    dispatch(setAccessToken(null));
-  }
+  const callAPI = async (pathname: string, isNavigate = true) => {
+    try {
+      const { data } = await axios.get(pathname, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      if (!isNavigate) {
+        return data;
+      }
+      navigate(pathname);
+    } catch (error) {
+      dispatch(setAccessToken(null));
+    }
+  };
+
+  return callAPI;
 };
 
-export default callAPI;
+export default useCallAPI;

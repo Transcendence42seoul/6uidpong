@@ -24,6 +24,7 @@ module.exports = {
     tsconfigRootDir: __dirname,
   },
   rules: {
+    'consistent-return': 'off',
     'no-param-reassign': [
       'error',
       { props: true, ignorePropertyModificationsFor: ['state'] },

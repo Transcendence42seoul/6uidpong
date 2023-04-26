@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { UserDto } from "src/user/dto/user.dto";
 import { InjectConnection , InjectRepository } from "@nestjs/typeorm";
@@ -6,6 +6,8 @@ import { Connection, Repository } from "typeorm";
 import * as nodemailer from 'nodemailer';
 import { UserEntity } from "../user/user.entity";
 import { VerificationDto } from "./dto/verification.dto";
+
+type Tuple = [number, string, string];
 
 @Injectable()
 export class AuthService {

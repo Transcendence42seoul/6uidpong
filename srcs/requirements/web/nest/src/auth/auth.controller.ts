@@ -3,7 +3,6 @@ import {
   Get,
   Req,
   Res,
-  Query,
   BadRequestException,
   HttpStatus,
   UseGuards,
@@ -27,22 +26,23 @@ export class AuthController {
   ) {}
 
   @Get("/social/redirect/forty-two")
-  redirect42LoginPage(@Res() res: Response): void {
+  redirectFortytwo(@Res() res: Response): void {
     res.status(HttpStatus.FOUND).redirect(OAUTH_42_LOGIN_URL);
   }
 
   @Get("/social/callback/forty-two")
   @UseGuards(OauthGuard)
-  async login(
+  async callbackFortytwo(
     @Req() req: any,
     @Res({ passthrough: true }) res: Response
   ): Promise<any> {
     let user = await this.userService.findUser(req.user.id);
     if (!user) {
-      user = await this.userService.createUser(new CreateUserDto(req.user.id, req.user.email, req.user.image.link));
+      user = await this.userService.createUser(new CreateUserDto(req.user.id, req.user.image.link));
     }
     // else if (user.isTwoFactor) {
-    //   return {isTwoFactor: "true"};
+      // 이메일 전송 후 인증코드 유지
+      // res.json({isTwoFactor: "true", id: user.id});
     // }
     const refreshToken = await this.authService.generateRefreshToken(user.id);
     res.cookie("refresh", refreshToken, {
@@ -54,6 +54,20 @@ export class AuthController {
     });
     const accessToken = await this.authService.generateAccessToken(user);
     res.json({ accessToken: accessToken });
+  }
+
+  async verifyCode() {
+    // 프론트에서 코드 받아서 확인하고 확인됬으면 아래 실행
+    // const refreshToken = await this.authService.generateRefreshToken(user.id);
+    // res.cookie("refresh", refreshToken, {
+    //   httpOnly: true,
+    //   maxAge: 60 * 60 * 24 * 7,
+    //   secure: true,
+    //   sameSite: "strict",
+    //   path: "/api/v1/auth/token/refresh"
+    // });
+    // const accessToken = await this.authService.generateAccessToken(user);
+    // res.json({ accessToken: accessToken });
   }
 
   @Get("/token/refresh")

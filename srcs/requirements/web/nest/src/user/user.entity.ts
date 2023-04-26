@@ -7,22 +7,20 @@ export class UserEntity {
   constructor(
     id?: number,
     nickname?: string,
-    email?: string,
     profileImage?: string,
   ) {
     this.id = id;
     this.nickname = nickname;
-    this.email = email;
     this.profileImage = profileImage;
   }
 
   @PrimaryColumn()
   id: number;
 
-  @Column({ unique: true})
+  @Column({ unique: true })
   nickname: string;
 
-  @Column()
+  @Column({ nullable: true })
   email: string;
 
   @Column({ name: "profile_image" })

@@ -1,18 +1,13 @@
 import axios from 'axios';
-import jwt_decode from 'jwt-decode';
 import React, { useEffect } from 'react';
-// import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { setAccessToken } from './authSlice';
+import { RootState } from './store';
 import Main from './pages/Main';
 import Login from './pages/Login';
 import Profile from './pages/Profile';
 import MyPage from './pages/MyPage';
-
-interface AccessToken {
-  id: number;
-  nickname: string;
-  isTwoFactor: boolean;
-}
 
 const App: React.FC = () => {
   const stats = {
@@ -21,8 +16,9 @@ const App: React.FC = () => {
     ladderScore: 4242,
     recentHistory: ['Win', 'Loss', 'Win', 'Win', 'Loss'],
   };
-  // const [jwt, setJwt] = useState<string | null>(null);
-  // const [accessToken, setAccessToken] = useState<AccessToken | null>(null);
+  const dispatch = useDispatch();
+  const accessToken = useSelector((state: RootState) => state.auth.accessToken);
+  const tokenInfo = useSelector((state: RootState) => state.auth.tokenInfo);
 
   useEffect(() => {
     const url = new URL(window.location.href);
@@ -38,21 +34,18 @@ const App: React.FC = () => {
         },
       );
       const { accessToken: token } = response.data;
-      localStorage.setItem('accessToken', token);
-      // const payload = jwt_decode<AccessToken>(token);
-      // setAccessToken(payload);
+      dispatch(setAccessToken(token));
     };
 
     const callAPI = async () => {
       try {
         await axios.get(url.pathname, {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         });
       } catch (error) {
-        localStorage.removeItem('accessToken');
-        // setAccessToken(null);
+        dispatch(setAccessToken(null));
       }
     };
 
@@ -62,7 +55,7 @@ const App: React.FC = () => {
         window.location.href = 'https://localhost/profile';
         return;
       }
-      await callAPI();
+      callAPI();
     };
 
     fetchData();
@@ -70,22 +63,13 @@ const App: React.FC = () => {
 
   return (
     <BrowserRouter>
-      {localStorage.getItem('accessToken') ? (
+      {tokenInfo ? (
         <Routes>
           <Route path="/" element={<Main />} />
           <Route path="/profile" element={<Profile />} />
           <Route
             path="/my-page"
-            element={
-              <MyPage
-                id={
-                  jwt_decode<AccessToken>(
-                    localStorage.getItem('accessToken') ?? '',
-                  ).id
-                }
-                stats={stats}
-              />
-            }
+            element={<MyPage id={tokenInfo.id} stats={stats} />}
           />
         </Routes>
       ) : (

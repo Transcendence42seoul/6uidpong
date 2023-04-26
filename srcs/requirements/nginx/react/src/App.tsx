@@ -17,7 +17,6 @@ const App: React.FC = () => {
     recentHistory: ['Win', 'Loss', 'Win', 'Win', 'Loss'],
   };
   const dispatch = useDispatch();
-  const accessToken = useSelector((state: RootState) => state.auth.accessToken);
   const tokenInfo = useSelector((state: RootState) => state.auth.tokenInfo);
 
   useEffect(() => {
@@ -37,25 +36,11 @@ const App: React.FC = () => {
       dispatch(setAccessToken(token));
     };
 
-    const callAPI = async () => {
-      try {
-        await axios.get(url.pathname, {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-      } catch (error) {
-        dispatch(setAccessToken(null));
-      }
-    };
-
     const fetchData = async () => {
       if (url.pathname === '/auth/social/callback/forty-two') {
         await fetchToken();
         window.location.href = 'https://localhost/profile';
-        return;
       }
-      callAPI();
     };
 
     fetchData();

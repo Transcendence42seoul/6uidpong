@@ -1,17 +1,14 @@
-import axios from 'axios';
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import callAPI from '../api';
 import ContentBox from '../components/box/ContentBox';
 import HoverButton from '../components/button/HoverButton';
 import Image from '../constants/Image';
 
 const Main: React.FC = () => {
-  const navigate = useNavigate();
-
   return (
     <div className="flex min-h-screen items-center justify-center text-white">
       <HoverButton
-        onClick={() => navigate('/my-page')}
+        onClick={() => callAPI('/my-page')}
         className="absolute right-0 top-0 m-4 rounded border-2 p-2.5"
       >
         My Page

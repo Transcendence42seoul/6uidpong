@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
+import callAPI from '../api';
 import ContentBox from '../components/box/ContentBox';
 import HoverButton from '../components/button/HoverButton';
 
@@ -23,7 +23,6 @@ interface MyPageProps {
 }
 
 const MyPage: React.FC<MyPageProps> = ({ id, stats }) => {
-  const navigate = useNavigate();
   const [profile, setProfile] = useState<Profile | null>(null);
 
   useEffect(() => {
@@ -43,7 +42,7 @@ const MyPage: React.FC<MyPageProps> = ({ id, stats }) => {
         <img className="rounded-full p-7" src={profile?.image} alt="Profile" />
       </ContentBox>
       <HoverButton
-        onClick={() => navigate('/profile')}
+        onClick={() => callAPI('/profile')}
         className="mb-4 w-full max-w-md rounded border p-2.5"
       >
         Change Profile

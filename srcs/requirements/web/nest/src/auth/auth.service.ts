@@ -42,44 +42,36 @@ export class AuthService {
     return refreshToken;
   }
 
-  async verifyTwoFactorAuth(email: string): Promise<boolean> {
+  async verifyTwoFactorAuth(body: {id:number, email:string}, req: any): Promise<boolean> {
     try {
-      const userRepository = this.connection.getRepository(UserEntity); // this.connection으로 커넥션 주입
-      const user = await userRepository.findOne({ where: { email:email } });
-
-      if (user) {
-        const verificationCode = this.generateVerificationCode(); // 이메일로 보낼 인증 코드 생성
-        await this.sendVerificationCodeByEmail(email, verificationCode); // 이메일로 인증 코드 전송
-  
-        this.verificationDto = new VerificationDto(); // verificationDto 초기화 (필요 없을 수도 있음)
-        this.verificationDto.code = verificationCode;
-        this.verificationDto.email = user.email;
-      }
-      else {
-        throw new Error("Failed to verify two-factor authentication.");
-      }
+      const {id, email} = body;
+      req.session.user = {id, email};
+      const verificationCode = this.generateVerificationCode();
+      req.session.verificationCode = verificationCode;
+      await this.sendVerificationCodeByEmail(req.session.user.email, req.session.verificationCode);
     } catch (error) {
       throw new Error('Failed to verify two-factor authentication.'); // 에러 처리
     }
     return true;
   }
-    
-  async verifyVerificationCode(email: string, code: string): Promise<boolean> {
-    const user = await this.userRepository.findOne({ where: { email: email } });
-    if (user && this.verificationDto.code === code) {
+
+  async verifyVerificationCode( code: string, storedVerificationCode: string, id: number, email: string): Promise<boolean> {
+    const user = await this.userRepository.findOne({ where: { id:id } });
+    if (code === storedVerificationCode) {
       // 변경된 이메일과 isTwoFactor값을 db에 저장
+      await this.userRepository.update(user.id, {isTwoFactor: true, email: email});
       return true;
     } else {
       throw new Error('Failed to verify verification code.');
     } 
   }
 
-  public generateVerificationCode() {
+  private generateVerificationCode() {
     const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
     return verificationCode;
   }
 
-  public async sendVerificationCodeByEmail(email: string, verificationCode: string): Promise<void> {
+  private async sendVerificationCodeByEmail(email: string, verificationCode: string): Promise<void> {
     // Nodemailer를 사용하여 이메일 전송 설정
     const emailUser:string = process.env.EMAIL_USER;
     const emailPass:string = process.env.EMAIL_PASS;

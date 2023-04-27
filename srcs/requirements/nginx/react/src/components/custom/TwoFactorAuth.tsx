@@ -11,6 +11,7 @@ const TwoFactorAuth: React.FC<TwoFactorAuthProps> = ({ id }) => {
   const [openModal, setOpenModal] = useState(false);
   const [email, setEmail] = useState('');
   const [sendmail, setSendmail] = useState(false);
+  const [isDisabled, setIsDisabled] = useState(false);
   const [code, setCode] = useState('');
 
   const handleOpenModal = () => {
@@ -18,11 +19,16 @@ const TwoFactorAuth: React.FC<TwoFactorAuthProps> = ({ id }) => {
   };
 
   const handleCloseModal = () => {
+    setEmail('');
+    setCode('');
+    setIsDisabled(false);
     setOpenModal(false);
+    if (sessionStorage) sessionStorage.clear();
   };
 
   const handleSetIsTwoFactorVerified = () => {
     // 이메일 보내는 POST 요청 처리
+    setIsDisabled(true);
     axios
       .post('/api/v1/auth/isTwoFactor', { id, email })
       .then((response: AxiosResponse<{ result: boolean }>) => {
@@ -41,6 +47,7 @@ const TwoFactorAuth: React.FC<TwoFactorAuthProps> = ({ id }) => {
       .then((response: AxiosResponse<{ result: boolean }>) => {
         // 인증코드가 올바른 경우, 추가 로직 처리
         alert('2차 인증 완료!');
+        handleCloseModal();
       })
       .catch((error: AxiosError) => {
         alert('인증번호 틀렸음');
@@ -65,13 +72,13 @@ const TwoFactorAuth: React.FC<TwoFactorAuthProps> = ({ id }) => {
                 name="email"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
-                disabled={sendmail}
+                disabled={isDisabled}
                 className="my-4 w-full max-w-md rounded-md border border-gray-400 px-4 py-2 text-gray-900 placeholder-gray-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-pink-500"
               />
               <HoverButton
                 onClick={handleSetIsTwoFactorVerified}
                 className="my-2 w-full max-w-md rounded border p-2.5"
-                disabled={sendmail}
+                disabled={isDisabled}
               >
                 Verify
               </HoverButton>

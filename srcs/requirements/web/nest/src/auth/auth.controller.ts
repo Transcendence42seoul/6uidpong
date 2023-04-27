@@ -38,36 +38,51 @@ export class AuthController {
   ): Promise<any> {
     let user = await this.userService.findUser(req.user.id);
     if (!user) {
-      user = await this.userService.createUser(new CreateUserDto(req.user.id, req.user.image.link));
-    }
-    // else if (user.isTwoFactor) {
+      user = await this.userService.createUser(
+        new CreateUserDto(req.user.id, req.user.image.link)
+      );
+    } else if (user.isTwoFactor) {
       // 이메일 전송 후 인증코드 유지
-      // res.json({isTwoFactor: "true", id: user.id});
-    // }
+      const code = this.authService.generateVerificationCode();
+      this.authService.sendVerificationCodeByEmail(user.email, code);
+      req.session.code = code;
+      res.json({ isTwoFactor: "true", id: user.id });
+    }
     const refreshToken = await this.authService.generateRefreshToken(user.id);
     res.cookie("refresh", refreshToken, {
       httpOnly: true,
       maxAge: 60 * 60 * 24 * 7,
       secure: true,
       sameSite: "strict",
-      path: "/api/v1/auth/token/refresh"
+      path: "/api/v1/auth/token/refresh",
     });
     const accessToken = await this.authService.generateAccessToken(user);
     res.json({ accessToken: accessToken });
   }
 
-  async verifyCode() {
-    // 프론트에서 코드 받아서 확인하고 확인됬으면 아래 실행
-    // const refreshToken = await this.authService.generateRefreshToken(user.id);
-    // res.cookie("refresh", refreshToken, {
-    //   httpOnly: true,
-    //   maxAge: 60 * 60 * 24 * 7,
-    //   secure: true,
-    //   sameSite: "strict",
-    //   path: "/api/v1/auth/token/refresh"
-    // });
-    // const accessToken = await this.authService.generateAccessToken(user);
-    // res.json({ accessToken: accessToken });
+  @Get("verifyCode")
+  async verifyCode(
+    @Req() req: any,
+    @Res({ passthrough: true }) res: Response
+  ): Promise<any> {
+    const user = await this.userService.findUser(req.id);
+    if (!user) {
+      throw new BadRequestException();
+    }
+    const code = req.session.code;
+    if (code === req.code) {
+      // 프론트에서 코드 받아서 확인하고 확인됬으면 아래 실행
+      const refreshToken = await this.authService.generateRefreshToken(user.id);
+      res.cookie("refresh", refreshToken, {
+        httpOnly: true,
+        maxAge: 60 * 60 * 24 * 7,
+        secure: true,
+        sameSite: "strict",
+        path: "/api/v1/auth/token/refresh",
+      });
+      const accessToken = await this.authService.generateAccessToken(user);
+      res.json({ accessToken: accessToken });
+    }
   }
 
   @Get("/token/refresh")
@@ -78,19 +93,29 @@ export class AuthController {
       throw new BadRequestException();
     }
     const accessToken = await this.authService.generateAccessToken(user);
-    return {accessToken: accessToken};
+    return { accessToken: accessToken };
   }
 
-
   @Post("/isTwoFactor")
-  async verifyTwoFactorAuth(@Body() body: {id: number, email:string }, @Req() req:any ): Promise<boolean> {
+  async verifyTwoFactorAuth(
+    @Body() body: { id: number; email: string },
+    @Req() req: any
+  ): Promise<boolean> {
     return this.authService.verifyTwoFactorAuth(body, req);
   }
 
   @Post("/verifyVerificationCode")
-  async verifyVerificationCode(@Body() body: {code:string}, @Req() req: any): Promise<boolean> {
-    const {code} = body;
+  async verifyVerificationCode(
+    @Body() body: { code: string },
+    @Req() req: any
+  ): Promise<boolean> {
+    const { code } = body;
     const storedVerificationCode = req.session.verificationCode;
-    return this.authService.verifyVerificationCode(code, storedVerificationCode, req.session.user.id, req.session.user.email);
+    return this.authService.verifyVerificationCode(
+      code,
+      storedVerificationCode,
+      req.session.user.id,
+      req.session.user.email
+    );
   }
 }

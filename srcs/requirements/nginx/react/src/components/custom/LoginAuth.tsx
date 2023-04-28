@@ -11,7 +11,7 @@ const LoginAuth: React.FC<LoginAuthProps> = ({ id }) => {
 
   const handleVerificationCode = async () => {
     axios
-      .post('/api/v1/auth/verificationCode', { id, code })
+      .post('/api/v1/auth/verifyCode', { id, code })
       .then((response: AxiosResponse<{ result: boolean }>) => {
         alert('인증번호가 이메일로 전송되었습니다.');
         sessionStorage.clear();

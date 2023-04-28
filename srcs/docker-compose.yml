@@ -36,6 +36,8 @@ services:
     networks:
       - transcendence
     restart: always
+    volumes:
+      - ./requirements/web/nest:/app
 
   nginx:
     build:

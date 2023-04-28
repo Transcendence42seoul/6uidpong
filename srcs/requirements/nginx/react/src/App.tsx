@@ -21,88 +21,43 @@ const App: React.FC = () => {
   const dispatch = useDispatch();
   const { tokenInfo } = useSelector((state: RootState) => state.auth);
   const [loading, setLoading] = useState(false);
-  const [twoFactorAuth, setTwoFactorAuth] = useState('');
-  const [authId, setAuthId] = useState(null);
 
   useEffect(() => {
     const url = new URL(window.location.href);
 
     const fetchToken = async () => {
       const code = url.searchParams.get('code');
-      const response = await axios.get(
-        '/api/v1/auth/social/callback/forty-two',
-        {
-          params: {
-            code,
-          },
+      const response = await axios.get<{
+        accessToken: string;
+      }>('/api/v1/auth/social/callback/forty-two', {
+        params: {
+          code,
         },
-      );
+      });
       const { accessToken: token } = response.data;
       dispatch(setAccessToken(token));
     };
 
-    const handleTwoFactorAuth = async () => {
-      const code = url.searchParams.get('code');
-      const response = await axios.get(
-        '/api/v1/auth/social/callback/forty-two',
-        {
-          params: {
-            code,
-          },
-        },
-      );
-      const { id } = response.data;
-      window.history.pushState({ page: 'LoginAuth' }, '', '');
-      LoginAuth({ id: parseInt(id, 10) });
-    };
-
-    const handlePopState = async (event: PopStateEvent) => {
-      if (event.state && event.state.page === 'LoginAuth') {
-        await fetchToken();
-        LoginAuth({ id: null });
-      }
-    };
-
-    window.addEventListener('popstate', handlePopState);
-
     const fetchData = async () => {
       if (url.pathname === '/auth/social/callback/forty-two') {
         setLoading(true);
-        const response = await axios.get(
-          '/api/v1/auth/social/callback/forty-two/check-two-factor',
-          {
-            params: {
-              code: url.searchParams.get('code'),
-            },
-          },
-        );
-        if (response.data.isTwoFactor === true) {
-          setTwoFactorAuth(true);
-          setAuthId(response.data.id);
-          handleTwoFactorAuth();
-          return;
-        }
         await fetchToken();
-        window.location.href = `https://localhost/profile`;
+        window.location.href = 'https://localhost/profile';
       }
     };
 
     fetchData();
-
-    return () => {
-      window.removeEventListener('popstate', handlePopState);
-    };
   }, []);
-
-  if (twoFactorAuth) {
-    return <LoginAuth id={authId} />;
-  }
 
   if (!tokenInfo) {
     if (loading) {
       return <Loading />;
     }
     return <Login />;
+  }
+
+  if (tokenInfo.isTwoFactor) {
+    return <LoginAuth id={tokenInfo.id} />;
   }
 
   return (

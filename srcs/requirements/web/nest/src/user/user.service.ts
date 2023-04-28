@@ -9,10 +9,10 @@ import { UserEntity } from "./user.entity";
 export class UserService {
   constructor(
     @InjectRepository(UserEntity)
-    private readonly userRepository: Repository<UserEntity>,
+    private readonly userRepository: Repository<UserEntity>
   ) {}
 
-  async findUser(id: number): Promise<UserDto> {
+  async findUser(id: number): Promise<UserDto | null> {
     const user = await this.userRepository.findOne({ where: { id } });
     return user ? new UserDto(user) : null;
   }

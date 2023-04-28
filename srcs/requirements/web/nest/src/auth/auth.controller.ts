@@ -8,8 +8,9 @@ import {
   UseGuards,
   Post,
   Body,
+  Session,
 } from "@nestjs/common";
-import { Response } from "express";
+import { Response, Request } from "express";
 import { AuthService } from "./auth.service";
 import { UserService } from "src/user/user.service";
 import { JwtRefreshGuard } from "./jwt-refresh.guard";
@@ -35,20 +36,27 @@ export class AuthController {
   async callbackFortytwo(
     @Req() req: any,
     @Res({ passthrough: true }) res: Response
-  ): Promise<any> {
+  ): Promise<{ accessToken: string }> {
     let user = await this.userService.findUser(req.user.id);
-    if (!user) {
-      user = await this.userService.createUser(
-        new CreateUserDto(req.user.id, req.user.image.link)
-      );
-    } else if (user.isTwoFactor) {
+
+    if (user?.isTwoFactor) {
+      // res.json({ isTwoFactor: "true", id: user.id });
       // 이메일 전송 후 인증코드 유지
       const code = this.authService.generateVerificationCode();
       this.authService.sendVerificationCodeByEmail(user.email, code);
       req.session.code = code;
-      res.json({ isTwoFactor: "true", id: user.id });
+      const accessToken = await this.authService.generateAccessToken(user);
+      return { accessToken };
     }
+
+    if (!user) {
+      user = await this.userService.createUser(
+        new CreateUserDto(req.user.id, req.user.image.link)
+      );
+    }
+
     const refreshToken = await this.authService.generateRefreshToken(user.id);
+
     res.cookie("refresh", refreshToken, {
       httpOnly: true,
       maxAge: 60 * 60 * 24 * 7,
@@ -56,21 +64,24 @@ export class AuthController {
       sameSite: "strict",
       path: "/api/v1/auth/token/refresh",
     });
+
     const accessToken = await this.authService.generateAccessToken(user);
-    res.json({ accessToken: accessToken });
+    return { accessToken };
   }
 
-  @Get("verifyCode")
+  @Post("/verifyCode")
   async verifyCode(
-    @Req() req: any,
-    @Res({ passthrough: true }) res: Response
+    @Body() body: { id: number; code: string },
+    @Res({ passthrough: true }) res: Response,
+    @Session() session: Record<string, any>
   ): Promise<any> {
-    const user = await this.userService.findUser(req.id);
+    console.log(session.code);
+    const user = await this.userService.findUser(body.id);
     if (!user) {
       throw new BadRequestException();
     }
-    const code = req.session.code;
-    if (code === req.code) {
+    const code = session.code;
+    if (code === body.code) {
       // 프론트에서 코드 받아서 확인하고 확인됬으면 아래 실행
       const refreshToken = await this.authService.generateRefreshToken(user.id);
       res.cookie("refresh", refreshToken, {

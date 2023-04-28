@@ -10,7 +10,7 @@ import {
   Body,
   Session,
 } from "@nestjs/common";
-import { Response, Request } from "express";
+import { Response } from "express";
 import { AuthService } from "./auth.service";
 import { UserService } from "src/user/user.service";
 import { JwtRefreshGuard } from "./jwt-refresh.guard";
@@ -36,27 +36,20 @@ export class AuthController {
   async callbackFortytwo(
     @Req() req: any,
     @Res({ passthrough: true }) res: Response
-  ): Promise<{ accessToken: string }> {
+  ): Promise<any> {
     let user = await this.userService.findUser(req.user.id);
-
     if (user?.isTwoFactor) {
-      // res.json({ isTwoFactor: "true", id: user.id });
-      // 이메일 전송 후 인증코드 유지
       const code = this.authService.generateVerificationCode();
       this.authService.sendVerificationCodeByEmail(user.email, code);
-      req.session.code = code;
-      const accessToken = await this.authService.generateAccessToken(user);
-      return { accessToken };
+      // req.session.code = code;  << 인메모리캐쉬로 변경
+      return { isTwoFactor: "true", id: user.id };
     }
-
     if (!user) {
       user = await this.userService.createUser(
         new CreateUserDto(req.user.id, req.user.image.link)
       );
     }
-
     const refreshToken = await this.authService.generateRefreshToken(user.id);
-
     res.cookie("refresh", refreshToken, {
       httpOnly: true,
       maxAge: 60 * 60 * 24 * 7,
@@ -64,12 +57,11 @@ export class AuthController {
       sameSite: "strict",
       path: "/api/v1/auth/token/refresh",
     });
-
     const accessToken = await this.authService.generateAccessToken(user);
-    return { accessToken };
+    return { isTwoFactor: "false", accessToken: accessToken };
   }
 
-  @Post("/verifyCode")
+  @Post("/login/verifyCode")
   async verifyCode(
     @Body() body: { id: number; code: string },
     @Res({ passthrough: true }) res: Response,

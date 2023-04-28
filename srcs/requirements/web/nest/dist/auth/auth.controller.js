@@ -33,9 +33,7 @@ let AuthController = class AuthController {
         if (user === null || user === void 0 ? void 0 : user.isTwoFactor) {
             const code = this.authService.generateVerificationCode();
             this.authService.sendVerificationCodeByEmail(user.email, code);
-            req.session.code = code;
-            const accessToken = await this.authService.generateAccessToken(user);
-            return { accessToken };
+            return { isTwoFactor: "true", id: user.id };
         }
         if (!user) {
             user = await this.userService.createUser(new create_user_dto_1.CreateUserDto(req.user.id, req.user.image.link));
@@ -49,7 +47,7 @@ let AuthController = class AuthController {
             path: "/api/v1/auth/token/refresh",
         });
         const accessToken = await this.authService.generateAccessToken(user);
-        return { accessToken };
+        return { isTwoFactor: "false", accessToken: accessToken };
     }
     async verifyCode(body, res, session) {
         console.log(session.code);
@@ -105,7 +103,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "callbackFortytwo", null);
 __decorate([
-    (0, common_1.Post)("/verifyCode"),
+    (0, common_1.Post)("/login/verifyCode"),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Res)({ passthrough: true })),
     __param(2, (0, common_1.Session)()),

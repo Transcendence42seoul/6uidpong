@@ -18,7 +18,6 @@ export class AuthService {
     const payload = {
       id: user.id,
       nickname: user.nickname,
-      isTwoFactor: user.isTwoFactor,
     };
     const accessToken = await this.jwtService.signAsync(payload, {
       secret: process.env.JWT_ACCESS_SECRET_KEY,

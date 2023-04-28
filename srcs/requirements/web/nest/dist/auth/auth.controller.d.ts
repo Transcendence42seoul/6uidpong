@@ -6,9 +6,7 @@ export declare class AuthController {
     private readonly userService;
     constructor(authService: AuthService, userService: UserService);
     redirectFortytwo(res: Response): void;
-    callbackFortytwo(req: any, res: Response): Promise<{
-        accessToken: string;
-    }>;
+    callbackFortytwo(req: any, res: Response): Promise<any>;
     verifyCode(body: {
         id: number;
         code: string;

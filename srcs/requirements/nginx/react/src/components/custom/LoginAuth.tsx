@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios, { AxiosResponse, AxiosError } from 'axios';
 import HoverButton from '../button/HoverButton';
 
@@ -13,27 +13,12 @@ const LoginAuth: React.FC<LoginAuthProps> = ({ id }) => {
     axios
       .post('/api/v1/auth/verifyCode', { id, code })
       .then((response: AxiosResponse<{ result: boolean }>) => {
-        alert('인증번호가 이메일로 전송되었습니다.');
-        sessionStorage.clear();
-        window.history.go(-1);
+        alert('인증 완료');
       })
       .catch((error: AxiosError) => {
         alert('인증번호 틀린듯?');
       });
   };
-
-  useEffect(() => {
-    const handlePopState = (event: PopStateEvent) => {
-      event.preventDefault();
-      window.history.go(1);
-    };
-
-    window.addEventListener('popstate', handlePopState);
-
-    return () => {
-      window.removeEventListener('popstate', handlePopState);
-    };
-  }, []);
 
   return (
     <div>

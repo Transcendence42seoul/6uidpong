@@ -10,7 +10,6 @@ export class AuthService {
   async generateAccessToken(user: UserDto): Promise<string> {
     const payload = {
       id: user.id,
-      nickname: user.nickname,
     };
     const accessToken = await this.jwtService.signAsync(payload, {
       secret: process.env.JWT_ACCESS_SECRET_KEY,

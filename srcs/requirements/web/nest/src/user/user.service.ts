@@ -28,15 +28,11 @@ export class UserService {
   }
 
   async updateNickname(id: number, nickname: string): Promise<void> {
-    try {
-      await this.userRepository.update(id, { nickname: nickname });
-    } catch (error) {
-      if (error instanceof QueryFailedError) {
-        if (error.message.includes("unique constraint")) {
-          throw new ConflictException();
-        }
+      const user = await this.userRepository.findOne({ where: { nickname: nickname } });
+      if (user) {
+        throw new ConflictException();
       }
-    }
+      await this.userRepository.update(id, { nickname: nickname });
   }
 
   async updateProfileImage(id: number, profileImage: string): Promise<void> {

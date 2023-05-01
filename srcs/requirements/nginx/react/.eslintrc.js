@@ -24,6 +24,11 @@ module.exports = {
     tsconfigRootDir: __dirname,
   },
   rules: {
+    'consistent-return': 'off',
+    'no-param-reassign': [
+      'error',
+      { props: true, ignorePropertyModificationsFor: ['state'] },
+    ],
     'prettier/prettier': ['error'],
     'react/button-has-type': 'off',
     'react/function-component-definition': [

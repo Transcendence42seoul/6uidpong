@@ -1,17 +1,14 @@
 import axios from 'axios';
-import jwt_decode from 'jwt-decode';
 import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Main from './pages/Main';
+import { setAccessToken } from './authSlice';
+import { RootState } from './store';
+import Loading from './pages/Loading';
 import Login from './pages/Login';
-import Profile from './pages/Profile';
+import Main from './pages/Main';
 import MyPage from './pages/MyPage';
-
-interface AccessToken {
-  id: number;
-  nickname: string;
-  isTwoFactor: boolean;
-}
+import Profile from './pages/Profile';
 
 const App: React.FC = () => {
   const stats = {
@@ -20,8 +17,9 @@ const App: React.FC = () => {
     ladderScore: 4242,
     recentHistory: ['Win', 'Loss', 'Win', 'Win', 'Loss'],
   };
-  const [jwt, setJwt] = useState<string | null>(null);
-  const [accessToken, setAccessToken] = useState<AccessToken | null>(null);
+  const dispatch = useDispatch();
+  const { tokenInfo } = useSelector((state: RootState) => state.auth);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const url = new URL(window.location.href);
@@ -37,46 +35,37 @@ const App: React.FC = () => {
         },
       );
       const { accessToken: token } = response.data;
-      const payload = jwt_decode<AccessToken>(token);
-      setJwt(token);
-      setAccessToken(payload);
+      dispatch(setAccessToken(token));
     };
 
-    const callAPI = async () => {
-      try {
-        await axios.get(url.pathname, {
-          headers: {
-            Authorization: `Bearer ${jwt}`,
-          },
-        });
-      } catch (error) {
-        setAccessToken(null);
+    const fetchData = async () => {
+      if (url.pathname === '/auth/social/callback/forty-two') {
+        setLoading(true);
+        await fetchToken();
+        window.location.href = 'https://localhost/profile';
       }
     };
 
-    if (url.pathname === '/auth/social/callback/forty-two') {
-      fetchToken();
-      return;
+    fetchData();
+  }, []);
+
+  if (!tokenInfo) {
+    if (loading) {
+      return <Loading />;
     }
-    callAPI();
-  });
+    return <Login />;
+  }
 
   return (
     <BrowserRouter>
-      {accessToken ? (
-        <Routes>
-          <Route path="/" element={<Main />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route
-            path="/my-page"
-            element={<MyPage id={accessToken.id} stats={stats} />}
-          />
-        </Routes>
-      ) : (
-        <Routes>
-          <Route path="*" element={<Login />} />
-        </Routes>
-      )}
+      <Routes>
+        <Route path="/" element={<Main />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route
+          path="/my-page"
+          element={<MyPage id={tokenInfo.id} stats={stats} />}
+        />
+      </Routes>
     </BrowserRouter>
   );
 };

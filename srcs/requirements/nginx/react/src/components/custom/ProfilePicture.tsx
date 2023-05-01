@@ -1,39 +1,44 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import axios, { AxiosResponse, AxiosError } from 'axios';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store';
+import HoverButton from '../button/HoverButton';
 
-const ProfilePicture = () => {
+interface ProfileProps {
+  id: number;
+}
+
+const ProfilePicture: React.FC<ProfileProps> = ({ id }) => {
   const [picture, setPicture] = useState('');
+  const { accessToken } = useSelector((state: RootState) => state.auth);
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setPicture(event.target.value);
-  };
-
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    // POST 요청 보내기
+  const handleSubmit = () => {
     axios
-      .post('/users', { picture })
-      .then((response) => {
-        console.log(response.data);
+      .put(
+        `api/v1/users/${id}/profileImage`,
+        { profileImage: picture },
+        {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        },
+      )
+      .then((response: AxiosResponse<void>) => {
+        alert('전송에 성공했습니다.');
       })
-      .catch((error) => {
-        console.error(error);
+      .catch((error: AxiosError) => {
+        alert('전송에 실패했습니다.');
       });
   };
 
   return (
     <div>
-      <h2>프로필 사진 추가</h2>
-      <form onSubmit={handleSubmit}>
-        <input type="file" onChange={handleChange} />
-        <button
-          type="submit"
-          className="absolute right-0 top-0 m-4 rounded border-2 p-2.5"
-        >
-          제출
-        </button>
-      </form>
+      <h1>프로필 사진 추가</h1>
+      <input
+        type="text"
+        name="picture"
+        onChange={(event) => setPicture(event.target.value)}
+        className="my-4 w-full max-w-md rounded-md border border-gray-400 px-4 py-2 text-gray-900 placeholder-gray-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-pink-500"
+      />
+      <HoverButton onClick={handleSubmit}>전송</HoverButton>
     </div>
   );
 };

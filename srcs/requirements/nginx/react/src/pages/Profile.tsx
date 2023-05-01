@@ -1,24 +1,28 @@
 import React from 'react';
-import useCallAPI from '../api';
+import { useCallAPI } from '../api';
 import HoverButton from '../components/button/HoverButton';
-import ContentBox from '../components/container/ContentBox';
 import Nickname from '../components/custom/Nickname';
+import ContentBox from '../components/container/ContentBox';
 import ProfilePicture from '../components/custom/ProfilePicture';
 import TwoFactorAuth from '../components/custom/TwoFactorAuth';
 
-const Profile: React.FC = () => {
+interface ProfileProps {
+  id: number;
+}
+
+const Profile: React.FC<ProfileProps> = ({ id }) => {
   const callAPI = useCallAPI();
 
   return (
     <div className="flex flex-col items-center p-4">
       <ContentBox className="mb-4 w-full max-w-md flex-col border p-4">
-        <Nickname />
+        <Nickname id={id} />
       </ContentBox>
       <ContentBox className="mb-4 w-full max-w-md flex-col border p-4">
-        <ProfilePicture />
+        <ProfilePicture id={id} />
       </ContentBox>
       <ContentBox className="mb-4 w-full max-w-md flex-col border p-4">
-        <TwoFactorAuth />
+        <TwoFactorAuth id={id} />
       </ContentBox>
       <HoverButton
         onClick={() => callAPI('/')}

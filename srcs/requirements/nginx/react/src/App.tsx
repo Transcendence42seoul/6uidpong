@@ -51,7 +51,7 @@ const App: React.FC = () => {
     const fetchData = async () => {
       setLoading(true);
       await fetchAuth();
-      window.location.href = 'https://localhost/profile';
+      window.location.href = `${url.origin}/profile`;
     };
 
     if (url.pathname === '/auth/social/callback/forty-two') {

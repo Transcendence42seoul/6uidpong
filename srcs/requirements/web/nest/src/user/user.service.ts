@@ -31,10 +31,10 @@ export class UserService {
     try {
       await this.userRepository.update(id, { nickname: nickname });
     } catch (error) {
-        if (error instanceof QueryFailedError) {
-          if (error.message.includes('unique constraint')) {
-            throw new ConflictException();
-          }
+      if (error instanceof QueryFailedError) {
+        if (error.message.includes("unique constraint")) {
+          throw new ConflictException();
+        }
       }
     }
   }
@@ -42,7 +42,6 @@ export class UserService {
   async updateProfileImage(id: number, profileImage: string): Promise<void> {
     await this.userRepository.update(id, { profileImage: profileImage });
   }
-
 
   async verifyTwoFactorAuth(body: {
     id: number;

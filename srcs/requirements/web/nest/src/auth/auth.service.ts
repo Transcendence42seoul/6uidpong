@@ -1,16 +1,11 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { UserDto } from "src/user/dto/user.dto";
-import { InjectRepository } from "@nestjs/typeorm";
 import * as nodemailer from "nodemailer";
-import { UserEntity } from "../user/user.entity";
 
 @Injectable()
 export class AuthService {
-  constructor(
-    @InjectRepository(UserEntity)
-    private readonly jwtService: JwtService,
-  ) {}
+  constructor(private readonly jwtService: JwtService) {}
 
   async generateAccessToken(user: UserDto): Promise<string> {
     const payload = {

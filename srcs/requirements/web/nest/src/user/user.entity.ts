@@ -1,14 +1,8 @@
-
-
 import { Column, Entity, PrimaryColumn } from "typeorm";
 
 @Entity("users")
 export class UserEntity {
-  constructor(
-    id?: number,
-    nickname?: string,
-    profileImage?: string,
-  ) {
+  constructor(id?: number, nickname?: string, profileImage?: string) {
     this.id = id;
     this.nickname = nickname;
     this.profileImage = profileImage;

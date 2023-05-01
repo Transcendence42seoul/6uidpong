@@ -11,8 +11,8 @@ import {
   Inject,
 } from "@nestjs/common";
 import { Response } from "express";
-import { CACHE_MANAGER } from "@nestjs/cache-manager";
 import { Cache } from "cache-manager";
+import { CACHE_MANAGER } from "@nestjs/cache-manager";
 import { AuthService } from "./auth.service";
 import { UserService } from "src/user/user.service";
 import { JwtRefreshGuard } from "./jwt-refresh.guard";
@@ -106,5 +106,4 @@ export class AuthController {
     const accessToken = await this.authService.generateAccessToken(user);
     return { accessToken: accessToken };
   }
-
 }

@@ -8,11 +8,10 @@ import {
   ParseIntPipe,
   HttpCode,
   HttpStatus,
-  Post
+  Post,
 } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { JwtAccessGuard } from "src/auth/jwt-access.guard";
-
 
 @Controller("api/v1/users")
 @UseGuards(JwtAccessGuard)
@@ -26,15 +25,19 @@ export class UserController {
 
   @Put("/:id/nickname")
   @HttpCode(HttpStatus.NO_CONTENT)
-  async updateNickname(@Param("id", ParseIntPipe) id: number, 
-                       @Body("nickname") nickname: string): Promise<void> {
+  async updateNickname(
+    @Param("id", ParseIntPipe) id: number,
+    @Body("nickname") nickname: string
+  ): Promise<void> {
     await this.userService.updateNickname(id, nickname);
   }
 
   @Put("/:id/profileImage")
   @HttpCode(HttpStatus.NO_CONTENT)
-  async updateProfileImage(@Param("id", ParseIntPipe) id: number,
-                           @Body("profileImage") profileImage: string): Promise<void> {
+  async updateProfileImage(
+    @Param("id", ParseIntPipe) id: number,
+    @Body("profileImage") profileImage: string
+  ): Promise<void> {
     await this.userService.updateProfileImage(id, profileImage);
   }
 

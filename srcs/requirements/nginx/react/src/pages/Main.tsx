@@ -1,7 +1,7 @@
 import React from 'react';
 import useCallAPI from '../api';
-import ContentBox from '../components/box/ContentBox';
 import HoverButton from '../components/button/HoverButton';
+import ContentBox from '../components/container/ContentBox';
 import Image from '../constants/Image';
 
 const Main: React.FC = () => {

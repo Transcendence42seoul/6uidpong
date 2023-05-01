@@ -1,8 +1,8 @@
 import React from 'react';
 import useCallAPI from '../api';
 import HoverButton from '../components/button/HoverButton';
+import ContentBox from '../components/container/ContentBox';
 import Nickname from '../components/custom/Nickname';
-import ContentBox from '../components/box/ContentBox';
 import ProfilePicture from '../components/custom/ProfilePicture';
 import TwoFactorAuth from '../components/custom/TwoFactorAuth';
 

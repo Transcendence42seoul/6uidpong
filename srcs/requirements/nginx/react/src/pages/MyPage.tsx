@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import useCallAPI from '../api';
-import ContentBox from '../components/box/ContentBox';
 import HoverButton from '../components/button/HoverButton';
+import ContentBox from '../components/container/ContentBox';
 
 interface User {
   nickname: string;

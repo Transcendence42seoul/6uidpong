@@ -8,6 +8,7 @@ import {
   ParseIntPipe,
   HttpCode,
   HttpStatus,
+  Post
 } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { JwtAccessGuard } from "src/auth/jwt-access.guard";
@@ -35,5 +36,21 @@ export class UserController {
   async updateProfileImage(@Param("id", ParseIntPipe) id: number,
                            @Body("profileImage") profileImage: string): Promise<void> {
     await this.userService.updateProfileImage(id, profileImage);
+  }
+
+  @Post("/isTwoFactor")
+  @UseGuards(JwtAccessGuard)
+  async verifyTwoFactorAuth(
+    @Body() body: { id: number; email: string }
+  ): Promise<boolean> {
+    return this.userService.verifyTwoFactorAuth(body);
+  }
+
+  @Post("/verifyVerificationCode")
+  @UseGuards(JwtAccessGuard)
+  async verifyVerificationCode(
+    @Body() body: { id: number; code: string; email: string }
+  ): Promise<boolean> {
+    return this.userService.verifyVerificationCode(body);
   }
 }

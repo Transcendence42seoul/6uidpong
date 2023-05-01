@@ -107,17 +107,4 @@ export class AuthController {
     return { accessToken: accessToken };
   }
 
-  @Post("/isTwoFactor")
-  async verifyTwoFactorAuth(
-    @Body() body: { id: number; email: string }
-  ): Promise<boolean> {
-    return this.authService.verifyTwoFactorAuth(body);
-  }
-
-  @Post("/verifyVerificationCode")
-  async verifyVerificationCode(
-    @Body() body: { id: number; code: string; email: string }
-  ): Promise<boolean> {
-    return this.authService.verifyVerificationCode(body);
-  }
 }

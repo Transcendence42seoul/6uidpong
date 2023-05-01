@@ -2,13 +2,20 @@ import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { setAccessToken } from './authSlice';
+import { setAuthInfo } from './authSlice';
 import { RootState } from './store';
 import Loading from './pages/Loading';
 import Login from './pages/Login';
 import Main from './pages/Main';
 import MyPage from './pages/MyPage';
 import Profile from './pages/Profile';
+import LoginAuth from './components/custom/LoginAuth';
+
+interface AuthInfo {
+  id: number | null;
+  isTwoFactor: boolean;
+  accessToken: string | null;
+}
 
 const App: React.FC = () => {
   const stats = {
@@ -17,16 +24,20 @@ const App: React.FC = () => {
     ladderScore: 4242,
     recentHistory: ['Win', 'Loss', 'Win', 'Win', 'Loss'],
   };
+
+  const { id, isTwoFactor, tokenInfo } = useSelector(
+    (state: RootState) => state.auth,
+  );
+
   const dispatch = useDispatch();
-  const { tokenInfo } = useSelector((state: RootState) => state.auth);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const url = new URL(window.location.href);
 
-    const fetchToken = async () => {
+    const fetchAuth = async () => {
       const code = url.searchParams.get('code');
-      const response = await axios.get(
+      const { data } = await axios.get<AuthInfo>(
         '/api/v1/auth/social/callback/forty-two',
         {
           params: {
@@ -34,22 +45,24 @@ const App: React.FC = () => {
           },
         },
       );
-      const { accessToken: token } = response.data;
-      dispatch(setAccessToken(token));
+      dispatch(setAuthInfo(data));
     };
 
     const fetchData = async () => {
-      if (url.pathname === '/auth/social/callback/forty-two') {
-        setLoading(true);
-        await fetchToken();
-        window.location.href = 'https://localhost/profile';
-      }
+      setLoading(true);
+      await fetchAuth();
+      window.location.href = 'https://localhost/profile';
     };
 
-    fetchData();
+    if (url.pathname === '/auth/social/callback/forty-two') {
+      fetchData();
+    }
   }, []);
 
   if (!tokenInfo) {
+    if (isTwoFactor) {
+      return <LoginAuth id={id} />;
+    }
     if (loading) {
       return <Loading />;
     }
@@ -60,7 +73,7 @@ const App: React.FC = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Main />} />
-        <Route path="/profile" element={<Profile />} />
+        <Route path="/profile" element={<Profile id={tokenInfo.id} />} />
         <Route
           path="/my-page"
           element={<MyPage id={tokenInfo.id} stats={stats} />}

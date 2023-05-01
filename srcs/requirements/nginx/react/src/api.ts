@@ -1,13 +1,13 @@
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { setAccessToken } from './authSlice';
+import { setAuthInfo } from './authSlice';
 import { RootState } from './store';
 
 const useCallAPI = () => {
-  const accessToken = useSelector((state: RootState) => state.auth.accessToken);
-  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { accessToken } = useSelector((state: RootState) => state.auth);
 
   const callAPI = async (pathname: string, isNavigate = true) => {
     try {
@@ -21,10 +21,9 @@ const useCallAPI = () => {
       }
       navigate(pathname);
     } catch (error) {
-      dispatch(setAccessToken(null));
+      dispatch(setAuthInfo(null));
     }
   };
-
   return callAPI;
 };
 

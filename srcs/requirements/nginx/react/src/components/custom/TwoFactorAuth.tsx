@@ -1,12 +1,20 @@
 import React, { useState } from 'react';
 import axios, { AxiosResponse, AxiosError } from 'axios';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store';
 import HoverButton from '../button/HoverButton';
 import Modal from '../modal/Modal';
 
-const TwoFactorAuth = () => {
+interface TwoFactorAuthProps {
+  id: number;
+}
+
+const TwoFactorAuth: React.FC<TwoFactorAuthProps> = ({ id }) => {
   const [openModal, setOpenModal] = useState(false);
+  const { accessToken } = useSelector((state: RootState) => state.auth);
   const [email, setEmail] = useState('');
   const [sendmail, setSendmail] = useState(false);
+  const [isDisabled, setIsDisabled] = useState(false);
   const [code, setCode] = useState('');
 
   const handleOpenModal = () => {
@@ -14,16 +22,28 @@ const TwoFactorAuth = () => {
   };
 
   const handleCloseModal = () => {
+    setEmail('');
+    setCode('');
+    setIsDisabled(false);
     setOpenModal(false);
+    if (sessionStorage) sessionStorage.clear();
   };
 
   const handleSetIsTwoFactorVerified = () => {
     // 이메일 보내는 POST 요청 처리
+    setIsDisabled(true);
     axios
-      .post('/api/v1/auth/isTwoFactor', { email })
+      .post(
+        '/api/v1/users/isTwoFactor',
+        { id, email },
+        {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        },
+      )
       .then((response: AxiosResponse<boolean>) => {
         // 이메일이 성공적으로 보내진 경우, 인증코드 작성 창이 나타나도록 상태 변경
-        setSendmail(true);
+        if (response.data === true) setSendmail(true);
+        else alert('이메일 형식 잘못된듯');
       })
       .catch((error: AxiosError) => {
         alert('이메일 잘못된듯');
@@ -33,16 +53,23 @@ const TwoFactorAuth = () => {
   const handleVerifyVerificationCode = () => {
     // 인증코드를 서버로 보내는 POST 요청 처리
     axios
-      .post('/api/v1/auth/verifyVerificationCode', {
-        email,
-        code,
-      })
+      .post(
+        '/api/v1/users/verifyVerificationCode',
+        { code, email },
+        {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        },
+      )
       .then((response: AxiosResponse<boolean>) => {
         // 인증코드가 올바른 경우, 추가 로직 처리
-        alert('2차 인증 완료!');
+        if (response.data === true) {
+          alert('2차 인증 완료!');
+          handleCloseModal();
+        } else alert('인증 실패');
       })
       .catch((error: AxiosError) => {
-        alert('인증번호 틀렸음');
+        console.log(error);
+        alert('서버 에러');
       });
   };
 
@@ -64,13 +91,13 @@ const TwoFactorAuth = () => {
                 name="email"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
-                disabled={sendmail}
+                disabled={isDisabled}
                 className="my-4 w-full max-w-md rounded-md border border-gray-400 px-4 py-2 text-gray-900 placeholder-gray-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-pink-500"
               />
               <HoverButton
                 onClick={handleSetIsTwoFactorVerified}
                 className="my-2 w-full max-w-md rounded border p-2.5"
-                disabled={sendmail}
+                disabled={isDisabled}
               >
                 Verify
               </HoverButton>

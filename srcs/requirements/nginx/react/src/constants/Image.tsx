@@ -8,7 +8,6 @@ class Image {
   static readonly MODAL_IMAGE = 'https://i.imgur.com/lfaWNsI.png';
 
   static readonly LOADING = 'https://i.imgur.com/dMRGsI1.png';
-
 }
 
 export default Image;

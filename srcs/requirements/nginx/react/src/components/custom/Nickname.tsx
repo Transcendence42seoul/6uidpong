@@ -1,59 +1,43 @@
-import React, { useState, useEffect } from 'react';
-import axios, { AxiosInstance } from 'axios';
+import React, { useState } from 'react';
+import axios, { AxiosResponse, AxiosError } from 'axios';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store';
 import HoverButton from '../button/HoverButton';
 
-const Nickname = () => {
+interface NicknameProps {
+  id: number;
+}
+
+const Nickname: React.FC<NicknameProps> = ({ id }) => {
   const [nickname, setNickname] = useState('');
-  const [updatedNickname, setUpdatedNickname] = useState('');
+  const { accessToken } = useSelector((state: RootState) => state.auth);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // AxiosInstance 객체 생성
-        const axiosInstance: AxiosInstance = axios.create({
-          // AxiosInstance 객체의 설정 옵션들
-        });
-
-        // GET 요청 보내기
-        const response = await axiosInstance.get('/api/nickname'); // mock db의 API 엔드포인트
-        // 응답 데이터에서 닉네임 추출하여 상태 업데이트
-        setNickname(response.data.nickname);
-      } catch (error) {
-        // 에러 처리
-        console.error('Failed to fetch data:', error);
-      }
-    };
-    // GET 요청을 보내 초기 데이터를 가져옴
-    fetchData();
-  }, []);
-
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setNickname(event.target.value);
-  };
-
-  const handleClick = async () => {
-    try {
-      // AxiosInstance 객체 생성
-      const axiosInstance: AxiosInstance = axios.create({
-        // AxiosInstance 객체의 설정 옵션들
+  const handleNickname = () => {
+    axios
+      .put(
+        `api/v1/users/${id}/nickname`,
+        { nickname },
+        {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        },
+      )
+      .then((response: AxiosResponse<void>) => {
+        alert('닉네임 변경 완료');
+      })
+      .catch((error: AxiosError) => {
+        alert('닉네임 변경 실패');
       });
-
-      // POST 요청 보내기
-      await axiosInstance.post('/api/nickname', { nickname }); // mock db의 API 엔드포인트와 데이터
-      // 업데이트된 닉네임으로 상태 업데이트
-      setUpdatedNickname(nickname);
-    } catch (error) {
-      // 에러 처리
-      console.error('Failed to update data:', error);
-    }
   };
-
   return (
     <div>
-      <h2>닉네임 변경</h2>
-      <input type="text" value={nickname} onChange={handleChange} />
-      <HoverButton onClick={handleClick}>변경</HoverButton>
-      <p>업데이트된 닉네임: {updatedNickname}</p>
+      <h1>닉네임 변경</h1>
+      <input
+        type="text"
+        name="nickname"
+        onChange={(event) => setNickname(event.target.value)}
+        className="my-4 w-full max-w-md rounded-md border border-gray-400 px-4 py-2 text-gray-900 placeholder-gray-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-pink-500"
+      />
+      <HoverButton onClick={handleNickname}>전송</HoverButton>
     </div>
   );
 };

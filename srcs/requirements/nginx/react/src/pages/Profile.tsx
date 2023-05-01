@@ -1,5 +1,5 @@
 import React from 'react';
-import { useCallAPI } from '../api';
+import useCallAPI from '../api';
 import HoverButton from '../components/button/HoverButton';
 import Nickname from '../components/custom/Nickname';
 import ContentBox from '../components/container/ContentBox';

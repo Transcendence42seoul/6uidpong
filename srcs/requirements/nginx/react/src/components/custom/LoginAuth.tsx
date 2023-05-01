@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { fetchAuth } from '../../api';
+import { setAuthInfo } from '../../authSlice';
 import HoverButton from '../button/HoverButton';
 
 interface LoginAuthProps {
@@ -14,12 +14,19 @@ const LoginAuth: React.FC<LoginAuthProps> = ({ id }) => {
 
   const handleVerificationCode = async () => {
     try {
-      await axios.post('/api/v1/auth/login/verifyCode', {
+      const { data } = await axios.post('/api/v1/auth/login/verifyCode', {
         id,
         code,
       });
       alert('인증 완료');
-      await fetchAuth(dispatch);
+      dispatch(
+        setAuthInfo({
+          id: null,
+          isTwoFactor: null,
+          accessToken: data.accessToken,
+        }),
+      );
+      window.location.href = 'https://localhost/profile';
     } catch {
       alert('인증번호 틀린듯?');
     }

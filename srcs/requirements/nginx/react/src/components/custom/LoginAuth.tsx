@@ -18,19 +18,15 @@ const LoginAuth: React.FC<LoginAuthProps> = ({ id }) => {
         id,
         code,
       });
-      if (data.code === 200) {
-        alert('인증 완료');
-        dispatch(
-          setAuthInfo({
-            id: null,
-            isTwoFactor: null,
-            accessToken: data.accessToken,
-          }),
-        );
-        window.location.href = 'https://localhost/profile';
-      } else {
-        alert('인증 실패');
-      }
+      alert('인증 완료');
+      dispatch(
+        setAuthInfo({
+          id: null,
+          isTwoFactor: null,
+          accessToken: data.accessToken,
+        }),
+      );
+      window.location.href = 'https://localhost/profile';
     } catch {
       alert('인증번호 틀린듯?');
     }

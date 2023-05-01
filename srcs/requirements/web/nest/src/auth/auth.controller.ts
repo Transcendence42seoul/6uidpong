@@ -94,6 +94,9 @@ export class AuthController {
       const accessToken = await this.authService.generateAccessToken(user);
       res.json({ accessToken: accessToken });
     }
+    else {
+      throw new BadRequestException();
+    }
   }
 
   @Get("/token/refresh")

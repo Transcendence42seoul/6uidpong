@@ -2,7 +2,6 @@ import {
   Controller,
   Get,
   Put,
-  Post,
   Param,
   Body,
   UseGuards,
@@ -55,7 +54,7 @@ export class UserController {
     await this.userService.updateImage(id, image);
   }
 
-  @Post("/:id/email/code")
+  @Put("/:id/email/code")
   @HttpCode(HttpStatus.NO_CONTENT)
   async sendCodeByEmail(@Param("id", ParseIntPipe) id: number): Promise<void> {
     const { email } = await this.userService.findUserById(id);

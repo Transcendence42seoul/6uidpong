@@ -1,7 +1,6 @@
-import { IsString, IsUrl } from "class-validator";
+import { IsString } from "class-validator";
 
 export class UpdateImageDto {
   @IsString()
-  @IsUrl()
   readonly image: string;
 }

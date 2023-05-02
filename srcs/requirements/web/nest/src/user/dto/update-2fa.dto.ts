@@ -3,9 +3,9 @@ import { IsBoolean, IsNotEmpty, IsString } from "class-validator";
 export class UpdateTwoFactorAuthDto {
   @IsString()
   @IsNotEmpty()
-  code: string;
+  readonly code: string;
 
   @IsBoolean()
   @IsNotEmpty()
-  is2FA: boolean;
+  readonly is2FA: boolean;
 }

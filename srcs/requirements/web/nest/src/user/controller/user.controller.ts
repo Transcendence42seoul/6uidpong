@@ -41,7 +41,7 @@ export class UserController {
   ): Promise<void> {
     const user = await this.userService.findUserByNickname(nickname);
     if (user) {
-      throw new ConflictException("Nickname already exists.");
+      throw new ConflictException();
     }
     await this.userService.updateNickname(id, nickname);
   }

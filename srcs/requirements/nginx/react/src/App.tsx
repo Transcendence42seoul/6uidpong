@@ -13,7 +13,7 @@ import LoginAuth from './components/custom/LoginAuth';
 
 interface AuthInfo {
   id: number | null;
-  isTwoFactor: boolean;
+  is2FA: boolean;
   accessToken: string | null;
 }
 
@@ -25,33 +25,41 @@ const App: React.FC = () => {
     recentHistory: ['Win', 'Loss', 'Win', 'Win', 'Loss'],
   };
 
-  const { id, isTwoFactor, tokenInfo } = useSelector(
+  const { id, is2FA, tokenInfo } = useSelector(
     (state: RootState) => state.auth,
   );
 
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
+  const [isFirstLogin, setIsFirstLogin] = useState(false);
+
+  const handleIsFirstLogin = (status: number) => {
+    if (status === 201) {
+      setIsFirstLogin(true);
+    }
+  };
 
   useEffect(() => {
     const url = new URL(window.location.href);
 
     const fetchAuth = async () => {
       const code = url.searchParams.get('code');
-      const { data } = await axios.get<AuthInfo>(
+      const { data, status } = await axios.post<AuthInfo>(
         '/api/v1/auth/social/callback/forty-two',
-        {
-          params: {
-            code,
-          },
-        },
+        { code },
       );
       dispatch(setAuthInfo(data));
+      handleIsFirstLogin(status);
     };
 
     const fetchData = async () => {
       setLoading(true);
       await fetchAuth();
-      window.location.href = `${url.origin}/profile`;
+      let pathname = '/';
+      if (isFirstLogin) {
+        pathname = '/profile';
+      }
+      window.location.href = url.origin + pathname;
     };
 
     if (url.pathname === '/auth/social/callback/forty-two') {
@@ -60,7 +68,7 @@ const App: React.FC = () => {
   }, []);
 
   if (!tokenInfo) {
-    if (isTwoFactor) {
+    if (is2FA) {
       return <LoginAuth id={id} />;
     }
     if (loading) {

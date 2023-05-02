@@ -8,7 +8,7 @@ interface TokenInfo {
 
 const initialState = {
   id: null,
-  isTwoFactor: null,
+  is2FA: null,
   accessToken: null,
   tokenInfo: null as TokenInfo | null,
 };
@@ -22,13 +22,13 @@ const authSlice = createSlice({
     setAuthInfo: (state, { payload }) => {
       if (!payload) {
         state.id = null;
-        state.isTwoFactor = null;
+        state.is2FA = null;
         state.accessToken = null;
         state.tokenInfo = null;
         return;
       }
       state.id = payload.id;
-      state.isTwoFactor = payload.isTwoFactor;
+      state.is2FA = payload.is2FA;
       state.accessToken = payload.accessToken;
       if (payload.accessToken) {
         state.tokenInfo = jwt_decode<TokenInfo>(payload.accessToken);

@@ -14,7 +14,7 @@ const LoginAuth: React.FC<LoginAuthProps> = ({ id }) => {
 
   const handleVerificationCode = async () => {
     try {
-      const { data } = await axios.post('/api/v1/auth/login/verifyCode', {
+      const { data } = await axios.post('/api/v1/auth/2fa', {
         id,
         code,
       });
@@ -22,7 +22,7 @@ const LoginAuth: React.FC<LoginAuthProps> = ({ id }) => {
       dispatch(
         setAuthInfo({
           id: null,
-          isTwoFactor: null,
+          is2FA: null,
           accessToken: data.accessToken,
         }),
       );

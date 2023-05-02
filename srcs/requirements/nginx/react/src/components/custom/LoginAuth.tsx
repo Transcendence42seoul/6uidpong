@@ -22,7 +22,7 @@ const LoginAuth: React.FC<LoginAuthProps> = ({ id }) => {
       dispatch(
         setAuthInfo({
           id: null,
-          isTwoFactor: null,
+          is2FA: null,
           accessToken: data.accessToken,
         }),
       );

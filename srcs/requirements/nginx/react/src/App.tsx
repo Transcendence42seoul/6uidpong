@@ -13,7 +13,7 @@ import LoginAuth from './components/custom/LoginAuth';
 
 interface AuthInfo {
   id: number | null;
-  isTwoFactor: boolean;
+  is2FA: boolean;
   accessToken: string | null;
 }
 
@@ -25,7 +25,7 @@ const App: React.FC = () => {
     recentHistory: ['Win', 'Loss', 'Win', 'Win', 'Loss'],
   };
 
-  const { id, isTwoFactor, tokenInfo } = useSelector(
+  const { id, is2FA, tokenInfo } = useSelector(
     (state: RootState) => state.auth,
   );
 
@@ -60,7 +60,7 @@ const App: React.FC = () => {
   }, []);
 
   if (!tokenInfo) {
-    if (isTwoFactor) {
+    if (is2FA) {
       return <LoginAuth id={id} />;
     }
     if (loading) {

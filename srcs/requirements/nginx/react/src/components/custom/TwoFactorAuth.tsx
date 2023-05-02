@@ -29,12 +29,12 @@ const TwoFactorAuth: React.FC<TwoFactorAuthProps> = ({ id }) => {
     if (sessionStorage) sessionStorage.clear();
   };
 
-  const handleSetIsTwoFactorVerified = () => {
+  const handleSetIs2faVerified = () => {
     // 이메일 보내는 POST 요청 처리
     setIsDisabled(true);
     axios
       .post(
-        '/api/v1/users/isTwoFactor',
+        '/api/v1/users/is2FA',
         { id, email },
         {
           headers: { Authorization: `Bearer ${accessToken}` },
@@ -95,7 +95,7 @@ const TwoFactorAuth: React.FC<TwoFactorAuthProps> = ({ id }) => {
                 className="my-4 w-full max-w-md rounded-md border border-gray-400 px-4 py-2 text-gray-900 placeholder-gray-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-pink-500"
               />
               <HoverButton
-                onClick={handleSetIsTwoFactorVerified}
+                onClick={handleSetIs2faVerified}
                 className="my-2 w-full max-w-md rounded border p-2.5"
                 disabled={isDisabled}
               >

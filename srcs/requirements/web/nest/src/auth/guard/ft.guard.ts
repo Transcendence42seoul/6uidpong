@@ -3,7 +3,7 @@ import {
   ExecutionContext,
   Injectable,
   UnauthorizedException,
-  BadRequestException,
+  UnprocessableEntityException,
 } from "@nestjs/common";
 import { HttpService } from "@nestjs/axios";
 import { lastValueFrom } from "rxjs";
@@ -16,7 +16,7 @@ export class FtGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const code = request.body.code;
     if (!code) {
-      throw new BadRequestException();
+      throw new UnprocessableEntityException();
     }
     try {
       const accessToken = await this.receiveOauthAccessToken(code);

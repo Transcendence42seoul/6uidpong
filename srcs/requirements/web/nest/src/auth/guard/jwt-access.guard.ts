@@ -3,6 +3,7 @@ import {
   ExecutionContext,
   Injectable,
   UnauthorizedException,
+  NotFoundException,
 } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { Request } from "express";
@@ -21,12 +22,12 @@ export class JwtAccessGuard implements CanActivate {
       const payload = await this.jwtService.verifyAsync(token, {
         secret: process.env.JWT_ACCESS_SECRET_KEY,
       });
-      if (request.params.id && payload.id != request.params.id) {
-        throw new UnauthorizedException();
-      }
       request["user"] = payload;
     } catch {
       throw new UnauthorizedException();
+    }
+    if (request.params.id != request.user.id) {
+      throw new NotFoundException();
     }
     return true;
   }

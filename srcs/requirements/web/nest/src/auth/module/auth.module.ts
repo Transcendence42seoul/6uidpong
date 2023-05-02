@@ -3,13 +3,13 @@ import { forwardRef, Module } from "@nestjs/common";
 import { JwtModule } from "@nestjs/jwt";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { CacheModule } from "@nestjs/cache-manager";
-import { UserEntity } from "src/user/user.entity";
-import { UserModule } from "src/user/user.module";
-import { AuthController } from "./auth.controller";
-import { AuthService } from "./auth.service";
-import { OauthGuard } from "./oauth.guard";
-import { JwtAccessGuard } from "./jwt-access.guard";
-import { JwtRefreshGuard } from "./jwt-refresh.guard";
+import { UserEntity } from "src/user/entity/user.entity";
+import { UserModule } from "src/user/module/user.module";
+import { AuthController } from "../controller/auth.controller";
+import { AuthService } from "../service/auth.service";
+import { FtGuard } from "../guard/ft.guard";
+import { JwtAccessGuard } from "../guard/jwt-access.guard";
+import { JwtRefreshGuard } from "../guard/jwt-refresh.guard";
 
 @Module({
   imports: [
@@ -22,6 +22,6 @@ import { JwtRefreshGuard } from "./jwt-refresh.guard";
     CacheModule.register(),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtAccessGuard, JwtRefreshGuard, OauthGuard],
+  providers: [AuthService, JwtAccessGuard, JwtRefreshGuard, FtGuard],
 })
 export class AuthModule {}

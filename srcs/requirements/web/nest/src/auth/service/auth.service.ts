@@ -1,15 +1,22 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Inject } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
-import { UserDto } from "src/user/dto/user.dto";
 import * as nodemailer from "nodemailer";
+import { CACHE_MANAGER } from "@nestjs/cache-manager";
+import { Cache } from "cache-manager";
+import { UserService } from "src/user/service/user.service";
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly jwtService: JwtService) {}
+  constructor(
+    private readonly jwtService: JwtService,
+    private readonly userService: UserService,
+    @Inject(CACHE_MANAGER)
+    private readonly cacheManager: Cache
+  ) {}
 
-  async generateAccessToken(user: UserDto): Promise<string> {
+  async generateAccessToken(id: number): Promise<string> {
     const payload = {
-      id: user.id,
+      id: id,
     };
     const accessToken = await this.jwtService.signAsync(payload, {
       secret: process.env.JWT_ACCESS_SECRET_KEY,
@@ -29,17 +36,7 @@ export class AuthService {
     return refreshToken;
   }
 
-  public generateVerificationCode() {
-    const verificationCode = Math.floor(
-      100000 + Math.random() * 900000
-    ).toString();
-    return verificationCode;
-  }
-
-  public async sendVerificationCodeByEmail(
-    email: string,
-    verificationCode: string
-  ): Promise<void> {
+  public async sendCodeByEmail(id: number, email: string): Promise<void> {
     // Nodemailer를 사용하여 이메일 전송 설정
     const emailUser: string = process.env.EMAIL_USER;
     const emailPass: string = process.env.EMAIL_PASS;
@@ -54,11 +51,14 @@ export class AuthService {
         pass: emailPass, // 발신자 이메일 비밀번호
       },
     });
+
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+
     const mailOptions = {
       from: "6uidpong@42seoul.kr", // 발신자 이메일 주소
       to: email, // 수신자 이메일 주소
       subject: "Verification Code", // 이메일 제목
-      text: `Your verification code is: ${verificationCode}`, // 이메일 본문
+      text: `Your verification code is: ${code}`, // 이메일 본문
     };
 
     // 이메일 전송
@@ -69,5 +69,15 @@ export class AuthService {
         console.log("Email sent: " + info.response);
       }
     });
+
+    await this.cacheManager.set(id.toString(), code, 300000);
+  }
+
+  async validateCode(id: number, code: string): Promise<boolean> {
+    if ((await this.cacheManager.get(id.toString())) != code) {
+      return false;
+    }
+    this.cacheManager.del(id.toString());
+    return true;
   }
 }

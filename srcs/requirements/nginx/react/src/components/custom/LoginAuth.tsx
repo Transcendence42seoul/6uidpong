@@ -14,7 +14,7 @@ const LoginAuth: React.FC<LoginAuthProps> = ({ id }) => {
 
   const handleVerificationCode = async () => {
     try {
-      const { data } = await axios.put('/api/v1/auth/2fa', {
+      const { data } = await axios.post('/api/v1/auth/2fa', {
         id,
         code,
       });

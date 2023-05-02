@@ -11,7 +11,7 @@ interface TwoFactorAuthProps {
 
 const TwoFactorAuth: React.FC<TwoFactorAuthProps> = ({ id }) => {
   const [openModal, setOpenModal] = useState(false);
-  const { accessToken } = useSelector((state: RootState) => state.auth);
+  const { is2FA, accessToken } = useSelector((state: RootState) => state.auth);
   const [email, setEmail] = useState('');
   const [sendmail, setSendmail] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
@@ -33,13 +33,9 @@ const TwoFactorAuth: React.FC<TwoFactorAuthProps> = ({ id }) => {
     // 이메일 보내는 POST 요청 처리
     setIsDisabled(true);
     axios
-      .post(
-        '/api/v1/users/is2FA',
-        { id, email },
-        {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        },
-      )
+      .post(`/api/v1/users/${id}/email/code`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      })
       .then((response: AxiosResponse<boolean>) => {
         // 이메일이 성공적으로 보내진 경우, 인증코드 작성 창이 나타나도록 상태 변경
         if (response.data === true) setSendmail(true);
@@ -54,8 +50,8 @@ const TwoFactorAuth: React.FC<TwoFactorAuthProps> = ({ id }) => {
     // 인증코드를 서버로 보내는 POST 요청 처리
     axios
       .post(
-        '/api/v1/users/verifyVerificationCode',
-        { code, email },
+        `/api/v1/users/${id}/is2fa`,
+        { code, is2FA },
         {
           headers: { Authorization: `Bearer ${accessToken}` },
         },

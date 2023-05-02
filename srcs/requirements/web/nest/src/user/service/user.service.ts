@@ -17,13 +17,13 @@ export class UserService {
   async createUser(
     id: number,
     email: string,
-    profileImage: string
+    image: string
   ): Promise<UserEntity> {
     const info = this.userRepository.create({
       id: id,
       nickname: `undefined-${id}`,
       email: email,
-      profileImage: profileImage,
+      image: image,
     });
     return await this.userRepository.save(info);
   }

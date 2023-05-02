@@ -36,17 +36,13 @@ export class AuthController {
     @Req() req: any,
     @Res({ passthrough: true }) res: Response
   ): Promise<Object> {
-    let user = await this.userService.findUser(req.user.id);
+    let user = await this.userService.findUserById(req.user.id);
     if (user?.is2FA) {
       this.authService.sendCodeByEmail(user.id, user.email);
       return { is2FA: true, id: user.id, accessToken: null };
     }
     if (!user) {
-      user = await this.userService.createUser(
-        req.user.id,
-        req.user.email,
-        req.user.image.link
-      );
+      user = await this.userService.createUser(req.user);
       res.status(HttpStatus.CREATED);
       res.setHeader("Location", `/api/v1/users/${user.id}`);
     }

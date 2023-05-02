@@ -10,12 +10,15 @@ import {
   HttpCode,
   HttpStatus,
   UnauthorizedException,
-  Query,
+  ConflictException,
 } from "@nestjs/common";
 import { UserService } from "../service/user.service";
 import { JwtAccessGuard } from "src/auth/guard/jwt-access.guard";
 import { AuthService } from "src/auth/service/auth.service";
 import { UserEntity } from "../entity/user.entity";
+import { UpdateImageDto } from "../dto/update-image.dto";
+import { UpdateNicknameDto } from "../dto/update-nickname.dto";
+import { UpdateTwoFactorAuthDto } from "../dto/update-2fa.dto";
 
 @Controller("api/v1/users")
 @UseGuards(JwtAccessGuard)
@@ -27,15 +30,19 @@ export class UserController {
 
   @Get("/:id")
   async getUser(@Param("id", ParseIntPipe) id: number): Promise<UserEntity> {
-    return this.userService.findUser(id);
+    return await this.userService.findUserById(id);
   }
 
   @Put("/:id/nickname")
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateNickname(
     @Param("id", ParseIntPipe) id: number,
-    @Body("nickname") nickname: string
+    @Body() { nickname }: UpdateNicknameDto
   ): Promise<void> {
+    const user = await this.userService.findUserByNickname(nickname);
+    if (user) {
+      throw new ConflictException("Nickname already exists.");
+    }
     await this.userService.updateNickname(id, nickname);
   }
 
@@ -43,7 +50,7 @@ export class UserController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateImage(
     @Param("id", ParseIntPipe) id: number,
-    @Body("image") image: string
+    @Body() { image }: UpdateImageDto
   ): Promise<void> {
     await this.userService.updateImage(id, image);
   }
@@ -51,15 +58,15 @@ export class UserController {
   @Post("/:id/email/code")
   @HttpCode(HttpStatus.NO_CONTENT)
   async sendCodeByEmail(@Param("id", ParseIntPipe) id: number): Promise<void> {
-    const user = await this.userService.findUser(id);
-    await this.authService.sendCodeByEmail(id, user.email);
+    const { email } = await this.userService.findUserById(id);
+    await this.authService.sendCodeByEmail(id, email);
   }
 
   @Put("/:id/is2FA")
   @HttpCode(HttpStatus.NO_CONTENT)
   async update2FA(
     @Param("id", ParseIntPipe) id: number,
-    @Body() body: { code: string; is2FA: boolean }
+    @Body() body: UpdateTwoFactorAuthDto
   ): Promise<void> {
     if (!(await this.authService.validateCode(id, body.code))) {
       throw new UnauthorizedException();

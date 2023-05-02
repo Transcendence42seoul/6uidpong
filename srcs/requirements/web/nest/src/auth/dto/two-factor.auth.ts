@@ -3,9 +3,9 @@ import { IsInt, IsNotEmpty, IsString } from "class-validator";
 export class TwoFactorAuthDto {
   @IsNotEmpty()
   @IsInt()
-  id: number;
+  readonly id: number;
 
   @IsNotEmpty()
   @IsString()
-  code: string;
+  readonly code: string;
 }

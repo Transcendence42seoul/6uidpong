@@ -10,31 +10,25 @@ export class UserService {
     private readonly userRepository: Repository<UserEntity>
   ) {}
 
-  async findUser(id: number): Promise<UserEntity> {
+  async findUserById(id: number): Promise<UserEntity> {
     return await this.userRepository.findOne({ where: { id } });
   }
 
-  async createUser(
-    id: number,
-    email: string,
-    image: string
-  ): Promise<UserEntity> {
-    const info = this.userRepository.create({
-      id: id,
-      nickname: `undefined-${id}`,
-      email: email,
-      image: image,
+  async findUserByNickname(nickname: string): Promise<UserEntity> {
+    return await this.userRepository.findOne({ where: { nickname } });
+  }
+
+  async createUser(profile: any): Promise<UserEntity> {
+    const profileEntity = this.userRepository.create({
+      id: profile.id,
+      nickname: `undefined-${profile.id}`,
+      email: profile.email,
+      image: profile.image.link,
     });
-    return await this.userRepository.save(info);
+    return await this.userRepository.save(profileEntity);
   }
 
   async updateNickname(id: number, nickname: string): Promise<void> {
-    const user = await this.userRepository.findOne({
-      where: { nickname: nickname },
-    });
-    if (user) {
-      throw new ConflictException();
-    }
     await this.userRepository.update(id, { nickname: nickname });
   }
 

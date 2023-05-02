@@ -21,7 +21,8 @@ import { JwtRefreshGuard } from "../guard/jwt-refresh.guard";
     HttpModule,
     CacheModule.register(),
   ],
-  controllers: [AuthController],
   providers: [AuthService, JwtAccessGuard, JwtRefreshGuard, FtGuard],
+  exports: [AuthService],
+  controllers: [AuthController],
 })
 export class AuthModule {}

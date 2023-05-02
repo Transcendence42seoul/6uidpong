@@ -31,27 +31,35 @@ const App: React.FC = () => {
 
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
+  const [isFirstLogin, setIsFirstLogin] = useState(false);
+
+  const handleIsFirstLogin = (status: number) => {
+    if (status === 201) {
+      setIsFirstLogin(true);
+    }
+  };
 
   useEffect(() => {
     const url = new URL(window.location.href);
 
     const fetchAuth = async () => {
       const code = url.searchParams.get('code');
-      const { data } = await axios.get<AuthInfo>(
+      const { data, status } = await axios.post<AuthInfo>(
         '/api/v1/auth/social/callback/forty-two',
-        {
-          params: {
-            code,
-          },
-        },
+        { code },
       );
       dispatch(setAuthInfo(data));
+      handleIsFirstLogin(status);
     };
 
     const fetchData = async () => {
       setLoading(true);
       await fetchAuth();
-      window.location.href = `${url.origin}/profile`;
+      let pathname = '/';
+      if (isFirstLogin) {
+        pathname = '/profile';
+      }
+      window.location.href = url.origin + pathname;
     };
 
     if (url.pathname === '/auth/social/callback/forty-two') {

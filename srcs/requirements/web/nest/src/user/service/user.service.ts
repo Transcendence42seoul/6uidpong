@@ -42,11 +42,7 @@ export class UserService {
     await this.userRepository.update(id, { image: image });
   }
 
-  async updateIsTwoFactor(
-    id: number,
-    email: string,
-    is2FA: boolean
-  ): Promise<void> {
+  async updateIsTwoFactor(id: number, is2FA: boolean): Promise<void> {
     await this.userRepository.update(id, {
       is2FA: is2FA,
     });

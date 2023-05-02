@@ -48,22 +48,22 @@ export class UserController {
     await this.userService.updateImage(id, image);
   }
 
-  @Put("/:id/is2FA")
-  @HttpCode(HttpStatus.NO_CONTENT)
-  async update2FA(
-    @Param("id", ParseIntPipe) id: number,
-    @Body() body: { code: string; email: string; is2FA: boolean }
-  ): Promise<void> {
-    if (!(await this.authService.validateCode(id, body.code))) {
-      throw new UnauthorizedException();
-    }
-    await this.userService.updateIsTwoFactor(id, body.email, body.is2FA);
-  }
-
   @Post("/:id/email/code")
   @HttpCode(HttpStatus.NO_CONTENT)
   async sendCodeByEmail(@Param("id", ParseIntPipe) id: number): Promise<void> {
     const user = await this.userService.findUser(id);
     await this.authService.sendCodeByEmail(id, user.email);
+  }
+
+  @Put("/:id/is2FA")
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async update2FA(
+    @Param("id", ParseIntPipe) id: number,
+    @Body() body: { code: string; is2FA: boolean }
+  ): Promise<void> {
+    if (!(await this.authService.validateCode(id, body.code))) {
+      throw new UnauthorizedException();
+    }
+    await this.userService.updateIsTwoFactor(id, body.is2FA);
   }
 }

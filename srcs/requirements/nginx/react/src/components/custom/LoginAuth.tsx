@@ -1,29 +1,17 @@
 import axios from 'axios';
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { setAuthInfo } from '../../authSlice';
-import HoverButton from '../button/HoverButton';
+import handleAuthInfo from '../../authInfo';
 import redirect from '../../redirect';
+import HoverButton from '../button/HoverButton';
 
 interface LoginAuthProps {
   id: number | null;
 }
 
-interface LoginAuthResponse {
-  accessToken: string;
-}
-
 const LoginAuth: React.FC<LoginAuthProps> = ({ id }) => {
   const dispatch = useDispatch();
   const [code, setCode] = useState('');
-
-  const handleAuthInfo = async ({ accessToken }: LoginAuthResponse) => {
-    dispatch(
-      setAuthInfo({
-        accessToken,
-      }),
-    );
-  };
 
   const handleVerificationCode = async () => {
     try {
@@ -31,7 +19,7 @@ const LoginAuth: React.FC<LoginAuthProps> = ({ id }) => {
         id,
         code,
       });
-      await handleAuthInfo(data);
+      await handleAuthInfo(data, dispatch);
       alert('인증 완료');
       redirect('/');
     } catch {

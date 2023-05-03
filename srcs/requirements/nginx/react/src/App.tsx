@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { setAuthInfo } from './authSlice';
+import handleAuthInfo from './authInfo';
 import redirect from './redirect';
 import { RootState } from './store';
 import Loading from './pages/Loading';
@@ -11,12 +11,6 @@ import Main from './pages/Main';
 import MyPage from './pages/MyPage';
 import Profile from './pages/Profile';
 import LoginAuth from './components/custom/LoginAuth';
-
-interface AuthInfo {
-  id: number | null;
-  is2FA: boolean;
-  accessToken: string | null;
-}
 
 const App: React.FC = () => {
   const stats = {
@@ -44,10 +38,6 @@ const App: React.FC = () => {
     }
   };
 
-  const handleAuthInfo = async (data: AuthInfo) => {
-    dispatch(setAuthInfo(data));
-  };
-
   useEffect(() => {
     const url = new URL(window.location.href);
 
@@ -58,7 +48,7 @@ const App: React.FC = () => {
         { code },
       );
       await handleIsFirstLogin(status);
-      await handleAuthInfo(data);
+      await handleAuthInfo(data, dispatch);
     };
 
     const fetchData = async () => {

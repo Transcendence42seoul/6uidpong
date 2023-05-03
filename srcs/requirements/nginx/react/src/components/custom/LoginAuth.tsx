@@ -3,14 +3,27 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { setAuthInfo } from '../../authSlice';
 import HoverButton from '../button/HoverButton';
+import redirect from '../../redirect';
 
 interface LoginAuthProps {
   id: number | null;
 }
 
+interface LoginAuthResponse {
+  accessToken: string;
+}
+
 const LoginAuth: React.FC<LoginAuthProps> = ({ id }) => {
   const dispatch = useDispatch();
   const [code, setCode] = useState('');
+
+  const handleAuthInfo = async ({ accessToken }: LoginAuthResponse) => {
+    dispatch(
+      setAuthInfo({
+        accessToken,
+      }),
+    );
+  };
 
   const handleVerificationCode = async () => {
     try {
@@ -18,15 +31,9 @@ const LoginAuth: React.FC<LoginAuthProps> = ({ id }) => {
         id,
         code,
       });
+      await handleAuthInfo(data);
       alert('인증 완료');
-      dispatch(
-        setAuthInfo({
-          id: null,
-          is2FA: null,
-          accessToken: data.accessToken,
-        }),
-      );
-      window.location.href = 'https://localhost/profile';
+      redirect('/');
     } catch {
       alert('인증번호 틀린듯?');
     }

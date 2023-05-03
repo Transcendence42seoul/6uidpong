@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { setAuthInfo } from './authSlice';
+import redirect from './redirect';
 import { RootState } from './store';
 import Loading from './pages/Loading';
 import Login from './pages/Login';
@@ -33,10 +34,18 @@ const App: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [isFirstLogin, setIsFirstLogin] = useState(false);
 
-  const handleIsFirstLogin = (status: number) => {
+  const handleLoading = async () => {
+    setLoading(true);
+  };
+
+  const handleIsFirstLogin = async (status: number) => {
     if (status === 201) {
       setIsFirstLogin(true);
     }
+  };
+
+  const handleAuthInfo = async (data: AuthInfo) => {
+    dispatch(setAuthInfo(data));
   };
 
   useEffect(() => {
@@ -44,22 +53,19 @@ const App: React.FC = () => {
 
     const fetchAuth = async () => {
       const code = url.searchParams.get('code');
-      const { data, status } = await axios.post<AuthInfo>(
+      const { data, status } = await axios.post(
         '/api/v1/auth/social/callback/forty-two',
         { code },
       );
-      dispatch(setAuthInfo(data));
-      handleIsFirstLogin(status);
+      await handleIsFirstLogin(status);
+      await handleAuthInfo(data);
     };
 
     const fetchData = async () => {
-      setLoading(true);
+      await handleLoading();
       await fetchAuth();
-      let pathname = '/';
-      if (isFirstLogin) {
-        pathname = '/profile';
-      }
-      window.location.href = url.origin + pathname;
+      const pathname = isFirstLogin ? '/profile' : '/';
+      redirect(pathname, url);
     };
 
     if (url.pathname === '/auth/social/callback/forty-two') {

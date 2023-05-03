@@ -11,7 +11,7 @@ interface TwoFactorAuthProps {
 
 const TwoFactorAuth: React.FC<TwoFactorAuthProps> = ({ id }) => {
   const [openModal, setOpenModal] = useState(false);
-  const { is2FA, accessToken } = useSelector((state: RootState) => state.auth);
+  const { accessToken } = useSelector((state: RootState) => state.auth);
   const [code, setCode] = useState('');
 
   const handleCloseModal = () => {
@@ -41,7 +41,7 @@ const TwoFactorAuth: React.FC<TwoFactorAuthProps> = ({ id }) => {
     axios
       .put(
         `/api/v1/users/${id}/is2fa`,
-        { code, is2FA },
+        { code, is2FA: true },
         {
           headers: { Authorization: `Bearer ${accessToken}` },
         },

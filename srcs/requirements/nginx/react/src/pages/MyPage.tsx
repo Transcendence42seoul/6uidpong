@@ -6,7 +6,7 @@ import ContentBox from '../components/container/ContentBox';
 
 interface User {
   nickname: string;
-  profileImage: string;
+  image: string;
 }
 
 interface Stats {
@@ -39,11 +39,7 @@ const MyPage: React.FC<MyPageProps> = ({ id, stats }) => {
         <h2 className="mt-2 text-2xl font-bold">
           {user?.nickname ?? 'Loading...'}
         </h2>
-        <img
-          className="rounded-full p-7"
-          src={user?.profileImage}
-          alt="Profile"
-        />
+        <img className="rounded-full p-7" src={user?.image} alt="Profile" />
       </ContentBox>
       <HoverButton
         onClick={() => callAPI('/profile')}

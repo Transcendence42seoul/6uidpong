@@ -26,16 +26,9 @@ const App: React.FC = () => {
 
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
-  const [isFirstLogin, setIsFirstLogin] = useState(false);
 
   const handleLoading = async () => {
     setLoading(true);
-  };
-
-  const handleIsFirstLogin = async (status: number) => {
-    if (status === 201) {
-      setIsFirstLogin(true);
-    }
   };
 
   useEffect(() => {
@@ -47,15 +40,14 @@ const App: React.FC = () => {
         '/api/v1/auth/social/callback/forty-two',
         { code },
       );
-      await handleIsFirstLogin(status);
       await handleAuthInfo(data, dispatch);
+      const pathname = status === 201 ? '/profile' : '/';
+      redirect(pathname, url);
     };
 
     const fetchData = async () => {
       await handleLoading();
       await fetchAuth();
-      const pathname = isFirstLogin ? '/profile' : '/';
-      redirect(pathname, url);
     };
 
     if (url.pathname === '/auth/social/callback/forty-two') {

@@ -37,16 +37,22 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response
   ): Promise<Object> {
     let user = await this.userService.findUserById(req.user.id);
+    res.status(HttpStatus.OK);
+
     if (user?.is2FA) {
       this.authService.sendCodeByEmail(user.id, user.email);
       return { is2FA: true, id: user.id, accessToken: null };
     }
+
     if (!user) {
       user = await this.userService.createUser(req.user);
-      res.status(HttpStatus.CREATED);
-      res.setHeader("Location", `/api/v1/users/${user.id}`);
+      res
+        .status(HttpStatus.CREATED)
+        .setHeader("Location", `/api/v1/users/${user.id}`);
     }
+    const accessToken = await this.authService.generateAccessToken(user.id);
     const refreshToken = await this.authService.generateRefreshToken(user.id);
+
     res.cookie("refresh", refreshToken, {
       httpOnly: true,
       maxAge: 60 * 60 * 24 * 7,
@@ -54,7 +60,7 @@ export class AuthController {
       sameSite: "strict",
       path: "/api/v1/auth/token/refresh",
     });
-    const accessToken = await this.authService.generateAccessToken(user.id);
+
     return { is2FA: false, id: user.id, accessToken: accessToken };
   }
 
@@ -66,7 +72,9 @@ export class AuthController {
     if (!(await this.authService.validateCode(body.id, body.code))) {
       throw new UnauthorizedException();
     }
+    const accessToken = await this.authService.generateAccessToken(body.id);
     const refreshToken = await this.authService.generateRefreshToken(body.id);
+
     res.cookie("refresh", refreshToken, {
       httpOnly: true,
       maxAge: 60 * 60 * 24 * 7,
@@ -74,7 +82,7 @@ export class AuthController {
       sameSite: "strict",
       path: "/api/v1/auth/token/refresh",
     });
-    const accessToken = await this.authService.generateAccessToken(body.id);
+
     return { accessToken: accessToken };
   }
 
@@ -82,6 +90,7 @@ export class AuthController {
   @UseGuards(JwtRefreshGuard)
   async refreshToken(@Req() req: any): Promise<Object> {
     const accessToken = await this.authService.generateAccessToken(req.user.id);
+
     return { accessToken: accessToken };
   }
 }

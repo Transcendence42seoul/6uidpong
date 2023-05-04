@@ -3,13 +3,11 @@ import { JwtService } from "@nestjs/jwt";
 import * as nodemailer from "nodemailer";
 import { CACHE_MANAGER } from "@nestjs/cache-manager";
 import { Cache } from "cache-manager";
-import { UserService } from "src/user/service/user.service";
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
-    private readonly userService: UserService,
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache
   ) {}
@@ -36,7 +34,7 @@ export class AuthService {
     return refreshToken;
   }
 
-  public async sendCodeByEmail(id: number, email: string): Promise<void> {
+  async sendCodeByEmail(id: number, email: string): Promise<void> {
     // Nodemailer를 사용하여 이메일 전송 설정
     const emailUser: string = process.env.EMAIL_USER;
     const emailPass: string = process.env.EMAIL_PASS;

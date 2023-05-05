@@ -1,21 +1,9 @@
-### 4/13 (목)
+## 플로우차트
 
-- 일정 조율
-    - 화/금/일 오프라인 1pm~8pm
-    - 그외 온라인: 필요할 때 슬랙 활용
-- 컨벤션 합의
-    - 코드 포맷팅: Prettier
-    - 커밋 컨벤션: [AngularJS](https://80000coding.oopy.io/00bcbffd-6fbb-4be4-81ab-ef0925efd267)
-- 프레임워크 결정
-    - 프론트엔드: React
-        - CSS: Tailwind
-    - 백엔드: NestJS
-        - DB: PostgreSQL
-    - 배포: Docker
-- 소프트웨어 개발 방법론
-    - 애자일
-        - TDD
-    - REST API
-    - 마이크로서비스
-- 마인드맵/플로우차트 형식의 설계 디자인 완성
-- 도커 환경설정
+![Flowchart](./docs/assets/Flowchart.png)
+
+<br/>
+
+## 와이어프레임
+
+![Wireframe](./docs/assets/Wireframe.png)

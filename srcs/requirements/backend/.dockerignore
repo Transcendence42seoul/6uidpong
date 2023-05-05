@@ -1,0 +1,12 @@
+.idea
+.DS_Store
+.git
+.gitignore
+.dockerignore
+.prettierrc
+dist
+node_modules
+Dockerfile
+*.md
+*.sh
+*.yml

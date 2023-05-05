@@ -1,0 +1,59 @@
+version: "3"
+
+services:
+  postgres:
+    container_name: postgres
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    image: postgres:15.2-alpine3.17
+    networks:
+      - transcendence
+    restart: always
+    volumes:
+      - db-volume:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: requirements/backend/
+      dockerfile: Dockerfile
+    container_name: backend
+    environment:
+      HOST_NAME: ${HOST_NAME}
+      OAUTH_42_CLIENT_ID: ${OAUTH_42_CLIENT_ID}
+      OAUTH_42_CLIENT_SECRET: ${OAUTH_42_CLIENT_SECRET}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_ACCESS_SECRET_KEY: ${JWT_ACCESS_SECRET_KEY}
+      JWT_REFRESH_SECRET_KEY: ${JWT_REFRESH_SECRET_KEY}
+      EMAIL_USER: ${EMAIL_USER}
+      EMAIL_PASS: ${EMAIL_PASS}
+      SESSION_SECRET: ${SESSION_SECRET}
+    depends_on:
+      - postgres
+    networks:
+      - transcendence
+    restart: always
+    # volumes:
+    #   - ./requirements/backend/nest:/app
+
+  nginx:
+    build:
+      context: requirements/nginx/
+      dockerfile: Dockerfile
+    container_name: nginx
+    depends_on:
+      - backend
+    networks:
+      - transcendence
+    ports:
+      - "80:80"
+      - "443:443"
+    restart: always
+networks:
+  transcendence:
+    driver: bridge
+volumes:
+  db-volume:

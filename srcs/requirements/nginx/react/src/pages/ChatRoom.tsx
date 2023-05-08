@@ -1,4 +1,5 @@
 import React, {
+  ChangeEvent,
   FormEvent,
   useCallback,
   useEffect,
@@ -19,24 +20,8 @@ const ChatRoom: React.FC = () => {
   const [message, setMessage] = useState<string>('');
   const chatContainer = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const { current } = chatContainer;
-    if (!current) return;
-
-    const { clientHeight, scrollHeight } = current;
-    if (scrollHeight > clientHeight) {
-      current.scrollTop = scrollHeight - clientHeight;
-    }
-  }, [chats.length]);
-
-  useEffect(() => {
-    const messageHandler = (chat: Chat) =>
-      setChats((prevChats) => [...prevChats, chat]);
-
-    socket.on('message', messageHandler);
-    return () => {
-      socket.off('message', messageHandler);
-    };
+  const onChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    setMessage(e.target.value);
   }, []);
 
   const onSendMessage = useCallback(
@@ -53,4 +38,24 @@ const ChatRoom: React.FC = () => {
     },
     [message],
   );
+
+  useEffect(() => {
+    const messageHandler = (chat: Chat) =>
+      setChats((prevChats) => [...prevChats, chat]);
+
+    socket.on('message', messageHandler);
+    return () => {
+      socket.off('message', messageHandler);
+    };
+  }, []);
+
+  useEffect(() => {
+    const { current } = chatContainer;
+    if (!current) return;
+
+    const { clientHeight, scrollHeight } = current;
+    if (scrollHeight > clientHeight) {
+      current.scrollTop = scrollHeight - clientHeight;
+    }
+  }, [chats.length]);
 };

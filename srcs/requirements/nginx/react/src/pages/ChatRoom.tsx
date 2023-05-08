@@ -31,9 +31,7 @@ const ChatRoom: React.FC = () => {
   const onSendMessage = useCallback(
     (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      if (!message) {
-        return alert('메시지를 입력해 주세요.');
-      }
+      if (!message) return;
 
       socket.emit('message', message, (chat: Chat) => {
         setChats((prevChats) => [...prevChats, chat]);

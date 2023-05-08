@@ -7,6 +7,10 @@ import React, {
   useState,
 } from 'react';
 import { io } from 'socket.io-client';
+import ChatContainer from '../components/container/ChatContainer';
+import Message from '../components/container/Message';
+import MessageBox from '../components/container/MessageBox';
+import MessageForm from '../components/container/MessageForm';
 
 interface Chat {
   username: string;
@@ -58,4 +62,36 @@ const ChatRoom: React.FC = () => {
       current.scrollTop = scrollHeight - clientHeight;
     }
   }, [chats.length]);
+
+  return (
+    <>
+      <h1>WebSocket Chat</h1>
+      <ChatContainer ref={chatContainer}>
+        {chats.map((chat, index) => {
+          let username = '';
+          let className = '';
+          if (!chat.username) {
+            className = 'alarm';
+          } else if (socket.id === chat.username) {
+            className = 'my_message';
+          } else {
+            username = chat.username;
+          }
+          return (
+            /* eslint-disable-next-line react/no-array-index-key */
+            <MessageBox key={index} className={className}>
+              <span>{username}</span>
+              <Message className="message">{chat.message}</Message>
+            </MessageBox>
+          );
+        })}
+      </ChatContainer>
+      <MessageForm onSubmit={onSendMessage}>
+        <input type="text" onChange={onChange} value={message} />
+        <button>보내기</button>
+      </MessageForm>
+    </>
+  );
 };
+
+export default ChatRoom;

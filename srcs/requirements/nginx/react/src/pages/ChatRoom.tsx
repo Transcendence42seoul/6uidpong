@@ -88,7 +88,7 @@ const ChatRoom: React.FC = () => {
       </ChatContainer>
       <MessageForm onSubmit={onSendMessage}>
         <input type="text" onChange={onChange} value={message} />
-        <button>보내기</button>
+        <button>Send</button>
       </MessageForm>
     </>
   );

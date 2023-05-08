@@ -5,7 +5,7 @@ type MessageFormProps = {
   onSubmit: (e: FormEvent<HTMLFormElement>) => void;
 };
 
-const MessageForm = ({ children, onSubmit }: MessageFormProps) => (
+const MessageForm: React.FC<MessageFormProps> = ({ children, onSubmit }) => (
   <form className="mt-6 flex" onSubmit={onSubmit}>
     {React.Children.map(children, (child) =>
       React.isValidElement(child) && child.type === 'input' ? (

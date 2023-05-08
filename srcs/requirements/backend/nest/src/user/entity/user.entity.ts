@@ -2,7 +2,7 @@ import { Column, Entity, PrimaryColumn } from "typeorm";
 
 @Entity("users")
 export class UserEntity {
-  @PrimaryColumn()
+  @PrimaryColumn({ name: "user_id" })
   id: number;
 
   @Column({ unique: true })

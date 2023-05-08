@@ -13,12 +13,12 @@ export class JwtRefreshGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const token = this.extractTokenFromCookies(request);
-    if (!token) {
+    const token: string | undefined = this.extractTokenFromCookies(request);
+    if (typeof token === undefined) {
       throw new UnauthorizedException();
     }
     try {
-      const payload = await this.jwtService.verifyAsync(token, {
+      const payload: Object = await this.jwtService.verifyAsync(token, {
         secret: process.env.JWT_REFRESH_SECRET_KEY,
       });
       request["user"] = payload;
@@ -29,7 +29,7 @@ export class JwtRefreshGuard implements CanActivate {
   }
 
   private extractTokenFromCookies(request: Request): string | undefined {
-    const token = request.cookies["refresh"];
+    const token: string | null = request.cookies["refresh"];
     return token ? token : undefined;
   }
 }

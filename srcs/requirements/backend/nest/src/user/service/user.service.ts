@@ -1,4 +1,4 @@
-import { Injectable, ConflictException } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { UserEntity } from "../entity/user.entity";
@@ -19,7 +19,7 @@ export class UserService {
   }
 
   async createUser(profile: any): Promise<UserEntity> {
-    const profileEntity = this.userRepository.create({
+    const profileEntity: Object = this.userRepository.create({
       id: profile.id,
       nickname: `undefined-${profile.id}`,
       email: profile.email,

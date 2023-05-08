@@ -15,6 +15,7 @@ import { UserService } from "src/user/service/user.service";
 import { JwtRefreshGuard } from "../guard/jwt-refresh.guard";
 import { FtGuard } from "../guard/ft.guard";
 import { TwoFactorAuthDto } from "../dto/two-factor.auth";
+import { UserEntity } from "src/user/entity/user.entity";
 
 const OAUTH_42_LOGIN_URL = `https://api.intra.42.fr/oauth/authorize?client_id=${process.env.OAUTH_42_CLIENT_ID}&redirect_uri=https://${process.env.HOST_NAME}/auth/social/callback/forty-two&response_type=code&scope=public`;
 
@@ -36,7 +37,7 @@ export class AuthController {
     @Req() req: any,
     @Res({ passthrough: true }) res: Response
   ): Promise<Object> {
-    let user = await this.userService.findUserById(req.user.id);
+    let user: UserEntity = await this.userService.findUserById(req.user.id);
     res.status(HttpStatus.OK);
 
     if (user?.is2FA) {
@@ -50,8 +51,13 @@ export class AuthController {
         .status(HttpStatus.CREATED)
         .setHeader("Location", `/api/v1/users/${user.id}`);
     }
-    const accessToken = await this.authService.generateAccessToken(user.id);
-    const refreshToken = await this.authService.generateRefreshToken(user.id);
+
+    const accessToken: string = await this.authService.generateAccessToken(
+      user.id
+    );
+    const refreshToken: string = await this.authService.generateRefreshToken(
+      user.id
+    );
 
     res.cookie("refresh", refreshToken, {
       httpOnly: true,
@@ -69,11 +75,18 @@ export class AuthController {
     @Body() body: TwoFactorAuthDto,
     @Res({ passthrough: true }) res: Response
   ): Promise<Object> {
-    if (!(await this.authService.validateCode(body.id, body.code))) {
-      throw new UnauthorizedException();
+    try {
+      await this.authService.validateCode(body.id, body.code);
+    } catch {
+      throw new UnauthorizedException("invalid 2fa code");
     }
-    const accessToken = await this.authService.generateAccessToken(body.id);
-    const refreshToken = await this.authService.generateRefreshToken(body.id);
+
+    const accessToken: string = await this.authService.generateAccessToken(
+      body.id
+    );
+    const refreshToken: string = await this.authService.generateRefreshToken(
+      body.id
+    );
 
     res.cookie("refresh", refreshToken, {
       httpOnly: true,
@@ -89,7 +102,9 @@ export class AuthController {
   @Get("/token/refresh")
   @UseGuards(JwtRefreshGuard)
   async refreshToken(@Req() req: any): Promise<Object> {
-    const accessToken = await this.authService.generateAccessToken(req.user.id);
+    const accessToken: string = await this.authService.generateAccessToken(
+      req.user.id
+    );
 
     return { accessToken: accessToken };
   }

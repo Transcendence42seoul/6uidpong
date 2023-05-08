@@ -14,12 +14,12 @@ export class JwtAccessGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const token = this.extractTokenFromHeader(request);
-    if (!token) {
+    const token: string | undefined = this.extractTokenFromHeader(request);
+    if (typeof token === undefined) {
       throw new UnauthorizedException();
     }
     try {
-      const payload = await this.jwtService.verifyAsync(token, {
+      const payload: Object = await this.jwtService.verifyAsync(token, {
         secret: process.env.JWT_ACCESS_SECRET_KEY,
       });
       request["user"] = payload;
@@ -33,7 +33,8 @@ export class JwtAccessGuard implements CanActivate {
   }
 
   private extractTokenFromHeader(request: Request): string | undefined {
-    const [type, token] = request.headers.authorization?.split(" ") ?? [];
+    const [type, token]: string[] =
+      request.headers.authorization?.split(" ") ?? [];
     return type === "Bearer" ? token : undefined;
   }
 }

@@ -1,9 +1,9 @@
 import {
+  BadRequestException,
   CanActivate,
   ExecutionContext,
   Injectable,
   UnauthorizedException,
-  UnprocessableEntityException,
 } from "@nestjs/common";
 import { HttpService } from "@nestjs/axios";
 import { lastValueFrom } from "rxjs";
@@ -14,12 +14,12 @@ export class FtGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const code = request.body.code;
-    if (!code) {
-      throw new UnprocessableEntityException();
+    const code: string | null = request.body.code;
+    if (typeof code === null) {
+      throw new BadRequestException();
     }
     try {
-      const accessToken = await this.receiveOauthAccessToken(code);
+      const accessToken: string = await this.receiveOauthAccessToken(code);
       const headers = { Authorization: `Bearer ${accessToken}` };
       const { data } = await lastValueFrom(
         this.httpService.get("https://api.intra.42.fr/v2/me", {

@@ -38,10 +38,13 @@ export class UserController {
     @Param("id", ParseIntPipe) id: number,
     @Body() { nickname }: UpdateNicknameDto
   ): Promise<void> {
-    const user = await this.userService.findUserByNickname(nickname);
+    const user: UserEntity = await this.userService.findUserByNickname(
+      nickname
+    );
     if (user) {
       throw new ConflictException();
     }
+
     await this.userService.updateNickname(id, nickname);
   }
 
@@ -67,9 +70,12 @@ export class UserController {
     @Param("id", ParseIntPipe) id: number,
     @Body() body: UpdateTwoFactorAuthDto
   ): Promise<void> {
-    if (!(await this.authService.validateCode(id, body.code))) {
-      throw new UnauthorizedException();
+    try {
+      await this.authService.validateCode(id, body.code);
+    } catch {
+      throw new UnauthorizedException("invalid code");
     }
+
     await this.userService.updateIsTwoFactor(id, body.is2FA);
   }
 }

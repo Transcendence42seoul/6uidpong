@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { socket } from '../App';
 
-const JoinChat: React.FC = () => {
+const ChatList: React.FC = () => {
   const navigate = useNavigate();
   const [rooms, setRooms] = useState<string[]>([]);
 
@@ -26,3 +26,5 @@ const JoinChat: React.FC = () => {
     };
   }, []);
 };
+
+export default ChatList;

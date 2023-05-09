@@ -11,11 +11,7 @@ import ChatContainer from '../components/container/ChatContainer';
 import Message from '../components/container/Message';
 import MessageBox from '../components/container/MessageBox';
 import MessageForm from '../components/container/MessageForm';
-
-interface Chat {
-  username: string;
-  message: string;
-}
+import { Chat } from './ChatList';
 
 interface ChatRoomProps {
   socket: Socket;

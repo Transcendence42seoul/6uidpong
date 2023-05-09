@@ -2,13 +2,25 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
 
+export interface Chat {
+  username: string;
+  message: string;
+  time: string;
+}
+
 interface ChatListProps {
   socket: Socket;
 }
 
+interface Room {
+  id: number;
+  user: number[];
+  lastChat: Chat;
+}
+
 const ChatList: React.FC<ChatListProps> = ({ socket }) => {
   const navigate = useNavigate();
-  const [rooms, setRooms] = useState<string[]>([]);
+  const [rooms, setRooms] = useState<Room[]>([]);
 
   const onJoinRoom = useCallback(
     (roomName: string) => () => {
@@ -20,7 +32,7 @@ const ChatList: React.FC<ChatListProps> = ({ socket }) => {
   );
 
   useEffect(() => {
-    const roomListHandler = (roomList: string[]) => {
+    const roomListHandler = (roomList: Room[]) => {
       setRooms(roomList);
     };
 

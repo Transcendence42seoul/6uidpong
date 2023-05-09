@@ -53,7 +53,18 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
             className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-2"
             onDoubleClick={onEnterRoom(room)}
           >
-            <span>{room.partner}</span>
+            <div className="flex items-center">
+              <img
+                // src={}
+                alt="PartnerImage"
+                className="mr-2 h-10 w-10 rounded-full"
+              />
+              <div>
+                <span>{room.partner}</span>
+                <p className="text-sm text-gray-600">{room.lastChat.message}</p>
+              </div>
+            </div>
+            <span className="text-sm text-gray-600">{room.lastChat.time}</span>
           </li>
         ))}
       </ul>

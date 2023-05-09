@@ -6,7 +6,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { socket } from '../App';
+import { Socket } from 'socket.io-client';
 import ChatContainer from '../components/container/ChatContainer';
 import Message from '../components/container/Message';
 import MessageBox from '../components/container/MessageBox';
@@ -17,7 +17,11 @@ interface Chat {
   message: string;
 }
 
-const ChatRoom: React.FC = () => {
+interface ChatRoomProps {
+  socket: Socket;
+}
+
+const ChatRoom: React.FC<ChatRoomProps> = ({ socket }) => {
   const [chats, setChats] = useState<Chat[]>([]);
   const [message, setMessage] = useState<string>('');
   const chatContainer = useRef<HTMLDivElement>(null);

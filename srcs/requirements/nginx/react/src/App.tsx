@@ -14,7 +14,7 @@ import MyPage from './pages/MyPage';
 import Profile from './pages/Profile';
 import LoginAuth from './components/custom/LoginAuth';
 
-export const socket = io('/chat');
+const socket = io('/chat');
 
 const App: React.FC = () => {
   const stats = {
@@ -73,7 +73,7 @@ const App: React.FC = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Main />} />
-        <Route path="/chat" element={<ChatList />} />
+        <Route path="/chat" element={<ChatList socket={socket} />} />
         <Route
           path="/my-page"
           element={<MyPage id={tokenInfo.id} stats={stats} />}

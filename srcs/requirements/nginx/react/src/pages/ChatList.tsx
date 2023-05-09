@@ -1,8 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { socket } from '../App';
+import { Socket } from 'socket.io-client';
 
-const ChatList: React.FC = () => {
+interface ChatListProps {
+  socket: Socket;
+}
+
+const ChatList: React.FC<ChatListProps> = ({ socket }) => {
   const navigate = useNavigate();
   const [rooms, setRooms] = useState<string[]>([]);
 

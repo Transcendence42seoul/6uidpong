@@ -51,14 +51,9 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
           <li
             key={room.id}
             className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-2"
+            onDoubleClick={onJoinRoom(room)}
           >
             <span>{room.partner}</span>
-            <button
-              className="rounded bg-blue-500 px-2 py-1 text-white hover:bg-blue-600"
-              onClick={onJoinRoom(room)}
-            >
-              Join
-            </button>
           </li>
         ))}
       </ul>

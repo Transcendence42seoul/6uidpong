@@ -22,10 +22,10 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
   const navigate = useNavigate();
   const [rooms, setRooms] = useState<Room[]>([]);
 
-  const onJoinRoom = useCallback(
+  const onEnterRoom = useCallback(
     ({ id }: Room) =>
       () => {
-        socket.emit('join-room', id, () => {
+        socket.emit('enter-room', id, () => {
           navigate(`/chat/${id}`);
         });
       },
@@ -51,7 +51,7 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
           <li
             key={room.id}
             className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-2"
-            onDoubleClick={onJoinRoom(room)}
+            onDoubleClick={onEnterRoom(room)}
           >
             <span>{room.partner}</span>
           </li>

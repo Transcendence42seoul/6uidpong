@@ -6,6 +6,7 @@ import { io } from 'socket.io-client';
 import handleAuthInfo from './authInfo';
 import redirect from './redirect';
 import { RootState } from './store';
+import ChatList from './pages/ChatList';
 import Loading from './pages/Loading';
 import Login from './pages/Login';
 import Main from './pages/Main';
@@ -72,11 +73,12 @@ const App: React.FC = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Main />} />
-        <Route path="/profile" element={<Profile id={tokenInfo.id} />} />
+        <Route path="/chat" element={<ChatList />} />
         <Route
           path="/my-page"
           element={<MyPage id={tokenInfo.id} stats={stats} />}
         />
+        <Route path="/profile" element={<Profile id={tokenInfo.id} />} />
       </Routes>
     </BrowserRouter>
   );

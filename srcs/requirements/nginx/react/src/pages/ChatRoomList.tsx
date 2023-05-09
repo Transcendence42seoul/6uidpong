@@ -8,7 +8,7 @@ export interface Chat {
   time: string;
 }
 
-interface ChatListProps {
+interface ChatRoomListProps {
   socket: Socket;
 }
 
@@ -18,7 +18,7 @@ interface Room {
   lastChat: Chat;
 }
 
-const ChatList: React.FC<ChatListProps> = ({ socket }) => {
+const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
   const navigate = useNavigate();
   const [rooms, setRooms] = useState<Room[]>([]);
 
@@ -43,4 +43,4 @@ const ChatList: React.FC<ChatListProps> = ({ socket }) => {
   }, []);
 };
 
-export default ChatList;
+export default ChatRoomList;

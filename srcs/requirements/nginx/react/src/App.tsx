@@ -6,7 +6,7 @@ import { io } from 'socket.io-client';
 import handleAuthInfo from './authInfo';
 import redirect from './redirect';
 import { RootState } from './store';
-import ChatList from './pages/ChatList';
+import ChatList from './pages/ChatRoomList';
 import Loading from './pages/Loading';
 import Login from './pages/Login';
 import Main from './pages/Main';

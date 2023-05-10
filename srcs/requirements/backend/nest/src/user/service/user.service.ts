@@ -41,4 +41,10 @@ export class UserService {
       is2FA: is2FA,
     });
   }
+
+  async updateStatus(id: number, status: string): Promise<void> {
+    await this.userRepository.update(id, {
+      status: status,
+    });
+  }
 }

@@ -2,7 +2,7 @@ import { Column, Entity, PrimaryColumn } from "typeorm";
 
 @Entity("users")
 export class UserEntity {
-  @PrimaryColumn({ name: "user_id" })
+  @PrimaryColumn()
   id: number;
 
   @Column({ unique: true })
@@ -17,7 +17,9 @@ export class UserEntity {
   @Column({ name: "is_2fa", type: "boolean", default: false })
   is2FA: boolean;
 
-  @Column({ default: "offline" })
+  @Column({
+    default: "offline",
+  })
   status: string;
 
   @Column({ name: "win_stat", default: 0 })

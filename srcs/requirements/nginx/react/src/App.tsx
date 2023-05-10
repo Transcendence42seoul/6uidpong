@@ -14,8 +14,6 @@ import MyPage from './pages/MyPage';
 import Profile from './pages/Profile';
 import LoginAuth from './components/custom/LoginAuth';
 
-const socket = io('/chat');
-
 const App: React.FC = () => {
   const stats = {
     wins: 4,
@@ -24,9 +22,11 @@ const App: React.FC = () => {
     recentHistory: ['Win', 'Loss', 'Win', 'Win', 'Loss'],
   };
 
-  const { id, is2FA, tokenInfo } = useSelector(
+  const { id, is2FA, tokenInfo, accessToken } = useSelector(
     (state: RootState) => state.auth,
   );
+
+  const socket = io({ auth: { token: `${accessToken}` } });
 
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);

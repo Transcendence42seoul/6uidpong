@@ -1,61 +1,94 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import { WsException } from "@nestjs/websockets";
 import { UserEntity } from "src/user/entity/user.entity";
-import { Repository, SelectQueryBuilder } from "typeorm";
+import { Repository, SelectQueryBuilder, MoreThanOrEqual } from "typeorm";
+import { DmBlocklistEntity } from "../entity/dm-blocklist.entity";
 import { DmChatEntity } from "../entity/dm-chat.entity";
-import { DmUserEntity } from "../entity/dm-user.entity";
+import { DmRoomUserEntity } from "../entity/dm-room-user.entity";
 
 @Injectable()
 export class ChatService {
   constructor(
-    @InjectRepository(DmUserEntity)
-    private readonly dmUserRepository: Repository<DmUserEntity>,
+    @InjectRepository(DmRoomUserEntity)
+    private readonly dmRoomUserRepository: Repository<DmRoomUserEntity>,
     @InjectRepository(DmChatEntity)
-    private readonly dmChatRepository: Repository<DmChatEntity>
+    private readonly dmChatRepository: Repository<DmChatEntity>,
+    @InjectRepository(DmBlocklistEntity)
+    private readonly dmBlocklistRepository: Repository<DmBlocklistEntity>
   ) {}
 
-  async findDmRooms(userId: number): Promise<DmUserEntity[]> {
-    return await this.dmUserRepository.findBy({
+  async findParticipationRoom(userId: number): Promise<DmRoomUserEntity[]> {
+    return await this.dmRoomUserRepository.findBy({
       userId: userId,
       isExit: false,
     });
   }
 
-  async findDmList(userId: number): Promise<Object[]> {
+  async findDmRooms(userId: number): Promise<Object[]> {
     const queryBuilder = this.dmChatRepository
-      .createQueryBuilder("last_chats")
+      .createQueryBuilder("dm_chats")
       .select([
-        "last_chats.room_id",
-        "last_chats.message AS last_message",
-        "last_chats.created_at AS last_message_time",
-        "u.nickname",
-        "u.image",
+        "dm_chats.room_id",
+        "dm_chats.message AS last_message",
+        "dm_chats.created_at AS last_message_time",
+        "users.nickname AS interlocutor",
+        "users.image AS interlocutor_image",
       ])
       .innerJoin(
         (subQueryBuilder: SelectQueryBuilder<DmChatEntity>) =>
           subQueryBuilder
-            .select("dc.room_id", "room_id")
-            .addSelect("MAX(dc.created_at)", "max_created_at")
-            .from(DmChatEntity, "dc")
+            .select("sub_dm_chats.room_id", "room_id")
+            .addSelect("MAX(sub_dm_chats.created_at)", "max_created_at")
+            .from(DmChatEntity, "sub_dm_chats")
             .innerJoin(
-              DmUserEntity,
-              "du",
-              "du.user_id = :userId AND du.is_exit = false AND du.room_id = dc.room_id AND du.created_at <= dc.created_at",
+              DmRoomUserEntity,
+              "room_users",
+              "room_users.user_id = :userId AND room_users.is_exit = false AND room_users.room_id = sub_dm_chats.room_id",
               { userId }
             )
-            .groupBy("dc.room_id"),
-        "last_dms",
-        "last_chats.room_id = last_dms.room_id AND last_chats.created_at = last_dms.max_created_at"
+            .groupBy("sub_dm_chats.room_id"),
+        "last_chats",
+        "dm_chats.room_id = last_chats.room_id AND dm_chats.created_at = last_chats.max_created_at"
       )
       .innerJoin(
-        DmUserEntity,
-        "du",
-        "last_chats.room_id = du.room_id AND du.user_id != :userId",
+        DmRoomUserEntity,
+        "room_users",
+        "dm_chats.room_id = room_users.room_id AND room_users.user_id != :userId",
         { userId }
       )
-      .innerJoin(UserEntity, "u", "du.user_id = u.id")
-      .orderBy("last_chats.created_at", "DESC");
+      .innerJoin(UserEntity, "users", "room_users.user_id = users.id")
+      .orderBy("dm_chats.created_at", "DESC");
 
     return await queryBuilder.getRawMany();
+  }
+
+  async findDmChats(userId: number, roomId: number): Promise<DmChatEntity[]> {
+    try {
+      const roomUserInfo = await this.dmRoomUserRepository.findOneByOrFail({
+        roomId,
+        userId,
+      });
+      return await this.dmChatRepository.find({
+        relations: {
+          user: true,
+        },
+        where: {
+          roomId,
+          createdAt: MoreThanOrEqual(roomUserInfo.createdAt),
+        },
+      });
+    } catch (EntityNotFoundError) {
+      throw new WsException("invalid request");
+    }
+  }
+
+  async isBlocked(userId: number, validateId: number): Promise<boolean> {
+    return (await this.dmBlocklistRepository.countBy({
+      userId: userId,
+      blockedUserid: validateId,
+    }))
+      ? true
+      : false;
   }
 }

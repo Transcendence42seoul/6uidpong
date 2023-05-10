@@ -1,7 +1,10 @@
+import { UserEntity } from "src/user/entity/user.entity";
 import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
 
@@ -13,8 +16,9 @@ export class DmChatEntity {
   @Column({ name: "room_id" })
   roomId: number;
 
-  @Column({ name: "user_id" })
-  userId: number;
+  @OneToOne(() => UserEntity)
+  @JoinColumn()
+  user: UserEntity;
 
   @Column()
   message: string;

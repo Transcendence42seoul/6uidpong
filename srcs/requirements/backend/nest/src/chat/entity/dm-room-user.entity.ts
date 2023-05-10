@@ -5,8 +5,8 @@ import {
   PrimaryGeneratedColumn,
 } from "typeorm";
 
-@Entity("dm_users")
-export class DmUserEntity {
+@Entity("dm_room_users")
+export class DmRoomUserEntity {
   @PrimaryGeneratedColumn()
   id: number;
 

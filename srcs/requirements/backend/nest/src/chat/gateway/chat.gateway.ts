@@ -37,12 +37,13 @@ export class ChatGateway implements OnGatewayDisconnect {
   @SubscribeMessage("findDmList")
   async findDmList(@ConnectedSocket() client: Socket): Promise<void> {
     const userId: number = client.data.user.id;
-    console.log(`Client connected ${userId}`);
+
     const dmRooms: DmUserEntity[] = await this.chatService.findDmRooms(userId);
-    console.log(dmRooms);
     dmRooms.forEach((roomId) => client.join("d" + roomId));
+
     await this.userService.updateStatus(userId, "online");
     const dmRoomInfo: Object[] = await this.chatService.findDmList(userId);
+
     client.emit("dmRoomInfo", dmRoomInfo);
   }
 }

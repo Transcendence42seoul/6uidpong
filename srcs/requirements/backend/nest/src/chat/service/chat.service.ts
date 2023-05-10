@@ -40,7 +40,7 @@ export class ChatService {
             .innerJoin(
               DmUserEntity,
               "du",
-              "du.user_id = :userId AND du.is_exit = false AND du.room_id = dc.room_id AND du.created_at >= dc.created_at",
+              "du.user_id = :userId AND du.is_exit = false AND du.room_id = dc.room_id AND du.created_at <= dc.created_at",
               { userId }
             )
             .groupBy("dc.room_id"),
@@ -55,8 +55,7 @@ export class ChatService {
       )
       .innerJoin(UserEntity, "u", "du.user_id = u.id")
       .orderBy("last_chats.created_at", "DESC");
-    const results = await queryBuilder.getRawMany();
-    console.log(results);
-    return results;
+
+    return await queryBuilder.getRawMany();
   }
 }

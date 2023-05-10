@@ -2,12 +2,6 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
 
-export interface Chat {
-  username: string;
-  message: string;
-  time: string;
-}
-
 interface ChatRoomListProps {
   socket: Socket;
 }

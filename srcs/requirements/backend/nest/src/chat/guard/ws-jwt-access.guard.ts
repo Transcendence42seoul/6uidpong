@@ -9,7 +9,7 @@ export class WsJwtAccessGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const client: Socket = context.switchToWs().getClient<Socket>();
-    const token: string | undefined = this.extractTokenFromHeader(client);
+    const token: string | undefined = this.extractToken(client);
     if (typeof token === undefined) {
       throw new WsException("token not exists");
     }
@@ -24,9 +24,11 @@ export class WsJwtAccessGuard implements CanActivate {
     return true;
   }
 
-  private extractTokenFromHeader(client: Socket): string | undefined {
-    const [type, token]: string[] =
-      client.handshake.headers.authorization?.split(" ") ?? [];
-    return type === "Bearer" ? token : undefined;
+  private extractToken(client: Socket): string | undefined {
+    // const [type, token]: string[] =
+    //   client.handshake.headers.authorization?.split(" ") ?? [];
+    // return type === "Bearer" ? token : undefined;
+    const { token } = client.handshake.auth;
+    return token ? token : undefined;
   }
 }

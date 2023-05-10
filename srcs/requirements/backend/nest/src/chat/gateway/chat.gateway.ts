@@ -1,7 +1,6 @@
 import { UseGuards } from "@nestjs/common";
 import {
   ConnectedSocket,
-  OnGatewayConnection,
   OnGatewayDisconnect,
   SubscribeMessage,
   WebSocketGateway,
@@ -13,14 +12,14 @@ import { DmUserEntity } from "../entity/dm-user.entity";
 import { WsJwtAccessGuard } from "../guard/ws-jwt-access.guard";
 import { ChatService } from "../service/chat.service";
 
-@WebSocketGateway({
+@WebSocketGateway(80, {
   cors: {
     origin: [`https://${process.env.HOST_NAME}`],
     credentials: true,
   },
 })
 @UseGuards(WsJwtAccessGuard)
-export class ChatGateway implements OnGatewayDisconnect, OnGatewayConnection {
+export class ChatGateway implements OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
@@ -29,23 +28,20 @@ export class ChatGateway implements OnGatewayDisconnect, OnGatewayConnection {
     private readonly userService: UserService
   ) {}
 
-  async handleConnection(@ConnectedSocket() client: Socket) {
-    const userId: number = client.data.user.id;
-    console.log(`Client connected ${userId}`);
-    const dmRooms: DmUserEntity[] = await this.chatService.findDmRooms(userId);
-    dmRooms.forEach((roomId) => client.join("d" + roomId));
-    await this.userService.updateStatus(userId, "online");
-  }
-
   async handleDisconnect(@ConnectedSocket() client: Socket) {
-    const userId: number = client.data.user.id;
-    console.log(`Client disconnected ${userId}`);
-    await this.userService.updateStatus(userId, "offline");
+    // const userId: number = client.data.user.id;
+    // console.log(`Client disconnected ${userId}`);
+    // await this.userService.updateStatus(userId, "offline");
   }
 
   @SubscribeMessage("findDmList")
   async findDmList(@ConnectedSocket() client: Socket): Promise<void> {
     const userId: number = client.data.user.id;
+    console.log(`Client connected ${userId}`);
+    const dmRooms: DmUserEntity[] = await this.chatService.findDmRooms(userId);
+    console.log(dmRooms);
+    dmRooms.forEach((roomId) => client.join("d" + roomId));
+    await this.userService.updateStatus(userId, "online");
     const dmRoomInfo: Object[] = await this.chatService.findDmList(userId);
     client.emit("dmRoomInfo", dmRoomInfo);
   }

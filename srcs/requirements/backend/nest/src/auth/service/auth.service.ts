@@ -79,6 +79,6 @@ export class AuthService {
     if ((await this.cacheManager.get(userId.toString())) != code) {
       throw new UnauthorizedException();
     }
-    this.cacheManager.del(userId.toString());
+    await this.cacheManager.del(userId.toString());
   }
 }

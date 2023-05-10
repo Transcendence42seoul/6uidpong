@@ -7,9 +7,11 @@ interface ChatRoomListProps {
 }
 
 interface Room {
-  id: number;
-  partner: number;
-  lastChat: Chat;
+  room_id: number;
+  last_message: string;
+  last_message_time: string;
+  nickname: string;
+  image: string;
 }
 
 const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
@@ -17,10 +19,10 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
   const [rooms, setRooms] = useState<Room[]>([]);
 
   const onEnterRoom = useCallback(
-    ({ id }: Room) =>
+    ({ room_id }: Room) =>
       () => {
-        socket.emit('enter-room', id, () => {
-          navigate(`/chat/${id}`);
+        socket.emit('enter-room', room_id, () => {
+          navigate(`/chat/${room_id}`);
         });
       },
     [navigate],
@@ -43,7 +45,7 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
       <ul className="w-full max-w-md">
         {rooms.map((room) => (
           <li
-            key={room.id}
+            key={room.room_id}
             className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-2"
             onDoubleClick={onEnterRoom(room)}
           >
@@ -54,11 +56,13 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
                 className="mr-2 h-10 w-10 rounded-full"
               />
               <div>
-                <span>{room.partner}</span>
-                <p className="text-sm text-gray-600">{room.lastChat.message}</p>
+                <span>{room.nickname}</span>
+                <p className="text-sm text-gray-600">{room.last_message}</p>
               </div>
             </div>
-            <span className="text-sm text-gray-600">{room.lastChat.time}</span>
+            <span className="text-sm text-gray-600">
+              {room.last_message_time}
+            </span>
           </li>
         ))}
       </ul>

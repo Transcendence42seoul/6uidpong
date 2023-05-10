@@ -54,7 +54,7 @@ export class ChatGateway implements OnGatewayDisconnect {
   @SubscribeMessage("dm-chats")
   async findDmChats(
     @ConnectedSocket() client: Socket,
-    @MessageBody() roomId: number
+    @MessageBody("roomId") roomId: number
   ): Promise<void> {
     const userId: number = client.data.user.id;
 

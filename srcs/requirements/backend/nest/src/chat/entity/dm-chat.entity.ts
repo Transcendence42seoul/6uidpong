@@ -7,20 +7,17 @@ import {
 
 @Entity("dm_chats")
 export class DmChatEntity {
-  @PrimaryGeneratedColumn({ name: "dm_chat_id" })
+  @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ name: "room_id" })
   roomId: number;
 
-  @Column()
-  sender: number;
+  @Column({ name: "user_id" })
+  userId: number;
 
   @Column()
-  recipient: number;
-
-  @Column()
-  content: string;
+  message: string;
 
   @CreateDateColumn({ name: "created_at" })
   createdAt: Date;

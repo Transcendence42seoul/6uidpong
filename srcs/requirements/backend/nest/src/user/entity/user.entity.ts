@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { Column, Entity, Index, PrimaryColumn } from "typeorm";
 
 @Entity("users")
 export class UserEntity {
@@ -6,6 +6,7 @@ export class UserEntity {
   id: number;
 
   @Column({ unique: true })
+  @Index()
   nickname: string;
 
   @Column()
@@ -30,4 +31,8 @@ export class UserEntity {
 
   @Column({ name: "ladder_score", default: 1000 })
   ladderScore: number;
+
+  @Column({ name: "socket_id", default: "" })
+  @Index()
+  socketId: string;
 }

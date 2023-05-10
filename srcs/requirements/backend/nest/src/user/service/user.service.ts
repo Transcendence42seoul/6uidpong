@@ -10,8 +10,10 @@ export class UserService {
     private readonly userRepository: Repository<UserEntity>
   ) {}
 
-  async findUserById(id: number): Promise<UserEntity> {
-    return await this.userRepository.findOne({ where: { id } });
+  async findUserById(id: number | string): Promise<UserEntity> {
+    if (typeof id === "number")
+      return await this.userRepository.findOne({ where: { id: id } });
+    return await this.userRepository.findOne({ where: { socketId: id } });
   }
 
   async findUserByNickname(nickname: string): Promise<UserEntity> {
@@ -28,22 +30,40 @@ export class UserService {
     return await this.userRepository.save(profileEntity);
   }
 
-  async updateNickname(id: number, nickname: string): Promise<void> {
-    await this.userRepository.update(id, { nickname: nickname });
+  async updateNickname(userId: number, nickname: string): Promise<void> {
+    await this.userRepository.update(userId, { nickname: nickname });
   }
 
-  async updateImage(id: number, image: string): Promise<void> {
-    await this.userRepository.update(id, { image: image });
+  async updateImage(userId: number, image: string): Promise<void> {
+    await this.userRepository.update(userId, { image: image });
   }
 
-  async updateIsTwoFactor(id: number, is2FA: boolean): Promise<void> {
-    await this.userRepository.update(id, {
+  async updateIsTwoFactor(userId: number, is2FA: boolean): Promise<void> {
+    await this.userRepository.update(userId, {
       is2FA: is2FA,
     });
   }
 
-  async updateStatus(id: number, status: string): Promise<void> {
-    await this.userRepository.update(id, {
+  async updateSocketId(id: number | string, socketId: string): Promise<void> {
+    const findOptions: { id?: number; socketId?: string } = {};
+    if (typeof id === "number") {
+      findOptions.id = id;
+    } else {
+      findOptions.socketId = id;
+    }
+    await this.userRepository.update(findOptions, {
+      socketId: socketId,
+    });
+  }
+
+  async updateStatus(id: number | string, status: string): Promise<void> {
+    const findOptions: { id?: number; socketId?: string } = {};
+    if (typeof id === "number") {
+      findOptions.id = id;
+    } else {
+      findOptions.socketId = id;
+    }
+    await this.userRepository.update(findOptions, {
       status: status,
     });
   }

@@ -44,25 +44,23 @@ export class ChatGateway implements OnGatewayDisconnect {
   }
 
   @SubscribeMessage("dm-rooms")
-  async findDmRooms(@ConnectedSocket() client: Socket): Promise<void> {
+  async findDmRooms(@ConnectedSocket() client: Socket): Promise<Object[]> {
     const userId: number = client.data.user.id;
-
     const rooms: Object[] = await this.chatService.findDmRooms(userId);
-    client.emit("dm-rooms", rooms);
+    return rooms;
   }
 
   @SubscribeMessage("dm-chats")
   async findDmChats(
     @ConnectedSocket() client: Socket,
     @MessageBody("roomId") roomId: number
-  ): Promise<void> {
+  ): Promise<DmChatEntity[]> {
     const userId: number = client.data.user.id;
-
     const chats: DmChatEntity[] = await this.chatService.findDmChats(
       userId,
       roomId
     );
-    client.emit("dm-chats", chats);
+    return chats;
   }
 
   // @SubscribeMessage("dm")

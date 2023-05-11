@@ -43,28 +43,36 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
     <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100">
       <h1 className="mb-4 text-3xl font-bold">Chat</h1>
       <ul className="w-full max-w-3xl">
-        {rooms.map((room) => (
-          <li
-            key={room.room_id}
-            className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-2"
-            onDoubleClick={onEnterRoom(room)}
-          >
-            <div className="flex items-center">
-              <img
-                src={room.interlocutor_image}
-                alt="Interlocutor"
-                className="mr-2 h-10 w-10 rounded-full"
-              />
-              <div>
-                <span>{room.interlocutor}</span>
-                <p className="text-sm text-gray-600">{room.last_message}</p>
+        {rooms.map((room) => {
+          const formattedTime = new Date(
+            room.last_message_time,
+          ).toLocaleTimeString('ko-KR', {
+            hour: 'numeric',
+            minute: 'numeric',
+            hour12: true,
+          });
+
+          return (
+            <li
+              key={room.room_id}
+              className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-2"
+              onDoubleClick={onEnterRoom(room)}
+            >
+              <div className="flex items-center">
+                <img
+                  src={room.interlocutor_image}
+                  alt="Interlocutor"
+                  className="mr-2 h-10 w-10 rounded-full"
+                />
+                <div>
+                  <span>{room.interlocutor}</span>
+                  <p className="text-sm text-gray-600">{room.last_message}</p>
+                </div>
               </div>
-            </div>
-            <span className="text-sm text-gray-600">
-              {room.last_message_time}
-            </span>
-          </li>
-        ))}
+              <span className="text-sm text-gray-600">{formattedTime}</span>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

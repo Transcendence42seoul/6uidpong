@@ -22,11 +22,9 @@ const App: React.FC = () => {
     recentHistory: ['Win', 'Loss', 'Win', 'Win', 'Loss'],
   };
 
-  const { id, is2FA, tokenInfo, accessToken } = useSelector(
+  const { id, is2FA, accessToken, tokenInfo } = useSelector(
     (state: RootState) => state.auth,
   );
-
-  const socket = io({ auth: { token: `${accessToken}` } });
 
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
@@ -68,6 +66,8 @@ const App: React.FC = () => {
     }
     return <Login />;
   }
+
+  const socket = io({ auth: { token: accessToken } });
 
   return (
     <BrowserRouter>

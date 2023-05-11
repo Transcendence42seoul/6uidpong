@@ -6,6 +6,7 @@ import { io } from 'socket.io-client';
 import handleAuthInfo from './authInfo';
 import redirect from './redirect';
 import { RootState } from './store';
+import ChatRoom from './pages/ChatRoom';
 import ChatRoomList from './pages/ChatRoomList';
 import Loading from './pages/Loading';
 import Login from './pages/Login';
@@ -74,6 +75,7 @@ const App: React.FC = () => {
       <Routes>
         <Route path="/" element={<Main />} />
         <Route path="/chat" element={<ChatRoomList socket={socket} />} />
+        <Route path="/chat/:roomId" element={<ChatRoom socket={socket} />} />
         <Route
           path="/my-page"
           element={<MyPage id={tokenInfo.id} stats={stats} />}

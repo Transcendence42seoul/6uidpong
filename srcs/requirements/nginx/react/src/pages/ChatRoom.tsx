@@ -59,14 +59,14 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ socket }) => {
     };
   }, []);
 
-  useEffect(() => {
-    const messageHandler = (chat: Chat) =>
-      setChats((prevChats) => [...prevChats, chat]);
-    socket.on('message', messageHandler);
-    return () => {
-      socket.off('message', messageHandler);
-    };
-  }, []);
+  // useEffect(() => {
+  //   const messageHandler = (chat: Chat) =>
+  //     setChats((prevChats) => [...prevChats, chat]);
+  //   socket.on('message', messageHandler);
+  //   return () => {
+  //     socket.off('message', messageHandler);
+  //   };
+  // }, []);
 
   useEffect(() => {
     const { current } = chatContainer;

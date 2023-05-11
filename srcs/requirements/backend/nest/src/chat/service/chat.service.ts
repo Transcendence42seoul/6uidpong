@@ -20,7 +20,9 @@ export class ChatService {
 
   async findParticipationRoom(userId: number): Promise<DmRoomUserEntity[]> {
     return await this.dmRoomUserRepository.findBy({
-      userId: userId,
+      user: {
+        id: userId,
+      },
       isExit: false,
     });
   }
@@ -29,11 +31,11 @@ export class ChatService {
     const queryBuilder = this.dmChatRepository
       .createQueryBuilder("dm_chats")
       .select([
-        "dm_chats.room_id     AS roomId",
-        "dm_chats.message     AS lastMessage",
-        "dm_chats.created_at  AS lastMessageTime",
+        'dm_chats.room_id     AS "roomId"',
+        'dm_chats.message     AS "lastMessage"',
+        'dm_chats.created_at  AS "lastMessageTime"',
         "users.nickname       AS interlocutor",
-        "users.image          AS interlocutorImage",
+        'users.image          AS "interlocutorImage"',
       ])
       .innerJoin(
         (subQueryBuilder: SelectQueryBuilder<DmChatEntity>) =>
@@ -66,8 +68,10 @@ export class ChatService {
   async findDmChats(userId: number, roomId: number): Promise<DmChatEntity[]> {
     try {
       const roomUserInfo = await this.dmRoomUserRepository.findOneByOrFail({
+        user: {
+          id: userId,
+        },
         roomId,
-        userId,
       });
       return await this.dmChatRepository.find({
         relations: {

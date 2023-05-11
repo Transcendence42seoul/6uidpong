@@ -2,6 +2,7 @@ import { UseGuards } from "@nestjs/common";
 import {
   ConnectedSocket,
   MessageBody,
+  OnGatewayConnection,
   OnGatewayDisconnect,
   SubscribeMessage,
   WebSocketGateway,
@@ -21,7 +22,7 @@ import { ChatService } from "../service/chat.service";
   },
 })
 @UseGuards(WsJwtAccessGuard)
-export class ChatGateway implements OnGatewayDisconnect {
+export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
@@ -29,6 +30,11 @@ export class ChatGateway implements OnGatewayDisconnect {
     private readonly chatService: ChatService,
     private readonly userService: UserService
   ) {}
+
+  async handleConnection(@ConnectedSocket() client: Socket) {
+    await this.userService.updateStatus(client.id, "online");
+    await this.userService.updateSocketId(client.id, client.id);
+  }
 
   async handleDisconnect(@ConnectedSocket() client: Socket) {
     await this.userService.updateStatus(client.id, "offline");
@@ -46,8 +52,7 @@ export class ChatGateway implements OnGatewayDisconnect {
   @SubscribeMessage("dm-rooms")
   async findDmRooms(@ConnectedSocket() client: Socket): Promise<Object[]> {
     const userId: number = client.data.user.id;
-    const rooms: Object[] = await this.chatService.findDmRooms(userId);
-    return rooms;
+    return await this.chatService.findDmRooms(userId);
   }
 
   @SubscribeMessage("dm-chats")
@@ -60,6 +65,7 @@ export class ChatGateway implements OnGatewayDisconnect {
       userId,
       roomId
     );
+    client.join("d" + roomId);
     return chats;
   }
 
@@ -85,7 +91,7 @@ export class ChatGateway implements OnGatewayDisconnect {
   //     );
   //   }
 
-  //   await this.chatService.saveDM(userId, to.roomId, message);
+  //   await this.chatService.saveDM(userId, to.id, message);
   //   if (recipient.socketId == "") {
   //     return;
   //   }

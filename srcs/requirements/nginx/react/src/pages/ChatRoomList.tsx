@@ -52,7 +52,6 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
               hour12: true,
             },
           );
-
           return (
             <li
               key={room.roomId}

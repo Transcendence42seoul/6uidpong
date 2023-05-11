@@ -12,10 +12,15 @@ import Message from '../components/container/Message';
 import MessageBox from '../components/container/MessageBox';
 import MessageForm from '../components/container/MessageForm';
 
+interface User {
+  nickname: string;
+  image: string;
+}
 interface Chat {
-  username: string;
+  id: number;
+  user: User;
   message: string;
-  time: string;
+  createdAt: Date;
 }
 
 interface ChatRoomProps {
@@ -69,19 +74,20 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ socket }) => {
       <h1>WebSocket Chat</h1>
       <ChatContainer ref={chatContainer}>
         {chats.map((chat, index) => {
-          let username = '';
+          const { nickname: username } = chat.user;
+          let nickname = '';
           let className = '';
-          if (!chat.username) {
+          if (!username) {
             className = 'alarm';
-          } else if (socket.id === chat.username) {
+          } else if (socket.id === username) {
             className = 'my_message';
           } else {
-            username = chat.username;
+            nickname = username;
           }
           return (
             /* eslint-disable-next-line react/no-array-index-key */
             <MessageBox key={index} className={className}>
-              <span>{username}</span>
+              <span>{nickname}</span>
               <Message className="message">{chat.message}</Message>
             </MessageBox>
           );

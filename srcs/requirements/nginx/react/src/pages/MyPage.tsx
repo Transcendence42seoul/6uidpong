@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import useCallAPI from '../api';
 import HoverButton from '../components/button/HoverButton';
@@ -24,6 +25,7 @@ interface MyPageProps {
 
 const MyPage: React.FC<MyPageProps> = ({ id, stats }) => {
   const [user, setUser] = useState<User | undefined>(undefined);
+  const navigate = useNavigate();
   const callAPI = useCallAPI();
 
   useEffect(() => {
@@ -47,7 +49,7 @@ const MyPage: React.FC<MyPageProps> = ({ id, stats }) => {
         />
       </ContentBox>
       <HoverButton
-        onClick={() => callAPI('/profile')}
+        onClick={() => navigate('/profile')}
         className="mb-4 w-full max-w-md rounded border p-2.5"
       >
         Change Profile

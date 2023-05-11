@@ -1,5 +1,5 @@
 import React from 'react';
-import useCallAPI from '../api';
+import { useNavigate } from 'react-router-dom';
 import HoverButton from '../components/button/HoverButton';
 import Nickname from '../components/custom/Nickname';
 import ContentBox from '../components/container/ContentBox';
@@ -11,7 +11,7 @@ interface ProfileProps {
 }
 
 const Profile: React.FC<ProfileProps> = ({ id }) => {
-  const callAPI = useCallAPI();
+  const navigate = useNavigate();
 
   return (
     <div className="flex flex-col items-center p-4">
@@ -25,7 +25,7 @@ const Profile: React.FC<ProfileProps> = ({ id }) => {
         <TwoFactorAuth id={id} />
       </ContentBox>
       <HoverButton
-        onClick={() => callAPI('/')}
+        onClick={() => navigate('/')}
         className="mb-4 w-full max-w-md rounded border p-2.5"
       >
         Home

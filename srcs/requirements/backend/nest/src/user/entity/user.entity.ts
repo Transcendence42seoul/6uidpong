@@ -1,4 +1,5 @@
-import { Column, Entity, Index, PrimaryColumn } from "typeorm";
+import { DmChatEntity } from "src/chat/entity/dm-chat.entity";
+import { Column, Entity, Index, OneToMany, PrimaryColumn } from "typeorm";
 
 @Entity("users")
 export class UserEntity {
@@ -35,4 +36,7 @@ export class UserEntity {
   @Column({ name: "socket_id", default: "" })
   @Index()
   socketId: string;
+
+  @OneToMany(() => DmChatEntity, (chat) => chat.user)
+  dmChats: DmChatEntity[];
 }

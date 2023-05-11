@@ -31,8 +31,8 @@ export class ChatGateway implements OnGatewayDisconnect {
   ) {}
 
   async handleDisconnect(@ConnectedSocket() client: Socket) {
-    await this.userService.updateSocketId(client.id, "");
     await this.userService.updateStatus(client.id, "offline");
+    await this.userService.updateSocketId(client.id, "");
   }
 
   @SubscribeMessage("connection")

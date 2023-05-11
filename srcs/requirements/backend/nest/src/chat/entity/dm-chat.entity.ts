@@ -4,6 +4,7 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
@@ -16,8 +17,7 @@ export class DmChatEntity {
   @Column({ name: "room_id" })
   roomId: number;
 
-  @OneToOne(() => UserEntity)
-  @JoinColumn()
+  @ManyToOne(() => UserEntity, (user) => user.dmChats)
   user: UserEntity;
 
   @Column()

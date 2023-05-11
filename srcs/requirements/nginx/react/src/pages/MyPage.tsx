@@ -30,7 +30,7 @@ const MyPage: React.FC<MyPageProps> = ({ id, stats }) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const data = await callAPI(`/api/v1/users/${id}`, false);
+      const data = await callAPI(`/api/v1/users/${id}`);
       setUser(data);
     };
     fetchData();

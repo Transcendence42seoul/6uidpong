@@ -7,11 +7,11 @@ interface ChatRoomListProps {
 }
 
 interface Room {
-  room_id: number;
-  last_message: string;
-  last_message_time: string;
+  roomId: number;
+  lastMessage: string;
+  lastMessageTime: string;
   interlocutor: string;
-  interlocutor_image: string;
+  interlocutorImage: string;
 }
 
 const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
@@ -19,10 +19,10 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
   const [rooms, setRooms] = useState<Room[]>([]);
 
   const onEnterRoom = useCallback(
-    ({ room_id }: Room) =>
+    ({ roomId }: Room) =>
       () => {
-        socket.emit('enter-room', room_id, () => {
-          navigate(`/chat/${room_id}`);
+        socket.emit('enter-room', roomId, () => {
+          navigate(`/chat/${roomId}`);
         });
       },
     [navigate],
@@ -45,7 +45,7 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
       <ul className="w-full max-w-3xl">
         {rooms.map((room) => {
           const formattedTime = new Date(
-            room.last_message_time,
+            room.lastMessageTime,
           ).toLocaleTimeString('ko-KR', {
             hour: 'numeric',
             minute: 'numeric',
@@ -54,19 +54,19 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
 
           return (
             <li
-              key={room.room_id}
+              key={room.roomId}
               className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-2"
               onDoubleClick={onEnterRoom(room)}
             >
               <div className="flex items-center">
                 <img
-                  src={room.interlocutor_image}
+                  src={room.interlocutorImage}
                   alt="Interlocutor"
                   className="mr-2 h-10 w-10 rounded-full"
                 />
                 <div>
                   <span>{room.interlocutor}</span>
-                  <p className="text-sm text-gray-600">{room.last_message}</p>
+                  <p className="text-sm text-gray-600">{room.lastMessage}</p>
                 </div>
               </div>
               <span className="text-sm text-gray-600">{formattedTime}</span>

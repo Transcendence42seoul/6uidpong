@@ -32,7 +32,6 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
     const roomListHandler = (roomList: Room[]) => {
       setRooms(roomList);
     };
-
     socket.emit('dm-rooms', roomListHandler);
     return () => {
       socket.off('dm-rooms', roomListHandler);

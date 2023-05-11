@@ -6,6 +6,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import { useParams } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
 import ChatContainer from '../components/container/ChatContainer';
 import Message from '../components/container/Message';
@@ -28,6 +29,7 @@ interface ChatRoomProps {
 }
 
 const ChatRoom: React.FC<ChatRoomProps> = ({ socket }) => {
+  const { roomId } = useParams<{ roomId: string }>();
   const [chats, setChats] = useState<Chat[]>([]);
   const [message, setMessage] = useState<string>('');
   const chatContainer = useRef<HTMLDivElement>(null);
@@ -50,9 +52,16 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ socket }) => {
   );
 
   useEffect(() => {
+    const chatsHandler = (prevChats: Chat[]) => setChats(prevChats);
+    socket.emit('dm-chats', { roomId }, chatsHandler);
+    return () => {
+      socket.off('dm-chats', chatsHandler);
+    };
+  }, []);
+
+  useEffect(() => {
     const messageHandler = (chat: Chat) =>
       setChats((prevChats) => [...prevChats, chat]);
-
     socket.on('message', messageHandler);
     return () => {
       socket.off('message', messageHandler);

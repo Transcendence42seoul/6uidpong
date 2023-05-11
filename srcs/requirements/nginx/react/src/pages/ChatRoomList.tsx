@@ -9,7 +9,7 @@ interface ChatRoomListProps {
 interface Room {
   roomId: number;
   lastMessage: string;
-  lastMessageTime: string;
+  lastMessageTime: Date;
   interlocutor: string;
   interlocutorImage: string;
 }
@@ -44,13 +44,14 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
       <h1 className="mb-4 text-3xl font-bold">Chat</h1>
       <ul className="w-full max-w-3xl">
         {rooms.map((room) => {
-          const formattedTime = new Date(
-            room.lastMessageTime,
-          ).toLocaleTimeString('ko-KR', {
-            hour: 'numeric',
-            minute: 'numeric',
-            hour12: true,
-          });
+          const formattedTime = room.lastMessageTime.toLocaleTimeString(
+            'ko-KR',
+            {
+              hour: 'numeric',
+              minute: 'numeric',
+              hour12: true,
+            },
+          );
 
           return (
             <li

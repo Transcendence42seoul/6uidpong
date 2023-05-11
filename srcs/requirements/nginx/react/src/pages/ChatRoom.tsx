@@ -73,7 +73,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ socket }) => {
     <>
       <h1>WebSocket Chat</h1>
       <ChatContainer ref={chatContainer}>
-        {chats.map((chat, index) => {
+        {chats.map((chat) => {
           const { nickname: username } = chat.user;
           let nickname = '';
           let className = '';
@@ -85,8 +85,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ socket }) => {
             nickname = username;
           }
           return (
-            /* eslint-disable-next-line react/no-array-index-key */
-            <MessageBox key={index} className={className}>
+            <MessageBox key={chat.id} className={className}>
               <span>{nickname}</span>
               <Message className="message">{chat.message}</Message>
             </MessageBox>

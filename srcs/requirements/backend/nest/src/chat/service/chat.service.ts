@@ -29,11 +29,11 @@ export class ChatService {
     const queryBuilder = this.dmChatRepository
       .createQueryBuilder("dm_chats")
       .select([
-        "dm_chats.room_id",
-        "dm_chats.message AS last_message",
-        "dm_chats.created_at AS last_message_time",
-        "users.nickname AS interlocutor",
-        "users.image AS interlocutor_image",
+        "dm_chats.room_id     AS roomId",
+        "dm_chats.message     AS lastMessage",
+        "dm_chats.created_at  AS lastMessageTime",
+        "users.nickname       AS interlocutor",
+        "users.image          AS interlocutorImage",
       ])
       .innerJoin(
         (subQueryBuilder: SelectQueryBuilder<DmChatEntity>) =>

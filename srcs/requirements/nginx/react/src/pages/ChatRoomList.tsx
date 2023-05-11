@@ -10,8 +10,8 @@ interface Room {
   room_id: number;
   last_message: string;
   last_message_time: string;
-  nickname: string;
-  image: string;
+  interlocutor: string;
+  interlocutor_image: string;
 }
 
 const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
@@ -51,12 +51,12 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
           >
             <div className="flex items-center">
               <img
-                src={room.image}
-                alt="RoomImage"
+                src={room.interlocutor_image}
+                alt="Interlocutor"
                 className="mr-2 h-10 w-10 rounded-full"
               />
               <div>
-                <span>{room.nickname}</span>
+                <span>{room.interlocutor}</span>
                 <p className="text-sm text-gray-600">{room.last_message}</p>
               </div>
             </div>

@@ -41,8 +41,8 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100">
-      <h1 className="mb-4 text-4xl font-bold">Chat</h1>
-      <ul className="w-full max-w-md">
+      <h1 className="mb-4 text-3xl font-bold">Chat</h1>
+      <ul className="w-full max-w-3xl">
         {rooms.map((room) => (
           <li
             key={room.room_id}

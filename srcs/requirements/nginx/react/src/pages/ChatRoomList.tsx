@@ -55,7 +55,8 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
             <li
               key={room.roomId}
               className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-2"
-              onDoubleClick={onEnterRoom(room)}
+              onDoubleClick={() => navigate(`/chat/${room.roomId}`)}
+              // onDoubleClick={onEnterRoom(room)}
             >
               <div className="flex items-center">
                 <img

@@ -14,6 +14,7 @@ import MessageBox from '../components/container/MessageBox';
 import MessageForm from '../components/container/MessageForm';
 
 interface User {
+  id: number;
   nickname: string;
   image: string;
 }
@@ -25,10 +26,11 @@ interface Chat {
 }
 
 interface ChatRoomProps {
+  myId: number;
   socket: Socket;
 }
 
-const ChatRoom: React.FC<ChatRoomProps> = ({ socket }) => {
+const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
   const { roomId } = useParams<{ roomId: string }>();
   const [chats, setChats] = useState<Chat[]>([]);
   const [message, setMessage] = useState<string>('');
@@ -83,12 +85,12 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ socket }) => {
       <h1>WebSocket Chat</h1>
       <ChatContainer ref={chatContainer}>
         {chats.map((chat) => {
-          const { nickname: username } = chat.user;
+          const { id: userId, nickname: username } = chat.user;
           let nickname = '';
           let className = '';
           if (!username) {
             className = 'alarm';
-          } else if (socket.id === username) {
+          } else if (userId === myId) {
             className = 'my_message';
           } else {
             nickname = username;

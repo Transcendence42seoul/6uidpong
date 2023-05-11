@@ -1,7 +1,10 @@
+import { UserEntity } from "src/user/entity/user.entity";
 import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
 
@@ -13,11 +16,15 @@ export class DmRoomUserEntity {
   @Column({ name: "room_id" })
   roomId: number;
 
-  @Column({ name: "user_id" })
-  userId: number;
+  @ManyToOne(() => UserEntity, (user) => user.dmRoomUsers)
+  @JoinColumn({ name: "user_id" })
+  user: UserEntity;
 
   @Column({ name: "is_exit", type: "boolean", default: false })
   isExit: boolean;
+
+  @Column({ name: "has_new_msg", default: false })
+  hasNewMsg: boolean;
 
   @CreateDateColumn({ name: "created_at" })
   createdAt: Date;

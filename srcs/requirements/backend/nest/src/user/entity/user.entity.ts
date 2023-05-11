@@ -1,4 +1,5 @@
 import { DmChatEntity } from "src/chat/entity/dm-chat.entity";
+import { DmRoomUserEntity } from "src/chat/entity/dm-room-user.entity";
 import { Column, Entity, Index, OneToMany, PrimaryColumn } from "typeorm";
 
 @Entity("users")
@@ -37,6 +38,9 @@ export class UserEntity {
   @Index()
   socketId: string;
 
-  @OneToMany(() => DmChatEntity, (chat) => chat.user)
+  @OneToMany(() => DmRoomUserEntity, (dmRoomUser) => dmRoomUser.user)
+  dmRoomUsers: DmRoomUserEntity[];
+
+  @OneToMany(() => DmChatEntity, (dmChat) => dmChat.user)
   dmChats: DmChatEntity[];
 }

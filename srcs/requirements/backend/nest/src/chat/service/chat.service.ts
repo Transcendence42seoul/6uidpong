@@ -1,15 +1,17 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { WsException } from "@nestjs/websockets";
 import { UserEntity } from "src/user/entity/user.entity";
 import { Repository, SelectQueryBuilder, MoreThanOrEqual } from "typeorm";
 import { DmBlocklistEntity } from "../entity/dm-blocklist.entity";
 import { DmChatEntity } from "../entity/dm-chat.entity";
 import { DmRoomUserEntity } from "../entity/dm-room-user.entity";
+import { DmRoomEntity } from "../entity/dm-room.entity";
 
 @Injectable()
 export class ChatService {
   constructor(
+    @InjectRepository(DmRoomEntity)
+    private readonly dmRoomRepository: Repository<DmRoomEntity>,
     @InjectRepository(DmRoomUserEntity)
     private readonly dmRoomUserRepository: Repository<DmRoomUserEntity>,
     @InjectRepository(DmChatEntity)
@@ -34,6 +36,7 @@ export class ChatService {
         'dm_chats.room_id     AS "roomId"',
         'dm_chats.message     AS "lastMessage"',
         'dm_chats.created_at  AS "lastMessageTime"',
+        'users.id             AS "interlocutorId"',
         "users.nickname       AS interlocutor",
         'users.image          AS "interlocutorImage"',
       ])
@@ -65,26 +68,62 @@ export class ChatService {
     return await queryBuilder.getRawMany();
   }
 
-  async findDmChats(userId: number, roomId: number): Promise<DmChatEntity[]> {
-    try {
-      const roomUserInfo = await this.dmRoomUserRepository.findOneByOrFail({
-        user: {
-          id: userId,
-        },
-        roomId,
-      });
-      return await this.dmChatRepository.find({
-        relations: {
-          user: true,
-        },
-        where: {
-          roomId,
-          createdAt: MoreThanOrEqual(roomUserInfo.createdAt),
-        },
-      });
-    } catch (EntityNotFoundError) {
-      throw new WsException("invalid request");
-    }
+  async findRoomUser(
+    userId: number,
+    interlocutorId: number
+  ): Promise<DmRoomUserEntity | undefined> {
+    const queryBuilder = this.dmRoomUserRepository
+      .createQueryBuilder()
+      .select(["room_id, is_exit, created_at"])
+      .where("user_id IN (:userId, :interlocutorId)", {
+        userId,
+        interlocutorId,
+      })
+      .groupBy("room_id")
+      .having("count(DISTINCT user_id) = 2")
+      .andHaving("user_id = :userId", { userId });
+
+    return await queryBuilder.getOne();
+  }
+
+  async updateEnterInfo(roomUser: DmRoomUserEntity): Promise<any> {
+    await this.dmRoomUserRepository.update(roomUser.id, {
+      isExit: false,
+      createdAt: new Date(),
+    });
+  }
+
+  async createRoomInfo(
+    userId: number,
+    interlocutorId: number
+  ): Promise<DmRoomUserEntity> {
+    const room: DmRoomEntity = await this.dmRoomRepository.save(
+      new DmRoomEntity()
+    );
+    const roomUsers: DmRoomUserEntity[] = await this.dmRoomUserRepository.save([
+      {
+        roomId: room.id,
+        userId: userId,
+      },
+      {
+        roomId: room.id,
+        userId: interlocutorId,
+      },
+    ]);
+
+    return roomUsers.find((roomUser) => roomUser.user.id === userId);
+  }
+
+  async findDmChats(roomUser: DmRoomUserEntity): Promise<DmChatEntity[]> {
+    return await this.dmChatRepository.find({
+      relations: {
+        user: true,
+      },
+      where: {
+        roomId: roomUser.roomId,
+        createdAt: MoreThanOrEqual(roomUser.createdAt),
+      },
+    });
   }
 
   async isBlocked(userId: number, validateId: number): Promise<boolean> {
@@ -94,5 +133,30 @@ export class ChatService {
     }))
       ? true
       : false;
+  }
+
+  async saveDM(
+    userId: number,
+    roomId: number,
+    message: string
+  ): Promise<DmChatEntity> {
+    return await this.dmChatRepository.save({
+      user: {
+        id: userId,
+      },
+      roomId,
+      message,
+    });
+  }
+
+  async updateHasNewMsg(
+    roomId: number,
+    userId: number,
+    hasNewMsg: boolean
+  ): Promise<void> {
+    const findOptions = { roomId, user: { id: userId } };
+    await this.dmRoomUserRepository.update(findOptions, {
+      hasNewMsg,
+    });
   }
 }

@@ -10,8 +10,11 @@ import {
   WsException,
 } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
+import { UserEntity } from "src/user/entity/user.entity";
 import { UserService } from "src/user/service/user.service";
 import { DmChatEntity } from "../entity/dm-chat.entity";
+import { DmRoomUserEntity } from "../entity/dm-room-user.entity";
+import { DmRoomEntity } from "../entity/dm-room.entity";
 import { WsJwtAccessGuard } from "../guard/ws-jwt-access.guard";
 import { ChatService } from "../service/chat.service";
 
@@ -41,59 +44,77 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     await this.userService.updateSocketId(client.id, "");
   }
 
-  @SubscribeMessage("connection")
-  async connectClient(@ConnectedSocket() client: Socket): Promise<void> {
-    const userId: number = client.data.user.id;
-
-    await this.userService.updateStatus(userId, "online");
-    await this.userService.updateSocketId(userId, client.id);
-  }
-
-  @SubscribeMessage("dm-rooms")
+  @SubscribeMessage("find-dm-rooms")
   async findDmRooms(@ConnectedSocket() client: Socket): Promise<Object[]> {
     const userId: number = client.data.user.id;
     return await this.chatService.findDmRooms(userId);
   }
 
-  @SubscribeMessage("dm-chats")
-  async findDmChats(
+  @SubscribeMessage("join-dm")
+  async joinDM(
     @ConnectedSocket() client: Socket,
-    @MessageBody("roomId") roomId: number
-  ): Promise<DmChatEntity[]> {
+    @MessageBody("interlocutorId") interlocutorId: number
+  ): Promise<Object> {
     const userId: number = client.data.user.id;
-    const chats: DmChatEntity[] = await this.chatService.findDmChats(
-      userId,
-      roomId
-    );
-    client.join("d" + roomId);
-    return chats;
+    let roomUser: DmRoomUserEntity | undefined =
+      await this.chatService.findRoomUser(userId, interlocutorId);
+
+    if (roomUser?.isExit) {
+      await this.chatService.updateEnterInfo(roomUser);
+    } else if (typeof roomUser === undefined) {
+      roomUser = await this.chatService.createRoomInfo(userId, interlocutorId);
+    }
+    client.join("d" + roomUser.roomId);
+
+    return await this.chatService.findDmChats(roomUser);
   }
 
-  // @SubscribeMessage("dm")
-  // async sendDM(
-  //   @ConnectedSocket() client: Socket,
-  //   @MessageBody("to") to: { id: number },
-  //   @MessageBody("message") message: string
-  // ): Promise<void> {
-  //   const userId: number = client.data.user.id;
+  @SubscribeMessage("send-dm")
+  async sendDM(
+    @ConnectedSocket() client: Socket,
+    @MessageBody("to") to: { userId: number; roomId: number },
+    @MessageBody("message") message: string
+  ): Promise<DmChatEntity> {
+    const userId: number = client.data.user.id;
 
-  //   const sender = await this.userService.findUserById(userId);
-  //   const recipient = await this.userService.findUserById(to.id);
+    const sender: UserEntity = await this.userService.findUserById(userId);
+    const recipient: UserEntity | null = await this.userService.findUserById(
+      to.userId
+    );
 
-  //   if (await this.chatService.isBlocked(sender.id, recipient.id)) {
-  //     throw new WsException(
-  //       "You can't send a message to the user you have blocked."
-  //     );
-  //   }
-  //   if (await this.chatService.isBlocked(recipient.id, sender.id)) {
-  //     throw new WsException(
-  //       "You can't send a message because you have been blocked."
-  //     );
-  //   }
+    if (typeof recipient === null) {
+      throw new WsException("invalid recipient user id.");
+    }
+    if (await this.chatService.isBlocked(sender.id, recipient.id)) {
+      throw new WsException(
+        "You can't send a message to the user you have blocked."
+      );
+    }
+    if (await this.chatService.isBlocked(recipient.id, sender.id)) {
+      throw new WsException(
+        "You can't send a message because you have been blocked."
+      );
+    }
 
-  //   await this.chatService.saveDM(userId, to.id, message);
-  //   if (recipient.socketId == "") {
-  //     return;
-  //   }
-  // }
+    const chat: DmChatEntity = await this.chatService.saveDM(
+      userId,
+      to.roomId,
+      message
+    );
+    if (recipient.socketId == "") {
+      return;
+    }
+
+    const roomSockets = await this.server.in("d" + to.roomId).fetchSockets();
+    if (!roomSockets.find((socket) => socket.id === recipient.socketId)) {
+      await this.chatService.updateHasNewMsg(to.roomId, recipient.id, true);
+    }
+
+    const recipientSocket = await this.server
+      .in(recipient.socketId)
+      .fetchSockets();
+    recipientSocket[0].emit("send-dm", message);
+
+    return chat;
+  }
 }

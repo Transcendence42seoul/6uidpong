@@ -123,4 +123,12 @@ export class ChatGateway implements OnGatewayDisconnect {
 
     return chat;
   }
+
+  @SubscribeMessage("leave-dm")
+  async leaveDM(
+    @ConnectedSocket() client: Socket,
+    @MessageBody("roomId") roomId: number
+  ): Promise<void> {
+    client.leave("d" + roomId);
+  }
 }

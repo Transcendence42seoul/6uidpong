@@ -42,7 +42,7 @@ const App: React.FC = () => {
         { code },
       );
       await handleAuthInfo(data, dispatch);
-      const pathname = status === 201 ? '/profile' : '/';
+      const pathname = status === 201 ? '/profile-settings' : '/';
       redirect(pathname, url);
     };
 

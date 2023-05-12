@@ -49,10 +49,14 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
       e.preventDefault();
       if (!message) return;
 
-      socket.emit('send-dm', { interlocutorId, roomId }, (chat: Chat) => {
-        setChats((prevChats) => [...prevChats, chat]);
-        setMessage('');
-      });
+      socket.emit(
+        'send-dm',
+        { to: { userId: interlocutorId, roomId }, message },
+        (chat: Chat) => {
+          setChats((prevChats) => [...prevChats, chat]);
+          setMessage('');
+        },
+      );
     },
     [message],
   );

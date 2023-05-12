@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import handleAuthInfo from './authInfo';
 import redirect from './redirect';
@@ -71,21 +71,19 @@ const App: React.FC = () => {
   const socket = io({ auth: { token: accessToken } });
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Main />} />
-        <Route path="/chat" element={<ChatRoomList socket={socket} />} />
-        <Route
-          path="/chat/:roomId"
-          element={<ChatRoom myId={tokenInfo.id} socket={socket} />}
-        />
-        <Route
-          path="/my-page"
-          element={<MyPage id={tokenInfo.id} stats={stats} />}
-        />
-        <Route path="/profile" element={<Profile id={tokenInfo.id} />} />
-      </Routes>
-    </BrowserRouter>
+    <Routes>
+      <Route path="/" element={<Main />} />
+      <Route path="/chat" element={<ChatRoomList socket={socket} />} />
+      <Route
+        path="/chat/:roomId"
+        element={<ChatRoom myId={tokenInfo.id} socket={socket} />}
+      />
+      <Route
+        path="/my-page"
+        element={<MyPage id={tokenInfo.id} stats={stats} />}
+      />
+      <Route path="/profile" element={<Profile id={tokenInfo.id} />} />
+    </Routes>
   );
 };
 

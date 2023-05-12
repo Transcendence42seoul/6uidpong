@@ -19,7 +19,7 @@ interface User {
   image: string;
 }
 
-interface Chat {
+export interface Chat {
   id: number;
   user: User;
   message: string;

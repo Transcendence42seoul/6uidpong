@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
 import CircularImage from '../components/container/CircularImage';
+import { Chat } from './ChatRoom';
 
 interface ChatRoomListProps {
   socket: Socket;
@@ -27,6 +28,21 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
     socket.emit('find-dm-rooms', roomListHandler);
     return () => {
       socket.off('find-dm-rooms', roomListHandler);
+    };
+  }, []);
+
+  useEffect(() => {
+    const messageHandler = (chat: Chat) => {
+      const roomToUpdate = rooms.find(
+        (room) => room.interlocutorId === chat.user.id,
+      );
+      if (!roomToUpdate) return;
+      roomToUpdate.lastMessage = chat.message;
+      roomToUpdate.lastMessageTime = chat.createdAt;
+    };
+    socket.on('send-dm', messageHandler);
+    return () => {
+      socket.off('send-dm', messageHandler);
     };
   }, []);
 

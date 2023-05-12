@@ -57,7 +57,7 @@ export class ChatGateway implements OnGatewayDisconnect {
   async joinDM(
     @ConnectedSocket() client: Socket,
     @MessageBody("interlocutorId") interlocutorId: number
-  ): Promise<Object> {
+  ): Promise<DmChatEntity[]> {
     const userId: number = client.data.user.id;
     let roomUser: DmRoomUserEntity | null = await this.chatService.findRoomUser(
       userId,

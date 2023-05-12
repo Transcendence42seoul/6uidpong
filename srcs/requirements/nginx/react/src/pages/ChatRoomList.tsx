@@ -11,6 +11,7 @@ interface Room {
   lastMessage: string;
   lastMessageTime: string;
   interlocutor: string;
+  interlocutorId: string;
   interlocutorImage: string;
 }
 
@@ -44,7 +45,11 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
             <li
               key={room.roomId}
               className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-2"
-              onDoubleClick={() => navigate(`/chat/${room.roomId}`)}
+              onDoubleClick={() =>
+                navigate(`/chat/${room.roomId}`, {
+                  state: { interlocutorId: room.interlocutorId },
+                })
+              }
             >
               <div className="flex items-center">
                 <img

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
+import CircularImage from '../components/container/CircularImage';
 
 interface ChatRoomListProps {
   socket: Socket;
@@ -52,10 +53,10 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
               }
             >
               <div className="flex items-center">
-                <img
+                <CircularImage
                   src={room.interlocutorImage}
                   alt="Interlocutor"
-                  className="mr-2 h-10 w-10 rounded-full"
+                  className="mr-2 h-10 w-10"
                 />
                 <div>
                   <span>{room.interlocutor}</span>

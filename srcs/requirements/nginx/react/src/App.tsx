@@ -14,13 +14,11 @@ import Login from './pages/Login';
 import Main from './pages/Main';
 import MyPage from './pages/MyPage';
 import ProfileSettings from './pages/ProfileSettings';
+import UserProfile from './pages/UserProfile';
 import LoginAuth from './components/custom/LoginAuth';
 
 const App: React.FC = () => {
   const stats = {
-    wins: 4,
-    losses: 2,
-    ladderScore: 4242,
     recentHistory: ['Win', 'Loss', 'Win', 'Win', 'Loss'],
   };
 
@@ -83,6 +81,7 @@ const App: React.FC = () => {
           path="/my-page"
           element={<MyPage id={tokenInfo.id} stats={stats} />}
         />
+        <Route path="/profile/:userId" element={<UserProfile />} />
         <Route
           path="/profile-settings"
           element={<ProfileSettings id={tokenInfo.id} />}

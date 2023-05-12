@@ -24,7 +24,7 @@ import { ChatService } from "../service/chat.service";
   },
 })
 @UseGuards(WsJwtAccessGuard)
-export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class ChatGateway implements OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
@@ -33,14 +33,18 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly userService: UserService
   ) {}
 
-  async handleConnection(@ConnectedSocket() client: Socket) {
-    await this.userService.updateStatus(client.id, "online");
-    await this.userService.updateSocketId(client.id, client.id);
-  }
-
   async handleDisconnect(@ConnectedSocket() client: Socket) {
+    console.log("Client disconnected ", client.id);
     await this.userService.updateStatus(client.id, "offline");
     await this.userService.updateSocketId(client.id, "");
+  }
+
+  @SubscribeMessage("connection")
+  async connectClient(@ConnectedSocket() client: Socket): Promise<void> {
+    const userId: number = client.data.user.id;
+    console.log("Client connected ", client.id, userId);
+    await this.userService.updateStatus(userId, "online");
+    await this.userService.updateSocketId(userId, client.id);
   }
 
   @SubscribeMessage("find-dm-rooms")

@@ -67,6 +67,7 @@ const App: React.FC = () => {
   }
 
   const socket = io({ auth: { token: accessToken } });
+  socket.emit('connection');
 
   return (
     <Layout>

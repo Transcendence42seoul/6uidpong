@@ -87,6 +87,11 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
     }
   }, [chats.length]);
 
+  window.addEventListener('beforeunload', (e: BeforeUnloadEvent) => {
+    e.preventDefault();
+    socket.emit('leave-dm', { roomId });
+  });
+
   return (
     <>
       <h1>WebSocket Chat</h1>

@@ -77,7 +77,7 @@ const App: React.FC = () => {
         <Route path="/chat" element={<ChatRoomList socket={socket} />} />
         <Route
           path="/chat/:roomId"
-          element={<ChatRoom myId={id} socket={socket} />}
+          element={<ChatRoom myId={tokenInfo.id} socket={socket} />}
         />
         <Route
           path="/my-page"

@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Routes, Route } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import handleAuthInfo from './authInfo';
+import Layout from './Layout';
 import redirect from './redirect';
 import { RootState } from './store';
 import ChatRoom from './pages/ChatRoom';
@@ -71,19 +72,21 @@ const App: React.FC = () => {
   const socket = io({ auth: { token: accessToken } });
 
   return (
-    <Routes>
-      <Route path="/" element={<Main />} />
-      <Route path="/chat" element={<ChatRoomList socket={socket} />} />
-      <Route
-        path="/chat/:roomId"
-        element={<ChatRoom myId={tokenInfo.id} socket={socket} />}
-      />
-      <Route
-        path="/my-page"
-        element={<MyPage id={tokenInfo.id} stats={stats} />}
-      />
-      <Route path="/profile" element={<Profile id={tokenInfo.id} />} />
-    </Routes>
+    <Layout>
+      <Routes>
+        <Route path="/" element={<Main />} />
+        <Route path="/chat" element={<ChatRoomList socket={socket} />} />
+        <Route
+          path="/chat/:roomId"
+          element={<ChatRoom myId={tokenInfo.id} socket={socket} />}
+        />
+        <Route
+          path="/my-page"
+          element={<MyPage id={tokenInfo.id} stats={stats} />}
+        />
+        <Route path="/profile" element={<Profile id={tokenInfo.id} />} />
+      </Routes>
+    </Layout>
   );
 };
 

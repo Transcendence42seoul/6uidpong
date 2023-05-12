@@ -21,8 +21,8 @@ const store = configureStore({
 
 export const persistor = persistStore(store);
 
-export type RootState = {
+export interface RootState {
   auth: AuthState;
-};
+}
 
 export default store;

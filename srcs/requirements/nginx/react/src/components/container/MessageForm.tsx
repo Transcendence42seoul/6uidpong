@@ -1,9 +1,9 @@
 import React, { FormEvent } from 'react';
 
-type MessageFormProps = {
+interface MessageFormProps {
   children: React.ReactNode;
   onSubmit: (e: FormEvent<HTMLFormElement>) => void;
-};
+}
 
 const MessageForm: React.FC<MessageFormProps> = ({ children, onSubmit }) => (
   <form className="mt-6 flex" onSubmit={onSubmit}>

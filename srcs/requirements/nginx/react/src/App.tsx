@@ -24,13 +24,12 @@ const App: React.FC = () => {
     recentHistory: ['Win', 'Loss', 'Win', 'Win', 'Loss'],
   };
 
+  const [loading, setLoading] = useState(false);
   const { id, is2FA, accessToken, tokenInfo } = useSelector(
     (state: RootState) => state.auth,
   );
 
   const dispatch = useDispatch();
-  const [loading, setLoading] = useState(false);
-
   const handleLoading = async () => {
     setLoading(true);
   };

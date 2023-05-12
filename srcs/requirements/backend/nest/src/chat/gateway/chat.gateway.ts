@@ -14,7 +14,6 @@ import { UserEntity } from "src/user/entity/user.entity";
 import { UserService } from "src/user/service/user.service";
 import { DmChatEntity } from "../entity/dm-chat.entity";
 import { DmRoomUserEntity } from "../entity/dm-room-user.entity";
-import { DmRoomEntity } from "../entity/dm-room.entity";
 import { WsJwtAccessGuard } from "../guard/ws-jwt-access.guard";
 import { ChatService } from "../service/chat.service";
 
@@ -102,6 +101,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       message
     );
     if (recipient.socketId == "") {
+      await this.chatService.updateHasNewMsg(to.roomId, recipient.id, true);
       return;
     }
 

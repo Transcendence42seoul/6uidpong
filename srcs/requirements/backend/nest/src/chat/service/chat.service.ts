@@ -30,19 +30,30 @@ export class ChatService {
   }
 
   async findDmRooms(userId: number): Promise<Object[]> {
+    const scalarSubQuery = this.dmRoomUserRepository
+      .createQueryBuilder()
+      .select("has_new_msg")
+      .where("user_id = :userId")
+      .andWhere("room_id = dm_chats.room_id")
+      .setParameter("userId", userId)
+      .getQuery();
+
     const queryBuilder = this.dmChatRepository
       .createQueryBuilder("dm_chats")
       .select([
-        'dm_chats.room_id     AS "roomId"',
-        'dm_chats.message     AS "lastMessage"',
-        'dm_chats.created_at  AS "lastMessageTime"',
-        'users.id             AS "interlocutorId"',
-        "users.nickname       AS interlocutor",
-        'users.image          AS "interlocutorImage"',
+        'dm_chats.room_id       AS "roomId"',
+        'dm_chats.message       AS "lastMessage"',
+        'dm_chats.created_at    AS "lastMessageTime"',
+        'users.id               AS "interlocutorId"',
+        "users.nickname         AS interlocutor",
+        'users.image            AS "interlocutorImage"',
+        `CASE WHEN (${scalarSubQuery})
+              THEN 'true'
+              ELSE 'false' END  AS "hasNewMsg"`,
       ])
       .innerJoin(
-        (subQueryBuilder: SelectQueryBuilder<DmChatEntity>) =>
-          subQueryBuilder
+        (inlineViewBuilder: SelectQueryBuilder<DmChatEntity>) =>
+          inlineViewBuilder
             .select("sub_dm_chats.room_id", "room_id")
             .addSelect("MAX(sub_dm_chats.created_at)", "max_created_at")
             .from(DmChatEntity, "sub_dm_chats")

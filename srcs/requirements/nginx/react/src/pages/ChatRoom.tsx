@@ -46,7 +46,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
       e.preventDefault();
       if (!message) return;
 
-      socket.emit('dm', message, (chat: Chat) => {
+      socket.emit('send-dm', message, (chat: Chat) => {
         setChats((prevChats) => [...prevChats, chat]);
         setMessage('');
       });

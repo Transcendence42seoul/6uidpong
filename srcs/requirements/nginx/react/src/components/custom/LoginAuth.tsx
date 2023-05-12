@@ -28,7 +28,7 @@ const LoginAuth: React.FC<LoginAuthProps> = ({ id }) => {
   };
 
   return (
-    <div>
+    <>
       <h1 className="mt-5 text-2xl font-bold text-white">Verification Code</h1>
       <input
         type="text"
@@ -43,7 +43,7 @@ const LoginAuth: React.FC<LoginAuthProps> = ({ id }) => {
       >
         Submit
       </HoverButton>
-    </div>
+    </>
   );
 };
 

@@ -57,7 +57,7 @@ const TwoFactorAuth: React.FC<TwoFactorAuthProps> = ({ id }) => {
   };
 
   return (
-    <div>
+    <>
       <HoverButton onClick={handleSetIs2faVerified}>인증 활성화</HoverButton>
       <Modal isOpen={openModal} onClose={handleCloseModal}>
         <div style={{ pointerEvents: 'auto' }}>
@@ -86,7 +86,7 @@ const TwoFactorAuth: React.FC<TwoFactorAuthProps> = ({ id }) => {
           )}
         </div>
       </Modal>
-    </div>
+    </>
   );
 };
 

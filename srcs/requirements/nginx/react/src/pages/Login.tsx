@@ -3,7 +3,7 @@ import HoverButton from '../components/button/HoverButton';
 
 const Login: React.FC = () => {
   return (
-    <div>
+    <>
       <h1 className="mt-0 pt-14 text-center text-3xl text-white">6u!dpong</h1>
       <div className="flex items-center justify-center">
         <HoverButton
@@ -16,7 +16,7 @@ const Login: React.FC = () => {
           42 LOGIN
         </HoverButton>
       </div>
-    </div>
+    </>
   );
 };
 

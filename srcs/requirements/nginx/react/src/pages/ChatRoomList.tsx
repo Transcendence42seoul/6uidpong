@@ -32,9 +32,9 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
     const roomListHandler = (roomList: Room[]) => {
       setRooms(roomList);
     };
-    socket.emit('dm-rooms', roomListHandler);
+    socket.emit('find-dm-rooms', roomListHandler);
     return () => {
-      socket.off('dm-rooms', roomListHandler);
+      socket.off('find-dm-rooms', roomListHandler);
     };
   }, []);
 

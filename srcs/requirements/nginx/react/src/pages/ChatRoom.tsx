@@ -18,6 +18,7 @@ interface User {
   nickname: string;
   image: string;
 }
+
 interface Chat {
   id: number;
   user: User;
@@ -45,7 +46,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
       e.preventDefault();
       if (!message) return;
 
-      socket.emit('message', message, (chat: Chat) => {
+      socket.emit('dm', message, (chat: Chat) => {
         setChats((prevChats) => [...prevChats, chat]);
         setMessage('');
       });
@@ -55,18 +56,18 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
 
   useEffect(() => {
     const chatsHandler = (prevChats: Chat[]) => setChats(prevChats);
-    socket.emit('dm-chats', { roomId }, chatsHandler);
+    socket.emit('join-dm', { roomId }, chatsHandler);
     return () => {
-      socket.off('dm-chats', chatsHandler);
+      socket.off('join-dm', chatsHandler);
     };
   }, []);
 
   // useEffect(() => {
   //   const messageHandler = (chat: Chat) =>
   //     setChats((prevChats) => [...prevChats, chat]);
-  //   socket.on('message', messageHandler);
+  //   socket.on('dm', messageHandler);
   //   return () => {
-  //     socket.off('message', messageHandler);
+  //     socket.off('dm', messageHandler);
   //   };
   // }, []);
 

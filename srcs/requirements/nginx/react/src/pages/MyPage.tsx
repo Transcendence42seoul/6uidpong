@@ -42,7 +42,7 @@ const MyPage: React.FC<MyPageProps> = ({ id, stats }) => {
         />
       </ContentBox>
       <HoverButton
-        onClick={() => navigate('/profile')}
+        onClick={() => navigate('/profile-settings')}
         className="mb-4 w-full max-w-md rounded border p-2.5"
       >
         Change Profile

@@ -102,7 +102,7 @@ export class ChatGateway implements OnGatewayDisconnect {
     }
 
     const chat: DmChatEntity = await this.chatService.saveDM(
-      userId,
+      sender.id,
       to.roomId,
       message
     );
@@ -119,7 +119,7 @@ export class ChatGateway implements OnGatewayDisconnect {
     const recipientSocket = await this.server
       .in(recipient.socketId)
       .fetchSockets();
-    recipientSocket[0].emit("send-dm", message);
+    recipientSocket[0].emit("send-dm", chat);
 
     return chat;
   }

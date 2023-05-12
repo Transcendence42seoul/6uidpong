@@ -6,11 +6,11 @@ import ContentBox from '../components/container/ContentBox';
 import ProfilePicture from '../components/custom/ProfilePicture';
 import TwoFactorAuth from '../components/custom/TwoFactorAuth';
 
-interface ProfileProps {
+interface ProfileSettingsProps {
   id: number;
 }
 
-const Profile: React.FC<ProfileProps> = ({ id }) => {
+const ProfileSettings: React.FC<ProfileSettingsProps> = ({ id }) => {
   const navigate = useNavigate();
 
   return (
@@ -34,4 +34,4 @@ const Profile: React.FC<ProfileProps> = ({ id }) => {
   );
 };
 
-export default Profile;
+export default ProfileSettings;

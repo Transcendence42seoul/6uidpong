@@ -13,7 +13,7 @@ import Loading from './pages/Loading';
 import Login from './pages/Login';
 import Main from './pages/Main';
 import MyPage from './pages/MyPage';
-import Profile from './pages/Profile';
+import ProfileSettings from './pages/ProfileSettings';
 import LoginAuth from './components/custom/LoginAuth';
 
 const App: React.FC = () => {
@@ -83,7 +83,10 @@ const App: React.FC = () => {
           path="/my-page"
           element={<MyPage id={tokenInfo.id} stats={stats} />}
         />
-        <Route path="/profile" element={<Profile id={tokenInfo.id} />} />
+        <Route
+          path="/profile-settings"
+          element={<ProfileSettings id={tokenInfo.id} />}
+        />
       </Routes>
     </Layout>
   );

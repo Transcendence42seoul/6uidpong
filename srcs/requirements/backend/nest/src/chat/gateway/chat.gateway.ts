@@ -59,12 +59,14 @@ export class ChatGateway implements OnGatewayDisconnect {
     @MessageBody("interlocutorId") interlocutorId: number
   ): Promise<Object> {
     const userId: number = client.data.user.id;
-    let roomUser: DmRoomUserEntity | undefined =
-      await this.chatService.findRoomUser(userId, interlocutorId);
+    let roomUser: DmRoomUserEntity | null = await this.chatService.findRoomUser(
+      userId,
+      interlocutorId
+    );
 
     if (roomUser?.isExit) {
       await this.chatService.updateEnterInfo(roomUser);
-    } else if (typeof roomUser === undefined) {
+    } else if (typeof roomUser === null) {
       roomUser = await this.chatService.createRoomInfo(userId, interlocutorId);
     }
     client.join("d" + roomUser.roomId);

@@ -48,31 +48,34 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
     (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       if (!message) return;
-
-      socket.emit('send-dm', { interlocutorId, roomId }, (chat: Chat) => {
-        setChats((prevChats) => [...prevChats, chat]);
-        setMessage('');
-      });
+      socket.emit(
+        'send-dm',
+        { to: { userId: interlocutorId, roomId }, message },
+        (chat: Chat) => {
+          setChats((prevChats) => [...prevChats, chat]);
+          setMessage('');
+        },
+      );
     },
     [message],
   );
 
   useEffect(() => {
     const chatsHandler = (prevChats: Chat[]) => setChats(prevChats);
-    socket.emit('join-dm', interlocutorId, chatsHandler);
+    socket.emit('join-dm', { interlocutorId }, chatsHandler);
     return () => {
       socket.off('join-dm', chatsHandler);
     };
   }, []);
 
-  // useEffect(() => {
-  //   const messageHandler = (chat: Chat) =>
-  //     setChats((prevChats) => [...prevChats, chat]);
-  //   socket.on('dm', messageHandler);
-  //   return () => {
-  //     socket.off('dm', messageHandler);
-  //   };
-  // }, []);
+  useEffect(() => {
+    const messageHandler = (chat: Chat) =>
+      setChats((prevChats) => [...prevChats, chat]);
+    socket.on('send-dm', messageHandler);
+    return () => {
+      socket.off('send-dm', messageHandler);
+    };
+  }, []);
 
   useEffect(() => {
     const { current } = chatContainer;

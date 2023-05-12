@@ -82,17 +82,23 @@ export class ChatService {
   async findRoomUser(
     userId: number,
     interlocutorId: number
-  ): Promise<DmRoomUserEntity | undefined> {
+  ): Promise<DmRoomUserEntity | null> {
     const queryBuilder = this.dmRoomUserRepository
-      .createQueryBuilder()
-      .select(["room_id, is_exit, created_at"])
-      .where("user_id IN (:userId, :interlocutorId)", {
-        userId,
-        interlocutorId,
-      })
-      .groupBy("room_id")
-      .having("count(DISTINCT user_id) = 2")
-      .andHaving("user_id = :userId", { userId });
+      .createQueryBuilder("room_user")
+      .select()
+      .innerJoin(
+        (inlineViewBuilder) =>
+          inlineViewBuilder
+            .select("d.room_id")
+            .from(DmRoomUserEntity, "d")
+            .where("d.user_id IN (:userId, :interlocutorId)")
+            .setParameters({ userId, interlocutorId })
+            .groupBy("d.room_id")
+            .having("COUNT(DISTINCT d.user_id) = 2"),
+        "match_room_user",
+        "room_user.room_id = match_room_user.room_id"
+      )
+      .where("room_user.user_id = :userId", { userId });
 
     return await queryBuilder.getOne();
   }

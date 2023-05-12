@@ -1,8 +1,8 @@
 import React from 'react';
 
-type ChatContainerProps = {
+interface ChatContainerProps {
   children: React.ReactNode;
-};
+}
 
 const ChatContainer = React.forwardRef<HTMLDivElement, ChatContainerProps>(
   ({ children }, ref) => (

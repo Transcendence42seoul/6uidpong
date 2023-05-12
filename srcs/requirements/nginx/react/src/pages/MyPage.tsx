@@ -5,16 +5,9 @@ import useCallAPI from '../api';
 import HoverButton from '../components/button/HoverButton';
 import CircularImage from '../components/container/CircularImage';
 import ContentBox from '../components/container/ContentBox';
-
-interface User {
-  nickname: string;
-  image: string;
-}
+import { User } from './UserProfile';
 
 interface Stats {
-  wins: number;
-  losses: number;
-  ladderScore: number;
   recentHistory: string[];
 }
 
@@ -24,9 +17,9 @@ interface MyPageProps {
 }
 
 const MyPage: React.FC<MyPageProps> = ({ id, stats }) => {
-  const [user, setUser] = useState<User | undefined>(undefined);
-  const navigate = useNavigate();
   const callAPI = useCallAPI();
+  const navigate = useNavigate();
+  const [user, setUser] = useState<User | undefined>(undefined);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -56,9 +49,9 @@ const MyPage: React.FC<MyPageProps> = ({ id, stats }) => {
       </HoverButton>
       <ContentBox className="mb-4 w-full max-w-md border p-4">
         <h3 className="mb-2 text-xl font-bold">Stats</h3>
-        <p className="mb-1.5">Wins: {stats.wins}</p>
-        <p className="mb-1.5">Losses: {stats.losses}</p>
-        <p>Ladder Score: {stats.ladderScore}</p>
+        <p className="mb-1.5">Wins: {user?.winStat}</p>
+        <p className="mb-1.5">Losses: {user?.loseStat}</p>
+        <p>Ladder Score: {user?.ladderScore}</p>
       </ContentBox>
       <ContentBox className="w-full max-w-md border p-4">
         <h3 className="mb-3 text-xl font-bold">Recent History</h3>

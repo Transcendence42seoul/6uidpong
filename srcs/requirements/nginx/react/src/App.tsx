@@ -1,9 +1,10 @@
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import handleAuthInfo from './authInfo';
+import Layout from './Layout';
 import redirect from './redirect';
 import { RootState } from './store';
 import ChatRoom from './pages/ChatRoom';
@@ -12,24 +13,21 @@ import Loading from './pages/Loading';
 import Login from './pages/Login';
 import Main from './pages/Main';
 import MyPage from './pages/MyPage';
-import Profile from './pages/Profile';
+import ProfileSettings from './pages/ProfileSettings';
+import UserProfile from './pages/UserProfile';
 import LoginAuth from './components/custom/LoginAuth';
 
 const App: React.FC = () => {
   const stats = {
-    wins: 4,
-    losses: 2,
-    ladderScore: 4242,
     recentHistory: ['Win', 'Loss', 'Win', 'Win', 'Loss'],
   };
 
+  const [loading, setLoading] = useState(false);
   const { id, is2FA, accessToken, tokenInfo } = useSelector(
     (state: RootState) => state.auth,
   );
 
   const dispatch = useDispatch();
-  const [loading, setLoading] = useState(false);
-
   const handleLoading = async () => {
     setLoading(true);
   };
@@ -71,21 +69,25 @@ const App: React.FC = () => {
   const socket = io({ auth: { token: accessToken } });
 
   return (
-    <BrowserRouter>
+    <Layout>
       <Routes>
         <Route path="/" element={<Main />} />
         <Route path="/chat" element={<ChatRoomList socket={socket} />} />
         <Route
           path="/chat/:roomId"
-          element={<ChatRoom myId={id} socket={socket} />}
+          element={<ChatRoom myId={tokenInfo.id} socket={socket} />}
         />
         <Route
           path="/my-page"
           element={<MyPage id={tokenInfo.id} stats={stats} />}
         />
-        <Route path="/profile" element={<Profile id={tokenInfo.id} />} />
+        <Route path="/profile/:userId" element={<UserProfile />} />
+        <Route
+          path="/profile-settings"
+          element={<ProfileSettings id={tokenInfo.id} />}
+        />
       </Routes>
-    </BrowserRouter>
+    </Layout>
   );
 };
 

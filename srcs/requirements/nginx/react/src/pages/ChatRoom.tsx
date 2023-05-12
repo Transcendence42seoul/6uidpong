@@ -6,7 +6,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
 import ChatContainer from '../components/container/ChatContainer';
 import Message from '../components/container/Message';
@@ -18,6 +18,7 @@ interface User {
   nickname: string;
   image: string;
 }
+
 interface Chat {
   id: number;
   user: User;
@@ -31,10 +32,13 @@ interface ChatRoomProps {
 }
 
 const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
+  const location = useLocation();
+  const { interlocutorId } = location.state;
   const { roomId } = useParams<{ roomId: string }>();
+
+  const chatContainer = useRef<HTMLDivElement>(null);
   const [chats, setChats] = useState<Chat[]>([]);
   const [message, setMessage] = useState<string>('');
-  const chatContainer = useRef<HTMLDivElement>(null);
 
   const onChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     setMessage(e.target.value);
@@ -45,7 +49,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
       e.preventDefault();
       if (!message) return;
 
-      socket.emit('message', message, (chat: Chat) => {
+      socket.emit('send-dm', { interlocutorId, roomId }, (chat: Chat) => {
         setChats((prevChats) => [...prevChats, chat]);
         setMessage('');
       });
@@ -55,18 +59,18 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
 
   useEffect(() => {
     const chatsHandler = (prevChats: Chat[]) => setChats(prevChats);
-    socket.emit('dm-chats', { roomId }, chatsHandler);
+    socket.emit('join-dm', interlocutorId, chatsHandler);
     return () => {
-      socket.off('dm-chats', chatsHandler);
+      socket.off('join-dm', chatsHandler);
     };
   }, []);
 
   // useEffect(() => {
   //   const messageHandler = (chat: Chat) =>
   //     setChats((prevChats) => [...prevChats, chat]);
-  //   socket.on('message', messageHandler);
+  //   socket.on('dm', messageHandler);
   //   return () => {
-  //     socket.off('message', messageHandler);
+  //     socket.off('dm', messageHandler);
   //   };
   // }, []);
 

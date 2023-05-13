@@ -15,6 +15,7 @@ interface Room {
   interlocutor: string;
   interlocutorId: number;
   interlocutorImage: string;
+  hasNewMsg: boolean;
 }
 
 const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
@@ -80,7 +81,12 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
                   <p className="text-sm text-gray-600">{room.lastMessage}</p>
                 </div>
               </div>
-              <span className="text-sm text-gray-600">{formattedTime}</span>
+              <div className="flex items-center">
+                {room.hasNewMsg && (
+                  <div className="mr-3 h-2 w-2 rounded-full bg-red-500" />
+                )}
+                <span className="text-sm text-gray-600">{formattedTime}</span>
+              </div>
             </li>
           );
         })}

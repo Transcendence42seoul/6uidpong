@@ -6,7 +6,7 @@ const Header: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="absolute right-0 top-0 m-4 flex space-x-4">
+    <div className="m-4 flex justify-end space-x-4">
       <HoverButton
         onClick={() => navigate('/')}
         className="rounded border-2 p-2.5"

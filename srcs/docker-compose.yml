@@ -1,6 +1,21 @@
-version: "3"
+version: '3'
 
 services:
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    depends_on:
+      - postgres
+    networks:
+      - transcendence
+    ports:
+      - '5050:80'
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+
   postgres:
     container_name: postgres
     environment:
@@ -12,7 +27,7 @@ services:
       - transcendence
     restart: always
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - db-volume:/var/lib/postgresql/data
 
@@ -50,11 +65,14 @@ services:
     networks:
       - transcendence
     ports:
-      - "80:80"
-      - "443:443"
+      - '80:80'
+      - '443:443'
     restart: always
+
 networks:
   transcendence:
     driver: bridge
+
 volumes:
   db-volume:
+  pgadmin-data:

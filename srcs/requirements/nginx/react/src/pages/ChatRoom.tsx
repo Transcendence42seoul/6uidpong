@@ -23,7 +23,7 @@ export interface Chat {
   id: number;
   user: User;
   message: string;
-  createdAt: Date;
+  createdAt: string;
 }
 
 interface ChatRoomProps {
@@ -103,7 +103,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
           if (!username) {
             className = 'alarm';
           } else if (userId === myId) {
-            className = 'my_message';
+            className = 'text-right';
           } else {
             nickname = username;
           }

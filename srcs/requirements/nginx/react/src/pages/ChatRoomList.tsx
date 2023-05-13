@@ -40,6 +40,7 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
       if (!roomToUpdate) return;
       roomToUpdate.lastMessage = chat.message;
       roomToUpdate.lastMessageTime = chat.createdAt;
+      roomToUpdate.hasNewMsg = 'true';
     };
     socket.on('send-dm', messageHandler);
     return () => {

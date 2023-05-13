@@ -166,6 +166,17 @@ export class ChatService {
     });
   }
 
+  async getDmWithUser(chatId: number): Promise<DmChatEntity> {
+    return await this.dmChatRepository.findOne({
+      relations: {
+        user: true,
+      },
+      where: {
+        id: chatId,
+      },
+    });
+  }
+
   async updateHasNewMsg(
     roomId: number,
     userId: number,

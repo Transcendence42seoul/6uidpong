@@ -64,6 +64,9 @@ export class ChatGateway implements OnGatewayDisconnect {
       interlocutorId
     );
 
+    if (roomUser?.hasNewMsg) {
+      await this.chatService.updateHasNewMsg(roomUser.roomId, userId, false);
+    }
     if (roomUser?.isExit) {
       await this.chatService.updateEnterInfo(roomUser);
     } else if (typeof roomUser === null) {
@@ -101,11 +104,12 @@ export class ChatGateway implements OnGatewayDisconnect {
       );
     }
 
-    const chat: DmChatEntity = await this.chatService.saveDM(
+    const { id: chatId } = await this.chatService.saveDM(
       sender.id,
       to.roomId,
       message
     );
+
     if (recipient.socketId == "") {
       await this.chatService.updateHasNewMsg(to.roomId, recipient.id, true);
       return;
@@ -119,6 +123,7 @@ export class ChatGateway implements OnGatewayDisconnect {
     const recipientSocket = await this.server
       .in(recipient.socketId)
       .fetchSockets();
+    const chat: DmChatEntity = await this.chatService.getDmWithUser(chatId);
     recipientSocket[0].emit("send-dm", chat);
 
     return chat;

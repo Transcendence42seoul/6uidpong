@@ -66,6 +66,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
     socket.emit('join-dm', { interlocutorId }, chatsHandler);
     return () => {
       socket.off('join-dm', chatsHandler);
+      socket.emit('leave-dm', { roomId });
     };
   }, []);
 
@@ -87,11 +88,6 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
       current.scrollTop = scrollHeight - clientHeight;
     }
   }, [chats.length]);
-
-  window.addEventListener('beforeunload', (e: BeforeUnloadEvent) => {
-    e.preventDefault();
-    socket.emit('leave-dm', { roomId });
-  });
 
   return (
     <>

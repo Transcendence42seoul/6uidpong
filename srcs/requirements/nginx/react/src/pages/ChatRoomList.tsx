@@ -41,12 +41,13 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
       roomToUpdate.lastMessage = chat.message;
       roomToUpdate.lastMessageTime = chat.createdAt;
       roomToUpdate.hasNewMsg = 'true';
+      setRooms([...rooms]);
     };
     socket.on('send-dm', messageHandler);
     return () => {
       socket.off('send-dm', messageHandler);
     };
-  }, []);
+  }, [rooms]);
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100">

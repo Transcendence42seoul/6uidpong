@@ -99,10 +99,11 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
       <ChatContainer ref={chatContainer}>
         {chats.map((chat) => {
           const { id: userId, nickname: username } = chat.user;
+          const isMyMessage = userId === myId;
           let msgBoxClassName = '';
           let msgClassName = '';
           let nickname = '';
-          if (userId === myId) {
+          if (isMyMessage) {
             msgBoxClassName = 'flex-col items-end';
             msgClassName = 'bg-yellow-300';
           } else {
@@ -110,11 +111,13 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
           }
           return (
             <MessageBox key={chat.id} className={msgBoxClassName}>
-              <CircularImage
-                src={chat.user.image}
-                alt="Interlocutor"
-                className="mr-2 h-10 w-10"
-              />
+              {!isMyMessage && (
+                <CircularImage
+                  src={chat.user.image}
+                  alt="Interlocutor"
+                  className="mr-2 h-10 w-10"
+                />
+              )}
               <div>
                 <span>{nickname}</span>
                 <Message className={msgClassName}>{chat.message}</Message>

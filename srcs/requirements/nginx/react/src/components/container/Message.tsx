@@ -6,9 +6,9 @@ interface MessageProps {
 }
 
 const Message: React.FC<MessageProps> = ({ children, className }) => (
-  <span className={`mb-2 w-max rounded-md bg-white p-3 ${className}`}>
+  <p className={`mb-2 w-max rounded-md bg-white p-3 ${className}`}>
     {children}
-  </span>
+  </p>
 );
 
 export default Message;

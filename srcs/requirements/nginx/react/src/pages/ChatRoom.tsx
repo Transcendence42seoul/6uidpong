@@ -9,6 +9,7 @@ import React, {
 import { useParams, useLocation } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
 import ChatContainer from '../components/container/ChatContainer';
+import CircularImage from '../components/container/CircularImage';
 import Message from '../components/container/Message';
 import MessageBox from '../components/container/MessageBox';
 import MessageForm from '../components/container/MessageForm';
@@ -98,19 +99,26 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
       <ChatContainer ref={chatContainer}>
         {chats.map((chat) => {
           const { id: userId, nickname: username } = chat.user;
+          let msgBoxClassName = '';
+          let msgClassName = '';
           let nickname = '';
-          let className = '';
-          if (!username) {
-            className = 'alarm';
-          } else if (userId === myId) {
-            className = 'text-right';
+          if (userId === myId) {
+            msgBoxClassName = 'flex-col items-end';
+            msgClassName = 'bg-yellow-300';
           } else {
             nickname = username;
           }
           return (
-            <MessageBox key={chat.id} className={className}>
-              <span>{nickname}</span>
-              <Message className="message">{chat.message}</Message>
+            <MessageBox key={chat.id} className={msgBoxClassName}>
+              <CircularImage
+                src={chat.user.image}
+                alt="Interlocutor"
+                className="mr-2 h-10 w-10"
+              />
+              <div>
+                <span>{nickname}</span>
+                <Message className={msgClassName}>{chat.message}</Message>
+              </div>
             </MessageBox>
           );
         })}

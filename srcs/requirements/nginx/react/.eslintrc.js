@@ -36,6 +36,7 @@ module.exports = {
       { namedComponents: 'arrow-function' },
     ],
     'react/jsx-props-no-spreading': 'off',
+    'react/prop-types': 'off',
     'react/require-default-props': 'off',
   },
   ignorePatterns: ['.eslintrc.js', 'tailwind.config.js'],

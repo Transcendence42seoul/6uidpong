@@ -10,6 +10,7 @@ import {
   HttpStatus,
   UnauthorizedException,
   ConflictException,
+  NotFoundException,
 } from "@nestjs/common";
 import { UserService } from "../service/user.service";
 import { JwtAccessGuard } from "src/auth/guard/jwt-access.guard";
@@ -29,7 +30,11 @@ export class UserController {
 
   @Get("/:id")
   async getUser(@Param("id", ParseIntPipe) id: number): Promise<UserEntity> {
-    return await this.userService.findUserById(id);
+    try {
+      return await this.userService.findUserById(id);
+    } catch (EntityNotFoundError) {
+      throw new NotFoundException();
+    }
   }
 
   @Put("/:id/nickname")
@@ -60,8 +65,12 @@ export class UserController {
   @Put("/:id/email/code")
   @HttpCode(HttpStatus.NO_CONTENT)
   async sendCodeByEmail(@Param("id", ParseIntPipe) id: number): Promise<void> {
-    const { email } = await this.userService.findUserById(id);
-    await this.authService.sendCodeByEmail(id, email);
+    try {
+      const { email } = await this.userService.findUserById(id);
+      await this.authService.sendCodeByEmail(id, email);
+    } catch (EntityNotFoundError) {
+      throw new NotFoundException();
+    }
   }
 
   @Put("/:id/is2FA")

@@ -14,7 +14,7 @@ import { AuthService } from "../service/auth.service";
 import { UserService } from "src/user/service/user.service";
 import { JwtRefreshGuard } from "../guard/jwt-refresh.guard";
 import { FtGuard } from "../guard/ft.guard";
-import { TwoFactorAuthDto } from "../dto/two-factor.auth";
+import { TwoFactorAuthDto } from "../dto/two-factor-auth.dto";
 import { UserEntity } from "src/user/entity/user.entity";
 
 const OAUTH_42_LOGIN_URL = `https://api.intra.42.fr/oauth/authorize?client_id=${process.env.OAUTH_42_CLIENT_ID}&redirect_uri=https://${process.env.HOST_NAME}/auth/social/callback/forty-two&response_type=code&scope=public`;
@@ -37,19 +37,19 @@ export class AuthController {
     @Req() req: any,
     @Res({ passthrough: true }) res: Response
   ): Promise<Object> {
-    let user: UserEntity = await this.userService.findUserById(req.user.id);
-    res.status(HttpStatus.OK);
+    let user: UserEntity;
+    try {
+      user = await this.userService.findUserById(req.user.id); //
+      res.status(HttpStatus.OK);
+      if (user.is2FA) {
+        this.authService.sendCodeByEmail(user.id, user.email);
 
-    if (user?.is2FA) {
-      this.authService.sendCodeByEmail(user.id, user.email);
-      return { is2FA: true, id: user.id, accessToken: null };
-    }
-
-    if (!user) {
+        return { is2FA: true, id: user.id, accessToken: null };
+      }
+    } catch (EntityNotFoundError) {
       user = await this.userService.createUser(req.user);
-      res
-        .status(HttpStatus.CREATED)
-        .setHeader("Location", `/api/v1/users/${user.id}`);
+      res.status(HttpStatus.CREATED);
+      res.setHeader("Location", `/api/v1/users/${user.id}`);
     }
 
     const accessToken: string = await this.authService.generateAccessToken(
@@ -58,7 +58,6 @@ export class AuthController {
     const refreshToken: string = await this.authService.generateRefreshToken(
       user.id
     );
-
     res.cookie("refresh", refreshToken, {
       httpOnly: true,
       maxAge: 60 * 60 * 24 * 7,

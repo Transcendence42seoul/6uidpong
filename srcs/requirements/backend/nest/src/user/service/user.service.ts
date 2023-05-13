@@ -12,8 +12,8 @@ export class UserService {
 
   async findUserById(id: number | string): Promise<UserEntity> {
     if (typeof id === "number")
-      return await this.userRepository.findOne({ where: { id: id } });
-    return await this.userRepository.findOne({ where: { socketId: id } });
+      return await this.userRepository.findOneOrFail({ where: { id: id } });
+    return await this.userRepository.findOneOrFail({ where: { socketId: id } });
   }
 
   async findUserByNickname(nickname: string): Promise<UserEntity> {

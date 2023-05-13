@@ -40,7 +40,7 @@ export class ChatGateway implements OnGatewayDisconnect {
   ) {}
 
   async handleDisconnect(@ConnectedSocket() client: Socket) {
-    this.disconnectionService.updateUserInfo(client.id);
+    await this.disconnectionService.updateUserInfo(client.id);
   }
 
   @SubscribeMessage("connection")
@@ -48,7 +48,7 @@ export class ChatGateway implements OnGatewayDisconnect {
     @WsJwtPayload() jwt: JwtPayload,
     @ConnectedSocket() client: Socket
   ): Promise<void> {
-    this.connectionService.updateUserInfo(jwt.id, client.id);
+    await this.connectionService.updateUserInfo(jwt.id, client.id);
   }
 
   @SubscribeMessage("find-dm-rooms")

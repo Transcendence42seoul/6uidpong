@@ -133,6 +133,9 @@ export class ChatService {
 
   async findDmChats(roomUser: DmRoomUserEntity): Promise<DmChatEntity[]> {
     return await this.dmChatRepository.find({
+      order: {
+        createdAt: 'ASC'
+      },
       relations: {
         user: true,
       },

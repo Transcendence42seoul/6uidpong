@@ -5,19 +5,21 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
-  OneToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
+import { DmRoomEntity } from "./dm-room.entity";
 
 @Entity("dm_chats")
 export class DmChatEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: "room_id" })
-  roomId: number;
+  @ManyToOne(() => DmRoomEntity, (room) => room.chats)
+  @JoinColumn({ name: "room_id" })
+  room: DmRoomEntity;
 
   @ManyToOne(() => UserEntity, (user) => user.dmChats)
+  @JoinColumn({ name: "user_id" })
   user: UserEntity;
 
   @Column()

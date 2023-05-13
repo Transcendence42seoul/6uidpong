@@ -2,7 +2,6 @@ import { UseGuards } from "@nestjs/common";
 import {
   ConnectedSocket,
   MessageBody,
-  OnGatewayConnection,
   OnGatewayDisconnect,
   SubscribeMessage,
   WebSocketGateway,
@@ -12,10 +11,15 @@ import {
 import { Server, Socket } from "socket.io";
 import { UserEntity } from "src/user/entity/user.entity";
 import { UserService } from "src/user/service/user.service";
-import { DmChatEntity } from "../entity/dm-chat.entity";
+import { DmChatResponseDto } from "../dto/dm-chats-response.dto";
+import { DmRoomsResponseDto } from "../dto/dm-rooms-response.dto";
 import { DmRoomUserEntity } from "../entity/dm-room-user.entity";
 import { WsJwtAccessGuard } from "../guard/ws-jwt-access.guard";
-import { ChatService } from "../service/chat.service";
+import { DmService } from "../service/dm.service";
+import { ConnectionService } from "../service/connection.service";
+import { DisconnectionService } from "../service/disconnection.service";
+import { WsJwtPayload } from "../utils/ws-jwt-payload.decorator";
+import { JwtPayload } from "jsonwebtoken";
 
 @WebSocketGateway(80, {
   cors: {
@@ -29,104 +33,99 @@ export class ChatGateway implements OnGatewayDisconnect {
   server: Server;
 
   constructor(
-    private readonly chatService: ChatService,
+    private readonly connectionService: ConnectionService,
+    private readonly disconnectionService: DisconnectionService,
+    private readonly dmService: DmService,
     private readonly userService: UserService
   ) {}
 
   async handleDisconnect(@ConnectedSocket() client: Socket) {
-    console.log("Client disconnected ", client.id);
-    await this.userService.updateStatus(client.id, "offline");
-    await this.userService.updateSocketId(client.id, "");
+    this.disconnectionService.updateUserInfo(client.id);
   }
 
   @SubscribeMessage("connection")
-  async connectClient(@ConnectedSocket() client: Socket): Promise<void> {
-    const userId: number = client.data.user.id;
-    console.log("Client connected ", client.id, userId);
-    await this.userService.updateStatus(userId, "online");
-    await this.userService.updateSocketId(userId, client.id);
+  async connectClient(
+    @WsJwtPayload() jwt: JwtPayload,
+    @ConnectedSocket() client: Socket
+  ): Promise<void> {
+    this.connectionService.updateUserInfo(jwt.id, client.id);
   }
 
   @SubscribeMessage("find-dm-rooms")
-  async findDmRooms(@ConnectedSocket() client: Socket): Promise<Object[]> {
-    const userId: number = client.data.user.id;
-    return await this.chatService.findDmRooms(userId);
+  async findDmRooms(
+    @WsJwtPayload() jwt: JwtPayload
+  ): Promise<DmRoomsResponseDto[]> {
+    return await this.dmService.findRooms(jwt.id);
   }
 
   @SubscribeMessage("join-dm")
   async joinDM(
+    @WsJwtPayload() jwt: JwtPayload,
     @ConnectedSocket() client: Socket,
     @MessageBody("interlocutorId") interlocutorId: number
-  ): Promise<DmChatEntity[]> {
-    const userId: number = client.data.user.id;
-    let roomUser: DmRoomUserEntity | null = await this.chatService.findRoomUser(
-      userId,
-      interlocutorId
-    );
-
-    if (roomUser?.hasNewMsg) {
-      await this.chatService.updateHasNewMsg(roomUser.roomId, userId, false);
+  ): Promise<Object> {
+    let roomUser: DmRoomUserEntity;
+    try {
+      roomUser = await this.dmService.findRoomUser(jwt.id, interlocutorId); // An exception can occur
+      await this.dmService.updateRoomUser(roomUser);
+    } catch (EntityNotFoundError) {
+      roomUser = await this.dmService.createRoom(jwt.id, interlocutorId);
     }
-    if (roomUser?.isExit) {
-      await this.chatService.updateEnterInfo(roomUser);
-    } else if (typeof roomUser === null) {
-      roomUser = await this.chatService.createRoomInfo(userId, interlocutorId);
-    }
-    client.join("d" + roomUser.roomId);
+    const chats: DmChatResponseDto[] = await this.dmService.findChats(roomUser);
+    const roomId = roomUser.room.id;
 
-    return await this.chatService.findDmChats(roomUser);
+    client.join("d" + roomId);
+
+    return { roomId, chats };
   }
 
   @SubscribeMessage("send-dm")
   async sendDM(
-    @ConnectedSocket() client: Socket,
+    @WsJwtPayload() jwt: JwtPayload,
     @MessageBody("to") to: { userId: number; roomId: number },
     @MessageBody("message") message: string
-  ): Promise<DmChatEntity> {
-    const userId: number = client.data.user.id;
+  ): Promise<DmChatResponseDto> {
+    try {
+      const recipient: UserEntity = await this.userService.findUserById(
+        to.userId
+      ); // An exception can occur
 
-    const sender: UserEntity = await this.userService.findUserById(userId);
-    const recipient: UserEntity | null = await this.userService.findUserById(
-      to.userId
-    );
+      if (await this.dmService.isBlocked(jwt.id, recipient.id)) {
+        throw new WsException(
+          "You can't send a message to the user you have blocked."
+        );
+      }
+      if (await this.dmService.isBlocked(recipient.id, jwt.id)) {
+        throw new WsException(
+          "You can't send a message because you have been blocked."
+        );
+      }
 
-    if (typeof recipient === null) {
-      throw new WsException("invalid recipient user id.");
-    }
-    if (await this.chatService.isBlocked(sender.id, recipient.id)) {
-      throw new WsException(
-        "You can't send a message to the user you have blocked."
+      const roomSockets = await this.server.in("d" + to.roomId).fetchSockets();
+      const isOffline = recipient.status === "offline";
+      const isNotJoin = isOffline
+        ? true
+        : !roomSockets.find((socket) => socket.id === recipient.socketId);
+
+      const { id: chatId } = await this.dmService.saveChat(
+        jwt.id,
+        to.roomId,
+        message,
+        recipient.id,
+        isNotJoin
       );
+      const chat: DmChatResponseDto = await this.dmService.findChat(chatId);
+
+      if (!isOffline) {
+        const recipientSocket = await this.server
+          .in(recipient.socketId)
+          .fetchSockets();
+        recipientSocket[0].emit("send-dm", chat);
+      }
+      return chat;
+    } catch (error) {
+      throw error;
     }
-    if (await this.chatService.isBlocked(recipient.id, sender.id)) {
-      throw new WsException(
-        "You can't send a message because you have been blocked."
-      );
-    }
-
-    const { id: chatId } = await this.chatService.saveDM(
-      sender.id,
-      to.roomId,
-      message
-    );
-
-    if (recipient.socketId == "") {
-      await this.chatService.updateHasNewMsg(to.roomId, recipient.id, true);
-      return;
-    }
-
-    const roomSockets = await this.server.in("d" + to.roomId).fetchSockets();
-    if (!roomSockets.find((socket) => socket.id === recipient.socketId)) {
-      await this.chatService.updateHasNewMsg(to.roomId, recipient.id, true);
-    }
-
-    const recipientSocket = await this.server
-      .in(recipient.socketId)
-      .fetchSockets();
-    const chat: DmChatEntity = await this.chatService.getDmWithUser(chatId);
-    recipientSocket[0].emit("send-dm", chat);
-
-    return chat;
   }
 
   @SubscribeMessage("leave-dm")
@@ -135,5 +134,28 @@ export class ChatGateway implements OnGatewayDisconnect {
     @MessageBody("roomId") roomId: number
   ): Promise<void> {
     client.leave("d" + roomId);
+  }
+
+  @SubscribeMessage("delete-dm-room")
+  async deleteDmRoom(
+    @WsJwtPayload() jwt: JwtPayload,
+    @ConnectedSocket() client: Socket,
+    @MessageBody("roomId") roomId: number
+  ): Promise<void> {
+    const roomUsers: DmRoomUserEntity[] = await this.dmService.findRoomUsers(
+      roomId
+    );
+    if (!roomUsers.find((roomUser) => roomUser.user.id === jwt.id)) {
+      throw new WsException("Entity not found");
+    }
+    client.leave("d" + roomId);
+    const interlocutorRoomUser = roomUsers.find(
+      (roomUser) => roomUser.user.id !== jwt.id
+    );
+    if (interlocutorRoomUser.isExit) {
+      await this.dmService.deleteRoom(roomId);
+      return;
+    }
+    await this.dmService.exitRoom(roomId, jwt.id);
   }
 }

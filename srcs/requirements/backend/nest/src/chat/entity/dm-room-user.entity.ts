@@ -7,14 +7,16 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
+import { DmRoomEntity } from "./dm-room.entity";
 
 @Entity("dm_room_users")
 export class DmRoomUserEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: "room_id" })
-  roomId: number;
+  @ManyToOne(() => DmRoomEntity, (dmRoom) => dmRoom.roomUsers)
+  @JoinColumn({ name: "room_id" })
+  room: DmRoomEntity;
 
   @ManyToOne(() => UserEntity, (user) => user.dmRoomUsers)
   @JoinColumn({ name: "user_id" })

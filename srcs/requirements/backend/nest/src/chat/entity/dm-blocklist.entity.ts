@@ -9,5 +9,5 @@ export class DmBlocklistEntity {
   userId: number;
 
   @Column({ name: "blocked_user_id" })
-  blockedUserid: number;
+  blockedUserId: number;
 }

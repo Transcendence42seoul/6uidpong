@@ -96,6 +96,7 @@ export class DmService {
         "room_user.room_id = match_room_user.room_id"
       )
       .leftJoinAndSelect("room_user.room", "room")
+      .leftJoinAndSelect("room_user.user", "user")
       .where("room_user.user_id = :userId", { userId });
 
     return await queryBuilder.getOneOrFail();
@@ -109,18 +110,19 @@ export class DmService {
     try {
       const roomId: number = roomUser.room.id;
       const userId: number = roomUser.user.id;
-
+      const queryRunnerRoomUserRepo =
+        queryRunner.manager.getRepository(DmRoomUserEntity);
       if (roomUser.newMsgCount > 0) {
         const findOptions: Object = {
           room: { id: roomId },
           user: { id: userId },
         };
-        await this.roomUserRepository.update(findOptions, {
+        await queryRunnerRoomUserRepo.update(findOptions, {
           newMsgCount: 0,
         });
       }
       if (roomUser.isExit) {
-        await this.roomUserRepository.update(roomId, {
+        await queryRunnerRoomUserRepo.update(roomId, {
           isExit: false,
           createdAt: new Date(),
         });
@@ -144,11 +146,12 @@ export class DmService {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      const newRoom: DmRoomEntity = await this.roomRepository.save(
-        new DmRoomEntity()
-      );
-      const newRoomUsers: DmRoomUserEntity[] =
-        await this.roomUserRepository.save([
+      const newRoom: DmRoomEntity = await queryRunner.manager
+        .getRepository(DmRoomEntity)
+        .save(new DmRoomEntity());
+      const newRoomUsers: DmRoomUserEntity[] = await queryRunner.manager
+        .getRepository(DmRoomUserEntity)
+        .save([
           {
             room: {
               id: newRoom.id,
@@ -193,7 +196,6 @@ export class DmService {
         createdAt: "ASC",
       },
     });
-
     return dmChats.map((dmChat) => {
       return new DmChatResponseDto(dmChat);
     });
@@ -220,22 +222,31 @@ export class DmService {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      const newChat: DmChatEntity = await this.chatRepository.save({
-        user: {
-          id: senderId,
-        },
-        room: {
-          id: roomId,
-        },
-        message,
-      });
+      const newChat: DmChatEntity = await queryRunner.manager
+        .getRepository(DmChatEntity)
+        .save({
+          user: {
+            id: senderId,
+          },
+          room: {
+            id: roomId,
+          },
+          message,
+        });
+      const findOptions: Object = {
+        room: { id: roomId },
+        user: { id: recipientId },
+      };
+      const queryRunnerRoomUserRepo =
+        queryRunner.manager.getRepository(DmRoomUserEntity);
       if (isNotJoin) {
-        const findOptions: Object = {
-          room: { id: roomId },
-          user: { id: recipientId },
-        };
-        await this.roomUserRepository.increment(findOptions, "newMsgCount", 1);
+        await queryRunnerRoomUserRepo.increment(findOptions, "newMsgCount", 1);
       }
+      await queryRunnerRoomUserRepo.update(findOptions, {
+        isExit: false,
+        createdAt: new Date(),
+      });
+
       await queryRunner.commitTransaction();
 
       return newChat;

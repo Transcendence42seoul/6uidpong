@@ -111,24 +111,26 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
             nickname = chat.nickname;
           }
           return (
-            <MessageBox key={chat.id} className={msgBoxClassName}>
+            <>
               {chats.length - index === newMsgCount && (
-                <div className="h-0.5 w-full bg-red-500">
-                  <br />
+                <div>
+                  <div className="m-2 h-px w-full bg-red-500" />
                 </div>
               )}
-              {!isMyMessage && (
-                <CircularImage
-                  src={chat.image}
-                  alt="Interlocutor"
-                  className="mr-2 h-10 w-10"
-                />
-              )}
-              <div>
-                <span>{nickname}</span>
-                <Message className={msgClassName}>{chat.message}</Message>
-              </div>
-            </MessageBox>
+              <MessageBox key={chat.id} className={msgBoxClassName}>
+                {!isMyMessage && (
+                  <CircularImage
+                    src={chat.image}
+                    alt="Interlocutor"
+                    className="mr-2 h-10 w-10"
+                  />
+                )}
+                <div>
+                  <span>{nickname}</span>
+                  <Message className={msgClassName}>{chat.message}</Message>
+                </div>
+              </MessageBox>
+            </>
           );
         })}
       </ChatContainer>

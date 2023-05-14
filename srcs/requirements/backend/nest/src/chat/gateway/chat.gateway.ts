@@ -21,6 +21,7 @@ import { DisconnectionService } from "../service/disconnection.service";
 import { WsJwtPayload } from "../utils/ws-jwt-payload.decorator";
 import { JwtPayload } from "jsonwebtoken";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
+import { EntityNotFoundError } from "typeorm";
 
 @WebSocketGateway(80, {
   cors: {
@@ -69,15 +70,19 @@ export class ChatGateway implements OnGatewayDisconnect {
     try {
       roomUser = await this.dmService.findRoomUser(jwt.id, interlocutorId); // An exception can occur
       await this.dmService.updateRoomUser(roomUser);
-    } catch (EntityNotFoundError) {
-      roomUser = await this.dmService.createRoom(jwt.id, interlocutorId);
+    } catch (error) {
+      if (error instanceof EntityNotFoundError) {
+        roomUser = await this.dmService.createRoom(jwt.id, interlocutorId);
+      } else {
+        throw new WsException("server error");
+      }
     }
     const chats: DmChatResponseDto[] = await this.dmService.findChats(roomUser);
     const roomId = roomUser.room.id;
 
     client.join("d" + roomId);
 
-    return { roomId, chats };
+    return { roomId, newMsgCount: roomUser.newMsgCount, chats };
   }
 
   @SubscribeMessage("send-dm")
@@ -122,6 +127,9 @@ export class ChatGateway implements OnGatewayDisconnect {
       }
       return chat;
     } catch (error) {
+      if (error instanceof EntityNotFoundError) {
+        throw new WsException("entity not found.");
+      }
       throw error;
     }
   }

@@ -285,6 +285,7 @@ export class DmService {
     const findOptions: Object = { room: { id: roomId }, user: { id: userId } };
     await this.roomUserRepository.update(findOptions, {
       isExit: true,
+      newMsgCount: 0,
     });
   }
 }

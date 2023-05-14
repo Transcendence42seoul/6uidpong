@@ -9,7 +9,6 @@ import {
   HttpCode,
   HttpStatus,
   UnauthorizedException,
-  ConflictException,
   NotFoundException,
 } from "@nestjs/common";
 import { UserService } from "../service/user.service";
@@ -31,7 +30,7 @@ export class UserController {
   @Get("/:id")
   async getUser(@Param("id", ParseIntPipe) id: number): Promise<UserEntity> {
     try {
-      return await this.userService.findUserById(id);
+      return await this.userService.findUser(id);
     } catch (EntityNotFoundError) {
       throw new NotFoundException();
     }
@@ -43,13 +42,6 @@ export class UserController {
     @Param("id", ParseIntPipe) id: number,
     @Body() { nickname }: UpdateNicknameDto
   ): Promise<void> {
-    const user: UserEntity = await this.userService.findUserByNickname(
-      nickname
-    );
-    if (user) {
-      throw new ConflictException();
-    }
-
     await this.userService.updateNickname(id, nickname);
   }
 
@@ -66,7 +58,7 @@ export class UserController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async sendCodeByEmail(@Param("id", ParseIntPipe) id: number): Promise<void> {
     try {
-      const { email } = await this.userService.findUserById(id);
+      const { email } = await this.userService.findUser(id);
       await this.authService.sendCodeByEmail(id, email);
     } catch (EntityNotFoundError) {
       throw new NotFoundException();

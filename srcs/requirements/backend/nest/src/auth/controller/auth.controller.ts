@@ -39,7 +39,7 @@ export class AuthController {
   ): Promise<Object> {
     let user: UserEntity;
     try {
-      user = await this.userService.findUserById(req.user.id); //
+      user = await this.userService.findUser(req.user.id);
       res.status(HttpStatus.OK);
       if (user.is2FA) {
         this.authService.sendCodeByEmail(user.id, user.email);

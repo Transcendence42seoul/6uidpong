@@ -1,23 +1,20 @@
-import { Injectable } from "@nestjs/common";
+import { ConflictException, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { DataSource, Repository } from "typeorm";
 import { UserEntity } from "../entity/user.entity";
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(UserEntity)
-    private readonly userRepository: Repository<UserEntity>
+    private readonly userRepository: Repository<UserEntity>,
+    private readonly dataSource: DataSource
   ) {}
 
-  async findUserById(id: number | string): Promise<UserEntity> {
+  async findUser(id: number | string): Promise<UserEntity> {
     if (typeof id === "number")
       return await this.userRepository.findOneOrFail({ where: { id: id } });
     return await this.userRepository.findOneOrFail({ where: { socketId: id } });
-  }
-
-  async findUserByNickname(nickname: string): Promise<UserEntity> {
-    return await this.userRepository.findOne({ where: { nickname } });
   }
 
   async createUser(profile: any): Promise<UserEntity> {
@@ -30,8 +27,28 @@ export class UserService {
     return await this.userRepository.save(profileEntity);
   }
 
-  async updateNickname(userId: number, nickname: string): Promise<void> {
-    await this.userRepository.update(userId, { nickname: nickname });
+  async updateNickname(id: number, nickname: string): Promise<void> {
+    const queryRunner = this.dataSource.createQueryRunner();
+    const userRepository = queryRunner.manager.getRepository(UserEntity);
+
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      const user: UserEntity = await userRepository.findOneBy({
+        nickname,
+      });
+      if (user) {
+        throw new ConflictException();
+      }
+      await userRepository.update(id, { nickname });
+
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   async updateImage(userId: number, image: string): Promise<void> {

@@ -87,7 +87,7 @@ export class ChatGateway implements OnGatewayDisconnect {
     @MessageBody("to") to: { id: number; message: string }
   ): Promise<DmChatResponseDto> {
     try {
-      const recipient: UserEntity = await this.userService.findUserById(to.id); // An exception can occur
+      const recipient: UserEntity = await this.userService.findUser(to.id); // An exception can occur
 
       if (await this.dmService.isBlocked(jwt.id, recipient.id)) {
         throw new WsException(

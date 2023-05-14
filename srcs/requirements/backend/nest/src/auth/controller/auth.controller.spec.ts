@@ -35,7 +35,7 @@ describe("AuthController", () => {
         {
           provide: UserService,
           useValue: {
-            findUserById: jest.fn(),
+            findUser: jest.fn(),
             createUser: jest.fn(),
           },
         },
@@ -80,7 +80,7 @@ describe("AuthController", () => {
       user.email = "mock";
       user.is2FA = true;
 
-      jest.spyOn(userService, "findUserById").mockResolvedValue(user);
+      jest.spyOn(userService, "findUser").mockResolvedValue(user);
 
       const req = { user: { id: 110731 } };
       const res: any = {
@@ -104,7 +104,7 @@ describe("AuthController", () => {
       user.id = 110731;
       user.is2FA = false;
 
-      jest.spyOn(userService, "findUserById").mockResolvedValue(user);
+      jest.spyOn(userService, "findUser").mockResolvedValue(user);
 
       const req = { user: { id: 110731 } };
       const res: any = {
@@ -136,7 +136,7 @@ describe("AuthController", () => {
       user.id = 110731;
 
       jest.spyOn(userService, "createUser").mockResolvedValue(user);
-      jest.spyOn(userService, "findUserById").mockResolvedValue(null);
+      jest.spyOn(userService, "findUser").mockResolvedValue(null);
 
       const req = { user: { id: 110731 } };
       const res: any = {
@@ -177,7 +177,7 @@ describe("AuthController", () => {
       };
       const res: any = {};
 
-      jest.spyOn(authService, "validateCode").mockResolvedValue(false);
+      jest.spyOn(authService, "validateCode");
 
       // Assert
       await expect(
@@ -194,7 +194,7 @@ describe("AuthController", () => {
         cookie: jest.fn(),
       };
 
-      jest.spyOn(authService, "validateCode").mockResolvedValue(true);
+      jest.spyOn(authService, "validateCode");
 
       // Act
       const result = await authController.TwoFactorAuthentication(

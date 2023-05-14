@@ -29,18 +29,17 @@ export class UserService {
 
   async updateNickname(id: number, nickname: string): Promise<void> {
     const queryRunner = this.dataSource.createQueryRunner();
-    const userRepository = queryRunner.manager.getRepository(UserEntity);
 
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      const user: UserEntity = await userRepository.findOneBy({
+      const user: UserEntity = await queryRunner.manager.findOneBy(UserEntity, {
         nickname,
       });
       if (user) {
         throw new ConflictException();
       }
-      await userRepository.update(id, { nickname });
+      await queryRunner.manager.update(UserEntity, id, { nickname });
 
       await queryRunner.commitTransaction();
     } catch (error) {

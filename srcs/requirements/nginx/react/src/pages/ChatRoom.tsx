@@ -14,15 +14,11 @@ import Message from '../components/container/Message';
 import MessageBox from '../components/container/MessageBox';
 import MessageForm from '../components/container/MessageForm';
 
-interface User {
-  id: number;
-  nickname: string;
-  image: string;
-}
-
 export interface Chat {
   id: number;
-  user: User;
+  userId: number;
+  nickname: string;
+  image: string;
   message: string;
   createdAt: string;
 }
@@ -94,8 +90,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
       <h1>WebSocket Chat</h1>
       <ChatContainer ref={chatContainer}>
         {chats.map((chat) => {
-          const { id: userId, nickname: username } = chat.user;
-          const isMyMessage = userId === myId;
+          const isMyMessage = chat.userId === myId;
           let msgBoxClassName = '';
           let msgClassName = '';
           let nickname = '';
@@ -103,13 +98,13 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
             msgBoxClassName = 'flex-col items-end';
             msgClassName = 'bg-yellow-300';
           } else {
-            nickname = username;
+            nickname = chat.nickname;
           }
           return (
             <MessageBox key={chat.id} className={msgBoxClassName}>
               {!isMyMessage && (
                 <CircularImage
-                  src={chat.user.image}
+                  src={chat.image}
                   alt="Interlocutor"
                   className="mr-2 h-10 w-10"
                 />

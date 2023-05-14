@@ -9,7 +9,7 @@ interface ChatRoomListProps {
 }
 
 interface Room {
-  roomId: number;
+  roomId: string;
   lastMessage: string;
   lastMessageTime: string;
   interlocutor: string;

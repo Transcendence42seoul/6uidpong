@@ -70,12 +70,8 @@ export class ChatGateway implements OnGatewayDisconnect {
     try {
       roomUser = await this.dmService.findRoomUser(jwt.id, interlocutorId); // An exception can occur
       await this.dmService.updateRoomUser(roomUser);
-    } catch (error) {
-      if (error instanceof EntityNotFoundError) {
-        roomUser = await this.dmService.createRoom(jwt.id, interlocutorId);
-      } else {
-        throw new WsException("server error");
-      }
+    } catch (EntityNotFoundError) {
+      roomUser = await this.dmService.createRoom(jwt.id, interlocutorId);
     }
     const chats: DmChatResponseDto[] = await this.dmService.findChats(roomUser);
     const roomId = roomUser.room.id;
@@ -127,9 +123,6 @@ export class ChatGateway implements OnGatewayDisconnect {
       }
       return chat;
     } catch (error) {
-      if (error instanceof EntityNotFoundError) {
-        throw new WsException("entity not found.");
-      }
       throw error;
     }
   }

@@ -233,14 +233,14 @@ export class DmService {
       const queryRunnerRoomUserRepo =
         queryRunner.manager.getRepository(DmRoomUserEntity);
       if (recipientRoomUser.isExit) {
-        await queryRunnerRoomUserRepo.update(recipientRoomUser, {
+        await queryRunnerRoomUserRepo.update(recipientRoomUser.id, {
           isExit: false,
           createdAt: new Date(),
         });
       }
       if (isNotJoin) {
         await queryRunnerRoomUserRepo.increment(
-          recipientRoomUser,
+          { id: recipientRoomUser.id },
           "newMsgCount",
           1
         );

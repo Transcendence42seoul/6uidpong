@@ -40,6 +40,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
 
   const addChat = (chat: Chat) => {
     setChats((prevChats) => [...prevChats, chat]);
+    setNewMsgCount(0);
   };
 
   const onTextChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {

@@ -29,7 +29,6 @@ const UserProfile: React.FC<UserProfileProps> = ({ socket }) => {
         state: { interlocutorId: userId },
       });
     socket.emit('join-dm', { userId }, roomIdHandler);
-    socket.off('join-dm', roomIdHandler);
   };
 
   useEffect(() => {

@@ -11,5 +11,5 @@ export class DmRoomsResponseDto {
 
   interlocutorImage: string;
 
-  hasNewMsg: boolean;
+  newMsgCount: number;
 }

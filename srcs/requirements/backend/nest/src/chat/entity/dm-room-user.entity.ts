@@ -25,8 +25,8 @@ export class DmRoomUserEntity {
   @Column({ name: "is_exit", type: "boolean", default: false })
   isExit: boolean;
 
-  @Column({ name: "has_new_msg", default: false })
-  hasNewMsg: boolean;
+  @Column({ name: "new_msg_count", default: 0 })
+  newMsgCount: number;
 
   @CreateDateColumn({ name: "created_at" })
   createdAt: Date;

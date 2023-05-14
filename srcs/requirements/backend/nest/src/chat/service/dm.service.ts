@@ -31,7 +31,7 @@ export class DmService {
   async findRooms(userId: number): Promise<DmRoomsResponseDto[]> {
     const scalarSubQuery = this.roomUserRepository
       .createQueryBuilder()
-      .select("has_new_msg")
+      .select("new_msg_count")
       .where("user_id = :userId")
       .andWhere("room_id = dm_chats.room_id")
       .setParameter("userId", userId)
@@ -46,9 +46,7 @@ export class DmService {
         'users.id               AS "interlocutorId"',
         "users.nickname         AS interlocutor",
         'users.image            AS "interlocutorImage"',
-        `CASE WHEN (${scalarSubQuery})
-              THEN 'true'
-              ELSE 'false' END  AS "hasNewMsg"`,
+        `(${scalarSubQuery})    AS "newMsgCount"`,
       ])
       .innerJoin(
         (inlineViewBuilder: SelectQueryBuilder<DmChatEntity>) =>
@@ -112,13 +110,13 @@ export class DmService {
       const roomId: number = roomUser.room.id;
       const userId: number = roomUser.user.id;
 
-      if (roomUser.hasNewMsg) {
+      if (roomUser.newMsgCount > 0) {
         const findOptions: Object = {
           room: { id: roomId },
           user: { id: userId },
         };
         await this.roomUserRepository.update(findOptions, {
-          hasNewMsg: false,
+          newMsgCount: 0,
         });
       }
       if (roomUser.isExit) {
@@ -236,9 +234,7 @@ export class DmService {
           room: { id: roomId },
           user: { id: recipientId },
         };
-        await this.roomUserRepository.update(findOptions, {
-          hasNewMsg: true,
-        });
+        await this.roomUserRepository.increment(findOptions, "newMsgCount", 1);
       }
       await queryRunner.commitTransaction();
 

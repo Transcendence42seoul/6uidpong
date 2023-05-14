@@ -36,6 +36,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
   const chatContainer = useRef<HTMLDivElement>(null);
   const [chats, setChats] = useState<Chat[]>([]);
   const [message, setMessage] = useState<string>('');
+  const [newMsgCount, setNewMsgCount] = useState<number>(0);
 
   const addChat = (chat: Chat) => {
     setChats((prevChats) => [...prevChats, chat]);
@@ -60,8 +61,16 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
   );
 
   useEffect(() => {
-    const chatsHandler = ({ chats: prevChats }: { chats: Chat[] }) =>
+    const chatsHandler = ({
+      newMsgCount: newMsgCnt,
+      chats: prevChats,
+    }: {
+      newMsgCount: number;
+      chats: Chat[];
+    }) => {
+      setNewMsgCount(newMsgCnt);
       setChats(prevChats);
+    };
     socket.emit('join-dm', { interlocutorId }, chatsHandler);
     return () => {
       socket.emit('leave-dm', { roomId });
@@ -90,7 +99,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
     <>
       <h1>WebSocket Chat</h1>
       <ChatContainer ref={chatContainer}>
-        {chats.map((chat) => {
+        {chats.map((chat, index) => {
           const isMyMessage = chat.userId === myId;
           let msgBoxClassName = '';
           let msgClassName = '';
@@ -103,6 +112,11 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
           }
           return (
             <MessageBox key={chat.id} className={msgBoxClassName}>
+              {chats.length - index === newMsgCount && (
+                <div className="h-0.5 w-full bg-red-500">
+                  <br />
+                </div>
+              )}
               {!isMyMessage && (
                 <CircularImage
                   src={chat.image}

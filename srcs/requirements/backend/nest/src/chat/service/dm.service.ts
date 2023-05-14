@@ -235,7 +235,7 @@ export class DmService {
       if (recipientRoomUser.isExit) {
         await queryRunnerRoomUserRepo.update(recipientRoomUser.id, {
           isExit: false,
-          createdAt: new Date(),
+          createdAt: newChat.createdAt,
         });
       }
       if (isNotJoin) {

@@ -50,37 +50,15 @@ export class UserService {
     }
   }
 
-  async updateImage(userId: number, image: string): Promise<void> {
-    await this.userRepository.update(userId, { image: image });
-  }
-
-  async updateIsTwoFactor(userId: number, is2FA: boolean): Promise<void> {
-    await this.userRepository.update(userId, {
-      is2FA: is2FA,
+  async updateImage(id: number, image: string): Promise<void> {
+    await this.userRepository.update(id, {
+      image,
     });
   }
 
-  async updateSocketId(id: number | string, socketId: string): Promise<void> {
-    const findOptions: { id?: number; socketId?: string } = {};
-    if (typeof id === "number") {
-      findOptions.id = id;
-    } else {
-      findOptions.socketId = id;
-    }
-    await this.userRepository.update(findOptions, {
-      socketId: socketId,
-    });
-  }
-
-  async updateStatus(id: number | string, status: string): Promise<void> {
-    const findOptions: { id?: number; socketId?: string } = {};
-    if (typeof id === "number") {
-      findOptions.id = id;
-    } else {
-      findOptions.socketId = id;
-    }
-    await this.userRepository.update(findOptions, {
-      status: status,
+  async updateIsTwoFactor(id: number, is2FA: boolean): Promise<void> {
+    await this.userRepository.update(id, {
+      is2FA,
     });
   }
 }

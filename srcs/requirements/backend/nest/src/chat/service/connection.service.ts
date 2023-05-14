@@ -1,13 +1,10 @@
 import { Injectable } from "@nestjs/common";
-import { UserService } from "src/user/service/user.service";
+import { UserEntity } from "src/user/entity/user.entity";
 import { DataSource } from "typeorm";
 
 @Injectable()
 export class ConnectionService {
-  constructor(
-    private readonly userService: UserService,
-    private readonly dataSource: DataSource
-  ) {}
+  constructor(private readonly dataSource: DataSource) {}
 
   async updateUserInfo(userId: number, socketId: string): Promise<void> {
     const queryRunner = this.dataSource.createQueryRunner();
@@ -15,8 +12,12 @@ export class ConnectionService {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      await this.userService.updateStatus(userId, "online");
-      await this.userService.updateSocketId(userId, socketId);
+      await queryRunner.manager.update(UserEntity, userId, {
+        status: "online",
+      });
+      await queryRunner.manager.update(UserEntity, userId, {
+        socketId: socketId,
+      });
 
       await queryRunner.commitTransaction();
     } catch (error) {

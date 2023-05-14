@@ -84,7 +84,10 @@ const App: React.FC = () => {
           path="/my-page"
           element={<MyPage id={tokenInfo.id} stats={stats} />}
         />
-        <Route path="/profile/:userId" element={<UserProfile />} />
+        <Route
+          path="/profile/:userId"
+          element={<UserProfile socket={socket} />}
+        />
         <Route
           path="/profile-settings"
           element={<ProfileSettings id={tokenInfo.id} />}

@@ -9,13 +9,13 @@ interface ChatRoomListProps {
 }
 
 interface Room {
-  roomId: number;
+  roomId: string;
   lastMessage: string;
   lastMessageTime: string;
   interlocutor: string;
   interlocutorId: number;
   interlocutorImage: string;
-  hasNewMsg: string;
+  newMsgCount: number;
 }
 
 const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
@@ -27,9 +27,6 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
       setRooms(roomList);
     };
     socket.emit('find-dm-rooms', roomListHandler);
-    return () => {
-      socket.off('find-dm-rooms', roomListHandler);
-    };
   }, []);
 
   useEffect(() => {
@@ -40,7 +37,7 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
       if (!roomToUpdate) return;
       roomToUpdate.lastMessage = chat.message;
       roomToUpdate.lastMessageTime = chat.createdAt;
-      roomToUpdate.hasNewMsg = 'true';
+      roomToUpdate.newMsgCount += 1;
       setRooms([...rooms]);
     };
     socket.on('send-dm', messageHandler);
@@ -83,8 +80,10 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
                 </div>
               </div>
               <div className="flex items-center">
-                {room.hasNewMsg === 'true' && (
-                  <div className="mr-3 h-2 w-2 rounded-full bg-red-500" />
+                {room.newMsgCount > 0 && (
+                  <div className="mr-3 rounded-full bg-red-500 text-white">
+                    {room.newMsgCount}
+                  </div>
                 )}
                 <span className="text-sm text-gray-600">{formattedTime}</span>
               </div>

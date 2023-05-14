@@ -37,7 +37,11 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
   const [chats, setChats] = useState<Chat[]>([]);
   const [message, setMessage] = useState<string>('');
 
-  const onChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+  const addChat = (chat: Chat) => {
+    setChats((prevChats) => [...prevChats, chat]);
+  };
+
+  const onTextChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     setMessage(e.target.value);
   }, []);
 
@@ -45,33 +49,30 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
     (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       if (!message) return;
-      socket.emit(
-        'send-dm',
-        { to: { userId: interlocutorId, roomId }, message },
-        (chat: Chat) => {
-          setChats((prevChats) => [...prevChats, chat]);
-          setMessage('');
-        },
-      );
+      const sendDmData = { to: { id: interlocutorId, message } };
+      const chatHandler = (chat: Chat) => {
+        addChat(chat);
+        setMessage('');
+      };
+      socket.emit('send-dm', sendDmData, chatHandler);
     },
     [message],
   );
 
   useEffect(() => {
-    const chatsHandler = (prevChats: Chat[]) => setChats(prevChats);
+    const chatsHandler = ({ chats: prevChats }: { chats: Chat[] }) =>
+      setChats(prevChats);
     socket.emit('join-dm', { interlocutorId }, chatsHandler);
     return () => {
-      socket.off('join-dm', chatsHandler);
       socket.emit('leave-dm', { roomId });
     };
   }, []);
 
   useEffect(() => {
-    const messageHandler = (chat: Chat) =>
-      setChats((prevChats) => [...prevChats, chat]);
-    socket.on('send-dm', messageHandler);
+    const chatHandler = (chat: Chat) => addChat(chat);
+    socket.on('send-dm', chatHandler);
     return () => {
-      socket.off('send-dm', messageHandler);
+      socket.off('send-dm', chatHandler);
     };
   }, []);
 
@@ -118,7 +119,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
         })}
       </ChatContainer>
       <MessageForm onSubmit={onSendMessage}>
-        <input type="text" onChange={onChange} value={message} />
+        <input type="text" onChange={onTextChange} value={message} />
         <button>Send</button>
       </MessageForm>
     </>

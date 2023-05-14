@@ -35,7 +35,7 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
   useEffect(() => {
     const messageHandler = (chat: Chat) => {
       const roomToUpdate = rooms.find(
-        (room) => room.interlocutorId === chat.user.id,
+        (room) => room.interlocutorId === chat.userId,
       );
       if (!roomToUpdate) return;
       roomToUpdate.lastMessage = chat.message;

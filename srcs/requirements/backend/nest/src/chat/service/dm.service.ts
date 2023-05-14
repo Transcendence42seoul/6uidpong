@@ -7,7 +7,8 @@ import {
   MoreThanOrEqual,
   DataSource,
 } from "typeorm";
-import { DmChatResponseDto } from "../dto/dm-chats-response.dto";
+import { DmChatResponseDto } from "../dto/dm-chat-response.dto";
+import { DmChatsResponseDto } from "../dto/dm-chats-response.dto";
 import { DmRoomsResponseDto } from "../dto/dm-rooms-response.dto";
 import { DmBlocklistEntity } from "../entity/dm-blocklist.entity";
 import { DmChatEntity } from "../entity/dm-chat.entity";
@@ -78,7 +79,7 @@ export class DmService {
   async findRoomUser(
     userId: number,
     interlocutorId: number
-  ): Promise<DmRoomUserEntity> {
+  ): Promise<DmRoomUserEntity | null> {
     const queryBuilder = this.roomUserRepository
       .createQueryBuilder("room_user")
       .select()
@@ -98,7 +99,7 @@ export class DmService {
       .leftJoinAndSelect("room_user.user", "user")
       .where("room_user.user_id = :userId", { userId });
 
-    return await queryBuilder.getOneOrFail();
+    return await queryBuilder.getOne();
   }
 
   async updateRoomUser(roomUser: DmRoomUserEntity): Promise<void> {
@@ -109,10 +110,8 @@ export class DmService {
     try {
       const roomId: number = roomUser.room.id;
       const userId: number = roomUser.user.id;
-      const queryRunnerRoomUserRepo =
-        queryRunner.manager.getRepository(DmRoomUserEntity);
       if (roomUser.isExit) {
-        await queryRunnerRoomUserRepo.update(roomId, {
+        await queryRunner.manager.update(DmRoomUserEntity, roomId, {
           isExit: false,
           createdAt: new Date(),
         });
@@ -121,7 +120,7 @@ export class DmService {
           room: { id: roomId },
           user: { id: userId },
         };
-        await queryRunnerRoomUserRepo.update(findOptions, {
+        await queryRunner.manager.update(DmRoomUserEntity, findOptions, {
           newMsgCount: 0,
         });
       }
@@ -144,12 +143,13 @@ export class DmService {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      const newRoom: DmRoomEntity = await queryRunner.manager
-        .getRepository(DmRoomEntity)
-        .save(new DmRoomEntity());
-      const newRoomUsers: DmRoomUserEntity[] = await queryRunner.manager
-        .getRepository(DmRoomUserEntity)
-        .save([
+      const newRoom: DmRoomEntity = await queryRunner.manager.save(
+        DmRoomEntity,
+        new DmRoomEntity()
+      );
+      const newRoomUsers: DmRoomUserEntity[] = await queryRunner.manager.save(
+        DmRoomUserEntity,
+        [
           {
             room: {
               id: newRoom.id,
@@ -166,7 +166,8 @@ export class DmService {
               id: interlocutorId,
             },
           },
-        ]);
+        ]
+      );
 
       await queryRunner.commitTransaction();
       return newRoomUsers.find((newRoomUser) => newRoomUser.user.id === userId);
@@ -178,8 +179,8 @@ export class DmService {
     }
   }
 
-  async findChats(roomUser: DmRoomUserEntity): Promise<DmChatResponseDto[]> {
-    const dmChats: DmChatEntity[] = await this.chatRepository.find({
+  async findChats(roomUser: DmRoomUserEntity): Promise<DmChatsResponseDto> {
+    const chats: DmChatEntity[] = await this.chatRepository.find({
       relations: {
         user: true,
         room: true,
@@ -194,9 +195,12 @@ export class DmService {
         createdAt: "ASC",
       },
     });
-    return dmChats.map((dmChat) => {
-      return new DmChatResponseDto(dmChat);
-    });
+
+    return new DmChatsResponseDto(
+      roomUser.room.id,
+      roomUser.newMsgCount,
+      chats
+    );
   }
 
   async isBlocked(from: number, to: number): Promise<boolean> {
@@ -219,9 +223,9 @@ export class DmService {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      const newChat: DmChatEntity = await queryRunner.manager
-        .getRepository(DmChatEntity)
-        .save({
+      const newChat: DmChatEntity = await queryRunner.manager.save(
+        DmChatEntity,
+        {
           user: {
             id: senderId,
           },
@@ -229,17 +233,21 @@ export class DmService {
             id: recipientRoomUser.room.id,
           },
           message,
-        });
-      const queryRunnerRoomUserRepo =
-        queryRunner.manager.getRepository(DmRoomUserEntity);
+        }
+      );
       if (recipientRoomUser.isExit) {
-        await queryRunnerRoomUserRepo.update(recipientRoomUser.id, {
-          isExit: false,
-          createdAt: newChat.createdAt,
-        });
+        await queryRunner.manager.update(
+          DmRoomUserEntity,
+          recipientRoomUser.id,
+          {
+            isExit: false,
+            createdAt: newChat.createdAt,
+          }
+        );
       }
       if (isNotJoin) {
-        await queryRunnerRoomUserRepo.increment(
+        await queryRunner.manager.increment(
+          DmRoomUserEntity,
           { id: recipientRoomUser.id },
           "newMsgCount",
           1
@@ -257,7 +265,7 @@ export class DmService {
   }
 
   async findChat(id: number): Promise<DmChatResponseDto> {
-    const DmChat: DmChatEntity = await this.chatRepository.findOne({
+    const chat: DmChatEntity = await this.chatRepository.findOne({
       relations: {
         user: true,
         room: true,
@@ -266,7 +274,7 @@ export class DmService {
         id: id,
       },
     });
-    return new DmChatResponseDto(DmChat);
+    return new DmChatResponseDto(chat);
   }
 
   async findRoomUsers(id: number): Promise<DmRoomUserEntity[]> {
@@ -289,17 +297,17 @@ export class DmService {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      queryRunner.manager.getRepository(DmChatEntity).delete({
+      queryRunner.manager.delete(DmChatEntity, {
         room: {
           id: id,
         },
       });
-      queryRunner.manager.getRepository(DmRoomUserEntity).delete({
+      queryRunner.manager.delete(DmRoomUserEntity, {
         room: {
           id: id,
         },
       });
-      queryRunner.manager.getRepository(DmRoomEntity).delete(id);
+      queryRunner.manager.delete(DmRoomEntity, id);
 
       await queryRunner.commitTransaction();
     } catch (error) {

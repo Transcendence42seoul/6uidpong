@@ -1,15 +1,15 @@
 export class DmRoomsResponseDto {
-  roomId: number;
+  readonly roomId: number;
 
-  lastMessage: string;
+  readonly lastMessage: string;
 
-  lastMessageTime: Date;
+  readonly lastMessageTime: Date;
 
-  interlocutorId: number;
+  readonly interlocutorId: number;
 
-  interlocutor: string;
+  readonly interlocutor: string;
 
-  interlocutorImage: string;
+  readonly interlocutorImage: string;
 
-  newMsgCount: number;
+  readonly newMsgCount: number;
 }

@@ -79,7 +79,7 @@ export class DmService {
   async findRoomUser(
     userId: number,
     interlocutorId: number
-  ): Promise<DmRoomUserEntity | null> {
+  ): Promise<DmRoomUserEntity> {
     const queryBuilder = this.roomUserRepository
       .createQueryBuilder("room_user")
       .select()
@@ -99,7 +99,7 @@ export class DmService {
       .leftJoinAndSelect("room_user.user", "user")
       .where("room_user.user_id = :userId", { userId });
 
-    return await queryBuilder.getOne();
+    return await queryBuilder.getOneOrFail();
   }
 
   async updateRoomUser(roomUser: DmRoomUserEntity): Promise<void> {
@@ -216,7 +216,7 @@ export class DmService {
     senderId: number,
     message: string,
     recipientRoomUser: DmRoomUserEntity,
-    isNotJoin: boolean
+    isJoin: boolean
   ): Promise<DmChatEntity> {
     const queryRunner = this.dataSource.createQueryRunner();
 
@@ -245,7 +245,7 @@ export class DmService {
           }
         );
       }
-      if (isNotJoin) {
+      if (!isJoin) {
         await queryRunner.manager.increment(
           DmRoomUserEntity,
           { id: recipientRoomUser.id },

@@ -21,8 +21,8 @@ import { DisconnectionService } from "../service/disconnection.service";
 import { WsJwtPayload } from "../utils/ws-jwt-payload.decorator";
 import { JwtPayload } from "jsonwebtoken";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
-import { EntityNotFoundError } from "typeorm";
 import { DmChatsResponseDto } from "../dto/dm-chats-response.dto";
+import { Entity, EntityNotFoundError } from "typeorm";
 
 @WebSocketGateway(80, {
   cors: {
@@ -67,14 +67,16 @@ export class ChatGateway implements OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
     @MessageBody("interlocutorId") interlocutorId: number
   ): Promise<DmChatsResponseDto> {
-    let roomUser: DmRoomUserEntity | null = await this.dmService.findRoomUser(
-      jwt.id,
-      interlocutorId
-    );
-    if (typeof roomUser === null) {
-      roomUser = await this.dmService.createRoom(jwt.id, interlocutorId);
-    } else {
+    let roomUser: DmRoomUserEntity;
+    try {
+      roomUser = await this.dmService.findRoomUser(jwt.id, interlocutorId);
       await this.dmService.updateRoomUser(roomUser);
+    } catch (error) {
+      if (error instanceof EntityNotFoundError) {
+        roomUser = await this.dmService.createRoom(jwt.id, interlocutorId);
+      } else {
+        throw error;
+      }
     }
     client.join("d" + roomUser.room.id);
     return await this.dmService.findChats(roomUser);
@@ -99,21 +101,24 @@ export class ChatGateway implements OnGatewayDisconnect {
       }
       const recipientRoomUser: DmRoomUserEntity =
         await this.dmService.findRoomUser(recipient.id, jwt.id);
-      const roomSockets: RemoteSocket<DefaultEventsMap, any>[] =
-        await this.server.in("d" + recipientRoomUser.room.id).fetchSockets();
-      const isOffline: boolean = recipient.status === "offline";
-      const isNotJoin: boolean = isOffline
-        ? true
-        : !roomSockets.find((socket) => socket.id === recipient.socketId);
+      const roomSockets = await this.server
+        .in("d" + recipientRoomUser.room.id)
+        .fetchSockets();
+      const isJoin: boolean =
+        typeof roomSockets.find(
+          (socket) => socket.id === recipient.socketId
+        ) === undefined
+          ? false
+          : true;
 
       const { id: chatId } = await this.dmService.saveChat(
         jwt.id,
         to.message,
         recipientRoomUser,
-        isNotJoin
+        isJoin
       );
       const chat: DmChatResponseDto = await this.dmService.findChat(chatId);
-      if (!isOffline) {
+      if (recipient.status === "online") {
         const recipientSocket = await this.server
           .in(recipient.socketId)
           .fetchSockets();
@@ -121,6 +126,9 @@ export class ChatGateway implements OnGatewayDisconnect {
       }
       return chat;
     } catch (error) {
+      if (error instanceof EntityNotFoundError) {
+        throw new WsException("invalid request.");
+      }
       throw error;
     }
   }
@@ -137,22 +145,19 @@ export class ChatGateway implements OnGatewayDisconnect {
   async deleteDmRoom(
     @WsJwtPayload() jwt: JwtPayload,
     @ConnectedSocket() client: Socket,
-    @MessageBody("roomId") roomId: number
+    @MessageBody("interlocutorId") interlocutorId: number
   ): Promise<void> {
-    const roomUsers: DmRoomUserEntity[] = await this.dmService.findRoomUsers(
-      roomId
-    );
-    if (!roomUsers.find((roomUser) => roomUser.user.id === jwt.id)) {
-      throw new WsException("Entity not found");
+    try {
+      const interlocutorRoomUser: DmRoomUserEntity =
+        await this.dmService.findRoomUser(interlocutorId, jwt.id);
+      if (interlocutorRoomUser.isExit) {
+        await this.dmService.deleteRoom(interlocutorRoomUser.room.id);
+      } else {
+        await this.dmService.exitRoom(interlocutorRoomUser.room.id, jwt.id);
+      }
+      client.leave("d" + interlocutorRoomUser.room.id);
+    } catch {
+      throw new WsException("invalid request.");
     }
-    const interlocutorRoomUser = roomUsers.find(
-      (roomUser) => roomUser.user.id !== jwt.id
-    );
-    if (interlocutorRoomUser.isExit) {
-      await this.dmService.deleteRoom(roomId);
-    } else {
-      await this.dmService.exitRoom(roomId, jwt.id);
-    }
-    client.leave("d" + roomId);
   }
 }

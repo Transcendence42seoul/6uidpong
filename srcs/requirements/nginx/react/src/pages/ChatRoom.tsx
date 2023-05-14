@@ -16,6 +16,7 @@ import MessageForm from '../components/container/MessageForm';
 
 export interface Chat {
   id: number;
+  roomId: string;
   userId: number;
   nickname: string;
   image: string;

@@ -36,7 +36,6 @@ export class DmService {
       .andWhere("room_id = dm_chats.room_id")
       .setParameter("userId", userId)
       .getQuery();
-
     const queryBuilder = this.chatRepository
       .createQueryBuilder("dm_chats")
       .select([
@@ -112,19 +111,18 @@ export class DmService {
       const userId: number = roomUser.user.id;
       const queryRunnerRoomUserRepo =
         queryRunner.manager.getRepository(DmRoomUserEntity);
-      if (roomUser.newMsgCount > 0) {
+      if (roomUser.isExit) {
+        await queryRunnerRoomUserRepo.update(roomId, {
+          isExit: false,
+          createdAt: new Date(),
+        });
+      } else if (roomUser.newMsgCount > 0) {
         const findOptions: Object = {
           room: { id: roomId },
           user: { id: userId },
         };
         await queryRunnerRoomUserRepo.update(findOptions, {
           newMsgCount: 0,
-        });
-      }
-      if (roomUser.isExit) {
-        await queryRunnerRoomUserRepo.update(roomId, {
-          isExit: false,
-          createdAt: new Date(),
         });
       }
 
@@ -212,9 +210,8 @@ export class DmService {
 
   async saveChat(
     senderId: number,
-    roomId: number,
     message: string,
-    recipientId: number,
+    recipientRoomUser: DmRoomUserEntity,
     isNotJoin: boolean
   ): Promise<DmChatEntity> {
     const queryRunner = this.dataSource.createQueryRunner();
@@ -229,26 +226,27 @@ export class DmService {
             id: senderId,
           },
           room: {
-            id: roomId,
+            id: recipientRoomUser.room.id,
           },
           message,
         });
-      const findOptions: Object = {
-        room: { id: roomId },
-        user: { id: recipientId },
-      };
       const queryRunnerRoomUserRepo =
         queryRunner.manager.getRepository(DmRoomUserEntity);
-      if (isNotJoin) {
-        await queryRunnerRoomUserRepo.increment(findOptions, "newMsgCount", 1);
+      if (recipientRoomUser.isExit) {
+        await queryRunnerRoomUserRepo.update(recipientRoomUser, {
+          isExit: false,
+          createdAt: new Date(),
+        });
       }
-      await queryRunnerRoomUserRepo.update(findOptions, {
-        isExit: false,
-        createdAt: new Date(),
-      });
+      if (isNotJoin) {
+        await queryRunnerRoomUserRepo.increment(
+          recipientRoomUser,
+          "newMsgCount",
+          1
+        );
+      }
 
       await queryRunner.commitTransaction();
-
       return newChat;
     } catch (error) {
       await queryRunner.rollbackTransaction();

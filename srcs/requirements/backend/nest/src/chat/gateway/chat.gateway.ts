@@ -8,7 +8,7 @@ import {
   WebSocketServer,
   WsException,
 } from "@nestjs/websockets";
-import { Server, Socket } from "socket.io";
+import { RemoteSocket, Server, Socket } from "socket.io";
 import { UserEntity } from "src/user/entity/user.entity";
 import { UserService } from "src/user/service/user.service";
 import { DmChatResponseDto } from "../dto/dm-chats-response.dto";
@@ -20,6 +20,7 @@ import { ConnectionService } from "../service/connection.service";
 import { DisconnectionService } from "../service/disconnection.service";
 import { WsJwtPayload } from "../utils/ws-jwt-payload.decorator";
 import { JwtPayload } from "jsonwebtoken";
+import { DefaultEventsMap } from "socket.io/dist/typed-events";
 
 @WebSocketGateway(80, {
   cors: {
@@ -82,13 +83,10 @@ export class ChatGateway implements OnGatewayDisconnect {
   @SubscribeMessage("send-dm")
   async sendDM(
     @WsJwtPayload() jwt: JwtPayload,
-    @MessageBody("to") to: { userId: number; roomId: number },
-    @MessageBody("message") message: string
+    @MessageBody("to") to: { id: number; message: string }
   ): Promise<DmChatResponseDto> {
     try {
-      const recipient: UserEntity = await this.userService.findUserById(
-        to.userId
-      ); // An exception can occur
+      const recipient: UserEntity = await this.userService.findUserById(to.id); // An exception can occur
 
       if (await this.dmService.isBlocked(jwt.id, recipient.id)) {
         throw new WsException(
@@ -100,22 +98,22 @@ export class ChatGateway implements OnGatewayDisconnect {
           "You can't send a message because you have been blocked."
         );
       }
-
-      const roomSockets = await this.server.in("d" + to.roomId).fetchSockets();
-      const isOffline = recipient.status === "offline";
-      const isNotJoin = isOffline
+      const recipientRoomUser: DmRoomUserEntity =
+        await this.dmService.findRoomUser(recipient.id, jwt.id);
+      const roomSockets: RemoteSocket<DefaultEventsMap, any>[] =
+        await this.server.in("d" + recipientRoomUser.room.id).fetchSockets();
+      const isOffline: boolean = recipient.status === "offline";
+      const isNotJoin: boolean = isOffline
         ? true
         : !roomSockets.find((socket) => socket.id === recipient.socketId);
 
       const { id: chatId } = await this.dmService.saveChat(
         jwt.id,
-        to.roomId,
-        message,
-        recipient.id,
+        to.message,
+        recipientRoomUser,
         isNotJoin
       );
       const chat: DmChatResponseDto = await this.dmService.findChat(chatId);
-
       if (!isOffline) {
         const recipientSocket = await this.server
           .in(recipient.socketId)

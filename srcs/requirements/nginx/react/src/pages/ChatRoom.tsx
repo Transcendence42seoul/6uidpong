@@ -37,6 +37,10 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
   const [chats, setChats] = useState<Chat[]>([]);
   const [message, setMessage] = useState<string>('');
 
+  const addChat = (chat: Chat) => {
+    setChats((prevChats) => [...prevChats, chat]);
+  };
+
   const onChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     setMessage(e.target.value);
   }, []);
@@ -47,7 +51,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
       if (!message) return;
       const sendDmData = { to: { userId: interlocutorId, roomId }, message };
       const chatHandler = (chat: Chat) => {
-        setChats((prevChats) => [...prevChats, chat]);
+        addChat(chat);
         setMessage('');
       };
       socket.emit('send-dm', sendDmData, chatHandler);
@@ -65,8 +69,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
   }, []);
 
   useEffect(() => {
-    const messageHandler = (chat: Chat) =>
-      setChats((prevChats) => [...prevChats, chat]);
+    const messageHandler = (chat: Chat) => addChat(chat);
     socket.on('send-dm', messageHandler);
     return () => {
       socket.off('send-dm', messageHandler);

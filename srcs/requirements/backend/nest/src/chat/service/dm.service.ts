@@ -270,9 +270,15 @@ export class DmService {
   }
 
   async findRoomUsers(id: number): Promise<DmRoomUserEntity[]> {
-    return await this.roomUserRepository.findBy({
-      room: {
-        id: id,
+    return await this.roomUserRepository.find({
+      relations: {
+        user: true,
+        room: true,
+      },
+      where: {
+        room: {
+          id: id,
+        },
       },
     });
   }

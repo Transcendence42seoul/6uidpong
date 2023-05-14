@@ -58,7 +58,8 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
   );
 
   useEffect(() => {
-    const chatsHandler = (prevChats: Chat[]) => setChats(prevChats);
+    const chatsHandler = ({ chats: prevChats }: { chats: Chat[] }) =>
+      setChats(prevChats);
     socket.emit('join-dm', { interlocutorId }, chatsHandler);
     return () => {
       socket.off('join-dm', chatsHandler);

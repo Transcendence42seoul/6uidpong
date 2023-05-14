@@ -3,6 +3,7 @@ import { DmChatEntity } from "../entity/dm-chat.entity";
 export class DmChatResponseDto {
   constructor(dmChatEntity: DmChatEntity) {
     this.id = dmChatEntity.id;
+    this.roomId = dmChatEntity.room.id;
     this.userId = dmChatEntity.user.id;
     this.nickname = dmChatEntity.user.nickname;
     this.image = dmChatEntity.user.image;
@@ -11,6 +12,8 @@ export class DmChatResponseDto {
   }
 
   id: number;
+
+  roomId: number;
 
   userId: number;
 

@@ -284,7 +284,30 @@ export class DmService {
   }
 
   async deleteRoom(id: number): Promise<void> {
-    await this.roomRepository.delete(id);
+    const queryRunner = this.dataSource.createQueryRunner();
+
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      queryRunner.manager.getRepository(DmChatEntity).delete({
+        room: {
+          id: id,
+        },
+      });
+      queryRunner.manager.getRepository(DmRoomUserEntity).delete({
+        room: {
+          id: id,
+        },
+      });
+      queryRunner.manager.getRepository(DmRoomEntity).delete(id);
+
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   async exitRoom(roomId: number, userId: number): Promise<void> {

@@ -7,11 +7,9 @@ export class DmRoomEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @OneToMany(() => DmRoomUserEntity, (roomUser) => roomUser.room, {
-    cascade: true,
-  })
+  @OneToMany(() => DmRoomUserEntity, (roomUser) => roomUser.room)
   roomUsers: DmRoomUserEntity[];
 
-  @OneToMany(() => DmChatEntity, (chat) => chat.room, { cascade: true })
+  @OneToMany(() => DmChatEntity, (chat) => chat.room)
   chats: DmChatEntity[];
 }

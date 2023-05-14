@@ -7,9 +7,9 @@ import { DmRoomUserEntity } from "../entity/dm-room-user.entity";
 import { ChatGateway } from "../gateway/chat.gateway";
 import { WsJwtAccessGuard } from "../guard/ws-jwt-access.guard";
 import { DmService } from "../service/dm.service";
-import { DmBlocklistEntity } from "../entity/dm-blocklist.entity";
 import { ConnectionService } from "../service/connection.service";
 import { DisconnectionService } from "../service/disconnection.service";
+import { BlocklistEntity } from "../entity/blocklist.entity";
 
 @Module({
   imports: [
@@ -17,7 +17,7 @@ import { DisconnectionService } from "../service/disconnection.service";
       DmRoomEntity,
       DmRoomUserEntity,
       DmChatEntity,
-      DmBlocklistEntity,
+      BlocklistEntity,
     ]),
     UserModule,
   ],

@@ -104,18 +104,15 @@ export class ChatGateway implements OnGatewayDisconnect {
       const roomSockets = await this.server
         .in("d" + recipientRoomUser.room.id)
         .fetchSockets();
-      const isJoin: boolean =
-        typeof roomSockets.find(
-          (socket) => socket.id === recipient.socketId
-        ) === undefined
-          ? false
-          : true;
+      const isNotJoin: boolean = !roomSockets.find(
+        (socket) => socket.id === recipient.socketId
+      );
 
       const { id: chatId } = await this.dmService.saveChat(
         jwt.id,
         to.message,
         recipientRoomUser,
-        isJoin
+        isNotJoin
       );
       const chat: DmChatResponseDto = await this.dmService.findChat(chatId);
       if (recipient.status === "online") {
@@ -159,5 +156,21 @@ export class ChatGateway implements OnGatewayDisconnect {
     } catch {
       throw new WsException("invalid request.");
     }
+  }
+
+  @SubscribeMessage("block-dm-user")
+  async blockDmUser(
+    @WsJwtPayload() jwt: JwtPayload,
+    @MessageBody("interlocutorId") interlocutorId: number
+  ): Promise<void> {
+    await this.dmService.createBlockUser(jwt.id, interlocutorId);
+  }
+
+  @SubscribeMessage("unblock-dm-user")
+  async unblockDmUser(
+    @WsJwtPayload() jwt: JwtPayload,
+    @MessageBody("interlocutorId") interlocutorId: number
+  ): Promise<void> {
+    await this.dmService.deleteBlockUser(jwt.id, interlocutorId);
   }
 }

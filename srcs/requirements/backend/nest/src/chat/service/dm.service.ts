@@ -10,7 +10,7 @@ import {
 import { DmChatResponseDto } from "../dto/dm-chat-response.dto";
 import { DmChatsResponseDto } from "../dto/dm-chats-response.dto";
 import { DmRoomsResponseDto } from "../dto/dm-rooms-response.dto";
-import { DmBlocklistEntity } from "../entity/dm-blocklist.entity";
+import { BlocklistEntity } from "../entity/blocklist.entity";
 import { DmChatEntity } from "../entity/dm-chat.entity";
 import { DmRoomUserEntity } from "../entity/dm-room-user.entity";
 import { DmRoomEntity } from "../entity/dm-room.entity";
@@ -18,14 +18,12 @@ import { DmRoomEntity } from "../entity/dm-room.entity";
 @Injectable()
 export class DmService {
   constructor(
-    @InjectRepository(DmRoomEntity)
-    private readonly roomRepository: Repository<DmRoomEntity>,
     @InjectRepository(DmRoomUserEntity)
     private readonly roomUserRepository: Repository<DmRoomUserEntity>,
     @InjectRepository(DmChatEntity)
     private readonly chatRepository: Repository<DmChatEntity>,
-    @InjectRepository(DmBlocklistEntity)
-    private readonly dmBlocklistRepository: Repository<DmBlocklistEntity>,
+    @InjectRepository(BlocklistEntity)
+    private readonly blocklistRepository: Repository<BlocklistEntity>,
     private readonly dataSource: DataSource
   ) {}
 
@@ -204,9 +202,13 @@ export class DmService {
   }
 
   async isBlocked(from: number, to: number): Promise<boolean> {
-    return (await this.dmBlocklistRepository.countBy({
-      userId: from,
-      blockedUserId: to,
+    return (await this.blocklistRepository.countBy({
+      user: {
+        id: from,
+      },
+      blockedUser: {
+        id: to,
+      },
     }))
       ? true
       : false;
@@ -216,7 +218,7 @@ export class DmService {
     senderId: number,
     message: string,
     recipientRoomUser: DmRoomUserEntity,
-    isJoin: boolean
+    isNotJoin: boolean
   ): Promise<DmChatEntity> {
     const queryRunner = this.dataSource.createQueryRunner();
 
@@ -245,7 +247,7 @@ export class DmService {
           }
         );
       }
-      if (!isJoin) {
+      if (isNotJoin) {
         await queryRunner.manager.increment(
           DmRoomUserEntity,
           { id: recipientRoomUser.id },
@@ -323,6 +325,28 @@ export class DmService {
     await this.roomUserRepository.update(findOptions, {
       isExit: true,
       newMsgCount: 0,
+    });
+  }
+
+  async createBlockUser(userId: number, interlocutorId: number): Promise<void> {
+    await this.blocklistRepository.save({
+      user: {
+        id: userId,
+      },
+      blockedUser: {
+        id: interlocutorId,
+      },
+    });
+  }
+
+  async deleteBlockUser(userId: number, interlocutorId: number): Promise<void> {
+    await this.blocklistRepository.delete({
+      user: {
+        id: userId,
+      },
+      blockedUser: {
+        id: interlocutorId,
+      },
     });
   }
 }

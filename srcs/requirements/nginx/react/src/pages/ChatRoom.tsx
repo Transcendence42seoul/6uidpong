@@ -45,14 +45,12 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
     (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       if (!message) return;
-      socket.emit(
-        'send-dm',
-        { to: { userId: interlocutorId, roomId }, message },
-        (chat: Chat) => {
-          setChats((prevChats) => [...prevChats, chat]);
-          setMessage('');
-        },
-      );
+      const sendDmData = { to: { userId: interlocutorId, roomId }, message };
+      const chatHandler = (chat: Chat) => {
+        setChats((prevChats) => [...prevChats, chat]);
+        setMessage('');
+      };
+      socket.emit('send-dm', sendDmData, chatHandler);
     },
     [message],
   );

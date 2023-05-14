@@ -71,7 +71,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
       chats: Chat[];
     }) => {
       setNewMsgCount(newMsgCnt);
-      setChats(prevChats);
+      setChats([...prevChats]);
     };
     socket.emit('join-dm', { interlocutorId }, chatsHandler);
     return () => {

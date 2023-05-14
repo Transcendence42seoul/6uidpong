@@ -25,6 +25,10 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [showMenu, setShowMenu] = useState(false);
 
+  const addRoom = (room: Room) => {
+    setRooms((prevRooms) => [...prevRooms, room]);
+  };
+
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
     setMenuPosition({ x: e.clientX, y: e.clientY });
@@ -48,15 +52,20 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
     const messageHandler = (chat: Chat) => {
       const roomToUpdate = rooms.find(
         (room) => room.interlocutorId === chat.userId,
-      ) ?? {
-        roomId: chat.roomId,
-        lastMessage: chat.message,
-        lastMessageTime: chat.createdAt,
-        interlocutor: chat.nickname,
-        interlocutorId: chat.userId,
-        interlocutorImage: chat.image,
-        newMsgCount: 0,
-      };
+      );
+      if (!roomToUpdate) {
+        const newRoom = {
+          roomId: chat.roomId,
+          lastMessage: chat.message,
+          lastMessageTime: chat.createdAt,
+          interlocutor: chat.nickname,
+          interlocutorId: chat.userId,
+          interlocutorImage: chat.image,
+          newMsgCount: 1,
+        };
+        addRoom(newRoom);
+        return;
+      }
       roomToUpdate.lastMessage = chat.message;
       roomToUpdate.lastMessageTime = chat.createdAt;
       roomToUpdate.newMsgCount += 1;

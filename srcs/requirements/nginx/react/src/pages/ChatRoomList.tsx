@@ -48,8 +48,15 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
     const messageHandler = (chat: Chat) => {
       const roomToUpdate = rooms.find(
         (room) => room.interlocutorId === chat.userId,
-      );
-      if (!roomToUpdate) return;
+      ) ?? {
+        roomId: chat.roomId,
+        lastMessage: chat.message,
+        lastMessageTime: chat.createdAt,
+        interlocutor: chat.nickname,
+        interlocutorId: chat.userId,
+        interlocutorImage: chat.image,
+        newMsgCount: 0,
+      };
       roomToUpdate.lastMessage = chat.message;
       roomToUpdate.lastMessageTime = chat.createdAt;
       roomToUpdate.newMsgCount += 1;

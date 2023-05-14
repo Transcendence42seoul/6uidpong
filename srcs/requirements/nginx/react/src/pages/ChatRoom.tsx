@@ -41,7 +41,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
     setChats((prevChats) => [...prevChats, chat]);
   };
 
-  const onChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+  const onTextChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     setMessage(e.target.value);
   }, []);
 
@@ -69,10 +69,10 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
   }, []);
 
   useEffect(() => {
-    const messageHandler = (chat: Chat) => addChat(chat);
-    socket.on('send-dm', messageHandler);
+    const chatHandler = (chat: Chat) => addChat(chat);
+    socket.on('send-dm', chatHandler);
     return () => {
-      socket.off('send-dm', messageHandler);
+      socket.off('send-dm', chatHandler);
     };
   }, []);
 
@@ -119,7 +119,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
         })}
       </ChatContainer>
       <MessageForm onSubmit={onSendMessage}>
-        <input type="text" onChange={onChange} value={message} />
+        <input type="text" onChange={onTextChange} value={message} />
         <button>Send</button>
       </MessageForm>
     </>

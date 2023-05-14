@@ -49,7 +49,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
     (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       if (!message) return;
-      const sendDmData = { to: { userId: interlocutorId, roomId }, message };
+      const sendDmData = { to: { id: interlocutorId, message } };
       const chatHandler = (chat: Chat) => {
         addChat(chat);
         setMessage('');

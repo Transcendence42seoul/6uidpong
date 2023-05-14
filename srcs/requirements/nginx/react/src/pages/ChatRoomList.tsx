@@ -32,7 +32,7 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
   };
 
   const handleMenuClick = (roomId: string) => {
-    socket.emit('delete-dm-rooms', { roomId });
+    socket.emit('delete-dm-room', { roomId });
     setRooms([...rooms.filter((room) => room.roomId !== roomId)]);
     setShowMenu(false);
   };

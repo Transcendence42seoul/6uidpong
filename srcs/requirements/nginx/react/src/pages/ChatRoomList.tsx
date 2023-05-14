@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
 import CircularImage from '../components/container/CircularImage';
@@ -20,7 +20,20 @@ interface Room {
 
 const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
   const navigate = useNavigate();
+  const menuRef = useRef<HTMLUListElement>(null);
+  const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
   const [rooms, setRooms] = useState<Room[]>([]);
+  const [showMenu, setShowMenu] = useState(false);
+
+  const handleContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setMenuPosition({ x: e.clientX, y: e.clientY });
+    setShowMenu(true);
+  };
+
+  const handleMenuClick = () => {
+    setShowMenu(false);
+  };
 
   useEffect(() => {
     const roomListHandler = (roomList: Room[]) => {
@@ -46,6 +59,18 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
     };
   }, [rooms]);
 
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (showMenu && !menuRef.current?.contains(e.target as Node)) {
+        setShowMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showMenu]);
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100">
       <h1 className="mb-4 text-3xl font-bold">Chat</h1>
@@ -68,12 +93,30 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
               <li
                 key={room.roomId}
                 className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-2"
+                onContextMenu={handleContextMenu}
                 onDoubleClick={() =>
                   navigate(`/chat/${room.roomId}`, {
                     state: { interlocutorId: room.interlocutorId },
                   })
                 }
               >
+                {showMenu && (
+                  <ul
+                    ref={menuRef}
+                    style={{
+                      position: 'fixed',
+                      top: menuPosition.y,
+                      left: menuPosition.x,
+                    }}
+                  >
+                    <button
+                      className="cursor-pointer rounded border-4 border-red-400 bg-black p-1 text-white hover:text-red-400"
+                      onClick={handleMenuClick}
+                    >
+                      Delete
+                    </button>
+                  </ul>
+                )}
                 <div className="flex items-center">
                   <CircularImage
                     src={room.interlocutorImage}

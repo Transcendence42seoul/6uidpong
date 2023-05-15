@@ -161,7 +161,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
       </MessageForm>
       {showAlert && (
         <AlertWithCloseButton
-          message="You can't send message to user who blocked you."
+          message="You can't send DM to user who blocked you."
           onClose={handleCloseAlert}
         />
       )}

@@ -35,9 +35,11 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
     setShowMenu(true);
   };
 
-  const handleMenuClick = (roomId: string) => {
-    socket.emit('delete-dm-room', { roomId });
-    setRooms([...rooms.filter((room) => room.roomId !== roomId)]);
+  const handleMenuClick = ({ interlocutorId }: Room) => {
+    socket.emit('delete-dm-room', { interlocutorId });
+    setRooms([
+      ...rooms.filter((room) => room.interlocutorId !== interlocutorId),
+    ]);
     setShowMenu(false);
   };
 
@@ -129,7 +131,7 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
                   >
                     <button
                       className="cursor-pointer rounded border-4 border-red-400 bg-black p-1 text-white hover:text-red-400"
-                      onClick={() => handleMenuClick(room.roomId)}
+                      onClick={() => handleMenuClick(room)}
                     >
                       Delete
                     </button>

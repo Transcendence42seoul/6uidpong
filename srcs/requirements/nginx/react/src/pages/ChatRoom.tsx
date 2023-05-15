@@ -8,6 +8,7 @@ import React, {
 } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
+import AlertWithCloseButton from '../components/alert/AlertWithCloseButton';
 import ChatContainer from '../components/container/ChatContainer';
 import CircularImage from '../components/container/CircularImage';
 import Message from '../components/container/Message';
@@ -38,10 +39,15 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
   const [chats, setChats] = useState<Chat[]>([]);
   const [message, setMessage] = useState<string>('');
   const [newMsgCount, setNewMsgCount] = useState<number>(0);
+  const [showAlert, setShowAlert] = useState(false);
 
   const addChat = (chat: Chat) => {
     setChats((prevChats) => [...prevChats, chat]);
     setNewMsgCount(0);
+  };
+
+  const handleCloseAlert = () => {
+    setShowAlert(false);
   };
 
   const onTextChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
@@ -70,6 +76,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
       newMsgCount: number;
       chats: Chat[];
     }) => {
+      if (showAlert) return;
       setNewMsgCount(newMsgCnt);
       setChats([...prevChats]);
     };
@@ -81,9 +88,12 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
 
   useEffect(() => {
     const chatHandler = (chat: Chat) => addChat(chat);
+    const errorHandler = () => setShowAlert(true);
     socket.on('send-dm', chatHandler);
+    socket.on('error', errorHandler);
     return () => {
       socket.off('send-dm', chatHandler);
+      socket.off('error', errorHandler);
     };
   }, []);
 
@@ -96,6 +106,15 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
       current.scrollTop = scrollHeight - clientHeight;
     }
   }, [chats.length]);
+
+  useEffect(() => {
+    if (showAlert) {
+      const timeoutId = setTimeout(() => {
+        setShowAlert(false);
+      }, 2500);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [showAlert]);
 
   return (
     <>
@@ -140,6 +159,12 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
         <input type="text" onChange={onTextChange} value={message} />
         <button>Send</button>
       </MessageForm>
+      {showAlert && (
+        <AlertWithCloseButton
+          message="You can't send message to user who blocked you."
+          onClose={handleCloseAlert}
+        />
+      )}
     </>
   );
 };

@@ -26,7 +26,7 @@ export class JwtAccessGuard implements CanActivate {
     } catch {
       throw new UnauthorizedException();
     }
-    if (request.params.id != request.user.id) {
+    if (request.params.id && request.params.id != request.user.id) {
       throw new NotFoundException();
     }
     return true;

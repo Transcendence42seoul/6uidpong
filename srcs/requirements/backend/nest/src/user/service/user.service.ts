@@ -1,6 +1,6 @@
 import { ConflictException, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { DataSource, Repository } from "typeorm";
+import { DataSource, ILike, Like, Repository } from "typeorm";
 import { UserEntity } from "../entity/user.entity";
 
 @Injectable()
@@ -11,13 +11,23 @@ export class UserService {
     private readonly dataSource: DataSource
   ) {}
 
-  async findUser(id: number | string): Promise<UserEntity> {
+  async findAll(): Promise<UserEntity[]> {
+    return await this.userRepository.find();
+  }
+
+  async findOne(id: number | string): Promise<UserEntity> {
     if (typeof id === "number")
       return await this.userRepository.findOneOrFail({ where: { id: id } });
     return await this.userRepository.findOneOrFail({ where: { socketId: id } });
   }
 
-  async createUser(profile: any): Promise<UserEntity> {
+  async search(nickname: string): Promise<UserEntity[]> {
+    return await this.userRepository.findBy({
+      nickname: ILike(`%${nickname}%`),
+    });
+  }
+
+  async create(profile: any): Promise<UserEntity> {
     const profileEntity: Object = this.userRepository.create({
       id: profile.id,
       nickname: `undefined-${profile.id}`,

@@ -35,8 +35,8 @@ describe("AuthController", () => {
         {
           provide: UserService,
           useValue: {
-            findUser: jest.fn(),
-            createUser: jest.fn(),
+            findOne: jest.fn(),
+            create: jest.fn(),
           },
         },
         {
@@ -80,7 +80,7 @@ describe("AuthController", () => {
       user.email = "mock";
       user.is2FA = true;
 
-      jest.spyOn(userService, "findUser").mockResolvedValue(user);
+      jest.spyOn(userService, "findOne").mockResolvedValue(user);
 
       const req = { user: { id: 110731 } };
       const res: any = {
@@ -104,7 +104,7 @@ describe("AuthController", () => {
       user.id = 110731;
       user.is2FA = false;
 
-      jest.spyOn(userService, "findUser").mockResolvedValue(user);
+      jest.spyOn(userService, "findOne").mockResolvedValue(user);
 
       const req = { user: { id: 110731 } };
       const res: any = {
@@ -135,8 +135,8 @@ describe("AuthController", () => {
       const user = new UserEntity();
       user.id = 110731;
 
-      jest.spyOn(userService, "createUser").mockResolvedValue(user);
-      jest.spyOn(userService, "findUser").mockResolvedValue(null);
+      jest.spyOn(userService, "create").mockResolvedValue(user);
+      jest.spyOn(userService, "findOne").mockResolvedValue(null);
 
       const req = { user: { id: 110731 } };
       const res: any = {

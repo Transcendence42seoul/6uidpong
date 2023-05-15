@@ -39,7 +39,7 @@ export class AuthController {
   ): Promise<Object> {
     let user: UserEntity;
     try {
-      user = await this.userService.findUser(req.user.id);
+      user = await this.userService.findOne(req.user.id);
       res.status(HttpStatus.OK);
       if (user.is2FA) {
         this.authService.sendCodeByEmail(user.id, user.email);
@@ -47,7 +47,7 @@ export class AuthController {
         return { is2FA: true, id: user.id, accessToken: null };
       }
     } catch (EntityNotFoundError) {
-      user = await this.userService.createUser(req.user);
+      user = await this.userService.create(req.user);
       res.status(HttpStatus.CREATED);
       res.setHeader("Location", `/api/v1/users/${user.id}`);
     }

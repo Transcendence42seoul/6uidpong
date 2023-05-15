@@ -10,6 +10,7 @@ import {
   HttpStatus,
   UnauthorizedException,
   NotFoundException,
+  Query,
 } from "@nestjs/common";
 import { UserService } from "../service/user.service";
 import { JwtAccessGuard } from "src/auth/guard/jwt-access.guard";
@@ -27,13 +28,23 @@ export class UserController {
     private readonly authService: AuthService
   ) {}
 
+  @Get()
+  async findAll(): Promise<UserEntity[]> {
+    return await this.userService.findAll();
+  }
+
   @Get("/:id")
-  async getUser(@Param("id", ParseIntPipe) id: number): Promise<UserEntity> {
+  async findOne(@Param("id", ParseIntPipe) id: number): Promise<UserEntity> {
     try {
-      return await this.userService.findUser(id);
+      return await this.userService.findOne(id);
     } catch (EntityNotFoundError) {
       throw new NotFoundException();
     }
+  }
+
+  @Get("/search")
+  async search(@Query("nickname") nickname: string): Promise<UserEntity[]> {
+    return await this.userService.search(nickname);
   }
 
   @Put("/:id/nickname")
@@ -58,7 +69,7 @@ export class UserController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async sendCodeByEmail(@Param("id", ParseIntPipe) id: number): Promise<void> {
     try {
-      const { email } = await this.userService.findUser(id);
+      const { email } = await this.userService.findOne(id);
       await this.authService.sendCodeByEmail(id, email);
     } catch (EntityNotFoundError) {
       throw new NotFoundException();

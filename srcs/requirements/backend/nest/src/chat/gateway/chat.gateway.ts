@@ -88,7 +88,7 @@ export class ChatGateway implements OnGatewayDisconnect {
     @MessageBody("to") to: { id: number; message: string }
   ): Promise<DmChatResponseDto> {
     try {
-      const recipient: UserEntity = await this.userService.findUser(to.id);
+      const recipient: UserEntity = await this.userService.findOne(to.id);
       if (await this.dmService.isBlocked(jwt.id, recipient.id)) {
         throw new WsException(
           "You can't send a message to the user you have blocked."

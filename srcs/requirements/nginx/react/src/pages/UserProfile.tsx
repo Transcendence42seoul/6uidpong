@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
 import useCallAPI from '../api';
+import AlertWithCloseButton from '../components/alert/AlertWithCloseButton';
 import CircularImage from '../components/container/CircularImage';
 import ContentBox from '../components/container/ContentBox';
 
@@ -21,6 +22,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ socket }) => {
   const callAPI = useCallAPI();
   const navigate = useNavigate();
   const { userId } = useParams<{ userId: string }>();
+  const [showAlert, setShowAlert] = useState(false);
   const [user, setUser] = useState<User | undefined>(undefined);
 
   const handleDM = () => {
@@ -31,6 +33,15 @@ const UserProfile: React.FC<UserProfileProps> = ({ socket }) => {
     socket.emit('join-dm', { userId }, roomIdHandler);
   };
 
+  const handleBlock = () => {
+    socket.emit('block-dm-user', { userId });
+    setShowAlert(true);
+  };
+
+  const handleCloseAlert = () => {
+    setShowAlert(false);
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       const data = await callAPI(`/api/v1/users/${userId}`);
@@ -38,6 +49,25 @@ const UserProfile: React.FC<UserProfileProps> = ({ socket }) => {
     };
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (showAlert) {
+      const timeoutId = setTimeout(() => {
+        setShowAlert(false);
+      }, 2500);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [showAlert]);
+
+  /* Mock User */
+  // const user: User = {
+  //   nickname: 'kijsong',
+  //   image:
+  //     'https://cdn.intra.42.fr/users/a99b98748e81f651c11c5fa2ccbb753e/kijsong.jpg',
+  //   winStat: 4,
+  //   loseStat: 2,
+  //   ladderScore: 4242,
+  // };
 
   return (
     <div className="flex flex-col items-center p-20">
@@ -63,11 +93,20 @@ const UserProfile: React.FC<UserProfileProps> = ({ socket }) => {
           >
             DM
           </button>
-          <button className="rounded bg-red-500 px-4 py-2 text-white hover:bg-red-400">
+          <button
+            className="rounded bg-red-500 px-4 py-2 text-white hover:bg-red-400"
+            onClick={handleBlock}
+          >
             Block
           </button>
         </div>
       </ContentBox>
+      {showAlert && (
+        <AlertWithCloseButton
+          message={`${user?.nickname} is blocked.`}
+          onClose={handleCloseAlert}
+        />
+      )}
     </div>
   );
 };

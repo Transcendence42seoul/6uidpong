@@ -71,6 +71,11 @@ const App: React.FC = () => {
     socket.emit('connection');
   });
 
+  /* Mock Token */
+  // const tokenInfo = {
+  //   id: 110729,
+  // };
+
   return (
     <Layout>
       <Routes>

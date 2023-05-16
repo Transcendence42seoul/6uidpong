@@ -26,7 +26,7 @@ const MyPage: React.FC<MyPageProps> = ({ id, stats }) => {
 
   useEffect(() => {
     const fetchUserData = async () => {
-      const data = await callAPI(`/api/v1/users/${id}`);
+      const data: User = await callAPI(`/api/v1/users/${id}`);
       setUser(data);
     };
     fetchUserData();

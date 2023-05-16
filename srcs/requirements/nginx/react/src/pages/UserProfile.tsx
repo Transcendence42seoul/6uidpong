@@ -10,6 +10,7 @@ export interface User {
   id: number;
   nickname: string;
   image: string;
+  status: string;
   winStat: number;
   loseStat: number;
   ladderScore: number;
@@ -19,6 +20,7 @@ export interface User {
 // export const user: User = {
 //   id: 110729,
 //   nickname: 'kijsong',
+//   status: 'online',
 //   image:
 //     'https://cdn.intra.42.fr/users/a99b98748e81f651c11c5fa2ccbb753e/kijsong.jpg',
 //   winStat: 4,

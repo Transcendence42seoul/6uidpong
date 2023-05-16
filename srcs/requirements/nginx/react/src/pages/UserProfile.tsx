@@ -28,7 +28,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ socket }) => {
   const [showAlert, setShowAlert] = useState(false);
   const [user, setUser] = useState<User | undefined>(undefined);
 
-  const handleDM = () => {
+  const handleClickDM = () => {
     const roomIdHandler = ({ roomId }: { roomId: string }) =>
       navigate(`/chat/${roomId}`, {
         state: { interlocutorId: userId },
@@ -36,7 +36,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ socket }) => {
     socket.emit('join-dm', { userId }, roomIdHandler);
   };
 
-  const handleBlock = () => {
+  const handleClickBlock = () => {
     socket.emit('block-dm-user', { userId });
     setShowAlert(true);
   };
@@ -95,13 +95,13 @@ const UserProfile: React.FC<UserProfileProps> = ({ socket }) => {
           </button>
           <button
             className="mr-2 rounded bg-green-500 px-4 py-2 text-white hover:bg-green-400"
-            onClick={handleDM}
+            onClick={handleClickDM}
           >
             DM
           </button>
           <button
             className="rounded bg-red-500 px-4 py-2 text-white hover:bg-red-400"
-            onClick={handleBlock}
+            onClick={handleClickBlock}
           >
             Block
           </button>

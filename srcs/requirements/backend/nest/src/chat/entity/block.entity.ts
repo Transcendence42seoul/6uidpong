@@ -1,8 +1,8 @@
 import { UserEntity } from "src/user/entity/user.entity";
 import { Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
 
-@Entity("blocklist")
-export class BlocklistEntity {
+@Entity("block")
+export class BlockEntity {
   @PrimaryColumn({ name: "user_id" })
   userId: number;
 

@@ -8,7 +8,7 @@ import {
   DataSource,
 } from "typeorm";
 import { DmRoomsResponseDto } from "../dto/dm-rooms-response.dto";
-import { BlocklistEntity } from "../entity/blocklist.entity";
+import { BlockEntity } from "../entity/block.entity";
 import { DmChatEntity } from "../entity/dm-chat.entity";
 import { DmRoomUserEntity } from "../entity/dm-room-user.entity";
 import { DmRoomEntity } from "../entity/dm-room.entity";
@@ -22,8 +22,8 @@ export class DmService {
     private readonly roomUserRepository: Repository<DmRoomUserEntity>,
     @InjectRepository(DmChatEntity)
     private readonly chatRepository: Repository<DmChatEntity>,
-    @InjectRepository(BlocklistEntity)
-    private readonly blocklistRepository: Repository<BlocklistEntity>,
+    @InjectRepository(BlockEntity)
+    private readonly blockRepository: Repository<BlockEntity>,
     private readonly dataSource: DataSource
   ) {}
 
@@ -188,7 +188,7 @@ export class DmService {
   }
 
   async isBlocked(from: number, to: number): Promise<boolean> {
-    return (await this.blocklistRepository.countBy({
+    return (await this.blockRepository.countBy({
       userId: from,
       blockedUserId: to,
     }))
@@ -279,14 +279,14 @@ export class DmService {
   }
 
   async createBlockUser(userId: number, interlocutorId: number): Promise<void> {
-    await this.blocklistRepository.save({
+    await this.blockRepository.save({
       userId: userId,
       blockedUserId: interlocutorId,
     });
   }
 
   async deleteBlockUser(userId: number, interlocutorId: number): Promise<void> {
-    await this.blocklistRepository.delete({
+    await this.blockRepository.delete({
       userId: userId,
       blockedUserId: interlocutorId,
     });

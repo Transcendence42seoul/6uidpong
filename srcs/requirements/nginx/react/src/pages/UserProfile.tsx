@@ -46,14 +46,14 @@ const UserProfile: React.FC<UserProfileProps> = ({ socket }) => {
   };
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchUserData = async () => {
       const params = {
         nickname,
       };
       const data = await callAPI('/api/v1/users/search', params);
       setUser(data);
     };
-    fetchData();
+    fetchUserData();
   }, []);
 
   useEffect(() => {

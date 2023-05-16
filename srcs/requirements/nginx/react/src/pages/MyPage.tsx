@@ -22,11 +22,11 @@ const MyPage: React.FC<MyPageProps> = ({ id, stats }) => {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchUserData = async () => {
       const data = await callAPI(`/api/v1/users/${id}`);
       setUser(data);
     };
-    fetchData();
+    fetchUserData();
   }, []);
 
   return (

@@ -19,7 +19,7 @@ interface MyPageProps {
 const MyPage: React.FC<MyPageProps> = ({ id, stats }) => {
   const callAPI = useCallAPI();
   const navigate = useNavigate();
-  const [user, setUser] = useState<User | undefined>(undefined);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {

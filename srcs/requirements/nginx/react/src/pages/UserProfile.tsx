@@ -15,6 +15,17 @@ export interface User {
   ladderScore: number;
 }
 
+/* Mock User */
+// export const user: User = {
+//   id: 110729,
+//   nickname: 'kijsong',
+//   image:
+//     'https://cdn.intra.42.fr/users/a99b98748e81f651c11c5fa2ccbb753e/kijsong.jpg',
+//   winStat: 4,
+//   loseStat: 2,
+//   ladderScore: 4242,
+// };
+
 interface UserProfileProps {
   socket: Socket;
 }
@@ -65,17 +76,6 @@ const UserProfile: React.FC<UserProfileProps> = ({ socket }) => {
       return () => clearTimeout(timeoutId);
     }
   }, [showAlert]);
-
-  /* Mock User */
-  // const user: User = {
-  //   id: 110729,
-  //   nickname: 'kijsong',
-  //   image:
-  //     'https://cdn.intra.42.fr/users/a99b98748e81f651c11c5fa2ccbb753e/kijsong.jpg',
-  //   winStat: 4,
-  //   loseStat: 2,
-  //   ladderScore: 4242,
-  // };
 
   return (
     <div className="flex flex-col items-center p-20">

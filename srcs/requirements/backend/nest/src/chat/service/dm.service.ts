@@ -113,8 +113,8 @@ export class DmService {
         });
       } else if (roomUser.newMsgCount > 0) {
         const findOptions: Object = {
-          room: { id: roomId },
-          user: { id: userId },
+          roomId,
+          userId,
         };
         await queryRunner.manager.update(DmRoomUserEntity, findOptions, {
           newMsgCount: 0,
@@ -147,20 +147,12 @@ export class DmService {
         DmRoomUserEntity,
         [
           {
-            room: {
-              id: newRoom.id,
-            },
-            user: {
-              id: userId,
-            },
+            roomId: newRoom.id,
+            userId: userId,
           },
           {
-            room: {
-              id: newRoom.id,
-            },
-            user: {
-              id: interlocutorId,
-            },
+            roomId: newRoom.id,
+            userId: interlocutorId,
           },
         ]
       );
@@ -183,7 +175,7 @@ export class DmService {
       },
       where: {
         room: {
-          id: roomUser.room.id,
+          id: roomUser.roomId,
         },
         createdAt: MoreThanOrEqual(roomUser.createdAt),
       },
@@ -195,12 +187,8 @@ export class DmService {
 
   async isBlocked(from: number, to: number): Promise<boolean> {
     return (await this.blocklistRepository.countBy({
-      user: {
-        id: from,
-      },
-      blockedUser: {
-        id: to,
-      },
+      userId: from,
+      blockedUserId: to,
     }))
       ? true
       : false;
@@ -232,7 +220,10 @@ export class DmService {
       if (recipientRoomUser.isExit) {
         await queryRunner.manager.update(
           DmRoomUserEntity,
-          recipientRoomUser.id,
+          {
+            userId: recipientRoomUser.userId,
+            roomId: recipientRoomUser.roomId,
+          },
           {
             isExit: false,
             createdAt: newChat.createdAt,
@@ -242,7 +233,10 @@ export class DmService {
       if (isNotJoin) {
         await queryRunner.manager.increment(
           DmRoomUserEntity,
-          { id: recipientRoomUser.id },
+          {
+            userId: recipientRoomUser.userId,
+            roomId: recipientRoomUser.roomId,
+          },
           "newMsgCount",
           1
         );
@@ -270,20 +264,6 @@ export class DmService {
     });
   }
 
-  async findRoomUsers(id: number): Promise<DmRoomUserEntity[]> {
-    return await this.roomUserRepository.find({
-      relations: {
-        user: true,
-        room: true,
-      },
-      where: {
-        room: {
-          id: id,
-        },
-      },
-    });
-  }
-
   async deleteRoom(id: number): Promise<void> {
     const queryRunner = this.dataSource.createQueryRunner();
 
@@ -296,9 +276,7 @@ export class DmService {
         },
       });
       queryRunner.manager.delete(DmRoomUserEntity, {
-        room: {
-          id: id,
-        },
+        roomId: id,
       });
       queryRunner.manager.delete(DmRoomEntity, id);
 
@@ -321,23 +299,15 @@ export class DmService {
 
   async createBlockUser(userId: number, interlocutorId: number): Promise<void> {
     await this.blocklistRepository.save({
-      user: {
-        id: userId,
-      },
-      blockedUser: {
-        id: interlocutorId,
-      },
+      userId: userId,
+      blockedUserId: interlocutorId,
     });
   }
 
   async deleteBlockUser(userId: number, interlocutorId: number): Promise<void> {
     await this.blocklistRepository.delete({
-      user: {
-        id: userId,
-      },
-      blockedUser: {
-        id: interlocutorId,
-      },
+      userId: userId,
+      blockedUserId: interlocutorId,
     });
   }
 }

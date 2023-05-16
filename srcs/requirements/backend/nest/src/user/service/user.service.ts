@@ -1,6 +1,6 @@
 import { ConflictException, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { DataSource, ILike, Like, Repository } from "typeorm";
+import { DataSource, Repository } from "typeorm";
 import { UserEntity } from "../entity/user.entity";
 
 @Injectable()

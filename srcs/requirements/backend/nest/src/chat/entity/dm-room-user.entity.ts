@@ -5,14 +5,18 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  PrimaryColumn,
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { DmRoomEntity } from "./dm-room.entity";
 
 @Entity("dm_room_users")
 export class DmRoomUserEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryColumn({ name: "room_id" })
+  roomId: number;
+
+  @PrimaryColumn({ name: "user_id" })
+  userId: number;
 
   @ManyToOne(() => DmRoomEntity, (dmRoom) => dmRoom.roomUsers)
   @JoinColumn({ name: "room_id" })

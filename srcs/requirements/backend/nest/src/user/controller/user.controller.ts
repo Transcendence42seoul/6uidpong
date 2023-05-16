@@ -33,6 +33,11 @@ export class UserController {
     return await this.userService.findAll();
   }
 
+  @Get("/search")
+  async search(@Query("nickname") nickname: string): Promise<UserEntity[]> {
+    return await this.userService.search(nickname);
+  }
+
   @Get("/:id")
   async findOne(@Param("id", ParseIntPipe) id: number): Promise<UserEntity> {
     try {
@@ -40,11 +45,6 @@ export class UserController {
     } catch (EntityNotFoundError) {
       throw new NotFoundException();
     }
-  }
-
-  @Get("/search")
-  async search(@Query("nickname") nickname: string): Promise<UserEntity[]> {
-    return await this.userService.search(nickname);
   }
 
   @Put("/:id/nickname")

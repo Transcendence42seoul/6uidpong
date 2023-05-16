@@ -8,6 +8,7 @@ import {
   UseGuards,
   Post,
   Body,
+  InternalServerErrorException,
 } from "@nestjs/common";
 import { Response } from "express";
 import { AuthService } from "../service/auth.service";
@@ -46,7 +47,10 @@ export class AuthController {
 
         return { is2FA: true, id: user.id, accessToken: null };
       }
-    } catch (EntityNotFoundError) {
+    } catch (error) {
+      if (error instanceof InternalServerErrorException) {
+        throw error;
+      }
       user = await this.userService.create(req.user);
       res.status(HttpStatus.CREATED);
       res.setHeader("Location", `/api/v1/users/${user.id}`);

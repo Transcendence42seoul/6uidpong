@@ -9,6 +9,7 @@ import redirect from './redirect';
 import { RootState } from './store';
 import ChatRoom from './pages/ChatRoom';
 import ChatRoomList from './pages/ChatRoomList';
+import FriendList from './pages/FriendList';
 import Loading from './pages/Loading';
 import Login from './pages/Login';
 import Main from './pages/Main';
@@ -85,6 +86,7 @@ const App: React.FC = () => {
           path="/chat/:roomId"
           element={<ChatRoom myId={tokenInfo.id} socket={socket} />}
         />
+        <Route path="/friend-list" element={<FriendList />} />
         <Route
           path="/my-page"
           element={<MyPage id={tokenInfo.id} stats={stats} />}

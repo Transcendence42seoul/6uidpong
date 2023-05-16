@@ -35,7 +35,7 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
     setShowMenu(true);
   };
 
-  const handleClickDelete = ({ interlocutorId }: Room) => {
+  const handleClickDelete = (interlocutorId: number) => {
     socket.emit('delete-dm-room', { interlocutorId });
     setRooms([
       ...rooms.filter((room) => room.interlocutorId !== interlocutorId),
@@ -102,21 +102,31 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
               new Date(lhs.lastMessageTime).getTime(),
           )
           .map((room) => {
-            const formattedTime = new Date(
-              room.lastMessageTime,
-            ).toLocaleTimeString('ko-KR', {
-              hour: 'numeric',
-              minute: 'numeric',
-              hour12: true,
-            });
+            const {
+              roomId,
+              lastMessage,
+              lastMessageTime,
+              interlocutor,
+              interlocutorId,
+              interlocutorImage,
+              newMsgCount,
+            } = room;
+            const formattedTime = new Date(lastMessageTime).toLocaleTimeString(
+              'ko-KR',
+              {
+                hour: 'numeric',
+                minute: 'numeric',
+                hour12: true,
+              },
+            );
             return (
               <li
-                key={room.roomId}
+                key={roomId}
                 className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-2"
                 onContextMenu={handleContextMenu}
                 onDoubleClick={() =>
-                  navigate(`/chat/${room.roomId}`, {
-                    state: { interlocutorId: room.interlocutorId },
+                  navigate(`/chat/${roomId}`, {
+                    state: { interlocutorId },
                   })
                 }
               >
@@ -131,7 +141,7 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
                   >
                     <button
                       className="cursor-pointer rounded border-4 border-red-400 bg-black p-1 text-white hover:text-red-400"
-                      onClick={() => handleClickDelete(room)}
+                      onClick={() => handleClickDelete(interlocutorId)}
                     >
                       Delete
                     </button>
@@ -139,19 +149,19 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
                 )}
                 <div className="flex items-center">
                   <CircularImage
-                    src={room.interlocutorImage}
-                    alt={room.interlocutor}
+                    src={interlocutorImage}
+                    alt={interlocutor}
                     className="mr-2 h-10 w-10"
                   />
                   <div>
-                    <span>{room.interlocutor}</span>
-                    <p className="text-sm text-gray-600">{room.lastMessage}</p>
+                    <span>{interlocutor}</span>
+                    <p className="text-sm text-gray-600">{lastMessage}</p>
                   </div>
                 </div>
                 <div className="flex items-center">
-                  {room.newMsgCount > 0 && (
+                  {newMsgCount > 0 && (
                     <div className="mr-3 rounded-full bg-red-500 text-white">
-                      {room.newMsgCount}
+                      {newMsgCount}
                     </div>
                   )}
                   <span className="text-sm text-gray-600">{formattedTime}</span>

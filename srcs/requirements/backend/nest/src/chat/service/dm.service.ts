@@ -7,8 +7,6 @@ import {
   MoreThanOrEqual,
   DataSource,
 } from "typeorm";
-import { DmChatResponseDto } from "../dto/dm-chat-response.dto";
-import { DmChatsResponseDto } from "../dto/dm-chats-response.dto";
 import { DmRoomsResponseDto } from "../dto/dm-rooms-response.dto";
 import { BlocklistEntity } from "../entity/blocklist.entity";
 import { DmChatEntity } from "../entity/dm-chat.entity";

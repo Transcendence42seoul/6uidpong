@@ -20,9 +20,8 @@ import { ConnectionService } from "../service/connection.service";
 import { DisconnectionService } from "../service/disconnection.service";
 import { WsJwtPayload } from "../utils/ws-jwt-payload.decorator";
 import { JwtPayload } from "jsonwebtoken";
-import { DefaultEventsMap } from "socket.io/dist/typed-events";
 import { DmChatsResponseDto } from "../dto/dm-chats-response.dto";
-import { Entity, EntityNotFoundError } from "typeorm";
+import { EntityNotFoundError } from "typeorm";
 import { DmChatEntity } from "../entity/dm-chat.entity";
 
 @WebSocketGateway(80, {

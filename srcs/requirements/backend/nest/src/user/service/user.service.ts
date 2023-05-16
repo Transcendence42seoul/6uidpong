@@ -22,9 +22,24 @@ export class UserService {
   }
 
   async search(nickname: string): Promise<UserEntity[]> {
-    return await this.userRepository.findBy({
-      nickname: ILike(`%${nickname}%`),
-    });
+    return this.userRepository
+      .createQueryBuilder()
+      .select()
+      .where("nickname ILIKE :includedNickname")
+      .orderBy(
+        "CASE WHEN nickname = :nickname THEN 0 \
+              WHEN nickname ILIKE :startNickname THEN 1 \
+              WHEN nickname ILIKE :includedNickname THEN 2 \
+              WHEN nickname ILIKE :endNickname THEN 3 \
+              ELSE 4 END"
+      )
+      .setParameters({
+        includedNickname: `%${nickname}%`,
+        nickname: nickname,
+        startNickname: `${nickname}%`,
+        endNickname: `%${nickname}`,
+      })
+      .getMany();
   }
 
   async create(profile: any): Promise<UserEntity> {

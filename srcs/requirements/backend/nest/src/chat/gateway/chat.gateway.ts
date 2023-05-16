@@ -8,7 +8,7 @@ import {
   WebSocketServer,
   WsException,
 } from "@nestjs/websockets";
-import { RemoteSocket, Server, Socket } from "socket.io";
+import { Server, Socket } from "socket.io";
 import { UserEntity } from "src/user/entity/user.entity";
 import { UserService } from "src/user/service/user.service";
 import { DmChatResponseDto } from "../dto/dm-chat-response.dto";
@@ -23,6 +23,7 @@ import { JwtPayload } from "jsonwebtoken";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
 import { DmChatsResponseDto } from "../dto/dm-chats-response.dto";
 import { Entity, EntityNotFoundError } from "typeorm";
+import { DmChatEntity } from "../entity/dm-chat.entity";
 
 @WebSocketGateway(80, {
   cors: {
@@ -79,7 +80,13 @@ export class ChatGateway implements OnGatewayDisconnect {
       }
     }
     client.join("d" + roomUser.room.id);
-    return await this.dmService.findChats(roomUser);
+    const chats: DmChatEntity[] = await this.dmService.findChats(roomUser);
+
+    return new DmChatsResponseDto(
+      roomUser.room.id,
+      roomUser.newMsgCount,
+      chats
+    );
   }
 
   @SubscribeMessage("send-dm")
@@ -114,7 +121,9 @@ export class ChatGateway implements OnGatewayDisconnect {
         recipientRoomUser,
         isNotJoin
       );
-      const chat: DmChatResponseDto = await this.dmService.findChat(chatId);
+      const chat: DmChatResponseDto = new DmChatResponseDto(
+        await this.dmService.findChat(chatId)
+      );
       if (recipient.status === "online") {
         const recipientSocket = await this.server
           .in(recipient.socketId)

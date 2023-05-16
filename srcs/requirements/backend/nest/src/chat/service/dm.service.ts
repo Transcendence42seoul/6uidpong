@@ -177,8 +177,8 @@ export class DmService {
     }
   }
 
-  async findChats(roomUser: DmRoomUserEntity): Promise<DmChatsResponseDto> {
-    const chats: DmChatEntity[] = await this.chatRepository.find({
+  async findChats(roomUser: DmRoomUserEntity): Promise<DmChatEntity[]> {
+    return await this.chatRepository.find({
       relations: {
         user: true,
         room: true,
@@ -193,12 +193,6 @@ export class DmService {
         createdAt: "ASC",
       },
     });
-
-    return new DmChatsResponseDto(
-      roomUser.room.id,
-      roomUser.newMsgCount,
-      chats
-    );
   }
 
   async isBlocked(from: number, to: number): Promise<boolean> {
@@ -266,8 +260,8 @@ export class DmService {
     }
   }
 
-  async findChat(id: number): Promise<DmChatResponseDto> {
-    const chat: DmChatEntity = await this.chatRepository.findOne({
+  async findChat(id: number): Promise<DmChatEntity> {
+    return await this.chatRepository.findOne({
       relations: {
         user: true,
         room: true,
@@ -276,7 +270,6 @@ export class DmService {
         id: id,
       },
     });
-    return new DmChatResponseDto(chat);
   }
 
   async findRoomUsers(id: number): Promise<DmRoomUserEntity[]> {

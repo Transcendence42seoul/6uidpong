@@ -19,6 +19,7 @@ import { UserEntity } from "../entity/user.entity";
 import { UpdateImageDto } from "../dto/update-image.dto";
 import { UpdateNicknameDto } from "../dto/update-nickname.dto";
 import { UpdateTwoFactorAuthDto } from "../dto/update-2fa.dto";
+import { UserResponseDto } from "../dto/user-response.dto";
 
 @Controller("api/v1/users")
 @UseGuards(JwtAccessGuard)
@@ -29,19 +30,30 @@ export class UserController {
   ) {}
 
   @Get()
-  async findAll(): Promise<UserEntity[]> {
-    return await this.userService.findAll();
+  async findAll(): Promise<UserResponseDto[]> {
+    const entities: UserEntity[] = await this.userService.findAll();
+    return entities.map((entity) => {
+      return new UserResponseDto(entity);
+    });
   }
 
   @Get("/search")
-  async search(@Query("nickname") nickname: string): Promise<UserEntity[]> {
-    return await this.userService.search(nickname);
+  async search(
+    @Query("nickname") nickname: string
+  ): Promise<UserResponseDto[]> {
+    const entities: UserEntity[] = await this.userService.search(nickname);
+    return entities.map((entity) => {
+      return new UserResponseDto(entity);
+    });
   }
 
   @Get("/:id")
-  async findOne(@Param("id", ParseIntPipe) id: number): Promise<UserEntity> {
+  async findOne(
+    @Param("id", ParseIntPipe) id: number
+  ): Promise<UserResponseDto> {
     try {
-      return await this.userService.findOne(id);
+      const entity: UserEntity = await this.userService.findOne(id);
+      return new UserResponseDto(entity);
     } catch (EntityNotFoundError) {
       throw new NotFoundException();
     }

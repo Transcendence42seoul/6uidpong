@@ -10,6 +10,7 @@ const FriendList: React.FC = () => {
       nickname: 'kijsong',
       image:
         'https://cdn.intra.42.fr/users/a99b98748e81f651c11c5fa2ccbb753e/kijsong.jpg',
+      status: 'online',
       winStat: 1,
       loseStat: 1,
       ladderScore: 1000,
@@ -19,6 +20,7 @@ const FriendList: React.FC = () => {
       nickname: 'yoson',
       image:
         'https://cdn.intra.42.fr/users/40840e98c56e893af845a7d2b05e631d/yoson.jpg',
+      status: 'offline',
       winStat: 1,
       loseStat: 1,
       ladderScore: 1000,
@@ -28,6 +30,7 @@ const FriendList: React.FC = () => {
       nickname: 'wocheon',
       image:
         'https://cdn.intra.42.fr/users/bd9d267e40c02269bbdcd09fe4924419/wocheon.jpg',
+      status: 'online',
       winStat: 1,
       loseStat: 1,
       ladderScore: 1000,

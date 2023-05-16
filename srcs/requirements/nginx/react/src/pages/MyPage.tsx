@@ -33,8 +33,8 @@ const MyPage: React.FC<MyPageProps> = ({ id, stats }) => {
   }, []);
 
   return (
-    <div className="flex flex-col items-center p-4">
-      <ContentBox className="mb-4 w-full max-w-md border p-4">
+    <div className="flex flex-col items-center space-y-4 p-4">
+      <ContentBox className="w-full max-w-md border p-4">
         <h2 className="mt-2 text-2xl font-bold">
           {user?.nickname ?? 'Loading...'}
         </h2>
@@ -46,11 +46,11 @@ const MyPage: React.FC<MyPageProps> = ({ id, stats }) => {
       </ContentBox>
       <HoverButton
         onClick={handleClickChangeProfile}
-        className="mb-4 w-full max-w-md rounded border p-2.5"
+        className="w-full max-w-md rounded border p-2.5"
       >
         Change Profile
       </HoverButton>
-      <ContentBox className="mb-4 w-full max-w-md border p-4">
+      <ContentBox className="w-full max-w-md border p-4">
         <h3 className="mb-2 text-xl font-bold">Stats</h3>
         <p className="mb-1.5">Wins: {user?.winStat}</p>
         <p className="mb-1.5">Losses: {user?.loseStat}</p>
@@ -73,7 +73,7 @@ const MyPage: React.FC<MyPageProps> = ({ id, stats }) => {
       </ContentBox>
       <HoverButton
         onClick={handleClickFriendsList}
-        className="mb-4 w-full max-w-md rounded border p-2.5"
+        className="w-full max-w-md rounded border p-2.5"
       >
         Friends List
       </HoverButton>

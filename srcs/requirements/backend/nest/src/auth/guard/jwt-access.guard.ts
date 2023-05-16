@@ -13,21 +13,24 @@ export class JwtAccessGuard implements CanActivate {
   constructor(private jwtService: JwtService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest();
+    const request: any = context.switchToHttp().getRequest();
     const token: string | undefined = this.extractTokenFromHeader(request);
     if (typeof token === undefined) {
       throw new UnauthorizedException();
     }
     try {
-      const payload: Object = await this.jwtService.verifyAsync(token, {
+      const payload: any = await this.jwtService.verifyAsync(token, {
         secret: process.env.JWT_ACCESS_SECRET_KEY,
       });
+      if (!this.isValidPermission(request, payload.id)) {
+        throw new NotFoundException();
+      }
       request["user"] = payload;
-    } catch {
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
       throw new UnauthorizedException();
-    }
-    if (request.params.id && request.params.id != request.user.id) {
-      throw new NotFoundException();
     }
     return true;
   }
@@ -36,5 +39,16 @@ export class JwtAccessGuard implements CanActivate {
     const [type, token]: string[] =
       request.headers.authorization?.split(" ") ?? [];
     return type === "Bearer" ? token : undefined;
+  }
+
+  private isValidPermission(request: Request, userId: string): boolean {
+    if (
+      request.params.id &&
+      request.method != "GET" &&
+      request.params.id != userId
+    ) {
+      return false;
+    }
+    return true;
   }
 }

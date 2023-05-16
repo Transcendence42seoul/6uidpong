@@ -4,17 +4,23 @@ interface CircularImageProps {
   src: string | undefined;
   alt: string;
   className?: string;
+  onClick?: () => void;
 }
 
 const CircularImage: React.FC<CircularImageProps> = ({
   src,
   alt,
   className,
+  onClick,
 }) => {
   return (
-    <div className={`overflow-hidden rounded-full ${className}`}>
+    <button
+      className={`overflow-hidden rounded-full ${className}`}
+      onClick={onClick}
+      disabled={!onClick}
+    >
       <img className="h-full object-cover" src={src} alt={alt} />
-    </div>
+    </button>
   );
 };
 

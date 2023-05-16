@@ -9,11 +9,15 @@ export class BlocklistEntity {
   @PrimaryColumn({ name: "blocked_user_id" })
   blockedUserId: number;
 
-  @ManyToOne(() => UserEntity)
+  @ManyToOne(() => UserEntity, {
+    onUpdate: "CASCADE",
+  })
   @JoinColumn({ name: "user_id" })
   user: UserEntity;
 
-  @ManyToOne(() => UserEntity)
+  @ManyToOne(() => UserEntity, {
+    onUpdate: "CASCADE",
+  })
   @JoinColumn({ name: "blocked_user_id" })
   blockedUser: UserEntity;
 }

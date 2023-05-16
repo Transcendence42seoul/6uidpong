@@ -6,7 +6,6 @@ import {
   JoinColumn,
   ManyToOne,
   PrimaryColumn,
-  PrimaryGeneratedColumn,
 } from "typeorm";
 import { DmRoomEntity } from "./dm-room.entity";
 
@@ -18,11 +17,16 @@ export class DmRoomUserEntity {
   @PrimaryColumn({ name: "user_id" })
   userId: number;
 
-  @ManyToOne(() => DmRoomEntity, (dmRoom) => dmRoom.roomUsers)
+  @ManyToOne(() => DmRoomEntity, (dmRoom) => dmRoom.roomUsers, {
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
+  })
   @JoinColumn({ name: "room_id" })
   room: DmRoomEntity;
 
-  @ManyToOne(() => UserEntity, (user) => user.dmRoomUsers)
+  @ManyToOne(() => UserEntity, (user) => user.dmRoomUsers, {
+    onUpdate: "CASCADE",
+  })
   @JoinColumn({ name: "user_id" })
   user: UserEntity;
 

@@ -16,6 +16,8 @@ import { DmRoomEntity } from "../entity/dm-room.entity";
 @Injectable()
 export class DmService {
   constructor(
+    @InjectRepository(DmRoomEntity)
+    private readonly roomRepository: Repository<DmRoomEntity>,
     @InjectRepository(DmRoomUserEntity)
     private readonly roomUserRepository: Repository<DmRoomUserEntity>,
     @InjectRepository(DmChatEntity)
@@ -265,28 +267,7 @@ export class DmService {
   }
 
   async deleteRoom(id: number): Promise<void> {
-    const queryRunner = this.dataSource.createQueryRunner();
-
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-    try {
-      queryRunner.manager.delete(DmChatEntity, {
-        room: {
-          id: id,
-        },
-      });
-      queryRunner.manager.delete(DmRoomUserEntity, {
-        roomId: id,
-      });
-      queryRunner.manager.delete(DmRoomEntity, id);
-
-      await queryRunner.commitTransaction();
-    } catch (error) {
-      await queryRunner.rollbackTransaction();
-      throw error;
-    } finally {
-      await queryRunner.release();
-    }
+    this.roomRepository.delete(id);
   }
 
   async exitRoom(roomId: number, userId: number): Promise<void> {

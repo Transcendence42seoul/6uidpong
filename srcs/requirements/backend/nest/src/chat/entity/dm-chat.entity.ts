@@ -14,11 +14,16 @@ export class DmChatEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => DmRoomEntity, (room) => room.chats)
+  @ManyToOne(() => DmRoomEntity, (room) => room.chats, {
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
+  })
   @JoinColumn({ name: "room_id" })
   room: DmRoomEntity;
 
-  @ManyToOne(() => UserEntity, (user) => user.dmChats)
+  @ManyToOne(() => UserEntity, (user) => user.dmChats, {
+    onUpdate: "CASCADE",
+  })
   @JoinColumn({ name: "user_id" })
   user: UserEntity;
 

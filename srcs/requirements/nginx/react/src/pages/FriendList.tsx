@@ -43,24 +43,31 @@ const FriendList: React.FC = () => {
     <div className="p-4">
       <h2 className="mb-4 text-2xl font-bold text-gray-100">Friends</h2>
       <ul className="space-y-2">
-        {friends.map(({ id, nickname, image }) => (
-          <li
-            key={nickname}
-            className="flex items-center border-2 border-white bg-black p-2"
-            onDoubleClick={() =>
-              navigate(`/profile/${id}`, {
-                state: { nickname },
-              })
-            }
-          >
-            <CircularImage
-              src={image}
-              alt={nickname}
-              className="mr-4 h-12 w-12 rounded-full"
-            />
-            <span className="text-lg font-medium text-white">{nickname}</span>
-          </li>
-        ))}
+        {friends.map(({ id, nickname, image, status }) => {
+          const statusColor =
+            status === 'offline' ? 'bg-red-400' : 'bg-green-400';
+          return (
+            <li
+              key={id}
+              className="flex items-center border-2 border-white bg-black p-2"
+              onDoubleClick={() =>
+                navigate(`/profile/${id}`, {
+                  state: { nickname },
+                })
+              }
+            >
+              <CircularImage
+                src={image}
+                alt={nickname}
+                className="mr-4 h-12 w-12 rounded-full"
+              />
+              <span className="text-lg font-medium text-white">{nickname}</span>
+              <div className="ml-auto pr-3">
+                <div className={`h-4 w-4 rounded-full ${statusColor}`} />
+              </div>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

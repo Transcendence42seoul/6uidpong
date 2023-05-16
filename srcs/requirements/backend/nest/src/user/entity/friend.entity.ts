@@ -28,8 +28,8 @@ export class FriendEntity {
   @JoinColumn({ name: "friend_id" })
   friendUser: UserEntity;
 
-  @Column({ type: "boolean", default: false })
-  status: boolean;
+  @Column({ name: "is_accept", type: "boolean", default: false })
+  isAccept: boolean;
 
   @CreateDateColumn({ name: "created_at" })
   createdAt: Date;

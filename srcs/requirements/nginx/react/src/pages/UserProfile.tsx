@@ -7,6 +7,7 @@ import CircularImage from '../components/container/CircularImage';
 import ContentBox from '../components/container/ContentBox';
 
 export interface User {
+  id: number;
   nickname: string;
   image: string;
   winStat: number;
@@ -67,6 +68,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ socket }) => {
 
   /* Mock User */
   // const user: User = {
+  //   id: 110729,
   //   nickname: 'kijsong',
   //   image:
   //     'https://cdn.intra.42.fr/users/a99b98748e81f651c11c5fa2ccbb753e/kijsong.jpg',

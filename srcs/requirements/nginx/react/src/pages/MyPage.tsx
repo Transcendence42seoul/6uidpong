@@ -68,6 +68,12 @@ const MyPage: React.FC<MyPageProps> = ({ id, stats }) => {
           ))}
         </ul>
       </ContentBox>
+      <HoverButton
+        onClick={() => navigate('/friend-list')}
+        className="mb-4 w-full max-w-md rounded border p-2.5"
+      >
+        Friends List
+      </HoverButton>
     </div>
   );
 };

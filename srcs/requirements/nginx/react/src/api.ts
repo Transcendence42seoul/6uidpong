@@ -7,12 +7,13 @@ const useCallAPI = () => {
   const dispatch = useDispatch();
   const { accessToken } = useSelector((state: RootState) => state.auth);
 
-  const callAPI = async (pathname: string) => {
+  const callAPI = async (pathname: string, params: any = null) => {
     try {
       const { data } = await axios.get(pathname, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
+        params,
       });
       return data;
     } catch (error) {

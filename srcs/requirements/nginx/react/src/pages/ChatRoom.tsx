@@ -6,7 +6,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { useParams, useLocation } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
 import AlertWithCloseButton from '../components/alert/AlertWithCloseButton';
 import ChatContainer from '../components/container/ChatContainer';

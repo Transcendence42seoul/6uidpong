@@ -65,7 +65,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ socket }) => {
         nickname,
       };
       const data = await callAPI('/api/v1/users/search', params);
-      setUser(data);
+      setUser(data[0]);
     };
     fetchUserData();
   }, []);

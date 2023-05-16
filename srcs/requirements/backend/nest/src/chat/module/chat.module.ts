@@ -10,6 +10,7 @@ import { DmService } from "../service/dm.service";
 import { ConnectionService } from "../service/connection.service";
 import { DisconnectionService } from "../service/disconnection.service";
 import { BlockEntity } from "../entity/block.entity";
+import { BlockService } from "../service/block.service";
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { BlockEntity } from "../entity/block.entity";
   ],
   providers: [
     DmService,
+    BlockService,
     ConnectionService,
     DisconnectionService,
     ChatGateway,

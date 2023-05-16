@@ -23,6 +23,7 @@ import { JwtPayload } from "jsonwebtoken";
 import { DmChatsResponseDto } from "../dto/dm-chats-response.dto";
 import { EntityNotFoundError } from "typeorm";
 import { DmChatEntity } from "../entity/dm-chat.entity";
+import { BlockService } from "../service/block.service";
 
 @WebSocketGateway(80, {
   cors: {
@@ -39,6 +40,7 @@ export class ChatGateway implements OnGatewayDisconnect {
     private readonly connectionService: ConnectionService,
     private readonly disconnectionService: DisconnectionService,
     private readonly dmService: DmService,
+    private readonly blockService: BlockService,
     private readonly userService: UserService
   ) {}
 
@@ -95,12 +97,12 @@ export class ChatGateway implements OnGatewayDisconnect {
   ): Promise<DmChatResponseDto> {
     try {
       const recipient: UserEntity = await this.userService.findOne(to.id);
-      if (await this.dmService.isBlocked(jwt.id, recipient.id)) {
+      if (await this.blockService.isBlocked(jwt.id, recipient.id)) {
         throw new WsException(
           "You can't send a message to the user you have blocked."
         );
       }
-      if (await this.dmService.isBlocked(recipient.id, jwt.id)) {
+      if (await this.blockService.isBlocked(recipient.id, jwt.id)) {
         throw new WsException(
           "You can't send a message because you have been blocked."
         );
@@ -171,7 +173,7 @@ export class ChatGateway implements OnGatewayDisconnect {
     @WsJwtPayload() jwt: JwtPayload,
     @MessageBody("interlocutorId") interlocutorId: number
   ): Promise<void> {
-    await this.dmService.createBlockUser(jwt.id, interlocutorId);
+    await this.blockService.create(jwt.id, interlocutorId);
   }
 
   @SubscribeMessage("unblock-dm-user")
@@ -179,6 +181,6 @@ export class ChatGateway implements OnGatewayDisconnect {
     @WsJwtPayload() jwt: JwtPayload,
     @MessageBody("interlocutorId") interlocutorId: number
   ): Promise<void> {
-    await this.dmService.deleteBlockUser(jwt.id, interlocutorId);
+    await this.blockService.delete(jwt.id, interlocutorId);
   }
 }

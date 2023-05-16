@@ -27,16 +27,12 @@ export class UserService {
       .select()
       .where("nickname ILIKE :includedNickname")
       .orderBy(
-        "CASE WHEN nickname = :nickname \
-              THEN 0 \
-              WHEN nickname ILIKE :startNickname \
-              THEN 1 \
-              WHEN nickname ILIKE :includedNickname \
-              THEN 2 \
-              WHEN nickname ILIKE :endNickname \
-              THEN 3 \
+        "CASE WHEN nickname = :nickname THEN 0 \
+              WHEN nickname ILIKE :startNickname THEN 1 \
+              WHEN nickname ILIKE :includedNickname THEN 2 \
+              WHEN nickname ILIKE :endNickname THEN 3 \
               ELSE 4 \
-              END"
+        END"
       )
       .setParameters({
         includedNickname: `%${nickname}%`,

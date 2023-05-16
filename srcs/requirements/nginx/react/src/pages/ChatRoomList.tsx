@@ -140,7 +140,7 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
                 <div className="flex items-center">
                   <CircularImage
                     src={room.interlocutorImage}
-                    alt="Interlocutor"
+                    alt={room.interlocutor}
                     className="mr-2 h-10 w-10"
                   />
                   <div>

@@ -142,7 +142,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
                 {!isMyMessage && (
                   <CircularImage
                     src={chat.image}
-                    alt="Interlocutor"
+                    alt={chat.nickname}
                     className="mr-2 h-10 w-10"
                   />
                 )}

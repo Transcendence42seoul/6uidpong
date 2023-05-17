@@ -15,7 +15,7 @@ const Header: React.FC = () => {
   const handleClickHome = () => navigate('/');
   const handleClickMyPage = () => navigate('/my-page');
   const handleClickUser = (id: number) => navigate(`/profile/${id}`);
-  const handleSearchChange = async (
+  const handleChangeSearch = async (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const nickname = event.target.value;
@@ -37,7 +37,7 @@ const Header: React.FC = () => {
           type="text"
           placeholder="Search users"
           value={search}
-          onChange={handleSearchChange}
+          onChange={handleChangeSearch}
           className="w-full rounded border border-white p-2 shadow"
         />
         {search && (

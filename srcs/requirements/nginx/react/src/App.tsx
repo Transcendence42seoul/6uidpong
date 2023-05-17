@@ -18,11 +18,6 @@ import ProfileSettings from './pages/ProfileSettings';
 import UserProfile from './pages/UserProfile';
 import LoginAuth from './components/custom/LoginAuth';
 
-/* Mock Token */
-// const tokenInfo = {
-//   id: 110729,
-// };
-
 const App: React.FC = () => {
   const stats = {
     recentHistory: ['Win', 'Loss', 'Win', 'Win', 'Loss'],

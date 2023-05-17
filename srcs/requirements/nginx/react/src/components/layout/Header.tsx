@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import useCallAPI from '../../api';
 import { User } from '../../pages/UserProfile';
 import HoverButton from '../button/HoverButton';
+import CircularImage from '../container/CircularImage';
+// import { users as data } from '../../mock';
 
 const Header: React.FC = () => {
   const callAPI = useCallAPI();
@@ -35,14 +37,19 @@ const Header: React.FC = () => {
           placeholder="Search users"
           value={search}
           onChange={handleSearchChange}
-          className="w-full rounded p-2"
+          className="w-full rounded border border-white p-2 shadow"
         />
         {search && (
-          <ul className="absolute z-10 rounded bg-white p-2 shadow-md">
+          <ul className="absolute z-10 rounded border-2 bg-black bg-white p-2.5 shadow-md">
             {searchResults.map((user) => {
               const { nickname, image } = user;
               return (
                 <li key={nickname} className="border-b border-gray-300 py-1">
+                  <CircularImage
+                    src={image}
+                    alt={nickname}
+                    className="mr-2 h-6 w-6 align-bottom"
+                  />
                   {nickname}
                 </li>
               );

@@ -50,11 +50,7 @@ const FriendList: React.FC = () => {
             <li
               key={id}
               className="flex items-center border-2 border-white bg-black p-2"
-              onDoubleClick={() =>
-                navigate(`/profile/${id}`, {
-                  state: { nickname },
-                })
-              }
+              onDoubleClick={() => navigate(`/profile/${id}`)}
             >
               <CircularImage
                 src={image}

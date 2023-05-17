@@ -12,7 +12,11 @@ export class UserService {
   ) {}
 
   async findAll(): Promise<UserEntity[]> {
-    return await this.userRepository.find();
+    return await this.userRepository.find({
+      order: {
+        nickname: "ASC",
+      },
+    });
   }
 
   async findOne(id: number | string): Promise<UserEntity> {

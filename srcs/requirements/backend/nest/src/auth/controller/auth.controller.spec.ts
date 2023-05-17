@@ -36,7 +36,7 @@ describe("AuthController", () => {
           provide: UserService,
           useValue: {
             findOne: jest.fn(),
-            create: jest.fn(),
+            save: jest.fn(),
           },
         },
         {
@@ -135,7 +135,7 @@ describe("AuthController", () => {
       const user = new UserEntity();
       user.id = 110731;
 
-      jest.spyOn(userService, "create").mockResolvedValue(user);
+      jest.spyOn(userService, "save").mockResolvedValue(user);
       jest.spyOn(userService, "findOne").mockResolvedValue(null);
 
       const req = { user: { id: 110731 } };

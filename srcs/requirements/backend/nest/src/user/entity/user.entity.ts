@@ -1,6 +1,7 @@
 import { DmChatEntity } from "src/chat/entity/dm-chat.entity";
 import { DmRoomUserEntity } from "src/chat/entity/dm-room-user.entity";
 import { Column, Entity, Index, OneToMany, PrimaryColumn } from "typeorm";
+import { FriendRequestEntity } from "./friend-request.entity";
 
 @Entity("users")
 export class UserEntity {
@@ -43,4 +44,7 @@ export class UserEntity {
 
   @OneToMany(() => DmChatEntity, (dmChat) => dmChat.user)
   dmChats: DmChatEntity[];
+
+  @OneToMany(() => FriendRequestEntity, (friendRequest) => friendRequest.from)
+  friendRequests: FriendRequestEntity[];
 }

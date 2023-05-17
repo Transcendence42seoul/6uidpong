@@ -10,6 +10,7 @@ import { AuthService } from "../service/auth.service";
 import { FtGuard } from "../guard/ft.guard";
 import { JwtAccessGuard } from "../guard/jwt-access.guard";
 import { JwtRefreshGuard } from "../guard/jwt-refresh.guard";
+import { PermissionGuard } from "../guard/permission.guard";
 
 @Module({
   imports: [
@@ -21,7 +22,13 @@ import { JwtRefreshGuard } from "../guard/jwt-refresh.guard";
     HttpModule,
     CacheModule.register(),
   ],
-  providers: [AuthService, JwtAccessGuard, JwtRefreshGuard, FtGuard],
+  providers: [
+    AuthService,
+    JwtAccessGuard,
+    JwtRefreshGuard,
+    FtGuard,
+    PermissionGuard,
+  ],
   exports: [AuthService],
   controllers: [AuthController],
 })

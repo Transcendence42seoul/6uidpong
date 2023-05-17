@@ -11,6 +11,9 @@ import {
   UnauthorizedException,
   NotFoundException,
   Query,
+  Post,
+  BadRequestException,
+  Delete,
 } from "@nestjs/common";
 import { UserService } from "../service/user.service";
 import { JwtAccessGuard } from "src/auth/guard/jwt-access.guard";
@@ -21,17 +24,25 @@ import { UpdateNicknameDto } from "../dto/update-nickname.dto";
 import { UpdateTwoFactorAuthDto } from "../dto/update-2fa.dto";
 import { UserResponseDto } from "../dto/user-response.dto";
 import { Pagination } from "src/utils/pagination/pagination";
+import { FriendService } from "../service/friend.service";
+import { FriendRequestService } from "../service/friend-request.service";
+import { FriendResponseDto } from "../dto/friend-response.dto";
+import { FriendRequestEntity } from "../entity/friend-request.entity";
+import { FriendRequestResponseDto } from "../dto/friend-request-response.dto";
+import { PermissionGuard } from "src/auth/guard/permission.guard";
 
 @Controller("api/v1/users")
 @UseGuards(JwtAccessGuard)
 export class UserController {
   constructor(
     private readonly userService: UserService,
-    private readonly authService: AuthService
+    private readonly authService: AuthService,
+    private readonly friendService: FriendService,
+    private readonly friendRequestService: FriendRequestService
   ) {}
 
   @Get()
-  async findAll(
+  async findAllUser(
     @Query("page", ParseIntPipe) page: number,
     @Query("size", ParseIntPipe) size: number
   ): Promise<Pagination<UserResponseDto>> {
@@ -44,7 +55,7 @@ export class UserController {
   }
 
   @Get("/search")
-  async search(
+  async searchUser(
     @Query("nickname") nickname: string,
     @Query("page", ParseIntPipe) page: number,
     @Query("size", ParseIntPipe) size: number
@@ -61,7 +72,7 @@ export class UserController {
   }
 
   @Get("/:id")
-  async findOne(
+  async findUser(
     @Param("id", ParseIntPipe) id: number
   ): Promise<UserResponseDto> {
     try {
@@ -73,6 +84,7 @@ export class UserController {
   }
 
   @Put("/:id/nickname")
+  @UseGuards(PermissionGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateNickname(
     @Param("id", ParseIntPipe) id: number,
@@ -82,6 +94,7 @@ export class UserController {
   }
 
   @Put("/:id/image")
+  @UseGuards(PermissionGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateImage(
     @Param("id", ParseIntPipe) id: number,
@@ -91,6 +104,7 @@ export class UserController {
   }
 
   @Put("/:id/email/code")
+  @UseGuards(PermissionGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async sendCodeByEmail(@Param("id", ParseIntPipe) id: number): Promise<void> {
     try {
@@ -102,6 +116,7 @@ export class UserController {
   }
 
   @Put("/:id/is2FA")
+  @UseGuards(PermissionGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async update2FA(
     @Param("id", ParseIntPipe) id: number,
@@ -114,5 +129,74 @@ export class UserController {
     }
 
     await this.userService.updateIsTwoFactor(id, body.is2FA);
+  }
+
+  @Get("/:id/friends")
+  @UseGuards(PermissionGuard)
+  async findFriends(
+    @Param("id", ParseIntPipe) userId: number
+  ): Promise<FriendResponseDto[]> {
+    return await this.friendService.find(userId);
+  }
+
+  @Post("/:id/friends")
+  @UseGuards(PermissionGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async saveFriend(
+    @Param("id", ParseIntPipe) userId: number,
+    @Body("friendId", ParseIntPipe) friendId: number
+  ): Promise<void> {
+    try {
+      await this.friendService.save(userId, friendId);
+    } catch {
+      throw new BadRequestException();
+    }
+  }
+
+  @Delete("/:id/friends/:friendId")
+  @UseGuards(PermissionGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteFriend(
+    @Param("id", ParseIntPipe) userId: number,
+    @Param("friendId", ParseIntPipe) friendId: number
+  ): Promise<void> {
+    try {
+      await this.friendService.delete(userId, friendId);
+    } catch {
+      throw new NotFoundException();
+    }
+  }
+
+  @Get("/:id/friend-requests")
+  @UseGuards(PermissionGuard)
+  async findFriendRequests(
+    @Param("id", ParseIntPipe) userId: number
+  ): Promise<FriendRequestResponseDto[]> {
+    const entities: FriendRequestEntity[] =
+      await this.friendRequestService.find(userId);
+
+    return entities.map((entity) => {
+      return new FriendRequestResponseDto(entity);
+    });
+  }
+
+  @Post("/:id/friend-requests")
+  @UseGuards(PermissionGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async saveFriendRequest(
+    @Param("id", ParseIntPipe) fromId: number,
+    @Body("toId", ParseIntPipe) toId: number
+  ): Promise<void> {
+    await this.friendRequestService.save(fromId, toId);
+  }
+
+  @Delete("/:id/friend-requests/:toId")
+  @UseGuards(PermissionGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteFriendRequest(
+    @Param("id", ParseIntPipe) fromId: number,
+    @Param("toId", ParseIntPipe) toId: number
+  ): Promise<void> {
+    await this.friendRequestService.delete(fromId, toId);
   }
 }

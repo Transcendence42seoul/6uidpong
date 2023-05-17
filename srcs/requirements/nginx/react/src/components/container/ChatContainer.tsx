@@ -8,7 +8,7 @@ const ChatContainer = React.forwardRef<HTMLDivElement, ChatContainerProps>(
   ({ children }, ref) => (
     <div
       ref={ref}
-      className="flex max-h-[600px] min-h-[360px] flex-col overflow-auto border border-black bg-[#b2c7d9] p-4"
+      className="flex max-h-[80vh] min-h-[60vh] flex-col overflow-auto border-4 border-white bg-black p-4"
     >
       {children}
     </div>

@@ -52,6 +52,12 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
     setShowMenu(false);
   };
 
+  const handleDoubleClickRoom = ({ roomId, interlocutorId }: Room) => {
+    navigate(`/chat/${roomId}`, {
+      state: { interlocutorId },
+    });
+  };
+
   useEffect(() => {
     const roomListHandler = (roomList: Room[]) => {
       setRooms(roomList);
@@ -89,8 +95,8 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
   }, [rooms]);
 
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (showMenu && !menuRef.current?.contains(e.target as Node)) {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (showMenu && !menuRef.current?.contains(event.target as Node)) {
         setShowMenu(false);
       }
     };
@@ -133,11 +139,7 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
                 key={roomId}
                 className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-2"
                 onContextMenu={handleContextMenu}
-                onDoubleClick={() =>
-                  navigate(`/chat/${roomId}`, {
-                    state: { interlocutorId },
-                  })
-                }
+                onDoubleClick={() => handleDoubleClickRoom(room)}
               >
                 {showMenu && (
                   <ul

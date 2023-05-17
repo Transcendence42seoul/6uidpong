@@ -14,6 +14,7 @@ import CircularImage from '../components/container/CircularImage';
 import Message from '../components/container/Message';
 import MessageBox from '../components/container/MessageBox';
 import MessageForm from '../components/container/MessageForm';
+import { mockChats, mockLocationState } from '../mock'; // test
 
 export interface Chat {
   id: number;
@@ -32,12 +33,12 @@ interface ChatRoomProps {
 
 const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
   const location = useLocation();
-  const { interlocutorId } = location.state;
+  const { interlocutorId } = location.state ?? mockLocationState; // test
   const { roomId } = useParams<{ roomId: string }>();
 
   const chatContainer = useRef<HTMLDivElement>(null);
   const [chats, setChats] = useState<Chat[]>([]);
-  const [message, setMessage] = useState<string>('');
+  const [inputMsg, setInputMsg] = useState<string>('');
   const [newMsgCount, setNewMsgCount] = useState<number>(0);
   const [showAlert, setShowAlert] = useState<boolean>(false);
 
@@ -46,26 +47,27 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
     setNewMsgCount(0);
   };
 
-  const handleCloseAlert = () => {
-    setShowAlert(false);
-  };
+  const handleChangeInputMsg = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      setInputMsg(event.target.value);
+    },
+    [],
+  );
 
-  const onTextChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    setMessage(e.target.value);
-  }, []);
+  const handleCloseAlert = () => setShowAlert(false);
 
-  const onSendMessage = useCallback(
+  const handleSubmitInputMsg = useCallback(
     (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      if (!message) return;
-      const sendDmData = { to: { id: interlocutorId, message } };
+      if (!inputMsg) return;
+      const sendDmData = { to: { id: interlocutorId, message: inputMsg } };
       const chatHandler = (chat: Chat) => {
         addChat(chat);
-        setMessage('');
+        setInputMsg('');
       };
       socket.emit('send-dm', sendDmData, chatHandler);
     },
-    [message],
+    [inputMsg],
   );
 
   useEffect(() => {
@@ -80,6 +82,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
       setNewMsgCount(newMsgCnt);
       setChats([...prevChats]);
     };
+    // setChats(mockChats); // test
     socket.emit('join-dm', { interlocutorId }, chatsHandler);
     return () => {
       socket.emit('leave-dm', { roomId });
@@ -117,19 +120,16 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
   }, [showAlert]);
 
   return (
-    <>
-      <h1>WebSocket Chat</h1>
+    <div className="mx-auto max-w-[1024px] p-4 pt-2">
       <ChatContainer ref={chatContainer}>
         {chats.map((chat, index) => {
-          const isMyMessage = chat.userId === myId;
+          const { id, userId, nickname, image, message } = chat;
+          const isMyMessage = userId === myId;
           let msgBoxClassName = '';
-          let msgClassName = '';
-          let nickname = '';
+          let msgClassName = 'mt-1';
           if (isMyMessage) {
             msgBoxClassName = 'flex-col items-end';
             msgClassName = 'bg-yellow-300';
-          } else {
-            nickname = chat.nickname;
           }
           return (
             <>
@@ -138,26 +138,28 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
                   <div className="m-2 h-px w-full bg-red-500" />
                 </div>
               )}
-              <MessageBox key={chat.id} className={msgBoxClassName}>
+              <MessageBox key={id} className={msgBoxClassName}>
                 {!isMyMessage && (
                   <CircularImage
-                    src={chat.image}
-                    alt={chat.nickname}
-                    className="mr-2 h-10 w-10"
+                    src={image}
+                    alt={nickname}
+                    className="h-10 w-10"
                   />
                 )}
                 <div>
-                  <span>{nickname}</span>
-                  <Message className={msgClassName}>{chat.message}</Message>
+                  {!isMyMessage && (
+                    <span className="text-white">{nickname}</span>
+                  )}
+                  <Message className={msgClassName}>{message}</Message>
                 </div>
               </MessageBox>
             </>
           );
         })}
       </ChatContainer>
-      <MessageForm onSubmit={onSendMessage}>
-        <input type="text" onChange={onTextChange} value={message} />
-        <button>Send</button>
+      <MessageForm onSubmit={handleSubmitInputMsg}>
+        <input type="text" onChange={handleChangeInputMsg} value={inputMsg} />
+        <button className="bg-black p-2 text-white">Send</button>
       </MessageForm>
       {showAlert && (
         <AlertWithCloseButton
@@ -165,7 +167,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
           onClose={handleCloseAlert}
         />
       )}
-    </>
+    </div>
   );
 };
 

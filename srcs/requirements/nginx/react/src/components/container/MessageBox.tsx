@@ -6,7 +6,7 @@ interface MessageBoxProps {
 }
 
 const MessageBox: React.FC<MessageBoxProps> = ({ children, className }) => (
-  <div className={`flex ${className}`}>{children}</div>
+  <div className={`flex space-x-2.5 ${className}`}>{children}</div>
 );
 
 export default MessageBox;

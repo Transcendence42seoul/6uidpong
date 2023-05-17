@@ -1,10 +1,12 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import CircularImage from '../components/container/CircularImage';
-import { users } from '../mock';
+import { mockUsers as users } from '../mock';
 
 const FriendList: React.FC = () => {
   const navigate = useNavigate();
+
+  const handleDoubleClickUser = (id: number) => navigate(`/profile/${id}`);
 
   return (
     <div className="p-4">
@@ -17,7 +19,7 @@ const FriendList: React.FC = () => {
             <li
               key={id}
               className="flex items-center border-2 border-white bg-black p-2"
-              onDoubleClick={() => navigate(`/profile/${id}`)}
+              onDoubleClick={() => handleDoubleClickUser(id)}
             >
               <CircularImage
                 src={image}

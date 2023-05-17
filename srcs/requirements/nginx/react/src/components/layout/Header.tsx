@@ -40,7 +40,7 @@ const Header: React.FC = () => {
           className="w-full rounded border border-white p-2 shadow"
         />
         {search && (
-          <ul className="absolute z-10 rounded border-2 bg-black bg-white p-2.5 shadow-md">
+          <ul className="absolute z-10 w-full rounded border-2 bg-black bg-white px-2.5 pb-2 pt-1.5 shadow-md">
             {searchResults.map((user) => {
               const { nickname, image } = user;
               return (

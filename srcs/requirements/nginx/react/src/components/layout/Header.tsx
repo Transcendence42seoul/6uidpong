@@ -4,7 +4,7 @@ import useCallAPI from '../../api';
 import { User } from '../../pages/UserProfile';
 import HoverButton from '../button/HoverButton';
 import CircularImage from '../container/CircularImage';
-import { users } from '../../mock'; // test
+import { mockUsers } from '../../mock'; // test
 
 const Header: React.FC = () => {
   const callAPI = useCallAPI();
@@ -34,7 +34,7 @@ const Header: React.FC = () => {
       nickname,
     };
     const data: User[] =
-      (await callAPI('/api/v1/users/search', params)) ?? users; // test
+      (await callAPI('/api/v1/users/search', params)) ?? mockUsers; // test
     setSearchResults(data);
   };
 

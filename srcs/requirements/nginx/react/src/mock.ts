@@ -1,11 +1,11 @@
 import { User } from './pages/UserProfile';
 
-export const tokenInfo = {
+export const mockTokenInfo = {
   id: 110729,
   nickname: 'kijsong',
 };
 
-export const users: User[] = [
+export const mockUsers: User[] = [
   {
     id: 110729,
     nickname: 'kijsong',

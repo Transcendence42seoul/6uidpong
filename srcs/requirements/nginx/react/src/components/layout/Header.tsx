@@ -14,6 +14,7 @@ const Header: React.FC = () => {
 
   const handleClickHome = () => navigate('/');
   const handleClickMyPage = () => navigate('/my-page');
+  const handleClickUser = (id: number) => navigate(`/profile/${id}`);
   const handleSearchChange = async (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
@@ -47,7 +48,7 @@ const Header: React.FC = () => {
                 <button
                   key={nickname}
                   className="flex border-b border-gray-300 py-1"
-                  onClick={() => navigate(`/profile/${id}`)}
+                  onClick={() => handleClickUser(id)}
                 >
                   <CircularImage
                     src={image}

@@ -6,6 +6,8 @@ import { users } from '../mock';
 const FriendList: React.FC = () => {
   const navigate = useNavigate();
 
+  const handleDoubleClickUser = (id: number) => navigate(`/profile/${id}`);
+
   return (
     <div className="p-4">
       <h2 className="mb-4 text-2xl font-bold text-gray-100">Friends</h2>
@@ -17,7 +19,7 @@ const FriendList: React.FC = () => {
             <li
               key={id}
               className="flex items-center border-2 border-white bg-black p-2"
-              onDoubleClick={() => navigate(`/profile/${id}`)}
+              onDoubleClick={() => handleDoubleClickUser(id)}
             >
               <CircularImage
                 src={image}

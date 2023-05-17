@@ -23,7 +23,7 @@ interface UserProfileProps {
 const UserProfile: React.FC<UserProfileProps> = ({ socket }) => {
   const callAPI = useCallAPI();
   const navigate = useNavigate();
-  const { userId } = useParams<{ userId: string }>();
+  const { userId: interlocutorId } = useParams<{ userId: string }>();
 
   const [showAlert, setShowAlert] = useState<boolean>(false);
   const [user, setUser] = useState<User | null>(null);
@@ -31,13 +31,13 @@ const UserProfile: React.FC<UserProfileProps> = ({ socket }) => {
   const handleClickDM = () => {
     const roomIdHandler = ({ roomId }: { roomId: string }) =>
       navigate(`/chat/${roomId}`, {
-        state: { interlocutorId: userId },
+        state: { interlocutorId },
       });
-    socket.emit('join-dm', { userId }, roomIdHandler);
+    socket.emit('join-dm', { interlocutorId }, roomIdHandler);
   };
 
   const handleClickBlock = () => {
-    socket.emit('block-dm-user', { userId });
+    socket.emit('block-dm-user', { interlocutorId });
     setShowAlert(true);
   };
 
@@ -47,7 +47,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ socket }) => {
 
   useEffect(() => {
     const fetchUserData = async () => {
-      const data: User = await callAPI(`/api/v1/users/${userId}`);
+      const data: User = await callAPI(`/api/v1/users/${interlocutorId}`);
       setUser(data);
     };
     fetchUserData();

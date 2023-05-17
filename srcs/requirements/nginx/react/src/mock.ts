@@ -1,11 +1,13 @@
-import { User } from './pages/UserProfile';
+export const mockLocationState = {
+  interlocutorId: 110731,
+};
 
 export const mockTokenInfo = {
   id: 110729,
   nickname: 'kijsong',
 };
 
-export const mockUsers: User[] = [
+export const mockUsers = [
   {
     id: 110729,
     nickname: 'kijsong',
@@ -35,5 +37,26 @@ export const mockUsers: User[] = [
     winStat: 1,
     loseStat: 1,
     ladderScore: 1000,
+  },
+];
+
+export const mockChats = [
+  {
+    id: 0,
+    roomId: 'd1',
+    userId: mockUsers[0].id,
+    nickname: mockUsers[0].nickname,
+    image: mockUsers[0].image,
+    message: 'Hello, there..!',
+    createdAt: '',
+  },
+  {
+    id: 1,
+    roomId: 'd1',
+    userId: mockUsers[1].id,
+    nickname: mockUsers[1].nickname,
+    image: mockUsers[1].image,
+    message: 'Hi~?',
+    createdAt: '',
   },
 ];

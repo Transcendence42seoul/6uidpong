@@ -17,7 +17,7 @@ import MyPage from './pages/MyPage';
 import ProfileSettings from './pages/ProfileSettings';
 import UserProfile from './pages/UserProfile';
 import LoginAuth from './components/custom/LoginAuth';
-// import { mockTokenInfo as tokenInfo } from './mock';
+// import { mockTokenInfo as tokenInfo } from './mock'; // test
 
 const App: React.FC = () => {
   const stats = {

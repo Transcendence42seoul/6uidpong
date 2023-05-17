@@ -33,7 +33,7 @@ interface ChatRoomProps {
 
 const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
   const location = useLocation();
-  const { interlocutorId } = location.state ?? mockLocationState;
+  const { interlocutorId } = location.state ?? mockLocationState; // test
   const { roomId } = useParams<{ roomId: string }>();
 
   const chatContainer = useRef<HTMLDivElement>(null);
@@ -81,6 +81,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
       setNewMsgCount(newMsgCnt);
       setChats([...prevChats]);
     };
+    setChats(mockChats); // test
     socket.emit('join-dm', { interlocutorId }, chatsHandler);
     return () => {
       socket.emit('leave-dm', { roomId });

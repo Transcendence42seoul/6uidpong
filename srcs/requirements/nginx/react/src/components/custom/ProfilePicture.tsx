@@ -9,7 +9,7 @@ interface ProfileProps {
 }
 
 const ProfilePicture: React.FC<ProfileProps> = ({ id }) => {
-  const [image, setImage] = useState('');
+  const [image, setImage] = useState<string>('');
   const { accessToken } = useSelector((state: RootState) => state.auth);
 
   const handleSubmit = () => {

@@ -39,7 +39,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
   const [chats, setChats] = useState<Chat[]>([]);
   const [message, setMessage] = useState<string>('');
   const [newMsgCount, setNewMsgCount] = useState<number>(0);
-  const [showAlert, setShowAlert] = useState(false);
+  const [showAlert, setShowAlert] = useState<boolean>(false);
 
   const addChat = (chat: Chat) => {
     setChats((prevChats) => [...prevChats, chat]);

@@ -16,18 +16,6 @@ export interface User {
   ladderScore: number;
 }
 
-/* Mock User */
-// export const user: User = {
-//   id: 110729,
-//   nickname: 'kijsong',
-//   status: 'online',
-//   image:
-//     'https://cdn.intra.42.fr/users/a99b98748e81f651c11c5fa2ccbb753e/kijsong.jpg',
-//   winStat: 4,
-//   loseStat: 2,
-//   ladderScore: 4242,
-// };
-
 interface UserProfileProps {
   socket: Socket;
 }
@@ -37,8 +25,8 @@ const UserProfile: React.FC<UserProfileProps> = ({ socket }) => {
   const navigate = useNavigate();
   const { userId } = useParams<{ userId: string }>();
 
-  const [showAlert, setShowAlert] = useState(false);
-  const [user, setUser] = useState<User | undefined>(undefined);
+  const [showAlert, setShowAlert] = useState<boolean>(false);
+  const [user, setUser] = useState<User | null>(null);
 
   const handleClickDM = () => {
     const roomIdHandler = ({ roomId }: { roomId: string }) =>

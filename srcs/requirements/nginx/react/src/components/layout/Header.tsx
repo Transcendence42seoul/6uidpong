@@ -54,7 +54,7 @@ const Header: React.FC = () => {
   }, [showSearchResults]);
 
   return (
-    <div className="m-4 flex items-center justify-between">
+    <div className="flex items-center justify-between p-4">
       <HoverButton onClick={handleClickHome} className="rounded border-2 p-2.5">
         Home
       </HoverButton>

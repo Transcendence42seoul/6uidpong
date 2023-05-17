@@ -75,7 +75,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ socket }) => {
   }, [showAlert]);
 
   return (
-    <div className="flex flex-col items-center p-20">
+    <div className="flex flex-col items-center space-y-2 p-20">
       <ContentBox className="p-4">
         <h2 className="text-lg font-semibold">
           {user?.nickname ?? 'Loading...'}

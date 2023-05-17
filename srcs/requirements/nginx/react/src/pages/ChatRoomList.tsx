@@ -29,9 +29,9 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
     setRooms((prevRooms) => [...prevRooms, room]);
   };
 
-  const handleContextMenu = (e: React.MouseEvent) => {
-    e.preventDefault();
-    setMenuPosition({ x: e.clientX, y: e.clientY });
+  const handleContextMenu = (event: React.MouseEvent) => {
+    event.preventDefault();
+    setMenuPosition({ x: event.clientX, y: event.clientY });
     setShowMenu(true);
   };
 

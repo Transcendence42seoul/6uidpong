@@ -18,6 +18,7 @@ const Header: React.FC = () => {
   const handleClickHome = () => navigate('/');
   const handleClickMyPage = () => navigate('/my-page');
   const handleClickUser = (id: number) => {
+    setSearch('');
     setShowSearchResults(false);
     navigate(`/profile/${id}`);
   };
@@ -66,7 +67,10 @@ const Header: React.FC = () => {
           className="w-full rounded border border-white p-2 shadow"
         />
         {showSearchResults && (
-          <ul className="absolute z-10 flex w-full flex-col rounded border-2 bg-black bg-white px-2.5 pb-2 pt-1.5 shadow-md">
+          <ul
+            className="absolute z-10 flex w-full flex-col rounded border-2 bg-black bg-white px-2.5 pb-2 pt-1.5 shadow-md"
+            ref={searchResultsRef}
+          >
             {searchResults.map((user) => {
               const { id, nickname, image } = user;
               return (

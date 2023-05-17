@@ -38,7 +38,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
 
   const chatContainer = useRef<HTMLDivElement>(null);
   const [chats, setChats] = useState<Chat[]>([]);
-  const [message, setMessage] = useState<string>('');
+  const [inputMsg, setInputMsg] = useState<string>('');
   const [newMsgCount, setNewMsgCount] = useState<number>(0);
   const [showAlert, setShowAlert] = useState<boolean>(false);
 
@@ -47,26 +47,27 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
     setNewMsgCount(0);
   };
 
-  const handleCloseAlert = () => {
-    setShowAlert(false);
-  };
+  const handleChangeInputMsg = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      setInputMsg(event.target.value);
+    },
+    [],
+  );
 
-  const onTextChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    setMessage(e.target.value);
-  }, []);
+  const handleCloseAlert = () => setShowAlert(false);
 
-  const onSendMessage = useCallback(
+  const handleSubmitInputMsg = useCallback(
     (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      if (!message) return;
-      const sendDmData = { to: { id: interlocutorId, message } };
+      if (!inputMsg) return;
+      const sendDmData = { to: { id: interlocutorId, inputMsg } };
       const chatHandler = (chat: Chat) => {
         addChat(chat);
-        setMessage('');
+        setInputMsg('');
       };
       socket.emit('send-dm', sendDmData, chatHandler);
     },
-    [message],
+    [inputMsg],
   );
 
   useEffect(() => {

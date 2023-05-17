@@ -23,8 +23,9 @@ export class UserService {
   }
 
   async findOne(id: number | string): Promise<UserEntity> {
-    if (typeof id === "number")
+    if (typeof id === "number") {
       return await this.userRepository.findOneOrFail({ where: { id: id } });
+    }
     return await this.userRepository.findOneOrFail({ where: { socketId: id } });
   }
 

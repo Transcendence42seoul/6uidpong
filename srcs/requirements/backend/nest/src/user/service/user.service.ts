@@ -1,5 +1,6 @@
 import { ConflictException, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import { PaginationOptions } from "src/utils/pagination/pagination.option";
 import { DataSource, Repository } from "typeorm";
 import { UserEntity } from "../entity/user.entity";
 
@@ -11,8 +12,10 @@ export class UserService {
     private readonly dataSource: DataSource
   ) {}
 
-  async findAll(): Promise<UserEntity[]> {
-    return await this.userRepository.find({
+  async findAll(options: PaginationOptions): Promise<[UserEntity[], number]> {
+    return await this.userRepository.findAndCount({
+      take: options.size,
+      skip: options.size * (options.page - 1),
       order: {
         nickname: "ASC",
       },
@@ -25,7 +28,10 @@ export class UserService {
     return await this.userRepository.findOneOrFail({ where: { socketId: id } });
   }
 
-  async search(nickname: string): Promise<UserEntity[]> {
+  async search(
+    nickname: string,
+    options: PaginationOptions
+  ): Promise<[UserEntity[], number]> {
     return this.userRepository
       .createQueryBuilder()
       .select()
@@ -38,13 +44,15 @@ export class UserService {
               ELSE 4 \
         END"
       )
+      .limit(options.size)
+      .offset(options.size * (options.page - 1))
       .setParameters({
         includedNickname: `%${nickname}%`,
         nickname: nickname,
         startNickname: `${nickname}%`,
         endNickname: `%${nickname}`,
       })
-      .getMany();
+      .getManyAndCount();
   }
 
   async create(profile: any): Promise<UserEntity> {

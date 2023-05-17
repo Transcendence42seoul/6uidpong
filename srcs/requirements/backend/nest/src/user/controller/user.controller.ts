@@ -20,6 +20,7 @@ import { UpdateImageDto } from "../dto/update-image.dto";
 import { UpdateNicknameDto } from "../dto/update-nickname.dto";
 import { UpdateTwoFactorAuthDto } from "../dto/update-2fa.dto";
 import { UserResponseDto } from "../dto/user-response.dto";
+import { Pagination } from "src/utils/pagination/pagination";
 
 @Controller("api/v1/users")
 @UseGuards(JwtAccessGuard)
@@ -30,21 +31,33 @@ export class UserController {
   ) {}
 
   @Get()
-  async findAll(): Promise<UserResponseDto[]> {
-    const entities: UserEntity[] = await this.userService.findAll();
-    return entities.map((entity) => {
+  async findAll(
+    @Query("page", ParseIntPipe) page: number,
+    @Query("size", ParseIntPipe) size: number
+  ): Promise<Pagination<UserResponseDto>> {
+    const [entities, total]: [UserEntity[], number] =
+      await this.userService.findAll({ page, size });
+    const dtos: UserResponseDto[] = entities.map((entity) => {
       return new UserResponseDto(entity);
     });
+    return new Pagination<UserResponseDto>({ results: dtos, total });
   }
 
   @Get("/search")
   async search(
-    @Query("nickname") nickname: string
-  ): Promise<UserResponseDto[]> {
-    const entities: UserEntity[] = await this.userService.search(nickname);
-    return entities.map((entity) => {
+    @Query("nickname") nickname: string,
+    @Query("page", ParseIntPipe) page: number,
+    @Query("size", ParseIntPipe) size: number
+  ): Promise<Pagination<UserResponseDto>> {
+    const [entities, total]: [UserEntity[], number] =
+      await this.userService.search(nickname, {
+        page,
+        size,
+      });
+    const dtos: UserResponseDto[] = entities.map((entity) => {
       return new UserResponseDto(entity);
     });
+    return new Pagination<UserResponseDto>({ results: dtos, total });
   }
 
   @Get("/:id")

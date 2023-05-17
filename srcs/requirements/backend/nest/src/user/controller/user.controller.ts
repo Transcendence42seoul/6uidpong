@@ -14,6 +14,7 @@ import {
   Post,
   BadRequestException,
   Delete,
+  DefaultValuePipe,
 } from "@nestjs/common";
 import { UserService } from "../service/user.service";
 import { JwtAccessGuard } from "src/auth/guard/jwt-access.guard";
@@ -43,8 +44,8 @@ export class UserController {
 
   @Get()
   async findAllUser(
-    @Query("page", ParseIntPipe) page: number,
-    @Query("size", ParseIntPipe) size: number
+    @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query("size", new DefaultValuePipe(10), ParseIntPipe) size: number
   ): Promise<Pagination<UserResponseDto>> {
     const [entities, total]: [UserEntity[], number] =
       await this.userService.findAll({ page, size });
@@ -57,8 +58,8 @@ export class UserController {
   @Get("/search")
   async searchUser(
     @Query("nickname") nickname: string,
-    @Query("page", ParseIntPipe) page: number,
-    @Query("size", ParseIntPipe) size: number
+    @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query("size", new DefaultValuePipe(10), ParseIntPipe) size: number
   ): Promise<Pagination<UserResponseDto>> {
     const [entities, total]: [UserEntity[], number] =
       await this.userService.search(nickname, {

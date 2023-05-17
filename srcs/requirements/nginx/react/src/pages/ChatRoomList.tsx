@@ -89,8 +89,8 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
   }, [rooms]);
 
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (showMenu && !menuRef.current?.contains(e.target as Node)) {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (showMenu && !menuRef.current?.contains(event.target as Node)) {
         setShowMenu(false);
       }
     };

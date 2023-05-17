@@ -8,6 +8,11 @@ interface ChatRoomListProps {
   socket: Socket;
 }
 
+interface Position {
+  x: number;
+  y: number;
+}
+
 interface Room {
   roomId: string;
   lastMessage: string;
@@ -20,10 +25,14 @@ interface Room {
 
 const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
   const navigate = useNavigate();
+
   const menuRef = useRef<HTMLUListElement>(null);
-  const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
   const [rooms, setRooms] = useState<Room[]>([]);
-  const [showMenu, setShowMenu] = useState(false);
+  const [showMenu, setShowMenu] = useState<boolean>(false);
+  const [menuPosition, setMenuPosition] = useState<Position>({
+    x: 0,
+    y: 0,
+  });
 
   const addRoom = (room: Room) => {
     setRooms((prevRooms) => [...prevRooms, room]);

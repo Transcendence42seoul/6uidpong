@@ -10,9 +10,9 @@ interface TwoFactorAuthProps {
 }
 
 const TwoFactorAuth: React.FC<TwoFactorAuthProps> = ({ id }) => {
-  const [openModal, setOpenModal] = useState(false);
+  const [openModal, setOpenModal] = useState<boolean>(false);
   const { accessToken } = useSelector((state: RootState) => state.auth);
-  const [code, setCode] = useState('');
+  const [code, setCode] = useState<string>('');
 
   const handleCloseModal = () => {
     setCode('');

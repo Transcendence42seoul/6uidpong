@@ -9,7 +9,7 @@ interface NicknameProps {
 }
 
 const Nickname: React.FC<NicknameProps> = ({ id }) => {
-  const [nickname, setNickname] = useState('');
+  const [nickname, setNickname] = useState<string>('');
   const { accessToken } = useSelector((state: RootState) => state.auth);
 
   const handleNickname = () => {

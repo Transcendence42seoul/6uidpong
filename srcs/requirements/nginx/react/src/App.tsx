@@ -28,7 +28,7 @@ const App: React.FC = () => {
     recentHistory: ['Win', 'Loss', 'Win', 'Win', 'Loss'],
   };
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const { id, is2FA, accessToken, tokenInfo } = useSelector(
     (state: RootState) => state.auth,
   );

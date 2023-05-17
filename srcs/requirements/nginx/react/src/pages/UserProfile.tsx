@@ -37,8 +37,8 @@ const UserProfile: React.FC<UserProfileProps> = ({ socket }) => {
   const navigate = useNavigate();
   const { userId } = useParams<{ userId: string }>();
 
-  const [showAlert, setShowAlert] = useState(false);
-  const [user, setUser] = useState<User | undefined>(undefined);
+  const [showAlert, setShowAlert] = useState<boolean>(false);
+  const [user, setUser] = useState<User | null>(null);
 
   const handleClickDM = () => {
     const roomIdHandler = ({ roomId }: { roomId: string }) =>

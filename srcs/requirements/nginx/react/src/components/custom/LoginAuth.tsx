@@ -11,7 +11,7 @@ interface LoginAuthProps {
 
 const LoginAuth: React.FC<LoginAuthProps> = ({ id }) => {
   const dispatch = useDispatch();
-  const [code, setCode] = useState('');
+  const [code, setCode] = useState<string>('');
 
   const handleVerificationCode = async () => {
     try {

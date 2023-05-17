@@ -7,7 +7,7 @@ import HoverButton from '../button/HoverButton';
 const Header: React.FC = () => {
   const callAPI = useCallAPI();
   const navigate = useNavigate();
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState<string>('');
   const [results, setResults] = useState<User[]>([]);
 
   const handleClickHome = () => navigate('/');

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
 import useCallAPI from '../api';
 import AlertWithCloseButton from '../components/alert/AlertWithCloseButton';
@@ -34,9 +34,7 @@ interface UserProfileProps {
 
 const UserProfile: React.FC<UserProfileProps> = ({ socket }) => {
   const callAPI = useCallAPI();
-  const location = useLocation();
   const navigate = useNavigate();
-  const { nickname } = location.state;
   const { userId } = useParams<{ userId: string }>();
 
   const [showAlert, setShowAlert] = useState(false);
@@ -61,11 +59,8 @@ const UserProfile: React.FC<UserProfileProps> = ({ socket }) => {
 
   useEffect(() => {
     const fetchUserData = async () => {
-      const params = {
-        nickname,
-      };
-      const data: User[] = await callAPI('/api/v1/users/search', params);
-      setUser(data[0]);
+      const data: User = await callAPI(`/api/v1/users/${userId}`);
+      setUser(data);
     };
     fetchUserData();
   }, []);

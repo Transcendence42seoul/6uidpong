@@ -8,7 +8,6 @@ import {
   UseGuards,
   Post,
   Body,
-  InternalServerErrorException,
 } from "@nestjs/common";
 import { Response } from "express";
 import { AuthService } from "../service/auth.service";
@@ -17,6 +16,7 @@ import { JwtRefreshGuard } from "../guard/jwt-refresh.guard";
 import { FtGuard } from "../guard/ft.guard";
 import { TwoFactorAuthDto } from "../dto/two-factor-auth.dto";
 import { UserEntity } from "src/user/entity/user.entity";
+import { EntityNotFoundError } from "typeorm";
 
 const OAUTH_42_LOGIN_URL = `https://api.intra.42.fr/oauth/authorize?client_id=${process.env.OAUTH_42_CLIENT_ID}&redirect_uri=https://${process.env.HOST_NAME}/auth/social/callback/forty-two&response_type=code&scope=public`;
 
@@ -48,7 +48,7 @@ export class AuthController {
         return { is2FA: true, id: user.id, accessToken: null };
       }
     } catch (error) {
-      if (error instanceof InternalServerErrorException) {
+      if (!(error instanceof EntityNotFoundError)) {
         throw error;
       }
       user = await this.userService.create(req.user);

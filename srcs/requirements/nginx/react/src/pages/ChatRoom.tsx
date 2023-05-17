@@ -135,7 +135,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
             <>
               {chats.length - index === newMsgCount && (
                 <div>
-                  <div className="m-2 h-px w-full bg-red-500" />
+                  <div className="mb-2 h-px w-full bg-red-500" />
                 </div>
               )}
               <MessageBox key={id} className={msgBoxClassName}>

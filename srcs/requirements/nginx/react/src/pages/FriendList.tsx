@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import CircularImage from '../components/container/CircularImage';
-import { users } from '../mock';
+import { mockUsers as users } from '../mock';
 
 const FriendList: React.FC = () => {
   const navigate = useNavigate();

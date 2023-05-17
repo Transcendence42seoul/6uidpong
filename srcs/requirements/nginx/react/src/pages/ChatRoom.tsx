@@ -14,6 +14,7 @@ import CircularImage from '../components/container/CircularImage';
 import Message from '../components/container/Message';
 import MessageBox from '../components/container/MessageBox';
 import MessageForm from '../components/container/MessageForm';
+import { mockChats, mockLocationState } from '../mock'; // test
 
 export interface Chat {
   id: number;
@@ -32,7 +33,7 @@ interface ChatRoomProps {
 
 const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
   const location = useLocation();
-  const { interlocutorId } = location.state;
+  const { interlocutorId } = location.state ?? mockLocationState;
   const { roomId } = useParams<{ roomId: string }>();
 
   const chatContainer = useRef<HTMLDivElement>(null);

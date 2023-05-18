@@ -60,7 +60,8 @@ export class UserController {
     @Query("nickname") nickname: string,
     @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query("size", new DefaultValuePipe(10), ParseIntPipe) size: number
-  ): Promise<Pagination<UserResponseDto>> {
+  ): Promise<UserResponseDto[]> {
+  // ): Promise<Pagination<UserResponseDto>> {
     const [entities, total]: [UserEntity[], number] =
       await this.userService.search(nickname, {
         page,
@@ -69,7 +70,8 @@ export class UserController {
     const dtos: UserResponseDto[] = entities.map((entity) => {
       return new UserResponseDto(entity);
     });
-    return new Pagination<UserResponseDto>({ results: dtos, total });
+    return dtos;
+    // return new Pagination<UserResponseDto>({ results: dtos, total });
   }
 
   @Get("/:id")

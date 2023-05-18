@@ -24,7 +24,7 @@ export class FriendRequestService {
     });
   }
 
-  async create(fromId: number, toId: number): Promise<FriendRequestEntity> {
+  async save(fromId: number, toId: number): Promise<FriendRequestEntity> {
     return await this.friendRequestRepository.save({
       fromId,
       toId,

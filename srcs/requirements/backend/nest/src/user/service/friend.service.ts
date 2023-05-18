@@ -28,7 +28,7 @@ export class FriendService {
       .getRawMany<FriendResponseDto>();
   }
 
-  async create(userId: number, friendId: number): Promise<void> {
+  async save(userId: number, friendId: number): Promise<void> {
     const queryRunner = this.dataSource.createQueryRunner();
 
     await queryRunner.connect();

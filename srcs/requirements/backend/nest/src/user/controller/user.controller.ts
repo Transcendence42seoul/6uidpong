@@ -61,7 +61,7 @@ export class UserController {
     @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query("size", new DefaultValuePipe(10), ParseIntPipe) size: number
   ): Promise<UserResponseDto[]> {
-  // ): Promise<Pagination<UserResponseDto>> {
+    // ): Promise<Pagination<UserResponseDto>> {
     const [entities, total]: [UserEntity[], number] =
       await this.userService.search(nickname, {
         page,
@@ -150,7 +150,7 @@ export class UserController {
     @Body("friendId", ParseIntPipe) friendId: number
   ): Promise<void> {
     try {
-      await this.friendService.create(userId, friendId);
+      await this.friendService.save(userId, friendId);
     } catch {
       throw new BadRequestException();
     }
@@ -190,7 +190,7 @@ export class UserController {
     @Param("id", ParseIntPipe) fromId: number,
     @Body("toId", ParseIntPipe) toId: number
   ): Promise<void> {
-    await this.friendRequestService.create(fromId, toId);
+    await this.friendRequestService.save(fromId, toId);
   }
 
   @Delete("/:id/friend-requests/:toId")

@@ -56,7 +56,7 @@ export class UserService {
       .getManyAndCount();
   }
 
-  async create(profile: any): Promise<UserEntity> {
+  async save(profile: any): Promise<UserEntity> {
     return await this.userRepository.save({
       id: profile.id,
       nickname: `undefined-${profile.id}`,

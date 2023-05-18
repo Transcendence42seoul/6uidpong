@@ -77,7 +77,7 @@ export class ChatGateway implements OnGatewayDisconnect {
       if (!(error instanceof EntityNotFoundError)) {
         throw error;
       }
-      roomUser = await this.dmService.createRoom(jwt.id, interlocutorId);
+      roomUser = await this.dmService.saveRoomUsers(jwt.id, interlocutorId);
     }
     client.join("d" + roomUser.roomId);
     const chats: DmChatEntity[] = await this.dmService.findChats(roomUser);

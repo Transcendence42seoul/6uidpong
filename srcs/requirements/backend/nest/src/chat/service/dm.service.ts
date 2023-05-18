@@ -126,7 +126,7 @@ export class DmService {
     }
   }
 
-  async createRoom(
+  async saveRoomUsers(
     userId: number,
     interlocutorId: number
   ): Promise<DmRoomUserEntity> {

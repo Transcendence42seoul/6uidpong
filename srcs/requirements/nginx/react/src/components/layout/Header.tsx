@@ -17,25 +17,31 @@ const Header: React.FC = () => {
 
   const handleClickHome = () => navigate('/');
   const handleClickMyPage = () => navigate('/my-page');
+  const handleClickSearch = () => setShowSearchResults(true);
   const handleClickUser = (id: number) => {
     setSearch('');
     setShowSearchResults(false);
     navigate(`/profile/${id}`);
   };
 
-  const handleClickSearch = () => setShowSearchResults(true);
+  const handleSearchResults = async (data: User[]) => {
+    setSearchResults([...data]);
+  };
+  const handleShowSearchResults = async (nickname: string) => {
+    setShowSearchResults(!!nickname);
+  };
   const handleChangeSearch = async (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const nickname = event.target.value;
     setSearch(nickname);
-    setShowSearchResults(!!nickname);
     const params = {
       nickname,
     };
     const data: User[] =
       (await callAPI('/api/v1/users/search', params)) ?? mockUsers; // test
-    setSearchResults([...data]);
+    await handleSearchResults(data);
+    await handleShowSearchResults(nickname);
   };
 
   useEffect(() => {

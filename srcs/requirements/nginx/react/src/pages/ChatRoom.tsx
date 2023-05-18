@@ -8,6 +8,7 @@ import React, {
 } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
+import formatTime from '../utils/formatTime';
 import AlertWithCloseButton from '../components/alert/AlertWithCloseButton';
 import ChatContainer from '../components/container/ChatContainer';
 import CircularImage from '../components/container/CircularImage';
@@ -127,12 +128,11 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
     <div className="mx-auto max-w-[1024px] p-4 pt-2">
       <ChatContainer ref={chatContainer}>
         {chats.map((chat, index) => {
-          const { id, userId, nickname, image, message } = chat;
+          const { id, userId, nickname, image, message, createdAt } = chat;
           const prevUserId = chats[index - 1]?.userId;
           const isMyMsg = userId === myId;
           const isConsecutiveMsg = userId === prevUserId;
           const showUserInfo = !isMyMsg && !isConsecutiveMsg;
-
           let messageBoxClassName = '';
           let messageClassName = 'mt-1';
           if (isMyMsg) {
@@ -161,7 +161,27 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
                   {showUserInfo && (
                     <span className="text-white">{nickname}</span>
                   )}
-                  <Message className={messageClassName}>{message}</Message>
+                  <div className="mb-2 flex items-end">
+                    {isMyMsg ? (
+                      <>
+                        <span className="mr-2 pb-1 text-xs text-gray-500">
+                          {formatTime(createdAt)}
+                        </span>
+                        <Message className={messageClassName}>
+                          {message}
+                        </Message>
+                      </>
+                    ) : (
+                      <>
+                        <Message className={messageClassName}>
+                          {message}
+                        </Message>
+                        <span className="ml-2 pb-1 text-xs text-gray-500">
+                          {formatTime(createdAt)}
+                        </span>
+                      </>
+                    )}
+                  </div>
                 </div>
               </MessageBox>
             </>

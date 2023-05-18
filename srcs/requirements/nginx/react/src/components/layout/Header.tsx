@@ -77,7 +77,7 @@ const Header: React.FC = () => {
               return (
                 <button
                   key={nickname}
-                  className="flex border-b border-gray-300 py-1"
+                  className="flex border-b border-gray-300 py-1 hover:bg-gray-200"
                   onClick={() => handleClickUser(id)}
                 >
                   <CircularImage

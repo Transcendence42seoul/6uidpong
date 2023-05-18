@@ -124,12 +124,19 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
       <ChatContainer ref={chatContainer}>
         {chats.map((chat, index) => {
           const { id, userId, nickname, image, message } = chat;
-          const isMyMessage = userId === myId;
-          let msgBoxClassName = '';
-          let msgClassName = 'mt-1';
-          if (isMyMessage) {
-            msgBoxClassName = 'flex-col items-end';
-            msgClassName = 'bg-yellow-300';
+          const prevUserId = chats[index - 1]?.userId;
+          const isMyMsg = userId === myId;
+          const isConsecutiveMsg = userId === prevUserId;
+          const showUserInfo = !isMyMsg && !isConsecutiveMsg;
+
+          let messageBoxClassName = '';
+          let messageClassName = 'mt-1';
+          if (isMyMsg) {
+            messageBoxClassName = 'flex-col items-end';
+            messageClassName = 'bg-yellow-300';
+          } else if (isConsecutiveMsg) {
+            messageBoxClassName = 'ml-10 pl-2.5';
+            messageClassName = '';
           }
           return (
             <>
@@ -138,8 +145,8 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
                   <div className="mb-2 h-px w-full bg-red-500" />
                 </div>
               )}
-              <MessageBox key={id} className={msgBoxClassName}>
-                {!isMyMessage && (
+              <MessageBox key={id} className={messageBoxClassName}>
+                {showUserInfo && (
                   <CircularImage
                     src={image}
                     alt={nickname}
@@ -147,10 +154,10 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
                   />
                 )}
                 <div>
-                  {!isMyMessage && (
+                  {showUserInfo && (
                     <span className="text-white">{nickname}</span>
                   )}
-                  <Message className={msgClassName}>{message}</Message>
+                  <Message className={messageClassName}>{message}</Message>
                 </div>
               </MessageBox>
             </>

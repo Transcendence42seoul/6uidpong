@@ -35,7 +35,7 @@ const Header: React.FC = () => {
     };
     const data: User[] =
       (await callAPI('/api/v1/users/search', params)) ?? mockUsers; // test
-    setSearchResults(data);
+    setSearchResults([...data]);
   };
 
   useEffect(() => {

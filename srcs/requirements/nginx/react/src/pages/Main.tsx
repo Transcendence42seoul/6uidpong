@@ -7,12 +7,12 @@ import Image from '../constants/Image';
 const Main: React.FC = () => {
   const navigate = useNavigate();
 
-  const handleClickChat = () => navigate('/chat');
-  const handleClickGame = () => navigate('/game');
+  const handleChatClick = () => navigate('/chat');
+  const handleGameClick = () => navigate('/game');
 
   return (
     <div className="flex min-h-screen items-center justify-center text-white">
-      <button className="group mx-10 w-1/3" onClick={handleClickGame}>
+      <button className="group mx-10 w-1/3" onClick={handleGameClick}>
         <ContentBox className="border-8 p-7 group-hover:scale-105 group-hover:border-pink-300 group-hover:bg-pink-300 group-hover:opacity-70">
           <img src={Image.GAME} alt="GAME" className="group-hover:opacity-0" />
           <h1 className="mt-7 text-4xl group-hover:text-black group-hover:opacity-50">
@@ -29,13 +29,13 @@ const Main: React.FC = () => {
         </ContentBox>
         <div className="absolute inset-0 hidden flex-col justify-center group-hover:flex">
           <HoverButton
-            onClick={handleClickChat}
+            onClick={handleChatClick}
             className="mb-10 h-1/4 w-full text-lg"
           >
             DM
           </HoverButton>
           <HoverButton
-            onClick={handleClickChat}
+            onClick={handleChatClick}
             className="h-1/4 w-full text-lg"
           >
             CHANNEL

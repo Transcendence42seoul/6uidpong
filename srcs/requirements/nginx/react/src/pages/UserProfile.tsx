@@ -29,7 +29,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ socket }) => {
   const [showAlert, setShowAlert] = useState<boolean>(false);
   const [user, setUser] = useState<User | null>(null);
 
-  const handleClickDM = () => {
+  const handleDmClick = () => {
     const roomIdHandler = ({ roomId }: { roomId: string }) =>
       navigate(`/chat/${roomId}`, {
         state: { interlocutorId },
@@ -37,12 +37,12 @@ const UserProfile: React.FC<UserProfileProps> = ({ socket }) => {
     socket.emit('join-dm', { interlocutorId }, roomIdHandler);
   };
 
-  const handleClickBlock = () => {
+  const handleBlockClick = () => {
     socket.emit('block-dm-user', { interlocutorId });
     setShowAlert(true);
   };
 
-  const handleCloseAlert = () => {
+  const handleAlertClose = () => {
     setShowAlert(false);
   };
 
@@ -83,13 +83,13 @@ const UserProfile: React.FC<UserProfileProps> = ({ socket }) => {
           </button>
           <button
             className="mr-2 rounded bg-green-500 px-4 py-2 text-white hover:bg-green-400"
-            onClick={handleClickDM}
+            onClick={handleDmClick}
           >
             DM
           </button>
           <button
             className="rounded bg-red-500 px-4 py-2 text-white hover:bg-red-400"
-            onClick={handleClickBlock}
+            onClick={handleBlockClick}
           >
             Block
           </button>
@@ -98,7 +98,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ socket }) => {
       {showAlert && (
         <AlertWithCloseButton
           message={`${user?.nickname} is blocked.`}
-          onClose={handleCloseAlert}
+          onClose={handleAlertClose}
         />
       )}
     </div>

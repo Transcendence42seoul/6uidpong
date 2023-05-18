@@ -21,8 +21,8 @@ const MyPage: React.FC<MyPageProps> = ({ id, stats }) => {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
 
-  const handleClickChangeProfile = () => navigate('/profile-settings');
-  const handleClickFriendsList = () => navigate('/friend-list');
+  const handleChangeProfileClick = () => navigate('/profile-settings');
+  const handleFriendsListClick = () => navigate('/friend-list');
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -45,7 +45,7 @@ const MyPage: React.FC<MyPageProps> = ({ id, stats }) => {
         />
       </ContentBox>
       <HoverButton
-        onClick={handleClickChangeProfile}
+        onClick={handleChangeProfileClick}
         className="w-full max-w-md rounded border p-2.5"
       >
         Change Profile
@@ -72,7 +72,7 @@ const MyPage: React.FC<MyPageProps> = ({ id, stats }) => {
         </ul>
       </ContentBox>
       <HoverButton
-        onClick={handleClickFriendsList}
+        onClick={handleFriendsListClick}
         className="w-full max-w-md rounded border p-2.5"
       >
         Friends List

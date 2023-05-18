@@ -79,14 +79,10 @@ export class ChatGateway implements OnGatewayDisconnect {
       }
       roomUser = await this.dmService.createRoom(jwt.id, interlocutorId);
     }
-    client.join("d" + roomUser.room.id);
+    client.join("d" + roomUser.roomId);
     const chats: DmChatEntity[] = await this.dmService.findChats(roomUser);
 
-    return new DmChatsResponseDto(
-      roomUser.room.id,
-      roomUser.newMsgCount,
-      chats
-    );
+    return new DmChatsResponseDto(roomUser.roomId, roomUser.newMsgCount, chats);
   }
 
   @SubscribeMessage("send-dm")
@@ -95,9 +91,7 @@ export class ChatGateway implements OnGatewayDisconnect {
     @MessageBody("to") to: { id: number; message: string }
   ): Promise<DmChatResponseDto> {
     try {
-      const recipient: UserEntity = await this.userService.findOne(
-        to.id
-      );
+      const recipient: UserEntity = await this.userService.findOne(to.id);
       if (await this.blockService.isBlocked(jwt.id, recipient.id)) {
         throw new WsException(
           "You can't send a message to the user you have blocked."
@@ -111,7 +105,7 @@ export class ChatGateway implements OnGatewayDisconnect {
       const recipientRoomUser: DmRoomUserEntity =
         await this.dmService.findRoomUser(recipient.id, jwt.id);
       const roomSockets = await this.server
-        .in("d" + recipientRoomUser.room.id)
+        .in("d" + recipientRoomUser.roomId)
         .fetchSockets();
       const isNotJoin: boolean = !roomSockets.find(
         (socket) => socket.id === recipient.socketId
@@ -159,11 +153,11 @@ export class ChatGateway implements OnGatewayDisconnect {
       const interlocutorRoomUser: DmRoomUserEntity =
         await this.dmService.findRoomUser(interlocutorId, jwt.id);
       if (interlocutorRoomUser.isExit) {
-        await this.dmService.deleteRoom(interlocutorRoomUser.room.id);
+        await this.dmService.deleteRoom(interlocutorRoomUser.roomId);
       } else {
-        await this.dmService.exitRoom(interlocutorRoomUser.room.id, jwt.id);
+        await this.dmService.exitRoom(interlocutorRoomUser.roomId, jwt.id);
       }
-      client.leave("d" + interlocutorRoomUser.room.id);
+      client.leave("d" + interlocutorRoomUser.roomId);
     } catch {
       throw new WsException("invalid request.");
     }

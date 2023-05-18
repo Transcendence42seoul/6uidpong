@@ -148,7 +148,7 @@ export class UserController {
     @Body("friendId", ParseIntPipe) friendId: number
   ): Promise<void> {
     try {
-      await this.friendService.save(userId, friendId);
+      await this.friendService.create(userId, friendId);
     } catch {
       throw new BadRequestException();
     }
@@ -188,7 +188,7 @@ export class UserController {
     @Param("id", ParseIntPipe) fromId: number,
     @Body("toId", ParseIntPipe) toId: number
   ): Promise<void> {
-    await this.friendRequestService.save(fromId, toId);
+    await this.friendRequestService.create(fromId, toId);
   }
 
   @Delete("/:id/friend-requests/:toId")

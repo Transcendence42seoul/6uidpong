@@ -6,6 +6,7 @@ import {
   SelectQueryBuilder,
   MoreThanOrEqual,
   DataSource,
+  InsertResult,
 } from "typeorm";
 import { DmRoomsResponseDto } from "../dto/dm-rooms-response.dto";
 import { DmChatEntity } from "../entity/dm-chat.entity";
@@ -90,8 +91,6 @@ export class DmService {
         "match_room_user",
         "room_user.room_id = match_room_user.room_id"
       )
-      .leftJoinAndSelect("room_user.room", "room")
-      .leftJoinAndSelect("room_user.user", "user")
       .where("room_user.user_id = :userId", { userId });
 
     return await queryBuilder.getOneOrFail();
@@ -103,18 +102,16 @@ export class DmService {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      const roomId: number = roomUser.room.id;
-      const userId: number = roomUser.user.id;
+      const findOptions: Object = {
+        roomId: roomUser.roomId,
+        userId: roomUser.userId,
+      };
       if (roomUser.isExit) {
-        await queryRunner.manager.update(DmRoomUserEntity, roomId, {
+        await queryRunner.manager.update(DmRoomUserEntity, findOptions, {
           isExit: false,
           createdAt: new Date(),
         });
       } else if (roomUser.newMsgCount > 0) {
-        const findOptions: Object = {
-          roomId,
-          userId,
-        };
         await queryRunner.manager.update(DmRoomUserEntity, findOptions, {
           newMsgCount: 0,
         });
@@ -138,26 +135,33 @@ export class DmService {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
+      const saveOptions: Object = {
+        transaction: false,
+      };
       const newRoom: DmRoomEntity = await queryRunner.manager.save(
         DmRoomEntity,
-        new DmRoomEntity()
+        new DmRoomEntity(),
+        saveOptions
       );
-      const newRoomUsers: DmRoomUserEntity[] = await queryRunner.manager.save(
+      const newRoomUser: DmRoomUserEntity = await queryRunner.manager.save(
         DmRoomUserEntity,
-        [
-          {
-            roomId: newRoom.id,
-            userId: userId,
-          },
-          {
-            roomId: newRoom.id,
-            userId: interlocutorId,
-          },
-        ]
+        {
+          roomId: newRoom.id,
+          userId: userId,
+        },
+        saveOptions
+      );
+      await queryRunner.manager.save(
+        DmRoomUserEntity,
+        {
+          roomId: newRoom.id,
+          userId: interlocutorId,
+        },
+        saveOptions
       );
 
       await queryRunner.commitTransaction();
-      return newRoomUsers.find((newRoomUser) => newRoomUser.user.id === userId);
+      return newRoomUser;
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;
@@ -202,10 +206,11 @@ export class DmService {
             id: senderId,
           },
           room: {
-            id: recipientRoomUser.room.id,
+            id: recipientRoomUser.roomId,
           },
           message,
-        }
+        },
+        { transaction: false }
       );
       if (recipientRoomUser.isExit) {
         await queryRunner.manager.update(
@@ -259,7 +264,7 @@ export class DmService {
   }
 
   async exitRoom(roomId: number, userId: number): Promise<void> {
-    const findOptions: Object = { room: { id: roomId }, user: { id: userId } };
+    const findOptions: Object = { roomId, userId };
     await this.roomUserRepository.update(findOptions, {
       isExit: true,
       newMsgCount: 0,

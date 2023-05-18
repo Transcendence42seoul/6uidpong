@@ -51,7 +51,7 @@ export class AuthController {
       if (!(error instanceof EntityNotFoundError)) {
         throw error;
       }
-      user = await this.userService.save(req.user);
+      user = await this.userService.create(req.user);
       res.status(HttpStatus.CREATED);
       res.setHeader("Location", `/api/v1/users/${user.id}`);
     }

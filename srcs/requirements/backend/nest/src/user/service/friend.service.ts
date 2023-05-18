@@ -28,7 +28,7 @@ export class FriendService {
       .getRawMany<FriendResponseDto>();
   }
 
-  async save(userId: number, friendId: number): Promise<void> {
+  async create(userId: number, friendId: number): Promise<void> {
     const queryRunner = this.dataSource.createQueryRunner();
 
     await queryRunner.connect();
@@ -42,10 +42,14 @@ export class FriendService {
         fromId: friendId,
         toId: userId,
       });
-      queryRunner.manager.save(FriendEntity, {
-        fromId: friendId,
-        toId: userId,
-      });
+      queryRunner.manager.save(
+        FriendEntity,
+        {
+          fromId: friendId,
+          toId: userId,
+        },
+        { transaction: false }
+      );
 
       await queryRunner.commitTransaction();
     } catch (error) {

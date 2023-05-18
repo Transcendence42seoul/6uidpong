@@ -31,9 +31,13 @@ interface ChatRoomProps {
   socket: Socket;
 }
 
+interface LocationState {
+  interlocutorId: number;
+}
+
 const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
   const location = useLocation();
-  const { interlocutorId } = location.state ?? mockLocationState; // test
+  const { interlocutorId }: LocationState = location.state ?? mockLocationState; // test
   const { roomId } = useParams<{ roomId: string }>();
 
   const chatContainer = useRef<HTMLDivElement>(null);

@@ -23,7 +23,8 @@ interface UserProfileProps {
 const UserProfile: React.FC<UserProfileProps> = ({ socket }) => {
   const callAPI = useCallAPI();
   const navigate = useNavigate();
-  const { userId: interlocutorId } = useParams<{ userId: string }>();
+  const { userId } = useParams<{ userId: string }>();
+  const interlocutorId = Number(userId);
 
   const [showAlert, setShowAlert] = useState<boolean>(false);
   const [user, setUser] = useState<User | null>(null);

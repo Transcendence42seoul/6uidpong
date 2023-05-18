@@ -61,8 +61,8 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
   const handleCloseAlert = () => setShowAlert(false);
 
   const handleSubmitInputMsg = useCallback(
-    (e: FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
+    (event: FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
       if (!inputMsg) return;
       const sendDmData = { to: { id: interlocutorId, message: inputMsg } };
       const chatHandler = (chat: Chat) => {

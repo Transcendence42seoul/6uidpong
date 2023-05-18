@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
+import formatTime from '../utils/formatTime';
 import CircularImage from '../components/container/CircularImage';
 import { Chat } from './ChatRoom';
 
@@ -126,14 +127,6 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
               interlocutorImage,
               newMsgCount,
             } = room;
-            const formattedTime = new Date(lastMessageTime).toLocaleTimeString(
-              'ko-KR',
-              {
-                hour: 'numeric',
-                minute: 'numeric',
-                hour12: true,
-              },
-            );
             return (
               <li
                 key={roomId}
@@ -175,7 +168,9 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
                       {newMsgCount}
                     </div>
                   )}
-                  <span className="text-sm text-gray-600">{formattedTime}</span>
+                  <span className="text-sm text-gray-600">
+                    {formatTime(lastMessageTime)}
+                  </span>
                 </div>
               </li>
             );

@@ -45,7 +45,7 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
     setShowMenu(true);
   };
 
-  const handleClickDelete = (interlocutorId: number) => {
+  const handleDeleteClick = (interlocutorId: number) => {
     socket.emit('delete-dm-room', { interlocutorId });
     setRooms([
       ...rooms.filter((room) => room.interlocutorId !== interlocutorId),
@@ -53,7 +53,7 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
     setShowMenu(false);
   };
 
-  const handleDoubleClickRoom = ({ roomId, interlocutorId }: Room) => {
+  const handleRoomDoubleClick = ({ roomId, interlocutorId }: Room) => {
     navigate(`/chat/${roomId}`, {
       state: { interlocutorId },
     });
@@ -96,14 +96,14 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
   }, [rooms]);
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handleOutsideClick = (event: MouseEvent) => {
       if (showMenu && !menuRef.current?.contains(event.target as Node)) {
         setShowMenu(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('mousedown', handleOutsideClick);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('mousedown', handleOutsideClick);
     };
   }, [showMenu]);
 
@@ -132,7 +132,7 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
                 key={roomId}
                 className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-2"
                 onContextMenu={handleContextMenu}
-                onDoubleClick={() => handleDoubleClickRoom(room)}
+                onDoubleClick={() => handleRoomDoubleClick(room)}
               >
                 {showMenu && (
                   <ul
@@ -145,7 +145,7 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
                   >
                     <button
                       className="cursor-pointer rounded border-4 border-red-400 bg-black p-1 text-white hover:text-red-400"
-                      onClick={() => handleClickDelete(interlocutorId)}
+                      onClick={() => handleDeleteClick(interlocutorId)}
                     >
                       Delete
                     </button>

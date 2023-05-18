@@ -15,31 +15,37 @@ const Header: React.FC = () => {
   const [searchResults, setSearchResults] = useState<User[]>([]);
   const [showSearchResults, setShowSearchResults] = useState<boolean>(false);
 
-  const handleClickHome = () => navigate('/');
-  const handleClickMyPage = () => navigate('/my-page');
-  const handleClickUser = (id: number) => {
+  const handleHomeClick = () => navigate('/');
+  const handleMyPageClick = () => navigate('/my-page');
+  const handleSearchClick = () => setShowSearchResults(true);
+  const handleUserClick = (id: number) => {
     setSearch('');
     setShowSearchResults(false);
     navigate(`/profile/${id}`);
   };
 
-  const handleClickSearch = () => setShowSearchResults(true);
-  const handleChangeSearch = async (
+  const handleSearchResults = async (data: User[]) => {
+    setSearchResults([...data]);
+  };
+  const handleShowSearchResults = async (nickname: string) => {
+    setShowSearchResults(!!nickname);
+  };
+  const handleSearchChange = async (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const nickname = event.target.value;
     setSearch(nickname);
-    setShowSearchResults(!!nickname);
     const params = {
       nickname,
     };
     const data: User[] =
       (await callAPI('/api/v1/users/search', params)) ?? mockUsers; // test
-    setSearchResults([...data]);
+    await handleSearchResults(data);
+    await handleShowSearchResults(nickname);
   };
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handleOutsideClick = (event: MouseEvent) => {
       if (
         showSearchResults &&
         !searchResultsRef.current?.contains(event.target as Node)
@@ -47,15 +53,15 @@ const Header: React.FC = () => {
         setShowSearchResults(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('mousedown', handleOutsideClick);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('mousedown', handleOutsideClick);
     };
   }, [showSearchResults]);
 
   return (
     <div className="flex items-center justify-between p-4">
-      <HoverButton onClick={handleClickHome} className="rounded border-2 p-2.5">
+      <HoverButton onClick={handleHomeClick} className="rounded border-2 p-2.5">
         Home
       </HoverButton>
       <div className="relative w-[40%]">
@@ -63,8 +69,8 @@ const Header: React.FC = () => {
           type="text"
           placeholder="Search users"
           value={search}
-          onChange={handleChangeSearch}
-          onClick={handleClickSearch}
+          onChange={handleSearchChange}
+          onClick={handleSearchClick}
           className="w-full rounded border border-white p-2 shadow"
         />
         {showSearchResults && (
@@ -77,8 +83,8 @@ const Header: React.FC = () => {
               return (
                 <button
                   key={nickname}
-                  className="flex border-b border-gray-300 py-1"
-                  onClick={() => handleClickUser(id)}
+                  className="flex border-b border-gray-300 py-1 hover:bg-gray-200"
+                  onClick={() => handleUserClick(id)}
                 >
                   <CircularImage
                     src={image}
@@ -93,7 +99,7 @@ const Header: React.FC = () => {
         )}
       </div>
       <HoverButton
-        onClick={handleClickMyPage}
+        onClick={handleMyPageClick}
         className="rounded border-2 p-2.5"
       >
         My Page

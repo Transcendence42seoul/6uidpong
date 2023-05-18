@@ -52,16 +52,16 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
     setNewMsgCount(0);
   };
 
-  const handleChangeInputMsg = useCallback(
+  const handleInputMsgChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       setInputMsg(event.target.value);
     },
     [],
   );
 
-  const handleCloseAlert = () => setShowAlert(false);
+  const handleAlertClose = () => setShowAlert(false);
 
-  const handleSubmitInputMsg = useCallback(
+  const handleInputMsgSubmit = useCallback(
     (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
       if (!inputMsg) return;
@@ -188,14 +188,14 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
           );
         })}
       </ChatContainer>
-      <MessageForm onSubmit={handleSubmitInputMsg}>
-        <input type="text" onChange={handleChangeInputMsg} value={inputMsg} />
+      <MessageForm onSubmit={handleInputMsgSubmit}>
+        <input type="text" onChange={handleInputMsgChange} value={inputMsg} />
         <button className="bg-black p-2 text-white">Send</button>
       </MessageForm>
       {showAlert && (
         <AlertWithCloseButton
           message="You can't send DM to user who blocked you."
-          onClose={handleCloseAlert}
+          onClose={handleAlertClose}
         />
       )}
     </div>

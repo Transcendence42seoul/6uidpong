@@ -5,7 +5,6 @@ import { Routes, Route } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import handleAuthInfo from './authInfo';
 import Layout from './Layout';
-import redirect from './redirect';
 import { RootState } from './store';
 import ChatRoom from './pages/ChatRoom';
 import ChatRoomList from './pages/ChatRoomList';
@@ -16,6 +15,7 @@ import Main from './pages/Main';
 import MyPage from './pages/MyPage';
 import ProfileSettings from './pages/ProfileSettings';
 import UserProfile from './pages/UserProfile';
+import redirect from './utils/redirect';
 import LoginAuth from './components/custom/LoginAuth';
 // import { mockTokenInfo as tokenInfo } from './mock'; // test
 

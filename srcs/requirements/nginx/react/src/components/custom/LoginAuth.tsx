@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import handleAuthInfo from '../../authInfo';
-import redirect from '../../redirect';
+import redirect from '../../utils/redirect';
 import HoverButton from '../button/HoverButton';
 
 interface LoginAuthProps {

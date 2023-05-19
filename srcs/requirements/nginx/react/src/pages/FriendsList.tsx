@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import CircularImage from '../components/container/CircularImage';
 import { mockUsers as users } from '../mock';
 
-const FriendList: React.FC = () => {
+const FriendsList: React.FC = () => {
   const navigate = useNavigate();
 
   const handleUserDoubleClick = (id: number) => navigate(`/profile/${id}`);
@@ -38,4 +38,4 @@ const FriendList: React.FC = () => {
   );
 };
 
-export default FriendList;
+export default FriendsList;

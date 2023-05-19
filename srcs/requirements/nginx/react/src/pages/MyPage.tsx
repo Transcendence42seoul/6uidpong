@@ -22,7 +22,7 @@ const MyPage: React.FC<MyPageProps> = ({ id, stats }) => {
   const [user, setUser] = useState<User | null>(null);
 
   const handleChangeProfileClick = () => navigate('/profile-settings');
-  const handleFriendsListClick = () => navigate('/friend-list');
+  const handleFriendsListClick = () => navigate('/friends-list');
 
   useEffect(() => {
     const fetchUserData = async () => {

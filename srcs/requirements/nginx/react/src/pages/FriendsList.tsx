@@ -1,19 +1,51 @@
-import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import React, { useEffect, useRef, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import HoverButton from '../components/button/HoverButton';
 import CircularImage from '../components/container/CircularImage';
+import dispatchAuth from '../features/auth/authAction';
+import selectAuth from '../features/auth/authSelector';
 import useCallAPI from '../utils/api';
+import { Position } from './ChatRoomList';
 import { User } from './UserProfile';
 import { mockUsers } from '../mock'; // test
 
-interface FriendsListProps {
-  myId: number;
-}
-
-const FriendsList: React.FC<FriendsListProps> = ({ myId }) => {
+const FriendsList: React.FC = () => {
   const callAPI = useCallAPI();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const { accessToken, tokenInfo } = selectAuth();
+  const myId = tokenInfo?.id;
+
+  const menuRef = useRef<HTMLUListElement>(null);
   const [friends, setFriends] = useState<User[]>([]);
+  const [showMenu, setShowMenu] = useState<boolean>(false);
+  const [menuPosition, setMenuPosition] = useState<Position>({
+    x: 0,
+    y: 0,
+  });
+
+  const handleContextMenu = (event: React.MouseEvent) => {
+    event.preventDefault();
+    setMenuPosition({ x: event.clientX, y: event.clientY });
+    setShowMenu(true);
+  };
+
+  const handleDeleteClick = (friendId: number) => {
+    try {
+      axios.delete(`/api/v1/users/${myId}/friend-requests/${friendId}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      setFriends([...friends.filter((friend) => friend.id !== friendId)]);
+      setShowMenu(false);
+    } catch (error) {
+      dispatchAuth(null, dispatch);
+    }
+  };
 
   const handleIncomingRequestsClick = () => {
     navigate(`/friend-requests/${myId}`);
@@ -52,8 +84,26 @@ const FriendsList: React.FC<FriendsListProps> = ({ myId }) => {
             <li
               key={id}
               className="flex items-center border-2 border-white bg-black p-2"
+              onContextMenu={handleContextMenu}
               onDoubleClick={() => handleUserDoubleClick(id)}
             >
+              {showMenu && (
+                <ul
+                  ref={menuRef}
+                  style={{
+                    position: 'fixed',
+                    top: menuPosition.y,
+                    left: menuPosition.x,
+                  }}
+                >
+                  <button
+                    className="cursor-pointer rounded border-4 border-red-400 bg-black p-1 text-white hover:text-red-400"
+                    onClick={() => handleDeleteClick(id)}
+                  >
+                    Delete
+                  </button>
+                </ul>
+              )}
               <CircularImage
                 src={image}
                 alt={nickname}

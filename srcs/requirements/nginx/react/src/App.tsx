@@ -82,10 +82,7 @@ const App: React.FC = () => {
           element={<ChatRoom myId={tokenInfo.id} socket={socket} />}
         />
         <Route path="/friend-requests" element={<FriendRequests />} />
-        <Route
-          path="/friends-list"
-          element={<FriendsList myId={tokenInfo.id} />}
-        />
+        <Route path="/friends-list" element={<FriendsList />} />
         <Route
           path="/my-page"
           element={<MyPage id={tokenInfo.id} stats={stats} />}

@@ -17,7 +17,12 @@ export class FriendService {
   async find(userId: number): Promise<FriendResponseDto[]> {
     return await this.friendRepository
       .createQueryBuilder("friends")
-      .select(["users.id", "users.nickname", "users.image", "users.status"])
+      .select([
+        "users.id       AS id",
+        "users.nickname AS nickname",
+        "users.image    AS image",
+        "users.status   AS status",
+      ])
       .innerJoin(
         UserEntity,
         "users",
@@ -25,7 +30,7 @@ export class FriendService {
         { userId }
       )
       .orderBy("users.nickname", "ASC")
-      .getRawMany<FriendResponseDto>();
+      .getRawMany();
   }
 
   async save(userId: number, friendId: number): Promise<void> {

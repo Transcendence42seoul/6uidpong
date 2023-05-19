@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import axios, { AxiosResponse, AxiosError } from 'axios';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../store';
 import HoverButton from '../button/HoverButton';
 import Modal from '../modal/Modal';
+import selectAuth from '../../features/auth/authSelector';
 
 interface TwoFactorAuthProps {
   id: number;
@@ -11,7 +10,7 @@ interface TwoFactorAuthProps {
 
 const TwoFactorAuth: React.FC<TwoFactorAuthProps> = ({ id }) => {
   const [openModal, setOpenModal] = useState<boolean>(false);
-  const { accessToken } = useSelector((state: RootState) => state.auth);
+  const { accessToken } = selectAuth();
   const [code, setCode] = useState<string>('');
 
   const handleCloseModal = () => {

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import handleAuthInfo from '../../authInfo';
+import dispatchAuth from '../../features/auth/authAction';
 import redirect from '../../utils/redirect';
 import HoverButton from '../button/HoverButton';
 
@@ -19,7 +19,7 @@ const LoginAuth: React.FC<LoginAuthProps> = ({ id }) => {
         id,
         code,
       });
-      await handleAuthInfo(data, dispatch);
+      await dispatchAuth(data, dispatch);
       alert('인증 완료');
       redirect('/');
     } catch {

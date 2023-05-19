@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import useCallAPI from '../api';
+import useCallAPI from '../utils/api';
 import { mockUsers } from '../mock';
 import CircularImage from '../components/container/CircularImage';
 import { User } from './UserProfile';

@@ -1,11 +1,11 @@
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { Routes, Route } from 'react-router-dom';
 import { io } from 'socket.io-client';
-import handleAuthInfo from './authInfo';
-import Layout from './Layout';
-import { RootState } from './store';
+import LoginAuth from './components/custom/LoginAuth';
+import dispatchAuth from './features/auth/authAction';
+import selectAuth from './features/auth/authSelector';
 import ChatRoom from './pages/ChatRoom';
 import ChatRoomList from './pages/ChatRoomList';
 import FriendsList from './pages/FriendsList';
@@ -16,7 +16,7 @@ import MyPage from './pages/MyPage';
 import ProfileSettings from './pages/ProfileSettings';
 import UserProfile from './pages/UserProfile';
 import redirect from './utils/redirect';
-import LoginAuth from './components/custom/LoginAuth';
+import Layout from './Layout';
 // import { mockTokenInfo as tokenInfo } from './mock'; // test
 
 const App: React.FC = () => {
@@ -25,9 +25,7 @@ const App: React.FC = () => {
   };
 
   const [loading, setLoading] = useState<boolean>(false);
-  const { id, is2FA, accessToken, tokenInfo } = useSelector(
-    (state: RootState) => state.auth,
-  );
+  const { id, is2FA, accessToken, tokenInfo } = selectAuth();
 
   const dispatch = useDispatch();
   const handleLoading = async () => {
@@ -43,7 +41,7 @@ const App: React.FC = () => {
         '/api/v1/auth/social/callback/forty-two',
         { code },
       );
-      await handleAuthInfo(data, dispatch);
+      await dispatchAuth(data, dispatch);
       const pathname = status === 201 ? '/profile-settings' : '/';
       redirect(pathname, url);
     };

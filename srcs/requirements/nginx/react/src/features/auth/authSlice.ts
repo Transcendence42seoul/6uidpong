@@ -6,11 +6,18 @@ interface TokenInfo {
   nickname: string;
 }
 
-const initialState = {
+interface AuthState {
+  id: number | null;
+  is2FA: boolean | null;
+  accessToken: string | null;
+  tokenInfo: TokenInfo | null;
+}
+
+const initialState: AuthState = {
   id: null,
   is2FA: null,
   accessToken: null,
-  tokenInfo: null as TokenInfo | null,
+  tokenInfo: null,
 };
 
 export type State = typeof initialState;
@@ -19,7 +26,7 @@ const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    setAuthInfo: (state, { payload }) => {
+    setAuth: (state, { payload }) => {
       if (!payload) {
         state.id = null;
         state.is2FA = null;
@@ -37,6 +44,6 @@ const authSlice = createSlice({
   },
 });
 
-export const { setAuthInfo } = authSlice.actions;
+export const { setAuth } = authSlice.actions;
 
 export default authSlice.reducer;

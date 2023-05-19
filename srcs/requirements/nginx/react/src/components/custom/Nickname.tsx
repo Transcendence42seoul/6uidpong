@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import axios, { AxiosResponse, AxiosError } from 'axios';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../store';
 import HoverButton from '../button/HoverButton';
+import selectAuth from '../../features/auth/authSelector';
 
 interface NicknameProps {
   id: number;
@@ -10,7 +9,7 @@ interface NicknameProps {
 
 const Nickname: React.FC<NicknameProps> = ({ id }) => {
   const [nickname, setNickname] = useState<string>('');
-  const { accessToken } = useSelector((state: RootState) => state.auth);
+  const { accessToken } = selectAuth();
 
   const handleNickname = () => {
     axios

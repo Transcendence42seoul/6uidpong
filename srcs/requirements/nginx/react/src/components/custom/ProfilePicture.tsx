@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import axios, { AxiosResponse, AxiosError } from 'axios';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../store';
 import HoverButton from '../button/HoverButton';
+import selectAuth from '../../features/auth/authSelector';
 
 interface ProfileProps {
   id: number;
@@ -10,7 +9,7 @@ interface ProfileProps {
 
 const ProfilePicture: React.FC<ProfileProps> = ({ id }) => {
   const [image, setImage] = useState<string>('');
-  const { accessToken } = useSelector((state: RootState) => state.auth);
+  const { accessToken } = selectAuth();
 
   const handleSubmit = () => {
     console.log(image);

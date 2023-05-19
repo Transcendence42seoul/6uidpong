@@ -1,11 +1,12 @@
 import axios from 'axios';
-import { useDispatch, useSelector } from 'react-redux';
-import { setAuthInfo } from './authSlice';
-import { RootState } from './store';
+import { useDispatch } from 'react-redux';
+import selectAuth from '../features/auth/authSelector';
+import { setAuth } from '../features/auth/authSlice';
 
 const useCallAPI = () => {
   const dispatch = useDispatch();
-  const { accessToken } = useSelector((state: RootState) => state.auth);
+
+  const { accessToken } = selectAuth();
 
   const callAPI = async (pathname: string, params: any = null) => {
     try {
@@ -17,7 +18,7 @@ const useCallAPI = () => {
       });
       return data;
     } catch (error) {
-      dispatch(setAuthInfo(null));
+      dispatch(setAuth(null));
     }
   };
   return callAPI;

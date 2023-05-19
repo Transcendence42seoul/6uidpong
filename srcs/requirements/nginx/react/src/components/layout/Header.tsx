@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import useCallAPI from '../../api';
+import useCallAPI from '../../utils/api';
 import { User } from '../../pages/UserProfile';
 import HoverButton from '../button/HoverButton';
 import CircularImage from '../container/CircularImage';

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
-import useCallAPI from '../api';
+import useCallAPI from '../utils/api';
 import AlertWithCloseButton from '../components/alert/AlertWithCloseButton';
 import CircularImage from '../components/container/CircularImage';
 import ContentBox from '../components/container/ContentBox';

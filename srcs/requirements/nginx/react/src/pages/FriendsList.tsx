@@ -1,18 +1,37 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import useCallAPI from '../api';
+import { mockUsers } from '../mock';
 import CircularImage from '../components/container/CircularImage';
-import { mockUsers as users } from '../mock';
+import { User } from './UserProfile';
 
-const FriendsList: React.FC = () => {
+interface FriendsListProps {
+  myId: number;
+}
+
+const FriendsList: React.FC<FriendsListProps> = ({ myId }) => {
+  const callAPI = useCallAPI();
   const navigate = useNavigate();
+  const [friends, setFriends] = useState<User[]>([]);
 
-  const handleUserDoubleClick = (id: number) => navigate(`/profile/${id}`);
+  const handleUserDoubleClick = (userId: number) => {
+    navigate(`/profile/${userId}`);
+  };
+
+  useEffect(() => {
+    const fetchFriendsData = async () => {
+      const data: User[] =
+        (await callAPI(`/api/v1/users/${myId}/friends`)) ?? mockUsers; // test
+      setFriends(data);
+    };
+    fetchFriendsData();
+  }, []);
 
   return (
     <div className="p-4">
       <h2 className="mb-4 text-2xl font-bold text-gray-100">Friends</h2>
       <ul className="space-y-2">
-        {users.map(({ id, nickname, image, status }) => {
+        {friends.map(({ id, nickname, image, status }) => {
           const statusColor =
             status === 'offline' ? 'bg-red-400' : 'bg-green-400';
           return (

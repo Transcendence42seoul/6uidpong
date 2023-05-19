@@ -48,7 +48,7 @@ const FriendsList: React.FC = () => {
   };
 
   const handleIncomingRequestsClick = () => {
-    navigate(`/friend-requests/${myId}`);
+    navigate('/friend-requests');
   };
 
   const handleUserDoubleClick = (userId: number) => {

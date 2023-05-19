@@ -28,7 +28,7 @@ const FriendRequests: React.FC = () => {
           },
         },
       );
-      axios.delete(`/api/v1/users/${fromId}/friend-requestUsers/${myId}`, {
+      axios.delete(`/api/v1/users/${fromId}/friend-requests/${myId}`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -41,7 +41,7 @@ const FriendRequests: React.FC = () => {
 
   const handleRejectClick = (fromId: number) => {
     try {
-      axios.delete(`/api/v1/users/${fromId}/friend-requestUsers/${myId}`, {
+      axios.delete(`/api/v1/users/${fromId}/friend-requests/${myId}`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -55,7 +55,7 @@ const FriendRequests: React.FC = () => {
   useEffect(() => {
     const fetchFriendRequestsData = async () => {
       const data: User[] =
-        (await callAPI(`/api/v1/users/${myId}/friend-requestUsers`)) ??
+        (await callAPI(`/api/v1/users/${myId}/friend-requests`)) ??
         mockFriendRequests; // test
       setRequestUsers(data);
     };

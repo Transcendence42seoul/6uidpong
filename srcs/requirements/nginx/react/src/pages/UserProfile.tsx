@@ -104,7 +104,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ socket }) => {
         <p className="mt-1 text-sm">Ladder Score: {user?.ladderScore}</p>
         <HoverButton
           onClick={handleFriendRequestClick}
-          className="mt-4 border-2"
+          className="mt-4 border-2 p-2"
         >
           Friend Request
         </HoverButton>

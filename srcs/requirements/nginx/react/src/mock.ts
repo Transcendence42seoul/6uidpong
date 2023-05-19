@@ -78,3 +78,9 @@ export const mockChats = [
     createdAt: '2023-05-18 00:27:44.127905',
   },
 ];
+
+export const mockFriendRequests = [
+  { from: mockUsers[0] },
+  { from: mockUsers[1] },
+  { from: mockUsers[2] },
+];

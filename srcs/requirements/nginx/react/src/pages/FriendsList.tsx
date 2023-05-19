@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import HoverButton from '../components/button/HoverButton';
 import CircularImage from '../components/container/CircularImage';
 import useCallAPI from '../utils/api';
 import { User } from './UserProfile';
@@ -13,6 +14,10 @@ const FriendsList: React.FC<FriendsListProps> = ({ myId }) => {
   const callAPI = useCallAPI();
   const navigate = useNavigate();
   const [friends, setFriends] = useState<User[]>([]);
+
+  const handleIncomingRequestsClick = () => {
+    navigate(`/friend-requests/${myId}`);
+  };
 
   const handleUserDoubleClick = (userId: number) => {
     navigate(`/profile/${userId}`);
@@ -29,9 +34,18 @@ const FriendsList: React.FC<FriendsListProps> = ({ myId }) => {
 
   return (
     <div className="p-4">
-      <h2 className="mb-4 text-2xl font-bold text-gray-100">Friends</h2>
+      <div className="mb-4 flex">
+        <h2 className="text-2xl font-bold text-gray-100">Friends</h2>
+        <HoverButton
+          onClick={handleIncomingRequestsClick}
+          className="ml-auto border p-1.5"
+        >
+          Incoming Requests
+        </HoverButton>
+      </div>
       <ul className="space-y-2">
-        {friends.map(({ id, nickname, image, status }) => {
+        {friends.map((friend) => {
+          const { id, nickname, image, status } = friend;
           const statusColor =
             status === 'offline' ? 'bg-red-400' : 'bg-green-400';
           return (
@@ -46,7 +60,7 @@ const FriendsList: React.FC<FriendsListProps> = ({ myId }) => {
                 className="mr-4 h-12 w-12 rounded-full"
               />
               <span className="text-lg font-medium text-white">{nickname}</span>
-              <div className="ml-auto pr-3">
+              <div className="ml-auto mr-3">
                 <div className={`h-4 w-4 rounded-full ${statusColor}`} />
               </div>
             </li>

@@ -8,6 +8,7 @@ import dispatchAuth from './features/auth/authAction';
 import selectAuth from './features/auth/authSelector';
 import ChatRoom from './pages/ChatRoom';
 import ChatRoomList from './pages/ChatRoomList';
+import FriendRequests from './pages/FriendRequests';
 import FriendsList from './pages/FriendsList';
 import Loading from './pages/Loading';
 import Login from './pages/Login';
@@ -80,6 +81,7 @@ const App: React.FC = () => {
           path="/chat/:roomId"
           element={<ChatRoom myId={tokenInfo.id} socket={socket} />}
         />
+        <Route path="/friend-requests" element={<FriendRequests />} />
         <Route
           path="/friends-list"
           element={<FriendsList myId={tokenInfo.id} />}

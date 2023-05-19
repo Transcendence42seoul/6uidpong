@@ -52,7 +52,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ socket }) => {
       setUser(data);
     };
     fetchUserData();
-  }, []);
+  }, [interlocutorId]);
 
   useEffect(() => {
     if (showAlert) {

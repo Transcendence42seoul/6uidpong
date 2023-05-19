@@ -8,10 +8,6 @@ import useCallAPI from '../utils/api';
 import { User } from './UserProfile';
 import { mockFriendRequests } from '../mock'; // test
 
-interface FriendRequest {
-  from: User;
-}
-
 const FriendRequests: React.FC = () => {
   const callAPI = useCallAPI();
   const dispatch = useDispatch();
@@ -19,25 +15,20 @@ const FriendRequests: React.FC = () => {
   const { accessToken, tokenInfo } = selectAuth();
   const myId = tokenInfo?.id;
 
-  const [requests, setRequests] = useState<FriendRequest[]>([]);
+  const [requestUsers, setRequestUsers] = useState<User[]>([]);
 
-  const handleAcceptClick = (fromId: number) => {
+  const handleAcceptClick = (friendId: number) => {
     try {
       axios.post(
         `/api/v1/users/${myId}/friends`,
-        { friendId: fromId },
+        { friendId },
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
         },
       );
-      axios.delete(`/api/v1/users/${fromId}/friend-requests/${myId}`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-      setRequests([...requests.filter(({ from }) => from.id !== fromId)]);
+      setRequestUsers([...requestUsers.filter((user) => user.id !== friendId)]);
     } catch (error) {
       dispatchAuth(null, dispatch);
     }
@@ -50,7 +41,7 @@ const FriendRequests: React.FC = () => {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-      setRequests([...requests.filter(({ from }) => from.id !== fromId)]);
+      setRequestUsers([...requestUsers.filter((user) => user.id !== fromId)]);
     } catch (error) {
       dispatchAuth(null, dispatch);
     }
@@ -58,10 +49,10 @@ const FriendRequests: React.FC = () => {
 
   useEffect(() => {
     const fetchFriendRequestsData = async () => {
-      const data: FriendRequest[] =
+      const data: User[] =
         (await callAPI(`/api/v1/users/${myId}/friend-requests`)) ??
         mockFriendRequests; // test
-      setRequests(data);
+      setRequestUsers(data);
     };
     fetchFriendRequestsData();
   }, []);
@@ -70,9 +61,8 @@ const FriendRequests: React.FC = () => {
     <div className="p-4">
       <h2 className="mb-4 text-2xl font-bold text-gray-100">Friend Requests</h2>
       <ul className="space-y-2">
-        {requests.map((request) => {
-          const { from } = request;
-          const { id, nickname, image } = from;
+        {requestUsers.map((user) => {
+          const { id, nickname, image } = user;
           return (
             <li
               key={id}

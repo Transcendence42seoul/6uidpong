@@ -58,7 +58,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ socket }) => {
   const handleFriendRequestClick = () => {
     try {
       axios.post(
-        `/api/v1/users/${myId}/friends-requests`,
+        `/api/v1/users/${myId}/friend-requests`,
         { toId: interlocutorId },
         {
           headers: {
@@ -102,7 +102,10 @@ const UserProfile: React.FC<UserProfileProps> = ({ socket }) => {
         <p className="mt-1 text-sm">Wins: {user?.winStat}</p>
         <p className="mt-1 text-sm">Losses: {user?.loseStat}</p>
         <p className="mt-1 text-sm">Ladder Score: {user?.ladderScore}</p>
-        <HoverButton onClick={handleFriendRequestClick}>
+        <HoverButton
+          onClick={handleFriendRequestClick}
+          className="mt-4 border-2 px-2 py-1"
+        >
           Friend Request
         </HoverButton>
         <div className="mt-4 flex">

@@ -1,6 +1,6 @@
 import React from 'react';
-import Image from '../constants/Image';
 import '../components/css/loading.css';
+import Image from '../constants/Image';
 
 const Loading: React.FC = () => {
   return (

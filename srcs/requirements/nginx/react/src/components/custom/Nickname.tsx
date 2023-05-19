@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios, { AxiosResponse, AxiosError } from 'axios';
-import HoverButton from '../button/HoverButton';
 import selectAuth from '../../features/auth/authSelector';
+import HoverButton from '../button/HoverButton';
 
 interface NicknameProps {
   id: number;

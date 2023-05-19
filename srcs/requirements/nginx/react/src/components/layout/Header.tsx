@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import useCallAPI from '../../utils/api';
 import { User } from '../../pages/UserProfile';
+import useCallAPI from '../../utils/api';
 import HoverButton from '../button/HoverButton';
 import CircularImage from '../container/CircularImage';
 import { mockUsers } from '../../mock'; // test

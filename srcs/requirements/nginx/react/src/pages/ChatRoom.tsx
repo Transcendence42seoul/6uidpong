@@ -8,13 +8,13 @@ import React, {
 } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
-import formatTime from '../utils/formatTime';
 import AlertWithCloseButton from '../components/alert/AlertWithCloseButton';
 import ChatContainer from '../components/container/ChatContainer';
 import CircularImage from '../components/container/CircularImage';
 import Message from '../components/container/Message';
 import MessageBox from '../components/container/MessageBox';
 import MessageForm from '../components/container/MessageForm';
+import formatTime from '../utils/formatTime';
 import { mockChats, mockLocationState } from '../mock'; // test
 
 export interface Chat {

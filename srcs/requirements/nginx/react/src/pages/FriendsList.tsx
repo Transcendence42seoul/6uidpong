@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import useCallAPI from '../utils/api';
-import { mockUsers } from '../mock';
 import CircularImage from '../components/container/CircularImage';
+import useCallAPI from '../utils/api';
 import { User } from './UserProfile';
+import { mockUsers } from '../mock'; // test
 
 interface FriendsListProps {
   myId: number;

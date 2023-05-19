@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
-import formatTime from '../utils/formatTime';
 import CircularImage from '../components/container/CircularImage';
+import formatTime from '../utils/formatTime';
 import { Chat } from './ChatRoom';
 
 interface ChatRoomListProps {

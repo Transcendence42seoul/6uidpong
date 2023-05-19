@@ -58,7 +58,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ socket }) => {
   const handleFriendRequestClick = () => {
     try {
       axios.post(
-        `/api/v1/users/${myId}/friends-requests`,
+        `/api/v1/users/${myId}/friend-requests`,
         { toId: interlocutorId },
         {
           headers: {

@@ -1,9 +1,14 @@
+import axios from 'axios';
 import React, { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
 import AlertWithCloseButton from '../components/alert/AlertWithCloseButton';
+import HoverButton from '../components/button/HoverButton';
 import CircularImage from '../components/container/CircularImage';
 import ContentBox from '../components/container/ContentBox';
+import dispatchAuth from '../features/auth/authAction';
+import selectAuth from '../features/auth/authSelector';
 import useCallAPI from '../utils/api';
 
 export interface User {
@@ -22,12 +27,25 @@ interface UserProfileProps {
 
 const UserProfile: React.FC<UserProfileProps> = ({ socket }) => {
   const callAPI = useCallAPI();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const { userId } = useParams<{ userId: string }>();
   const interlocutorId = Number(userId);
 
+  const { accessToken, tokenInfo } = selectAuth();
+  const myId = tokenInfo?.id;
+
   const [showAlert, setShowAlert] = useState<boolean>(false);
   const [user, setUser] = useState<User | null>(null);
+
+  const handleAlertClose = () => {
+    setShowAlert(false);
+  };
+
+  const handleBlockClick = () => {
+    socket.emit('block-dm-user', { interlocutorId });
+    setShowAlert(true);
+  };
 
   const handleDmClick = () => {
     const roomIdHandler = ({ roomId }: { roomId: string }) =>
@@ -37,13 +55,20 @@ const UserProfile: React.FC<UserProfileProps> = ({ socket }) => {
     socket.emit('join-dm', { interlocutorId }, roomIdHandler);
   };
 
-  const handleBlockClick = () => {
-    socket.emit('block-dm-user', { interlocutorId });
-    setShowAlert(true);
-  };
-
-  const handleAlertClose = () => {
-    setShowAlert(false);
+  const handleFriendRequestClick = () => {
+    try {
+      axios.post(
+        `/api/v1/users/${myId}/friends-requests`,
+        { toId: interlocutorId },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      );
+    } catch (error) {
+      dispatchAuth(null, dispatch);
+    }
   };
 
   useEffect(() => {
@@ -77,6 +102,9 @@ const UserProfile: React.FC<UserProfileProps> = ({ socket }) => {
         <p className="mt-1 text-sm">Wins: {user?.winStat}</p>
         <p className="mt-1 text-sm">Losses: {user?.loseStat}</p>
         <p className="mt-1 text-sm">Ladder Score: {user?.ladderScore}</p>
+        <HoverButton onClick={handleFriendRequestClick}>
+          Friend Request
+        </HoverButton>
         <div className="mt-4 flex">
           <button className="mr-2 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-400">
             Game

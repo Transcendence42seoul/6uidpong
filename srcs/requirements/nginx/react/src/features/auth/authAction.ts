@@ -7,7 +7,7 @@ interface AuthInfo {
   accessToken: string | null;
 }
 
-const dispatchAuth = async (data: AuthInfo, dispatch: Dispatch) => {
+const dispatchAuth = async (data: AuthInfo | null, dispatch: Dispatch) => {
   dispatch(setAuth(data));
 };
 

@@ -17,23 +17,18 @@ const FriendRequests: React.FC = () => {
 
   const [requestUsers, setRequestUsers] = useState<User[]>([]);
 
-  const handleAcceptClick = (fromId: number) => {
+  const handleAcceptClick = (friendId: number) => {
     try {
       axios.post(
         `/api/v1/users/${myId}/friends`,
-        { friendId: fromId },
+        { friendId },
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
         },
       );
-      axios.delete(`/api/v1/users/${fromId}/friend-requests/${myId}`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-      setRequestUsers([...requestUsers.filter((user) => user.id !== fromId)]);
+      setRequestUsers([...requestUsers.filter((user) => user.id !== friendId)]);
     } catch (error) {
       dispatchAuth(null, dispatch);
     }

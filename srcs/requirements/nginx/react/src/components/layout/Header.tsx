@@ -83,15 +83,15 @@ const Header: React.FC = () => {
               return (
                 <button
                   key={nickname}
-                  className="flex border-b border-gray-300 py-1 hover:bg-gray-200"
+                  className="flex space-x-2 border-b border-gray-300 py-1 hover:bg-gray-200"
                   onClick={() => handleUserClick(id)}
                 >
                   <CircularImage
                     src={image}
                     alt={nickname}
-                    className="mr-2 h-6 w-6 align-bottom"
+                    className="h-6 w-6 align-bottom"
                   />
-                  {nickname}
+                  <span className="w-[90%] truncate text-left">{nickname}</span>
                 </button>
               );
             })}

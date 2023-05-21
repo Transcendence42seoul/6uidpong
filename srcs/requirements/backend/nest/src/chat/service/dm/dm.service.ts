@@ -1,12 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { UserEntity } from "src/user/entity/user.entity";
-import {
-  Repository,
-  SelectQueryBuilder,
-  MoreThanOrEqual,
-  DataSource,
-} from "typeorm";
+import { Repository, MoreThanOrEqual, DataSource } from "typeorm";
 import { DmRoomsResponseDto } from "../../dto/dm/dm-rooms-response.dto";
 import { DmChatEntity } from "../../entity/dm/dm-chat.entity";
 import { DmRoomUserEntity } from "../../entity/dm/dm-room-user.entity";
@@ -25,14 +20,7 @@ export class DmService {
   ) {}
 
   async findRooms(userId: number): Promise<DmRoomsResponseDto[]> {
-    const scalarSubQuery = this.roomUserRepository
-      .createQueryBuilder()
-      .select("new_msg_count")
-      .where("user_id = :userId")
-      .andWhere("room_id = dm_chats.room_id")
-      .setParameter("userId", userId)
-      .getQuery();
-    const queryBuilder = this.chatRepository
+    return await this.chatRepository
       .createQueryBuilder("dm_chats")
       .select([
         'dm_chats.room_id       AS "roomId"',
@@ -41,19 +29,24 @@ export class DmService {
         'users.id               AS "interlocutorId"',
         "users.nickname         AS interlocutor",
         'users.image            AS "interlocutorImage"',
-        `(${scalarSubQuery})    AS "newMsgCount"`,
       ])
+      .addSelect((subQuery) => {
+        return subQuery
+          .select("sub.new_msg_count")
+          .from(DmRoomUserEntity, "sub")
+          .where("sub.user_id = :userId")
+          .andWhere("sub.room_id = dm_chats.room_id");
+      }, "newMsgCount")
       .innerJoin(
-        (inlineViewBuilder: SelectQueryBuilder<DmChatEntity>) =>
-          inlineViewBuilder
+        (subQuery) =>
+          subQuery
             .select("sub_dm_chats.room_id", "room_id")
             .addSelect("MAX(sub_dm_chats.created_at)", "max_created_at")
             .from(DmChatEntity, "sub_dm_chats")
             .innerJoin(
               DmRoomUserEntity,
               "room_users",
-              "room_users.user_id = :userId AND room_users.is_exit = false AND room_users.room_id = sub_dm_chats.room_id",
-              { userId }
+              "room_users.user_id = :userId AND room_users.is_exit = false AND room_users.room_id = sub_dm_chats.room_id"
             )
             .groupBy("sub_dm_chats.room_id"),
         "last_chats",
@@ -62,37 +55,35 @@ export class DmService {
       .innerJoin(
         DmRoomUserEntity,
         "room_users",
-        "dm_chats.room_id = room_users.room_id AND room_users.user_id != :userId",
-        { userId }
+        "dm_chats.room_id = room_users.room_id AND room_users.user_id != :userId"
       )
       .innerJoin(UserEntity, "users", "room_users.user_id = users.id")
-      .orderBy("dm_chats.created_at", "DESC");
-
-    return await queryBuilder.getRawMany<DmRoomsResponseDto>();
+      .orderBy("dm_chats.created_at", "DESC")
+      .setParameter("userId", userId)
+      .getRawMany();
   }
 
   async findRoomUser(
     userId: number,
     interlocutorId: number
   ): Promise<DmRoomUserEntity> {
-    const queryBuilder = this.roomUserRepository
+    return await this.roomUserRepository
       .createQueryBuilder("room_user")
       .select()
       .innerJoin(
-        (inlineViewBuilder) =>
-          inlineViewBuilder
+        (subQuery) =>
+          subQuery
             .select("d.room_id")
             .from(DmRoomUserEntity, "d")
             .where("d.user_id IN (:userId, :interlocutorId)")
-            .setParameters({ userId, interlocutorId })
             .groupBy("d.room_id")
             .having("COUNT(DISTINCT d.user_id) = 2"),
         "match_room_user",
         "room_user.room_id = match_room_user.room_id"
       )
-      .where("room_user.user_id = :userId", { userId });
-
-    return await queryBuilder.getOneOrFail();
+      .where("room_user.user_id = :userId")
+      .setParameters({ userId, interlocutorId })
+      .getOneOrFail();
   }
 
   async updateRoomUser(roomUser: DmRoomUserEntity): Promise<void> {

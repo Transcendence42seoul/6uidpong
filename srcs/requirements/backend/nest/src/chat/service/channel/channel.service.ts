@@ -44,16 +44,17 @@ export class ChannelService {
       ])
       .innerJoin("channel_users.channel", "channel")
       .innerJoin(
-        (memberCountSubQuery) =>
-          memberCountSubQuery
+        (subQuery) =>
+          subQuery
             .select(["sub.channel_id", "count(*) AS count"])
             .from(ChannelUserEntity, "sub")
             .groupBy("sub.channel_id"),
         "member_count",
         "channel_users.channel_id = member_count.channel_id"
       )
-      .where("channel_users.user_id = :userId", { userId })
+      .where("channel_users.user_id = :userId")
       .orderBy("channel.title", "ASC")
+      .setParameter("userId", userId)
       .getRawMany();
   }
 }

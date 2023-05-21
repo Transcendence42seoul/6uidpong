@@ -53,7 +53,7 @@ const FriendsList: React.FC = () => {
         url: `/api/v1/users/${myId}/friends`,
       };
       const data: User[] = (await callApi(config)) ?? mockUsers; // test
-      setFriends(data);
+      setFriends([...data]);
     };
     fetchFriendsData();
   }, []);

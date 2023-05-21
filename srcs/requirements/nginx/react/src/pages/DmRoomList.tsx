@@ -61,7 +61,7 @@ const DmRoomList: React.FC<DmRoomListProps> = ({ socket }) => {
 
   useEffect(() => {
     const roomListHandler = (roomList: Room[]) => {
-      setRooms(roomList);
+      setRooms([...roomList]);
     };
     socket.emit('find-dm-rooms', roomListHandler);
   }, []);

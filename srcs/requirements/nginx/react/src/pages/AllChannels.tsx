@@ -1,28 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
-import HoverButton from '../components/button/HoverButton';
+import { Channel } from './ChannelList';
 
-interface ChannelListProps {
+interface AllChannelsProps {
   socket: Socket;
 }
 
-export interface Channel {
-  id: number;
-  title: string;
-  isPublic: boolean;
-  newMsgCount: number;
-  memberCount: number;
-}
-
-const ChannelList: React.FC<ChannelListProps> = ({ socket }) => {
+const AllChannels: React.FC<AllChannelsProps> = ({ socket }) => {
   const navigate = useNavigate();
 
   const [channels, setChannels] = useState<Channel[]>([]);
-
-  const handleAllChannelsClick = () => {
-    navigate('/channel/all');
-  };
 
   const handleChannelDoubleClick = ({ id }: Channel) => {
     navigate(`/channel/${id}`);
@@ -32,21 +20,15 @@ const ChannelList: React.FC<ChannelListProps> = ({ socket }) => {
     const channelListHandler = (channelList: Channel[]) => {
       setChannels([...channelList]);
     };
-    socket.emit('find-my-channels', channelListHandler);
+    socket.emit('find-all-channels', channelListHandler);
   }, []);
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100">
-      <HoverButton
-        onClick={handleAllChannelsClick}
-        className="mb-10 rounded border-2 p-2.5"
-      >
-        All Channels
-      </HoverButton>
-      <h1 className="mb-4 text-3xl font-bold">Channel</h1>
+      <h1 className="mb-4 text-3xl font-bold">All Channels</h1>
       <ul className="w-full max-w-3xl">
         {channels.map((channel) => {
-          const { id, title, isPublic, newMsgCount, memberCount } = channel;
+          const { id, title, isPublic, memberCount } = channel;
           return (
             <li
               key={id}
@@ -58,11 +40,6 @@ const ChannelList: React.FC<ChannelListProps> = ({ socket }) => {
                 <span>{title}</span>
               </div>
               <div className="flex items-center">
-                {newMsgCount > 0 && (
-                  <div className="mr-3 rounded-full bg-red-500 text-white">
-                    {newMsgCount}
-                  </div>
-                )}
                 <span className="text-sm text-gray-600">{memberCount}</span>
               </div>
             </li>
@@ -73,4 +50,4 @@ const ChannelList: React.FC<ChannelListProps> = ({ socket }) => {
   );
 };
 
-export default ChannelList;
+export default AllChannels;

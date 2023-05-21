@@ -10,7 +10,7 @@ export class BlockService {
     private readonly blockRepository: Repository<BlockEntity>
   ) {}
 
-  async create(userId: number, interlocutorId: number): Promise<void> {
+  async save(userId: number, interlocutorId: number): Promise<void> {
     await this.blockRepository.save({
       userId: userId,
       blockedUserId: interlocutorId,

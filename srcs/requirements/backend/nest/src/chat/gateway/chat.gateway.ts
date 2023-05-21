@@ -24,6 +24,11 @@ import { DmChatsResponseDto } from "../dto/dm/dm-chats-response.dto";
 import { EntityNotFoundError } from "typeorm";
 import { DmChatEntity } from "../entity/dm/dm-chat.entity";
 import { BlockService } from "../service/dm/block.service";
+import { ChannelService } from "../service/channel/channel.service";
+import { ChannelEntity } from "../entity/channel/channel.entity";
+import { AllChannelResponseDto } from "../dto/channel/all-channel-response.dto";
+import { ChannelUserEntity } from "../entity/channel/channel-user.entity";
+import { MyChannelResponseDto } from "../dto/channel/my-channel-response.dto";
 
 @WebSocketGateway(80, {
   cors: {
@@ -41,6 +46,7 @@ export class ChatGateway implements OnGatewayDisconnect {
     private readonly disconnectionService: DisconnectionService,
     private readonly dmService: DmService,
     private readonly blockService: BlockService,
+    private readonly channelService: ChannelService,
     private readonly userService: UserService
   ) {}
 
@@ -168,7 +174,7 @@ export class ChatGateway implements OnGatewayDisconnect {
     @WsJwtPayload() jwt: JwtPayload,
     @MessageBody("interlocutorId") interlocutorId: number
   ): Promise<void> {
-    await this.blockService.create(jwt.id, interlocutorId);
+    await this.blockService.save(jwt.id, interlocutorId);
   }
 
   @SubscribeMessage("unblock-dm-user")
@@ -177,5 +183,25 @@ export class ChatGateway implements OnGatewayDisconnect {
     @MessageBody("interlocutorId") interlocutorId: number
   ): Promise<void> {
     await this.blockService.delete(jwt.id, interlocutorId);
+  }
+
+  @SubscribeMessage("find-all-channels")
+  async findAllChannels(): Promise<AllChannelResponseDto[]> {
+    const channels: ChannelEntity[] = await this.channelService.findAll();
+    return channels.map((channel) => {
+      return new AllChannelResponseDto(channel);
+    });
+  }
+
+  @SubscribeMessage("find-my-channels")
+  async findMyChannels(
+    @WsJwtPayload() jwt: JwtPayload
+  ): Promise<MyChannelResponseDto[]> {
+    const channelUsers: ChannelUserEntity[] = await this.channelService.find(
+      jwt.id
+    );
+    return channelUsers.map((channelUser) => {
+      return new MyChannelResponseDto(channelUser);
+    });
   }
 }

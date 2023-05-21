@@ -14,6 +14,7 @@ import { BlockService } from "../service/dm/block.service";
 import { ChannelEntity } from "../entity/channel/channel.entity";
 import { ChannelUserEntity } from "../entity/channel/channel-user.entity";
 import { ChannelChatEntity } from "../entity/channel/channel-chat.entity";
+import { ChannelService } from "../service/channel/channel.service";
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { ChannelChatEntity } from "../entity/channel/channel-chat.entity";
   ],
   providers: [
     DmService,
+    ChannelService,
     BlockService,
     ConnectionService,
     DisconnectionService,

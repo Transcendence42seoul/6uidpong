@@ -31,7 +31,7 @@ const FriendsList: React.FC = () => {
 
   const handleDeleteClick = (friendId: number) => {
     const config = {
-      url: `/api/v1/users/${myId}/friend-requests/${friendId}`,
+      url: `/api/v1/users/${myId}/friends/${friendId}`,
       method: 'delete',
     };
     callApi(config);

@@ -6,6 +6,7 @@ import { io } from 'socket.io-client';
 import LoginAuth from './components/custom/LoginAuth';
 import dispatchAuth from './features/auth/authAction';
 import selectAuth from './features/auth/authSelector';
+import AllChannels from './pages/AllChannels';
 import ChannelList from './pages/ChannelList';
 import DmRoom from './pages/DmRoom';
 import DmRoomList from './pages/DmRoomList';
@@ -78,6 +79,7 @@ const App: React.FC = () => {
       <Routes>
         <Route path="/" element={<Main />} />
         <Route path="/channel" element={<ChannelList socket={socket} />} />
+        <Route path="/channel/all" element={<AllChannels socket={socket} />} />
         <Route path="/dm" element={<DmRoomList socket={socket} />} />
         <Route
           path="/dm/:roomId"

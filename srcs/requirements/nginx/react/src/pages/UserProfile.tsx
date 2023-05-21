@@ -1,15 +1,12 @@
-import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
 import AlertWithCloseButton from '../components/alert/AlertWithCloseButton';
 import HoverButton from '../components/button/HoverButton';
 import CircularImage from '../components/container/CircularImage';
 import ContentBox from '../components/container/ContentBox';
-import dispatchAuth from '../features/auth/authAction';
 import selectAuth from '../features/auth/authSelector';
-import useCallAPI from '../utils/api';
+import useCallApi from '../utils/useCallApi';
 
 export interface User {
   id: number;
@@ -26,13 +23,12 @@ interface UserProfileProps {
 }
 
 const UserProfile: React.FC<UserProfileProps> = ({ socket }) => {
-  const callAPI = useCallAPI();
-  const dispatch = useDispatch();
+  const callApi = useCallApi();
   const navigate = useNavigate();
   const { userId } = useParams<{ userId: string }>();
   const interlocutorId = Number(userId);
 
-  const { accessToken, tokenInfo } = selectAuth();
+  const { tokenInfo } = selectAuth();
   const myId = tokenInfo?.id;
 
   const [showAlert, setShowAlert] = useState<boolean>(false);
@@ -56,24 +52,20 @@ const UserProfile: React.FC<UserProfileProps> = ({ socket }) => {
   };
 
   const handleFriendRequestClick = () => {
-    try {
-      axios.post(
-        `/api/v1/users/${myId}/friend-requests`,
-        { toId: interlocutorId },
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        },
-      );
-    } catch (error) {
-      dispatchAuth(null, dispatch);
-    }
+    const config = {
+      url: `/api/v1/users/${myId}/friend-requests`,
+      method: 'post',
+      data: { toId: interlocutorId },
+    };
+    callApi(config);
   };
 
   useEffect(() => {
     const fetchUserData = async () => {
-      const data: User = await callAPI(`/api/v1/users/${interlocutorId}`);
+      const config = {
+        url: `/api/v1/users/${interlocutorId}`,
+      };
+      const data: User = await callApi(config);
       setUser(data);
     };
     fetchUserData();

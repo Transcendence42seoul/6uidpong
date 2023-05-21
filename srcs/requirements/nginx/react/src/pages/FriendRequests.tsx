@@ -1,57 +1,43 @@
-import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
 import CircularImage from '../components/container/CircularImage';
-import dispatchAuth from '../features/auth/authAction';
 import selectAuth from '../features/auth/authSelector';
-import useCallAPI from '../utils/api';
+import useCallApi from '../utils/useCallApi';
 import { User } from './UserProfile';
 import { mockFriendRequests } from '../mock'; // test
 
 const FriendRequests: React.FC = () => {
-  const callAPI = useCallAPI();
-  const dispatch = useDispatch();
+  const callApi = useCallApi();
 
-  const { accessToken, tokenInfo } = selectAuth();
+  const { tokenInfo } = selectAuth();
   const myId = tokenInfo?.id;
 
   const [requestUsers, setRequestUsers] = useState<User[]>([]);
 
   const handleAcceptClick = (friendId: number) => {
-    try {
-      axios.post(
-        `/api/v1/users/${myId}/friends`,
-        { friendId },
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        },
-      );
-      setRequestUsers([...requestUsers.filter((user) => user.id !== friendId)]);
-    } catch (error) {
-      dispatchAuth(null, dispatch);
-    }
+    const config = {
+      url: `/api/v1/users/${myId}/friends`,
+      method: 'post',
+      data: { friendId },
+    };
+    callApi(config);
+    setRequestUsers([...requestUsers.filter((user) => user.id !== friendId)]);
   };
 
   const handleRejectClick = (fromId: number) => {
-    try {
-      axios.delete(`/api/v1/users/${fromId}/friend-requests/${myId}`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-      setRequestUsers([...requestUsers.filter((user) => user.id !== fromId)]);
-    } catch (error) {
-      dispatchAuth(null, dispatch);
-    }
+    const config = {
+      url: `/api/v1/users/${fromId}/friend-requests/${myId}`,
+      method: 'delete',
+    };
+    callApi(config);
+    setRequestUsers([...requestUsers.filter((user) => user.id !== fromId)]);
   };
 
   useEffect(() => {
     const fetchFriendRequestsData = async () => {
-      const data: User[] =
-        (await callAPI(`/api/v1/users/${myId}/friend-requests`)) ??
-        mockFriendRequests; // test
+      const config = {
+        url: `/api/v1/users/${myId}/friend-requests`,
+      };
+      const data: User[] = (await callApi(config)) ?? mockFriendRequests; // test
       setRequestUsers(data);
     };
     fetchFriendRequestsData();

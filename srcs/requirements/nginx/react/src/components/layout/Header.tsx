@@ -1,13 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User } from '../../pages/UserProfile';
-import useCallAPI from '../../utils/api';
+import useCallApi from '../../utils/useCallApi';
 import HoverButton from '../button/HoverButton';
 import CircularImage from '../container/CircularImage';
 import { mockUsers } from '../../mock'; // test
 
 const Header: React.FC = () => {
-  const callAPI = useCallAPI();
+  const callApi = useCallApi();
   const navigate = useNavigate();
 
   const searchResultsRef = useRef<HTMLUListElement>(null);
@@ -35,11 +35,11 @@ const Header: React.FC = () => {
   ) => {
     const nickname = event.target.value;
     setSearch(nickname);
-    const params = {
-      nickname,
+    const config = {
+      url: '/api/v1/users/search',
+      params: { nickname },
     };
-    const data: User[] =
-      (await callAPI('/api/v1/users/search', params)) ?? mockUsers; // test
+    const data: User[] = (await callApi(config)) ?? mockUsers; // test
     await handleSearchResults(data);
     await handleShowSearchResults(nickname);
   };

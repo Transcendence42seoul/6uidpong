@@ -2,15 +2,15 @@ import React from 'react';
 
 interface HoverButtonProps {
   onClick: () => void;
-  className?: string;
   children: React.ReactNode;
+  className?: string;
   disabled?: boolean;
 }
 
 const HoverButton: React.FC<HoverButtonProps> = ({
   onClick,
-  className,
   children,
+  className,
   disabled,
 }) => {
   return (

@@ -6,12 +6,11 @@ import {
   SelectQueryBuilder,
   MoreThanOrEqual,
   DataSource,
-  InsertResult,
 } from "typeorm";
-import { DmRoomsResponseDto } from "../dto/dm-rooms-response.dto";
-import { DmChatEntity } from "../entity/dm-chat.entity";
-import { DmRoomUserEntity } from "../entity/dm-room-user.entity";
-import { DmRoomEntity } from "../entity/dm-room.entity";
+import { DmRoomsResponseDto } from "../../dto/dm/dm-rooms-response.dto";
+import { DmChatEntity } from "../../entity/dm/dm-chat.entity";
+import { DmRoomUserEntity } from "../../entity/dm/dm-room-user.entity";
+import { DmRoomEntity } from "../../entity/dm/dm-room.entity";
 
 @Injectable()
 export class DmService {

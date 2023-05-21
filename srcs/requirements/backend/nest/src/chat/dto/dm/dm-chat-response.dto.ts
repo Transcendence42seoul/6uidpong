@@ -1,4 +1,4 @@
-import { DmChatEntity } from "../entity/dm-chat.entity";
+import { DmChatEntity } from "../../entity/dm/dm-chat.entity";
 
 export class DmChatResponseDto {
   constructor(entity: DmChatEntity) {

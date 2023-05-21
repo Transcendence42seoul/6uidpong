@@ -1,4 +1,4 @@
-import { DmChatEntity } from "../entity/dm-chat.entity";
+import { DmChatEntity } from "../../entity/dm/dm-chat.entity";
 import { DmChatResponseDto } from "./dm-chat-response.dto";
 
 export class DmChatsResponseDto {

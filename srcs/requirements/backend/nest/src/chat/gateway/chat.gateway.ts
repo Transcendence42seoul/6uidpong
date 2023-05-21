@@ -11,19 +11,19 @@ import {
 import { Server, Socket } from "socket.io";
 import { UserEntity } from "src/user/entity/user.entity";
 import { UserService } from "src/user/service/user.service";
-import { DmChatResponseDto } from "../dto/dm-chat-response.dto";
-import { DmRoomsResponseDto } from "../dto/dm-rooms-response.dto";
-import { DmRoomUserEntity } from "../entity/dm-room-user.entity";
+import { DmChatResponseDto } from "../dto/dm/dm-chat-response.dto";
+import { DmRoomsResponseDto } from "../dto/dm/dm-rooms-response.dto";
+import { DmRoomUserEntity } from "../entity/dm/dm-room-user.entity";
 import { WsJwtAccessGuard } from "../guard/ws-jwt-access.guard";
-import { DmService } from "../service/dm.service";
+import { DmService } from "../service/dm/dm.service";
 import { ConnectionService } from "../service/connection.service";
 import { DisconnectionService } from "../service/disconnection.service";
 import { WsJwtPayload } from "../utils/ws-jwt-payload.decorator";
 import { JwtPayload } from "jsonwebtoken";
-import { DmChatsResponseDto } from "../dto/dm-chats-response.dto";
+import { DmChatsResponseDto } from "../dto/dm/dm-chats-response.dto";
 import { EntityNotFoundError } from "typeorm";
-import { DmChatEntity } from "../entity/dm-chat.entity";
-import { BlockService } from "../service/block.service";
+import { DmChatEntity } from "../entity/dm/dm-chat.entity";
+import { BlockService } from "../service/dm/block.service";
 
 @WebSocketGateway(80, {
   cors: {

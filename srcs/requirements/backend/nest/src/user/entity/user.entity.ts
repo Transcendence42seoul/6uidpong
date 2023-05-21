@@ -1,7 +1,7 @@
-import { ChannelChatEntity } from "src/chat/entity/channel-chat.entity";
-import { ChannelUserEntity } from "src/chat/entity/channel-user.entity";
-import { DmChatEntity } from "src/chat/entity/dm-chat.entity";
-import { DmRoomUserEntity } from "src/chat/entity/dm-room-user.entity";
+import { ChannelChatEntity } from "src/chat/entity/channel/channel-chat.entity";
+import { ChannelUserEntity } from "src/chat/entity/channel/channel-user.entity";
+import { DmChatEntity } from "src/chat/entity/dm/dm-chat.entity";
+import { DmRoomUserEntity } from "src/chat/entity/dm/dm-room-user.entity";
 import { Column, Entity, Index, OneToMany, PrimaryColumn } from "typeorm";
 import { FriendRequestEntity } from "./friend-request.entity";
 

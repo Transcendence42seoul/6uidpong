@@ -4,7 +4,7 @@ import HoverButton from '../components/button/HoverButton';
 import CircularImage from '../components/container/CircularImage';
 import selectAuth from '../features/auth/authSelector';
 import useCallApi from '../utils/useCallApi';
-import { Position } from './ChatRoomList';
+import { Position } from './DmRoomList';
 import { User } from './UserProfile';
 import { mockUsers } from '../mock'; // test
 

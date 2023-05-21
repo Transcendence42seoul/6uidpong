@@ -7,7 +7,8 @@ import Image from '../constants/Image';
 const Main: React.FC = () => {
   const navigate = useNavigate();
 
-  const handleChatClick = () => navigate('/chat');
+  const handleChannelClick = () => navigate('/channel');
+  const handleDmClick = () => navigate('/dm');
   const handleGameClick = () => navigate('/game');
 
   return (
@@ -29,13 +30,13 @@ const Main: React.FC = () => {
         </ContentBox>
         <div className="absolute inset-0 hidden flex-col justify-center group-hover:flex">
           <HoverButton
-            onClick={handleChatClick}
+            onClick={handleDmClick}
             className="mb-10 h-1/4 w-full text-lg"
           >
             DM
           </HoverButton>
           <HoverButton
-            onClick={handleChatClick}
+            onClick={handleChannelClick}
             className="h-1/4 w-full text-lg"
           >
             CHANNEL

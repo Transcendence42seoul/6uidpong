@@ -45,7 +45,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ socket }) => {
 
   const handleDmClick = () => {
     const roomIdHandler = ({ roomId }: { roomId: string }) =>
-      navigate(`/chat/${roomId}`, {
+      navigate(`/dm/${roomId}`, {
         state: { interlocutorId },
       });
     socket.emit('join-dm', { interlocutorId }, roomIdHandler);

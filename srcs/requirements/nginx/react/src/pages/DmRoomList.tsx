@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
 import CircularImage from '../components/container/CircularImage';
 import formatTime from '../utils/formatTime';
-import { Chat } from './ChatRoom';
+import { Chat } from './DmRoom';
 
-interface ChatRoomListProps {
+interface DmRoomListProps {
   socket: Socket;
 }
 
@@ -24,7 +24,7 @@ interface Room {
   newMsgCount: number;
 }
 
-const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
+const DmRoomList: React.FC<DmRoomListProps> = ({ socket }) => {
   const navigate = useNavigate();
 
   const menuRef = useRef<HTMLUListElement>(null);
@@ -54,7 +54,7 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
   };
 
   const handleRoomDoubleClick = ({ roomId, interlocutorId }: Room) => {
-    navigate(`/chat/${roomId}`, {
+    navigate(`/dm/${roomId}`, {
       state: { interlocutorId },
     });
   };
@@ -180,4 +180,4 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ socket }) => {
   );
 };
 
-export default ChatRoomList;
+export default DmRoomList;

@@ -19,7 +19,7 @@ import { mockChats, mockLocationState } from '../mock'; // test
 
 export interface Chat {
   id: number;
-  roomId: string;
+  roomId: number;
   userId: number;
   nickname: string;
   image: string;
@@ -39,7 +39,9 @@ interface LocationState {
 const DmRoom: React.FC<DmRoomProps> = ({ myId, socket }) => {
   const location = useLocation();
   const { interlocutorId }: LocationState = location.state ?? mockLocationState; // test
-  const { roomId } = useParams<{ roomId: string }>();
+
+  const { roomId: roomIdString } = useParams<{ roomId: string }>();
+  const roomId = Number(roomIdString);
 
   const chatContainer = useRef<HTMLDivElement>(null);
   const [chats, setChats] = useState<Chat[]>([]);

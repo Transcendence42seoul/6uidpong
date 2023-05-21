@@ -43,7 +43,7 @@ export const mockUsers = [
 export const mockChats = [
   {
     id: 0,
-    roomId: 'd1',
+    roomId: 1,
     userId: mockUsers[0].id,
     nickname: mockUsers[0].nickname,
     image: mockUsers[0].image,
@@ -52,7 +52,7 @@ export const mockChats = [
   },
   {
     id: 0,
-    roomId: 'd1',
+    roomId: 1,
     userId: mockUsers[0].id,
     nickname: mockUsers[0].nickname,
     image: mockUsers[0].image,
@@ -61,7 +61,7 @@ export const mockChats = [
   },
   {
     id: 1,
-    roomId: 'd1',
+    roomId: 1,
     userId: mockUsers[1].id,
     nickname: mockUsers[1].nickname,
     image: mockUsers[1].image,
@@ -70,7 +70,7 @@ export const mockChats = [
   },
   {
     id: 1,
-    roomId: 'd1',
+    roomId: 1,
     userId: mockUsers[1].id,
     nickname: mockUsers[1].nickname,
     image: mockUsers[1].image,

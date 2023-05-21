@@ -44,7 +44,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ socket }) => {
   };
 
   const handleDmClick = () => {
-    const roomIdHandler = ({ roomId }: { roomId: string }) =>
+    const roomIdHandler = ({ roomId }: { roomId: number }) =>
       navigate(`/dm/${roomId}`, {
         state: { interlocutorId },
       });

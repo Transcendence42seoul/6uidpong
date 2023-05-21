@@ -15,7 +15,7 @@ export interface Position {
 }
 
 interface Room {
-  roomId: string;
+  roomId: number;
   lastMessage: string;
   lastMessageTime: string;
   interlocutor: string;

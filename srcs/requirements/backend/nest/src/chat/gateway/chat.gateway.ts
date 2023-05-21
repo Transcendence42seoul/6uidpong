@@ -187,21 +187,13 @@ export class ChatGateway implements OnGatewayDisconnect {
 
   @SubscribeMessage("find-all-channels")
   async findAllChannels(): Promise<AllChannelResponseDto[]> {
-    const channels: ChannelEntity[] = await this.channelService.findAll();
-    return channels.map((channel) => {
-      return new AllChannelResponseDto(channel);
-    });
+    return await this.channelService.findAll();
   }
 
   @SubscribeMessage("find-my-channels")
   async findMyChannels(
     @WsJwtPayload() jwt: JwtPayload
   ): Promise<MyChannelResponseDto[]> {
-    const channelUsers: ChannelUserEntity[] = await this.channelService.find(
-      jwt.id
-    );
-    return channelUsers.map((channelUser) => {
-      return new MyChannelResponseDto(channelUser);
-    });
+    return await this.channelService.find(jwt.id);
   }
 }

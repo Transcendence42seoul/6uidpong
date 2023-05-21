@@ -22,17 +22,12 @@ export class ChannelService {
         "channel.id                   AS id",
         "channel.title                AS title",
         'channel.is_public            AS "isPublic"',
-        'member_count.count           AS "memberCount"',
+        'count(*)                     AS "memberCount"',
       ])
-      .innerJoin(
-        (memberCountSubQuery) =>
-          memberCountSubQuery
-            .select(["sub.channel_id", "count(*) AS count"])
-            .from(ChannelUserEntity, "sub")
-            .groupBy("sub.channel_id"),
-        "member_count",
-        "channel.id = member_count.channel_id"
-      )
+      .innerJoin("channel.channelUsers", "channel_users")
+      .groupBy("channel.id")
+      .addGroupBy("channel.title")
+      .addGroupBy("channel.is_public")
       .orderBy("channel.title", "ASC")
       .getRawMany();
   }

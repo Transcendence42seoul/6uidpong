@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import HoverButton from '../components/button/HoverButton';
 import CircularImage from '../components/container/CircularImage';
 import ContentBox from '../components/container/ContentBox';
-import useCallAPI from '../utils/api';
+import useCallApi from '../utils/useCallApi';
 import { User } from './UserProfile';
 
 interface Stats {
@@ -17,7 +17,7 @@ interface MyPageProps {
 }
 
 const MyPage: React.FC<MyPageProps> = ({ id, stats }) => {
-  const callAPI = useCallAPI();
+  const callApi = useCallApi();
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
 
@@ -26,7 +26,10 @@ const MyPage: React.FC<MyPageProps> = ({ id, stats }) => {
 
   useEffect(() => {
     const fetchUserData = async () => {
-      const data: User = await callAPI(`/api/v1/users/${id}`);
+      const config = {
+        url: `/api/v1/users/${id}`,
+      };
+      const data: User = await callApi(config);
       setUser(data);
     };
     fetchUserData();

@@ -1,22 +1,18 @@
-import axios from 'axios';
 import React, { useEffect, useRef, useState } from 'react';
-import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import HoverButton from '../components/button/HoverButton';
 import CircularImage from '../components/container/CircularImage';
-import dispatchAuth from '../features/auth/authAction';
 import selectAuth from '../features/auth/authSelector';
-import useCallAPI from '../utils/api';
-import { Position } from './ChatRoomList';
+import useCallApi from '../utils/useCallApi';
+import { Position } from './DmRoomList';
 import { User } from './UserProfile';
 import { mockUsers } from '../mock'; // test
 
 const FriendsList: React.FC = () => {
-  const callAPI = useCallAPI();
-  const dispatch = useDispatch();
+  const callApi = useCallApi();
   const navigate = useNavigate();
 
-  const { accessToken, tokenInfo } = selectAuth();
+  const { tokenInfo } = selectAuth();
   const myId = tokenInfo?.id;
 
   const menuRef = useRef<HTMLUListElement>(null);
@@ -34,17 +30,13 @@ const FriendsList: React.FC = () => {
   };
 
   const handleDeleteClick = (friendId: number) => {
-    try {
-      axios.delete(`/api/v1/users/${myId}/friend-requests/${friendId}`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-      setFriends([...friends.filter((friend) => friend.id !== friendId)]);
-      setShowMenu(false);
-    } catch (error) {
-      dispatchAuth(null, dispatch);
-    }
+    const config = {
+      url: `/api/v1/users/${myId}/friends/${friendId}`,
+      method: 'delete',
+    };
+    callApi(config);
+    setFriends([...friends.filter((friend) => friend.id !== friendId)]);
+    setShowMenu(false);
   };
 
   const handleIncomingRequestsClick = () => {
@@ -57,8 +49,10 @@ const FriendsList: React.FC = () => {
 
   useEffect(() => {
     const fetchFriendsData = async () => {
-      const data: User[] =
-        (await callAPI(`/api/v1/users/${myId}/friends`)) ?? mockUsers; // test
+      const config = {
+        url: `/api/v1/users/${myId}/friends`,
+      };
+      const data: User[] = (await callApi(config)) ?? mockUsers; // test
       setFriends(data);
     };
     fetchFriendsData();

@@ -27,7 +27,7 @@ export interface Chat {
   createdAt: string;
 }
 
-interface ChatRoomProps {
+interface DmRoomProps {
   myId: number;
   socket: Socket;
 }
@@ -36,7 +36,7 @@ interface LocationState {
   interlocutorId: number;
 }
 
-const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
+const DmRoom: React.FC<DmRoomProps> = ({ myId, socket }) => {
   const location = useLocation();
   const { interlocutorId }: LocationState = location.state ?? mockLocationState; // test
   const { roomId } = useParams<{ roomId: string }>();
@@ -202,4 +202,4 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ myId, socket }) => {
   );
 };
 
-export default ChatRoom;
+export default DmRoom;

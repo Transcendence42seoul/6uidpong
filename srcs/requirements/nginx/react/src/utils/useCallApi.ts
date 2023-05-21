@@ -3,24 +3,39 @@ import { useDispatch } from 'react-redux';
 import dispatchAuth from '../features/auth/authAction';
 import selectAuth from '../features/auth/authSelector';
 
-const useCallAPI = () => {
+interface CallApiConfig {
+  url: string;
+  method?: string;
+  params?: any;
+  data?: any;
+}
+
+const useCallApi = () => {
   const dispatch = useDispatch();
   const { accessToken } = selectAuth();
 
-  const callAPI = async (pathname: string, params: any = null) => {
+  const callApi = async ({
+    url,
+    method = 'get',
+    params = null,
+    data = null,
+  }: CallApiConfig) => {
     try {
-      const { data } = await axios.get(pathname, {
+      const response = await axios({
+        url,
+        method,
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
         params,
+        data,
       });
-      return data;
+      return response.data;
     } catch (error) {
       dispatchAuth(null, dispatch);
     }
   };
-  return callAPI;
+  return callApi;
 };
 
-export default useCallAPI;
+export default useCallApi;

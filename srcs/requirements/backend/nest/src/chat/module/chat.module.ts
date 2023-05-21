@@ -9,8 +9,11 @@ import { WsJwtAccessGuard } from "../guard/ws-jwt-access.guard";
 import { DmService } from "../service/dm.service";
 import { ConnectionService } from "../service/connection.service";
 import { DisconnectionService } from "../service/disconnection.service";
-import { BlockEntity } from "../entity/block.entity";
+import { BlockEntity } from "../entity/block-list.entity";
 import { BlockService } from "../service/block.service";
+import { ChannelEntity } from "../entity/channel.entity";
+import { ChannelUserEntity } from "../entity/channel-user.entity";
+import { ChannelChatEntity } from "../entity/channel-chat.entity";
 
 @Module({
   imports: [
@@ -19,6 +22,9 @@ import { BlockService } from "../service/block.service";
       DmRoomUserEntity,
       DmChatEntity,
       BlockEntity,
+      ChannelEntity,
+      ChannelUserEntity,
+      ChannelChatEntity,
     ]),
     UserModule,
   ],

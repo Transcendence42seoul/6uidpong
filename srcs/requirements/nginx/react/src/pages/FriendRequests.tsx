@@ -3,7 +3,7 @@ import CircularImage from '../components/container/CircularImage';
 import selectAuth from '../features/auth/authSelector';
 import useCallApi from '../utils/useCallApi';
 import { User } from './UserProfile';
-import { mockFriendRequests } from '../mock'; // test
+import { isTest, mockFriendRequests } from '../mock'; // test
 
 const FriendRequests: React.FC = () => {
   const callApi = useCallApi();
@@ -37,7 +37,7 @@ const FriendRequests: React.FC = () => {
       const config = {
         url: `/api/v1/users/${myId}/friend-requests`,
       };
-      const data: User[] = (await callApi(config)) ?? mockFriendRequests; // test
+      const data: User[] = isTest ? mockFriendRequests : await callApi(config); // test
       setRequestUsers([...data]);
     };
     fetchFriendRequestsData();

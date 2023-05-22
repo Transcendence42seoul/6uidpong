@@ -15,7 +15,7 @@ import Message from '../components/container/Message';
 import MessageBox from '../components/container/MessageBox';
 import MessageForm from '../components/container/MessageForm';
 import formatTime from '../utils/formatTime';
-import { mockChats, mockLocationState } from '../mock'; // test
+import { isTest, mockChats, mockLocationState } from '../mock'; // test
 
 export interface Chat {
   id: number;
@@ -38,7 +38,9 @@ interface LocationState {
 
 const DmRoom: React.FC<DmRoomProps> = ({ myId, socket }) => {
   const location = useLocation();
-  const { interlocutorId }: LocationState = location.state ?? mockLocationState; // test
+  const { interlocutorId }: LocationState = isTest
+    ? mockLocationState
+    : location.state; // test
 
   const { roomId: roomIdString } = useParams<{ roomId: string }>();
   const roomId = Number(roomIdString);
@@ -90,7 +92,7 @@ const DmRoom: React.FC<DmRoomProps> = ({ myId, socket }) => {
       setChats([...prevChats]);
     };
     socket.emit('join-dm', { interlocutorId }, chatsHandler);
-    // setChats(mockChats); // test
+    setChats(isTest ? mockChats : chats); // test
     return () => {
       socket.emit('leave-dm', { roomId });
     };

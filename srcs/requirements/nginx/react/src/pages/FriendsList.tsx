@@ -6,7 +6,7 @@ import selectAuth from '../features/auth/authSelector';
 import useCallApi from '../utils/useCallApi';
 import { Position } from './DmRoomList';
 import { User } from './UserProfile';
-import { mockUsers } from '../mock'; // test
+import { isTest, mockUsers } from '../mock'; // test
 
 const FriendsList: React.FC = () => {
   const callApi = useCallApi();
@@ -52,7 +52,7 @@ const FriendsList: React.FC = () => {
       const config = {
         url: `/api/v1/users/${myId}/friends`,
       };
-      const data: User[] = (await callApi(config)) ?? mockUsers; // test
+      const data: User[] = isTest ? mockUsers : await callApi(config); // test
       setFriends([...data]);
     };
     fetchFriendsData();

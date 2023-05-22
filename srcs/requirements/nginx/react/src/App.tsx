@@ -20,9 +20,7 @@ import ProfileSettings from './pages/ProfileSettings';
 import UserProfile from './pages/UserProfile';
 import redirect from './utils/redirect';
 import Layout from './Layout';
-// import { mockTokenInfo } from './mock'; // test
-
-// const tokenInfo = mockTokenInfo; // test
+import { isTest, mockAuthState } from './mock'; // test
 
 const App: React.FC = () => {
   const stats = {
@@ -30,8 +28,9 @@ const App: React.FC = () => {
   };
 
   const [loading, setLoading] = useState<boolean>(false);
-  const { id, is2FA, accessToken, tokenInfo } = selectAuth();
-  // const { id, is2FA, accessToken } = selectAuth(); // test
+  const { id, is2FA, accessToken, tokenInfo } = isTest
+    ? mockAuthState
+    : selectAuth(); // test
 
   const dispatch = useDispatch();
   const handleLoading = async () => {

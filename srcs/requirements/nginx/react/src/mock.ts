@@ -1,3 +1,5 @@
+export const isTest = false;
+
 export const mockChannels = [
   {
     id: 1,
@@ -121,4 +123,11 @@ export const mockRooms = [
 export const mockTokenInfo = {
   id: mockUsers[0].id,
   nickname: mockUsers[0].nickname,
+};
+
+export const mockAuthState = {
+  id: null,
+  is2FA: null,
+  accessToken: null,
+  tokenInfo: mockTokenInfo,
 };

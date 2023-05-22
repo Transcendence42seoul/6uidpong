@@ -112,7 +112,7 @@ const DmRoomList: React.FC<DmRoomListProps> = ({ socket }) => {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100">
       <ul className="w-full max-w-3xl">
-        <h1 className="mb-4 ml-4 text-left text-lg font-bold">
+        <h1 className="mb-4 ml-4 text-left text-xl font-bold">
           Direct Messages
         </h1>
         {rooms

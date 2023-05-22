@@ -5,7 +5,10 @@ interface ContentBoxProps {
   className?: string;
 }
 
-const ContentBox: React.FC<ContentBoxProps> = ({ children, className }) => {
+const ContentBox: React.FC<ContentBoxProps> = ({
+  children,
+  className = '',
+}) => {
   return (
     <div
       className={`flex flex-col items-center rounded border-white bg-black text-center text-white ${className}`}

@@ -10,8 +10,8 @@ interface HoverButtonProps {
 const HoverButton: React.FC<HoverButtonProps> = ({
   onClick,
   children,
-  className,
-  disabled,
+  className = '',
+  disabled = false,
 }) => {
   return (
     <button

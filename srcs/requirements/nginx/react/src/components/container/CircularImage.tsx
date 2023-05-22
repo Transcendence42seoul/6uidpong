@@ -3,15 +3,15 @@ import React from 'react';
 interface CircularImageProps {
   src: string | undefined;
   alt: string;
-  className?: string;
   onClick?: () => void;
+  className?: string;
 }
 
 const CircularImage: React.FC<CircularImageProps> = ({
   src,
   alt,
-  className,
   onClick,
+  className = '',
 }) => {
   return (
     <button

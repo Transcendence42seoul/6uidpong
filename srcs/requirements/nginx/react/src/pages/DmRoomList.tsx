@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
 import CircularImage from '../components/container/CircularImage';
+import ListContainer from '../components/container/ListContainer';
+import ListTitle from '../components/container/ListTitle';
 import formatTime from '../utils/formatTime';
 import { Chat } from './DmRoom';
 import { isTest, mockRooms } from '../mock'; // test
@@ -110,77 +112,73 @@ const DmRoomList: React.FC<DmRoomListProps> = ({ socket }) => {
   }, [showMenu]);
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100">
-      <ul className="w-full max-w-3xl">
-        <h1 className="mb-4 ml-4 text-left text-xl font-bold">
-          Direct Messages
-        </h1>
-        {rooms
-          .sort(
-            (lhs, rhs) =>
-              new Date(rhs.lastMessageTime).getTime() -
-              new Date(lhs.lastMessageTime).getTime(),
-          )
-          .map((room) => {
-            const {
-              roomId,
-              lastMessage,
-              lastMessageTime,
-              interlocutor,
-              interlocutorId,
-              interlocutorImage,
-              newMsgCount,
-            } = room;
-            return (
-              <li
-                key={roomId}
-                className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-2"
-                onContextMenu={handleContextMenu}
-                onDoubleClick={() => handleRoomDoubleClick(room)}
-              >
-                {showMenu && (
-                  <ul
-                    ref={menuRef}
-                    style={{
-                      position: 'fixed',
-                      top: menuPosition.y,
-                      left: menuPosition.x,
-                    }}
+    <ListContainer>
+      <ListTitle>Direct Messages</ListTitle>
+      {rooms
+        .sort(
+          (lhs, rhs) =>
+            new Date(rhs.lastMessageTime).getTime() -
+            new Date(lhs.lastMessageTime).getTime(),
+        )
+        .map((room) => {
+          const {
+            roomId,
+            lastMessage,
+            lastMessageTime,
+            interlocutor,
+            interlocutorId,
+            interlocutorImage,
+            newMsgCount,
+          } = room;
+          return (
+            <li
+              key={roomId}
+              className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-2"
+              onContextMenu={handleContextMenu}
+              onDoubleClick={() => handleRoomDoubleClick(room)}
+            >
+              {showMenu && (
+                <ul
+                  ref={menuRef}
+                  style={{
+                    position: 'fixed',
+                    top: menuPosition.y,
+                    left: menuPosition.x,
+                  }}
+                >
+                  <button
+                    className="cursor-pointer rounded border-4 border-red-400 bg-black p-1 text-white hover:text-red-400"
+                    onClick={() => handleDeleteClick(interlocutorId)}
                   >
-                    <button
-                      className="cursor-pointer rounded border-4 border-red-400 bg-black p-1 text-white hover:text-red-400"
-                      onClick={() => handleDeleteClick(interlocutorId)}
-                    >
-                      Delete
-                    </button>
-                  </ul>
-                )}
-                <div className="flex items-center">
-                  <CircularImage
-                    src={interlocutorImage}
-                    alt={interlocutor}
-                    className="mr-2 h-10 w-10"
-                  />
-                  <div>
-                    <span>{interlocutor}</span>
-                    <p className="text-sm text-gray-600">{lastMessage}</p>
+                    Delete
+                  </button>
+                </ul>
+              )}
+              <div className="flex items-center">
+                <CircularImage
+                  src={interlocutorImage}
+                  alt={interlocutor}
+                  className="mr-2 h-10 w-10"
+                />
+                <div>
+                  <span>{interlocutor}</span>
+                  <p className="text-sm text-gray-600">{lastMessage}</p>
+                </div>
+              </div>
+              <div className="flex items-center">
+                {newMsgCount > 0 && (
+                  <div className="mr-3 rounded-full bg-red-500 text-white">
+                    {newMsgCount}
                   </div>
-                </div>
-                <div className="flex items-center">
-                  {newMsgCount > 0 && (
-                    <div className="mr-3 rounded-full bg-red-500 text-white">
-                      {newMsgCount}
-                    </div>
-                  )}
-                  <span className="text-sm text-gray-600">
-                    {formatTime(lastMessageTime)}
-                  </span>
-                </div>
-              </li>
-            );
-          })}
-      </ul>
-    </div>
+                )}
+                <span className="text-sm text-gray-600">
+                  {formatTime(lastMessageTime)}
+                </span>
+              </div>
+            </li>
+          );
+        })}
+    </ListContainer>
   );
 };
 

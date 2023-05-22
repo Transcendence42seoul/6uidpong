@@ -15,15 +15,6 @@ export const mockChannels = [
   },
 ];
 
-export const mockLocationState = {
-  interlocutorId: 110731,
-};
-
-export const mockTokenInfo = {
-  id: 110729,
-  nickname: 'kijsong',
-};
-
 export const mockUsers = [
   {
     id: 110729,
@@ -101,3 +92,33 @@ export const mockFriendRequests = [
   { from: mockUsers[1] },
   { from: mockUsers[2] },
 ];
+
+export const mockLocationState = {
+  interlocutorId: mockUsers[1].id,
+};
+
+export const mockRooms = [
+  {
+    roomId: 1,
+    lastMessage: mockChats[3].message,
+    lastMessageTime: mockChats[3].createdAt,
+    interlocutor: mockUsers[1].nickname,
+    interlocutorId: mockUsers[1].id,
+    interlocutorImage: mockUsers[1].image,
+    newMsgCount: 0,
+  },
+  {
+    roomId: 2,
+    lastMessage: mockChats[0].message,
+    lastMessageTime: mockChats[0].createdAt,
+    interlocutor: mockUsers[2].nickname,
+    interlocutorId: mockUsers[2].id,
+    interlocutorImage: mockUsers[2].image,
+    newMsgCount: 42,
+  },
+];
+
+export const mockTokenInfo = {
+  id: mockUsers[0].id,
+  nickname: mockUsers[0].nickname,
+};

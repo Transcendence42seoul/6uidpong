@@ -4,6 +4,7 @@ import { Socket } from 'socket.io-client';
 import CircularImage from '../components/container/CircularImage';
 import formatTime from '../utils/formatTime';
 import { Chat } from './DmRoom';
+import { mockRooms } from '../mock'; // test
 
 interface DmRoomListProps {
   socket: Socket;
@@ -64,6 +65,7 @@ const DmRoomList: React.FC<DmRoomListProps> = ({ socket }) => {
       setRooms([...roomList]);
     };
     socket.emit('find-dm-rooms', roomListHandler);
+    // setRooms(mockRooms); // test
   }, []);
 
   useEffect(() => {

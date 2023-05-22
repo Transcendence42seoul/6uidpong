@@ -21,6 +21,7 @@ import UserProfile from './pages/UserProfile';
 import redirect from './utils/redirect';
 import Layout from './Layout';
 // import { mockTokenInfo as tokenInfo } from './mock'; // test
+// const { id, is2FA, accessToken } = selectAuth(); // test
 
 const App: React.FC = () => {
   const stats = {

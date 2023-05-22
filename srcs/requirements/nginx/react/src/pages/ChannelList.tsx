@@ -65,7 +65,7 @@ const ChannelList: React.FC<ChannelListProps> = ({ socket }) => {
                     {newMsgCount}
                   </div>
                 )}
-                <span className="text-sm text-gray-600">{memberCount}</span>
+                <span className="text-sm text-gray-600">{`${memberCount} members`}</span>
               </div>
             </li>
           );

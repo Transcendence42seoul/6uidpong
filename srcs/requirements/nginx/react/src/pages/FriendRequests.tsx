@@ -45,7 +45,7 @@ const FriendRequests: React.FC = () => {
 
   return (
     <div className="p-4">
-      <h2 className="mb-4 text-2xl font-bold text-gray-100">Friend Requests</h2>
+      <h1 className="mb-4 text-2xl font-bold text-gray-100">Friend Requests</h1>
       <ul className="space-y-2">
         {requestUsers.map((user) => {
           const { id, nickname, image } = user;

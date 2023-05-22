@@ -16,17 +16,17 @@ const Main: React.FC = () => {
       <button className="group mx-10 w-1/3" onClick={handleGameClick}>
         <ContentBox className="border-8 p-7 group-hover:scale-105 group-hover:border-pink-300 group-hover:bg-pink-300 group-hover:opacity-70">
           <img src={Image.GAME} alt="GAME" className="group-hover:opacity-0" />
-          <h1 className="mt-7 text-4xl group-hover:text-black group-hover:opacity-50">
+          <h2 className="mt-7 text-4xl group-hover:text-black group-hover:opacity-50">
             GAME
-          </h1>
+          </h2>
         </ContentBox>
       </button>
       <div className="group relative mx-10 w-1/3">
         <ContentBox className="border-8 p-7 group-hover:scale-105 group-hover:border-pink-300 group-hover:bg-pink-300 group-hover:opacity-70">
           <img src={Image.CHAT} alt="CHAT" className="group-hover:opacity-0" />
-          <h1 className="mt-7 text-4xl group-hover:text-black group-hover:opacity-50">
+          <h2 className="mt-7 text-4xl group-hover:text-black group-hover:opacity-50">
             CHAT
-          </h1>
+          </h2>
         </ContentBox>
         <div className="absolute inset-0 hidden flex-col justify-center group-hover:flex">
           <HoverButton

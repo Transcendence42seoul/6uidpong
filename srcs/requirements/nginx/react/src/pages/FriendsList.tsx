@@ -61,7 +61,7 @@ const FriendsList: React.FC = () => {
   return (
     <div className="p-4">
       <div className="mb-4 flex">
-        <h2 className="text-2xl font-bold text-gray-100">Friends</h2>
+        <h1 className="text-2xl font-bold text-gray-100">Friends</h1>
         <HoverButton
           onClick={handleIncomingRequestsClick}
           className="ml-auto border p-1.5"

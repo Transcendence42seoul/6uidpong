@@ -39,14 +39,16 @@ const ChannelList: React.FC<ChannelListProps> = ({ socket }) => {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100">
-      <HoverButton
-        onClick={handleAllChannelsClick}
-        className="mb-10 rounded border-2 p-2.5"
-      >
-        All Channels
-      </HoverButton>
-      <h1 className="mb-4 text-3xl font-bold">Channel</h1>
       <ul className="w-full max-w-3xl">
+        <div className="flex w-full items-end">
+          <h1 className="mb-4 ml-4 text-xl font-bold">Channels</h1>
+          <HoverButton
+            onClick={handleAllChannelsClick}
+            className="mb-3.5 ml-auto rounded border-2 p-2.5 text-sm"
+          >
+            All Channels
+          </HoverButton>
+        </div>
         {channels.map((channel) => {
           const { id, title, isPublic, newMsgCount, memberCount } = channel;
           return (

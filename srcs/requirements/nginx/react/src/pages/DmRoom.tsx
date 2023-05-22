@@ -89,8 +89,8 @@ const DmRoom: React.FC<DmRoomProps> = ({ myId, socket }) => {
       setNewMsgCount(newMsgCnt);
       setChats([...prevChats]);
     };
-    // setChats(mockChats); // test
     socket.emit('join-dm', { interlocutorId }, chatsHandler);
+    // setChats(mockChats); // test
     return () => {
       socket.emit('leave-dm', { roomId });
     };

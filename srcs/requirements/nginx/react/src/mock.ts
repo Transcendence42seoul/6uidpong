@@ -1,3 +1,20 @@
+export const mockChannels = [
+  {
+    id: 1,
+    title: '42seoul_other_pet',
+    isPublic: true,
+    newMsgCount: 0,
+    memberCount: 42,
+  },
+  {
+    id: 2,
+    title: '42seoul_other_shouting',
+    isPublic: true,
+    newMsgCount: 42,
+    memberCount: 1234,
+  },
+];
+
 export const mockLocationState = {
   interlocutorId: 110731,
 };
@@ -42,25 +59,25 @@ export const mockUsers = [
 
 export const mockChats = [
   {
-    id: 0,
-    roomId: 1,
-    userId: mockUsers[0].id,
-    nickname: mockUsers[0].nickname,
-    image: mockUsers[0].image,
-    message: 'Hello, there..!',
-    createdAt: '2023-05-18 00:25:57.304419',
-  },
-  {
-    id: 0,
-    roomId: 1,
-    userId: mockUsers[0].id,
-    nickname: mockUsers[0].nickname,
-    image: mockUsers[0].image,
-    message: 'Hello, there..!',
-    createdAt: '2023-05-18 00:25:57.304419',
-  },
-  {
     id: 1,
+    roomId: 1,
+    userId: mockUsers[0].id,
+    nickname: mockUsers[0].nickname,
+    image: mockUsers[0].image,
+    message: 'Hello, there..!',
+    createdAt: '2023-05-18 00:25:57.304419',
+  },
+  {
+    id: 2,
+    roomId: 1,
+    userId: mockUsers[0].id,
+    nickname: mockUsers[0].nickname,
+    image: mockUsers[0].image,
+    message: 'Hello, there..!',
+    createdAt: '2023-05-18 00:25:57.304419',
+  },
+  {
+    id: 3,
     roomId: 1,
     userId: mockUsers[1].id,
     nickname: mockUsers[1].nickname,
@@ -69,7 +86,7 @@ export const mockChats = [
     createdAt: '2023-05-18 00:27:37.593432',
   },
   {
-    id: 1,
+    id: 4,
     roomId: 1,
     userId: mockUsers[1].id,
     nickname: mockUsers[1].nickname,

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
 import { Channel } from './ChannelList';
+import { mockChannels } from '../mock'; // test
 
 interface AllChannelsProps {
   socket: Socket;
@@ -21,6 +22,7 @@ const AllChannels: React.FC<AllChannelsProps> = ({ socket }) => {
       setChannels([...channelList]);
     };
     socket.emit('find-all-channels', channelListHandler);
+    // setChannels(mockChannels); // test
   }, []);
 
   return (

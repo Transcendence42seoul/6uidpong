@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
 import HoverButton from '../components/button/HoverButton';
+import { mockChannels } from '../mock'; // test
 
 interface ChannelListProps {
   socket: Socket;
@@ -33,6 +34,7 @@ const ChannelList: React.FC<ChannelListProps> = ({ socket }) => {
       setChannels([...channelList]);
     };
     socket.emit('find-my-channels', channelListHandler);
+    // setChannels(mockChannels); // test
   }, []);
 
   return (

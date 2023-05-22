@@ -2,10 +2,11 @@ import React from 'react';
 
 interface ListTitleProps {
   children: React.ReactNode;
+  className?: string;
 }
 
-const ListTitle: React.FC<ListTitleProps> = ({ children }) => {
-  return <h1 className="mb-4 ml-4 text-xl font-bold">{children}</h1>;
+const ListTitle: React.FC<ListTitleProps> = ({ children, className = '' }) => {
+  return <h1 className={`text-xl font-bold ${className}`}>{children}</h1>;
 };
 
 export default ListTitle;

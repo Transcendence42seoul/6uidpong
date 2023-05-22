@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import HoverButton from '../components/button/HoverButton';
 import CircularImage from '../components/container/CircularImage';
+import ListTitle from '../components/container/ListTitle';
 import selectAuth from '../features/auth/authSelector';
 import useCallApi from '../utils/useCallApi';
 import { Position } from './DmRoomList';
@@ -60,8 +61,8 @@ const FriendsList: React.FC = () => {
 
   return (
     <div className="p-4">
-      <div className="mb-4 flex">
-        <h1 className="text-2xl font-bold text-gray-100">Friends</h1>
+      <div className="mb-4 flex items-end">
+        <ListTitle className="ml-2 text-gray-100">Friends</ListTitle>
         <HoverButton
           onClick={handleIncomingRequestsClick}
           className="ml-auto border p-1.5"

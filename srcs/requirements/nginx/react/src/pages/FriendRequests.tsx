@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import CircularImage from '../components/container/CircularImage';
+import ListTitle from '../components/container/ListTitle';
 import selectAuth from '../features/auth/authSelector';
 import useCallApi from '../utils/useCallApi';
 import { User } from './UserProfile';
@@ -45,7 +46,9 @@ const FriendRequests: React.FC = () => {
 
   return (
     <div className="p-4">
-      <h1 className="mb-4 text-2xl font-bold text-gray-100">Friend Requests</h1>
+      <ListTitle className="mb-3.5 ml-2 text-gray-100">
+        Friend Requests
+      </ListTitle>
       <ul className="space-y-2">
         {requestUsers.map((user) => {
           const { id, nickname, image } = user;

@@ -113,7 +113,7 @@ const DmRoomList: React.FC<DmRoomListProps> = ({ socket }) => {
 
   return (
     <ListContainer>
-      <ListTitle>Direct Messages</ListTitle>
+      <ListTitle className="mb-4 ml-4">Direct Messages</ListTitle>
       {rooms
         .sort(
           (lhs, rhs) =>

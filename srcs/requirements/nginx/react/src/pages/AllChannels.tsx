@@ -29,7 +29,7 @@ const AllChannels: React.FC<AllChannelsProps> = ({ socket }) => {
 
   return (
     <ListContainer>
-      <ListTitle>All Channels</ListTitle>
+      <ListTitle className="mb-3.5 ml-4">All Channels</ListTitle>
       {channels.map((channel) => {
         const { id, title, isPublic, memberCount } = channel;
         return (

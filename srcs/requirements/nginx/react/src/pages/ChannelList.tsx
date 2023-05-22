@@ -42,7 +42,7 @@ const ChannelList: React.FC<ChannelListProps> = ({ socket }) => {
   return (
     <ListContainer>
       <div className="flex items-end">
-        <ListTitle>Channels</ListTitle>
+        <ListTitle className="mb-4 ml-4">Channels</ListTitle>
         <HoverButton
           onClick={handleAllChannelsClick}
           className="mb-3.5 ml-auto rounded border-2 p-2.5 text-sm"

@@ -27,8 +27,8 @@ const AllChannels: React.FC<AllChannelsProps> = ({ socket }) => {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100">
-      <h1 className="mb-4 text-3xl font-bold">All Channels</h1>
       <ul className="w-full max-w-3xl">
+        <h1 className="mb-4 ml-4 text-xl font-bold">All Channels</h1>
         {channels.map((channel) => {
           const { id, title, isPublic, memberCount } = channel;
           return (
@@ -42,7 +42,7 @@ const AllChannels: React.FC<AllChannelsProps> = ({ socket }) => {
                 <span>{title}</span>
               </div>
               <div className="flex items-center">
-                <span className="text-sm text-gray-600">{memberCount}</span>
+                <span className="text-sm text-gray-600">{`${memberCount} members`}</span>
               </div>
             </li>
           );

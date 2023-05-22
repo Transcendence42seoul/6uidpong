@@ -45,7 +45,7 @@ const ChannelList: React.FC<ChannelListProps> = ({ socket }) => {
         <ListTitle className="mb-4 ml-4">Channels</ListTitle>
         <HoverButton
           onClick={handleAllChannelsClick}
-          className="mb-3.5 ml-auto rounded border-2 p-2.5 text-sm"
+          className="mb-3.5 ml-auto p-2.5 text-sm"
         >
           All Channels
         </HoverButton>

@@ -31,7 +31,7 @@ const AllChannels: React.FC<AllChannelsProps> = ({ socket }) => {
     <ListContainer>
       <ListTitle className="mb-3.5 ml-4">All Channels</ListTitle>
       {channels.map((channel) => {
-        const { id, title, isPublic, memberCount } = channel;
+        const { id, title, isLocked, memberCount } = channel;
         return (
           <li
             key={id}
@@ -39,7 +39,7 @@ const AllChannels: React.FC<AllChannelsProps> = ({ socket }) => {
             onDoubleClick={() => handleChannelDoubleClick(channel)}
           >
             <div className="flex items-center">
-              {/* isPublic 아이콘 */}
+              {/* isLocked 아이콘 */}
               <span>{title}</span>
             </div>
             <div className="flex items-center">

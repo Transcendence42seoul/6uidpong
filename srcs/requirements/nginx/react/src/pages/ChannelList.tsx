@@ -13,7 +13,7 @@ interface ChannelListProps {
 export interface Channel {
   id: number;
   title: string;
-  isPublic: boolean;
+  isLocked: boolean;
   newMsgCount: number;
   memberCount: number;
 }
@@ -51,7 +51,7 @@ const ChannelList: React.FC<ChannelListProps> = ({ socket }) => {
         </HoverButton>
       </div>
       {channels.map((channel) => {
-        const { id, title, isPublic, newMsgCount, memberCount } = channel;
+        const { id, title, newMsgCount, memberCount } = channel;
         return (
           <li
             key={id}
@@ -59,7 +59,6 @@ const ChannelList: React.FC<ChannelListProps> = ({ socket }) => {
             onDoubleClick={() => handleChannelDoubleClick(channel)}
           >
             <div className="flex items-center">
-              {/* isPublic 아이콘 */}
               <span>{title}</span>
             </div>
             <div className="flex items-center">

@@ -4,14 +4,14 @@ export const mockChannels = [
   {
     id: 1,
     title: '42seoul_other_pet',
-    isPublic: true,
+    isLocked: false,
     newMsgCount: 0,
     memberCount: 42,
   },
   {
     id: 2,
     title: '42seoul_other_shouting',
-    isPublic: true,
+    isLocked: false,
     newMsgCount: 42,
     memberCount: 1234,
   },

@@ -26,7 +26,9 @@ export class FriendService {
       .innerJoin(
         UserEntity,
         "users",
-        "users.id = CASE WHEN friends.from_id = :userId THEN friends.to_id ELSE friends.from_id END",
+        "users.id = CASE WHEN friends.from_id = :userId THEN friends.to_id \
+                         WHEN friends.to_id = :userId THEN friends.from_id \
+                         END",
         { userId }
       )
       .orderBy("users.nickname", "ASC")

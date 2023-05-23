@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
 import ListContainer from '../components/container/ListContainer';
 import ListTitle from '../components/container/ListTitle';
-import Image from '../constants/Image';
+import ImageSrc from '../constants/ImageSrc';
 import { Channel } from './ChannelList';
 import { isTest, mockChannels } from '../mock'; // test
 
@@ -42,7 +42,7 @@ const AllChannels: React.FC<AllChannelsProps> = ({ socket }) => {
             <div className="flex items-center space-x-1">
               <span>{title}</span>
               {isLocked && (
-                <img src={Image.LOCK} alt="LOCK" className="h-5 w-5" />
+                <img src={ImageSrc.LOCK} alt="LOCK" className="h-5 w-5" />
               )}
             </div>
             <span className="text-sm text-gray-600">{`${memberCount} members`}</span>

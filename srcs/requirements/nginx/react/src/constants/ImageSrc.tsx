@@ -1,4 +1,4 @@
-class Image {
+class ImageSrc {
   static readonly CHAT =
     'https://cdn-icons-png.flaticon.com/512/465/465227.png';
 
@@ -13,4 +13,4 @@ class Image {
   static readonly MODAL_IMAGE = 'https://i.imgur.com/lfaWNsI.png';
 }
 
-export default Image;
+export default ImageSrc;

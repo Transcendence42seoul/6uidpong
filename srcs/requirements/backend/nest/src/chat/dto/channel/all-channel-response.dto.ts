@@ -1,9 +1,9 @@
 export class AllChannelResponseDto {
-  id: number;
+  readonly id: number;
 
-  title: string;
+  readonly title: string;
 
-  isPublic: boolean;
+  readonly isPublic: boolean;
 
-  memberCount: number;
+  readonly memberCount: number;
 }

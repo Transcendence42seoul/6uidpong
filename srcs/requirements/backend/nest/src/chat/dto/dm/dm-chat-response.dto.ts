@@ -11,17 +11,17 @@ export class DmChatResponseDto {
     this.createdAt = entity.createdAt;
   }
 
-  id: number;
+  readonly id: number;
 
-  roomId: number;
+  readonly roomId: number;
 
-  userId: number;
+  readonly userId: number;
 
-  nickname: string;
+  readonly nickname: string;
 
-  image: string;
+  readonly image: string;
 
-  message: string;
+  readonly message: string;
 
-  createdAt: Date;
+  readonly createdAt: Date;
 }

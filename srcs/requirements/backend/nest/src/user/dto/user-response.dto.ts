@@ -12,21 +12,21 @@ export class UserResponseDto {
     this.loseStat = entity.loseStat;
     this.ladderScore = entity.ladderScore;
   }
-  id: number;
+  readonly id: number;
 
-  nickname: string;
+  readonly nickname: string;
 
-  email: string;
+  readonly email: string;
 
-  image: string;
+  readonly image: string;
 
-  is2FA: boolean;
+  readonly is2FA: boolean;
 
-  status: string;
+  readonly status: string;
 
-  winStat: number;
+  readonly winStat: number;
 
-  loseStat: number;
+  readonly loseStat: number;
 
-  ladderScore: number;
+  readonly ladderScore: number;
 }

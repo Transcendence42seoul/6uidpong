@@ -1,9 +1,9 @@
 export class FriendResponseDto {
-  id: number;
+  readonly id: number;
 
-  nickname: string;
+  readonly nickname: string;
 
-  image: string;
+  readonly image: string;
 
-  status: string;
+  readonly status: string;
 }

@@ -85,7 +85,7 @@ export class ChatGateway implements OnGatewayDisconnect {
       }
       roomUser = await this.dmService.saveRoomUsers(jwt.id, interlocutorId);
     }
-    client.join("d" + roomUser.roomId);
+    client.join(roomUser.roomId.toString());
     const chats: DmChatEntity[] = await this.dmService.findChats(roomUser);
 
     return new DmChatsResponseDto(roomUser.roomId, roomUser.newMsgCount, chats);
@@ -146,7 +146,7 @@ export class ChatGateway implements OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
     @MessageBody("roomId") roomId: number
   ): Promise<void> {
-    client.leave("d" + roomId);
+    client.leave(roomId.toString());
   }
 
   @SubscribeMessage("delete-dm-room")
@@ -163,7 +163,7 @@ export class ChatGateway implements OnGatewayDisconnect {
       } else {
         await this.dmService.exitRoom(interlocutorRoomUser.roomId, jwt.id);
       }
-      client.leave("d" + interlocutorRoomUser.roomId);
+      client.leave(interlocutorRoomUser.roomId.toString());
     } catch {
       throw new WsException("invalid request.");
     }

@@ -6,9 +6,9 @@ export class FriendRequestResponseDto {
     this.nickname = entity.from.nickname;
     this.image = entity.from.image;
   }
-  id: number;
+  readonly id: number;
 
-  nickname: string;
+  readonly nickname: string;
 
-  image: string;
+  readonly image: string;
 }

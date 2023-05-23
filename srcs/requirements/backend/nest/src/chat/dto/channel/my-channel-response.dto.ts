@@ -1,11 +1,11 @@
 export class MyChannelResponseDto {
-  id: number;
+  readonly id: number;
 
-  title: string;
+  readonly title: string;
 
-  isPublic: boolean;
+  readonly isPublic: boolean;
 
-  newMsgCount: number;
+  readonly newMsgCount: number;
 
-  memberCount: number;
+  readonly memberCount: number;
 }

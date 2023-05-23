@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
 import ListContainer from '../components/container/ListContainer';
 import ListTitle from '../components/container/ListTitle';
+import Image from '../constants/Image';
 import { Channel } from './ChannelList';
 import { isTest, mockChannels } from '../mock'; // test
 
@@ -38,13 +39,13 @@ const AllChannels: React.FC<AllChannelsProps> = ({ socket }) => {
             className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-2"
             onDoubleClick={() => handleChannelDoubleClick(channel)}
           >
-            <div className="flex items-center">
-              {/* isLocked 아이콘 */}
+            <div className="flex items-center space-x-1">
               <span>{title}</span>
+              {isLocked && (
+                <img src={Image.LOCK} alt="LOCK" className="h-5 w-5" />
+              )}
             </div>
-            <div className="flex items-center">
-              <span className="text-sm text-gray-600">{`${memberCount} members`}</span>
-            </div>
+            <span className="text-sm text-gray-600">{`${memberCount} members`}</span>
           </li>
         );
       })}

@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString } from "class-validator";
 
-export class UpdateImageRequest {
+export class ImageUpdateRequest {
   @IsString()
   @IsNotEmpty()
   readonly image: string;

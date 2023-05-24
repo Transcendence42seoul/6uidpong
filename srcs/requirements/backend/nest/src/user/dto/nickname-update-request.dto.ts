@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString, Length, Matches } from "class-validator";
 
-export class UpdateNicknameRequest {
+export class NicknameUpdateRequest {
   @IsNotEmpty()
   @IsString()
   @Length(4, 14)

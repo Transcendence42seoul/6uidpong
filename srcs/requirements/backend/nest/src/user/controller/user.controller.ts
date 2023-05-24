@@ -20,9 +20,9 @@ import { UserService } from "../service/user.service";
 import { JwtAccessGuard } from "src/auth/guard/jwt-access.guard";
 import { AuthService } from "src/auth/service/auth.service";
 import { User } from "../entity/user.entity";
-import { UpdateImageRequest } from "../dto/update-image-request.dto";
-import { UpdateNicknameRequest } from "../dto/update-nickname-request.dto";
-import { Update2FARequest } from "../dto/update-2fa-request.dto";
+import { ImageUpdateRequest } from "../dto/image-update-request.dto";
+import { NicknameUpdateRequest } from "../dto/nickname-update-request.dto";
+import { TwoFactorAuthUpdateRequest } from "../dto/two-factor-auth-update-request.dto";
 import { UserResponse } from "../dto/user-response.dto";
 import { Pagination } from "src/utils/pagination/pagination";
 import { FriendService } from "../service/friend.service";
@@ -85,7 +85,7 @@ export class UserController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateNickname(
     @Param("id", ParseIntPipe) id: number,
-    @Body() body: UpdateNicknameRequest
+    @Body() body: NicknameUpdateRequest
   ): Promise<void> {
     await this.userService.updateNickname(id, body.nickname);
   }
@@ -95,7 +95,7 @@ export class UserController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateImage(
     @Param("id", ParseIntPipe) id: number,
-    @Body() body: UpdateImageRequest
+    @Body() body: ImageUpdateRequest
   ): Promise<void> {
     await this.userService.updateImage(id, body.image);
   }
@@ -117,7 +117,7 @@ export class UserController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async update2FA(
     @Param("id", ParseIntPipe) id: number,
-    @Body() body: Update2FARequest
+    @Body() body: TwoFactorAuthUpdateRequest
   ): Promise<void> {
     await this.authService.validate2FACode(id, body.code);
     await this.userService.updateIsTwoFactor(id, body.is2FA);

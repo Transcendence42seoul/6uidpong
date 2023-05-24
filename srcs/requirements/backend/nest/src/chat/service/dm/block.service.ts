@@ -1,13 +1,13 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { BlockEntity } from "../../entity/dm/block-list.entity";
+import { Block } from "../../entity/dm/block.entity";
 
 @Injectable()
 export class BlockService {
   constructor(
-    @InjectRepository(BlockEntity)
-    private readonly blockRepository: Repository<BlockEntity>
+    @InjectRepository(Block)
+    private readonly blockRepository: Repository<Block>
   ) {}
 
   async save(userId: number, interlocutorId: number): Promise<void> {

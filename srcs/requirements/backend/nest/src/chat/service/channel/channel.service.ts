@@ -1,27 +1,26 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { AllChannelResponseDto } from "src/chat/dto/channel/all-channel-response.dto";
-import { CreateChannelDto } from "src/chat/dto/channel/create-channel.dto";
-import { MyChannelResponseDto } from "src/chat/dto/channel/my-channel-response.dto";
-import { ChannelChatEntity } from "src/chat/entity/channel/channel-chat.entity";
+import { ChannelCreateRequest } from "src/chat/dto/channel/channel-create-request.dto";
+import { ChannelResponse } from "src/chat/dto/channel/channel-response.dto";
+import { ChannelChat } from "src/chat/entity/channel/channel-chat.entity";
 import { ChannelUser } from "src/chat/entity/channel/channel-user.entity";
-import { ChannelEntity } from "src/chat/entity/channel/channel.entity";
+import { Channel } from "src/chat/entity/channel/channel.entity";
 import * as bcryptjs from "bcryptjs";
 import { DataSource, MoreThanOrEqual, Repository } from "typeorm";
 
 @Injectable()
 export class ChannelService {
   constructor(
-    @InjectRepository(ChannelEntity)
-    private readonly channelRepository: Repository<ChannelEntity>,
+    @InjectRepository(Channel)
+    private readonly channelRepository: Repository<Channel>,
     @InjectRepository(ChannelUser)
     private readonly channelUserRepository: Repository<ChannelUser>,
-    @InjectRepository(ChannelChatEntity)
-    private readonly chatRepository: Repository<ChannelChatEntity>,
+    @InjectRepository(ChannelChat)
+    private readonly chatRepository: Repository<ChannelChat>,
     private readonly dataSource: DataSource
   ) {}
 
-  async findAllChannels(): Promise<AllChannelResponseDto[]> {
+  async findAllChannels(): Promise<ChannelResponse[]> {
     return await this.channelRepository
       .createQueryBuilder("channel")
       .select([
@@ -45,7 +44,7 @@ export class ChannelService {
       .getRawMany();
   }
 
-  async findChannel(channelId: number): Promise<ChannelEntity> {
+  async findChannelOrFail(channelId: number): Promise<Channel> {
     return await this.channelRepository.findOneOrFail({
       where: {
         id: channelId,
@@ -53,7 +52,7 @@ export class ChannelService {
     });
   }
 
-  async findMyChannels(userId: number): Promise<MyChannelResponseDto[]> {
+  async findMyChannels(userId: number): Promise<ChannelResponse[]> {
     return await this.channelUserRepository
       .createQueryBuilder("channel_users")
       .select([
@@ -79,7 +78,10 @@ export class ChannelService {
       .getRawMany();
   }
 
-  async findUser(channelId: number, userId: number): Promise<ChannelUser> {
+  async findUserOrFail(
+    channelId: number,
+    userId: number
+  ): Promise<ChannelUser> {
     return await this.channelUserRepository.findOneOrFail({
       where: {
         channelId,
@@ -98,7 +100,7 @@ export class ChannelService {
   async findChats(
     channelId: number,
     channelUser: ChannelUser
-  ): Promise<ChannelChatEntity[]> {
+  ): Promise<ChannelChat[]> {
     return await this.chatRepository.find({
       relations: {
         user: true,
@@ -115,7 +117,10 @@ export class ChannelService {
     });
   }
 
-  async createChannel(userId: number, body: CreateChannelDto): Promise<any> {
+  async createChannel(
+    userId: number,
+    body: ChannelCreateRequest
+  ): Promise<any> {
     const queryRunner = this.dataSource.createQueryRunner();
 
     await queryRunner.connect();
@@ -129,8 +134,8 @@ export class ChannelService {
         await bcryptjs.genSalt()
       );
 
-      const newChannel: ChannelEntity = await queryRunner.manager.save(
-        ChannelEntity,
+      const newChannel: Channel = await queryRunner.manager.save(
+        Channel,
         {
           title: body.title,
           isPublic: body.isPublic,

@@ -2,7 +2,7 @@ import { User } from "src/user/entity/user.entity";
 import { Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
 
 @Entity("block_list")
-export class BlockEntity {
+export class Block {
   @PrimaryColumn({ name: "user_id" })
   userId: number;
 

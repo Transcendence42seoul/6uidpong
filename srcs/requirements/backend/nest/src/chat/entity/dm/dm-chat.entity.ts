@@ -7,19 +7,19 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { DmRoomEntity } from "./dm-room.entity";
+import { DmRoom } from "./dm-room.entity";
 
 @Entity("dm_chats")
-export class DmChatEntity {
+export class DmChat {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => DmRoomEntity, (room) => room.chats, {
+  @ManyToOne(() => DmRoom, (room) => room.chats, {
     onDelete: "CASCADE",
     onUpdate: "CASCADE",
   })
   @JoinColumn({ name: "room_id" })
-  room: DmRoomEntity;
+  room: DmRoom;
 
   @ManyToOne(() => User, (user) => user.dmChats, {
     onUpdate: "CASCADE",

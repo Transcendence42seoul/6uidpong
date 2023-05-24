@@ -2,24 +2,24 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "src/user/entity/user.entity";
 import { Repository, MoreThanOrEqual, DataSource } from "typeorm";
-import { DmRoomsResponseDto } from "../../dto/dm/dm-rooms-response.dto";
-import { DmChatEntity } from "../../entity/dm/dm-chat.entity";
+import { DmRoomResponse } from "../../dto/dm/dm-rooms-response.dto";
+import { DmChat } from "../../entity/dm/dm-chat.entity";
 import { DmRoomUser } from "../../entity/dm/dm-room-user.entity";
-import { DmRoomEntity } from "../../entity/dm/dm-room.entity";
+import { DmRoom } from "../../entity/dm/dm-room.entity";
 
 @Injectable()
 export class DmService {
   constructor(
-    @InjectRepository(DmRoomEntity)
-    private readonly roomRepository: Repository<DmRoomEntity>,
+    @InjectRepository(DmRoom)
+    private readonly roomRepository: Repository<DmRoom>,
     @InjectRepository(DmRoomUser)
     private readonly roomUserRepository: Repository<DmRoomUser>,
-    @InjectRepository(DmChatEntity)
-    private readonly chatRepository: Repository<DmChatEntity>,
+    @InjectRepository(DmChat)
+    private readonly chatRepository: Repository<DmChat>,
     private readonly dataSource: DataSource
   ) {}
 
-  async findRooms(userId: number): Promise<DmRoomsResponseDto[]> {
+  async findRooms(userId: number): Promise<DmRoomResponse[]> {
     return await this.chatRepository
       .createQueryBuilder("dm_chats")
       .select([
@@ -42,7 +42,7 @@ export class DmService {
           subQuery
             .select("sub_dm_chats.room_id", "room_id")
             .addSelect("MAX(sub_dm_chats.created_at)", "max_created_at")
-            .from(DmChatEntity, "sub_dm_chats")
+            .from(DmChat, "sub_dm_chats")
             .innerJoin(
               DmRoomUser,
               "room_users",
@@ -63,7 +63,10 @@ export class DmService {
       .getRawMany();
   }
 
-  async findUser(userId: number, interlocutorId: number): Promise<DmRoomUser> {
+  async findUserOrFail(
+    userId: number,
+    interlocutorId: number
+  ): Promise<DmRoomUser> {
     return await this.roomUserRepository
       .createQueryBuilder("room_user")
       .select()
@@ -122,9 +125,9 @@ export class DmService {
       const saveOptions: Object = {
         transaction: false,
       };
-      const newRoom: DmRoomEntity = await queryRunner.manager.save(
-        DmRoomEntity,
-        new DmRoomEntity(),
+      const newRoom: DmRoom = await queryRunner.manager.save(
+        DmRoom,
+        new DmRoom(),
         saveOptions
       );
       const newRoomUser: DmRoomUser = await queryRunner.manager.save(
@@ -154,7 +157,7 @@ export class DmService {
     }
   }
 
-  async findChats(roomUser: DmRoomUser): Promise<DmChatEntity[]> {
+  async findChats(roomUser: DmRoomUser): Promise<DmChat[]> {
     return await this.chatRepository.find({
       relations: {
         user: true,
@@ -177,14 +180,14 @@ export class DmService {
     message: string,
     recipientRoomUser: DmRoomUser,
     isNotJoin: boolean
-  ): Promise<DmChatEntity> {
+  ): Promise<DmChat> {
     const queryRunner = this.dataSource.createQueryRunner();
 
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      const newChat: DmChatEntity = await queryRunner.manager.save(
-        DmChatEntity,
+      const newChat: DmChat = await queryRunner.manager.save(
+        DmChat,
         {
           user: {
             id: senderId,
@@ -231,7 +234,7 @@ export class DmService {
     }
   }
 
-  async findChat(id: number): Promise<DmChatEntity> {
+  async findChat(id: number): Promise<DmChat> {
     return await this.chatRepository.findOne({
       relations: {
         user: true,

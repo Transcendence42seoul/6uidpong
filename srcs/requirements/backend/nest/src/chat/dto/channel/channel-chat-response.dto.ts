@@ -1,7 +1,7 @@
-import { ChannelChatEntity } from "src/chat/entity/channel/channel-chat.entity";
+import { ChannelChat } from "src/chat/entity/channel/channel-chat.entity";
 
-export class ChannelChatResponseDto {
-  constructor(entity: ChannelChatEntity) {
+export class ChannelChatResponse {
+  constructor(entity: ChannelChat) {
     this.userId = entity.user.id;
     this.nickname = entity.user.nickname;
     this.image = entity.user.image;

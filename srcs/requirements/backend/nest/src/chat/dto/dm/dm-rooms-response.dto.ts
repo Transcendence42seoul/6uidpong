@@ -1,4 +1,4 @@
-export class DmRoomsResponseDto {
+export class DmRoomResponse {
   readonly roomId: number;
 
   readonly lastMessage: string;

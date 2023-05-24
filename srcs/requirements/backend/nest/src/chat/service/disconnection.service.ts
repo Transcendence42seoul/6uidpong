@@ -6,7 +6,7 @@ import { DataSource } from "typeorm";
 export class DisconnectionService {
   constructor(private readonly dataSource: DataSource) {}
 
-  async updateUserInfo(socketId: string): Promise<void> {
+  async update(socketId: string): Promise<void> {
     const queryRunner = this.dataSource.createQueryRunner();
 
     await queryRunner.connect();

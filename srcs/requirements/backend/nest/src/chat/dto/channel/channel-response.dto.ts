@@ -1,4 +1,4 @@
-export class MyChannelResponseDto {
+export class ChannelResponse {
   readonly id: number;
 
   readonly title: string;

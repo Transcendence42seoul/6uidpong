@@ -7,19 +7,19 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { ChannelEntity } from "./channel.entity";
+import { Channel } from "./channel.entity";
 
 @Entity("channel_chats")
-export class ChannelChatEntity {
+export class ChannelChat {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => ChannelEntity, (channel) => channel.chats, {
+  @ManyToOne(() => Channel, (channel) => channel.chats, {
     onDelete: "CASCADE",
     onUpdate: "CASCADE",
   })
   @JoinColumn({ name: "channel_id" })
-  channel: ChannelEntity;
+  channel: Channel;
 
   @ManyToOne(() => User, (user) => user.channelChats, {
     onUpdate: "CASCADE",

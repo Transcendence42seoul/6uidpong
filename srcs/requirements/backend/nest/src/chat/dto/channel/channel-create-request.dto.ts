@@ -6,7 +6,7 @@ import {
   Matches,
 } from "class-validator";
 
-export class CreateChannelDto {
+export class ChannelCreateRequest {
   @IsNotEmpty()
   @IsString()
   @Length(4, 30)

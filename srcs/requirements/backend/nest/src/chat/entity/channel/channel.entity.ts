@@ -5,11 +5,11 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { ChannelChatEntity } from "./channel-chat.entity";
+import { ChannelChat } from "./channel-chat.entity";
 import { ChannelUser } from "./channel-user.entity";
 
 @Entity("channels")
-export class ChannelEntity {
+export class Channel {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -28,6 +28,6 @@ export class ChannelEntity {
   @OneToMany(() => ChannelUser, (channelUser) => channelUser.channel)
   channelUsers: ChannelUser[];
 
-  @OneToMany(() => ChannelChatEntity, (chat) => chat.channel)
-  chats: ChannelChatEntity[];
+  @OneToMany(() => ChannelChat, (chat) => chat.channel)
+  chats: ChannelChat[];
 }

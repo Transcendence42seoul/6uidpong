@@ -7,7 +7,7 @@ import {
   ManyToOne,
   PrimaryColumn,
 } from "typeorm";
-import { ChannelEntity } from "./channel.entity";
+import { Channel } from "./channel.entity";
 
 @Entity("channel_users")
 export class ChannelUser {
@@ -17,12 +17,12 @@ export class ChannelUser {
   @PrimaryColumn({ name: "user_id" })
   userId: number;
 
-  @ManyToOne(() => ChannelEntity, (channel) => channel.channelUsers, {
+  @ManyToOne(() => Channel, (channel) => channel.channelUsers, {
     onDelete: "CASCADE",
     onUpdate: "CASCADE",
   })
   @JoinColumn({ name: "channel_id" })
-  channel: ChannelEntity;
+  channel: Channel;
 
   @ManyToOne(() => User, (user) => user.dmRoomUsers, {
     onUpdate: "CASCADE",

@@ -11,27 +11,26 @@ import {
 import { Server, Socket } from "socket.io";
 import { User } from "src/user/entity/user.entity";
 import { UserService } from "src/user/service/user.service";
-import { DmChatResponseDto } from "../dto/dm/dm-chat-response.dto";
-import { DmRoomsResponseDto } from "../dto/dm/dm-rooms-response.dto";
+import { DmChatResponse } from "../dto/dm/dm-chat-response.dto";
+import { DmRoomResponse } from "../dto/dm/dm-rooms-response.dto";
 import { DmRoomUser } from "../entity/dm/dm-room-user.entity";
 import { WsJwtAccessGuard } from "../guard/ws-jwt-access.guard";
 import { DmService } from "../service/dm/dm.service";
 import { ConnectionService } from "../service/connection.service";
 import { DisconnectionService } from "../service/disconnection.service";
-import { WsJwtPayload } from "../utils/ws-jwt-payload.decorator";
+import { WsJwtPayload } from "../utils/decorator/ws-jwt-payload.decorator";
 import { JwtPayload } from "jsonwebtoken";
-import { DmChatsResponseDto } from "../dto/dm/dm-chats-response.dto";
+import { DmJoinResponse } from "../dto/dm/dm-join-response.dto";
 import { EntityNotFoundError } from "typeorm";
-import { DmChatEntity } from "../entity/dm/dm-chat.entity";
+import { DmChat } from "../entity/dm/dm-chat.entity";
 import { BlockService } from "../service/dm/block.service";
 import { ChannelService } from "../service/channel/channel.service";
-import { ChannelEntity } from "../entity/channel/channel.entity";
-import { AllChannelResponseDto } from "../dto/channel/all-channel-response.dto";
+import { Channel } from "../entity/channel/channel.entity";
 import { ChannelUser } from "../entity/channel/channel-user.entity";
-import { MyChannelResponseDto } from "../dto/channel/my-channel-response.dto";
-import { ChannelChatEntity } from "../entity/channel/channel-chat.entity";
-import { ChannelChatResponseDto } from "../dto/channel/channel-chat-response.dto";
-import { CreateChannelDto } from "../dto/channel/create-channel.dto";
+import { ChannelResponse } from "../dto/channel/channel-response.dto";
+import { ChannelChat } from "../entity/channel/channel-chat.entity";
+import { ChannelChatResponse } from "../dto/channel/channel-chat-response.dto";
+import { ChannelCreateRequest } from "../dto/channel/channel-create-request.dto";
 import * as bcryptjs from "bcryptjs";
 
 @WebSocketGateway(80, {
@@ -55,7 +54,7 @@ export class ChatGateway implements OnGatewayDisconnect {
   ) {}
 
   async handleDisconnect(@ConnectedSocket() client: Socket) {
-    await this.disconnectionService.updateUserInfo(client.id);
+    await this.disconnectionService.update(client.id);
   }
 
   @SubscribeMessage("connection")
@@ -63,13 +62,13 @@ export class ChatGateway implements OnGatewayDisconnect {
     @WsJwtPayload() jwt: JwtPayload,
     @ConnectedSocket() client: Socket
   ): Promise<void> {
-    await this.connectionService.updateUserInfo(jwt.id, client.id);
+    await this.connectionService.update(jwt.id, client.id);
   }
 
   @SubscribeMessage("find-dm-rooms")
   async findDmRooms(
     @WsJwtPayload() jwt: JwtPayload
-  ): Promise<DmRoomsResponseDto[]> {
+  ): Promise<DmRoomResponse[]> {
     return await this.dmService.findRooms(jwt.id);
   }
 
@@ -78,28 +77,28 @@ export class ChatGateway implements OnGatewayDisconnect {
     @WsJwtPayload() jwt: JwtPayload,
     @ConnectedSocket() client: Socket,
     @MessageBody("interlocutorId") interlocutorId: number
-  ): Promise<DmChatsResponseDto> {
+  ): Promise<DmJoinResponse> {
     let roomUser: DmRoomUser;
     try {
-      roomUser = await this.dmService.findUser(jwt.id, interlocutorId);
+      roomUser = await this.dmService.findUserOrFail(jwt.id, interlocutorId);
       await this.dmService.updateUser(roomUser);
-    } catch (error) {
-      if (!(error instanceof EntityNotFoundError)) {
-        throw error;
+    } catch (e) {
+      if (!(e instanceof EntityNotFoundError)) {
+        throw e;
       }
       roomUser = await this.dmService.saveUsers(jwt.id, interlocutorId);
     }
     client.join("d" + roomUser.roomId);
-    const chats: DmChatEntity[] = await this.dmService.findChats(roomUser);
+    const chats: DmChat[] = await this.dmService.findChats(roomUser);
 
-    return new DmChatsResponseDto(roomUser.roomId, roomUser.newMsgCount, chats);
+    return new DmJoinResponse(roomUser.roomId, roomUser.newMsgCount, chats);
   }
 
   @SubscribeMessage("send-dm")
   async sendDM(
     @WsJwtPayload() jwt: JwtPayload,
     @MessageBody("to") to: { id: number; message: string }
-  ): Promise<DmChatResponseDto> {
+  ): Promise<DmChatResponse> {
     try {
       const recipient: User = await this.userService.findOneOrFail(to.id);
       if (await this.blockService.isBlocked(jwt.id, recipient.id)) {
@@ -112,7 +111,7 @@ export class ChatGateway implements OnGatewayDisconnect {
           "You can't send a message because you have been blocked."
         );
       }
-      const recipientRoomUser: DmRoomUser = await this.dmService.findUser(
+      const recipientRoomUser: DmRoomUser = await this.dmService.findUserOrFail(
         recipient.id,
         jwt.id
       );
@@ -129,7 +128,7 @@ export class ChatGateway implements OnGatewayDisconnect {
         recipientRoomUser,
         isNotJoin
       );
-      const chat: DmChatResponseDto = new DmChatResponseDto(
+      const chat: DmChatResponse = new DmChatResponse(
         await this.dmService.findChat(chatId)
       );
       if (recipient.status === "online") {
@@ -139,11 +138,8 @@ export class ChatGateway implements OnGatewayDisconnect {
         recipientSocket[0].emit("send-dm", chat);
       }
       return chat;
-    } catch (error) {
-      if (error instanceof EntityNotFoundError) {
-        throw new WsException("invalid request.");
-      }
-      throw error;
+    } catch (e) {
+      throw e;
     }
   }
 
@@ -161,20 +157,16 @@ export class ChatGateway implements OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
     @MessageBody("interlocutorId") interlocutorId: number
   ): Promise<void> {
-    try {
-      const interlocutorRoomUser: DmRoomUser = await this.dmService.findUser(
-        interlocutorId,
-        jwt.id
-      );
-      if (interlocutorRoomUser.isExit) {
-        await this.dmService.deleteRoom(interlocutorRoomUser.roomId);
-      } else {
-        await this.dmService.exitRoom(interlocutorRoomUser.roomId, jwt.id);
-      }
-      client.leave("d" + interlocutorRoomUser.roomId);
-    } catch {
-      throw new WsException("invalid request.");
+    const interRoomUser: DmRoomUser = await this.dmService.findUserOrFail(
+      interlocutorId,
+      jwt.id
+    );
+    if (interRoomUser.isExit) {
+      await this.dmService.deleteRoom(interRoomUser.roomId);
+    } else {
+      await this.dmService.exitRoom(interRoomUser.roomId, jwt.id);
     }
+    client.leave("d" + interRoomUser.roomId);
   }
 
   @SubscribeMessage("block-dm-user")
@@ -194,14 +186,14 @@ export class ChatGateway implements OnGatewayDisconnect {
   }
 
   @SubscribeMessage("find-all-channels")
-  async findAllChannels(): Promise<AllChannelResponseDto[]> {
+  async findAllChannels(): Promise<ChannelResponse[]> {
     return await this.channelService.findAllChannels();
   }
 
   @SubscribeMessage("find-my-channels")
   async findMyChannels(
     @WsJwtPayload() jwt: JwtPayload
-  ): Promise<MyChannelResponseDto[]> {
+  ): Promise<ChannelResponse[]> {
     return await this.channelService.findMyChannels(jwt.id);
   }
 
@@ -209,7 +201,7 @@ export class ChatGateway implements OnGatewayDisconnect {
   async createChannel(
     @WsJwtPayload() jwt: JwtPayload,
     @MessageBody()
-    body: CreateChannelDto
+    body: ChannelCreateRequest
   ): Promise<void> {
     await this.channelService.createChannel(jwt.id, body);
   }
@@ -220,12 +212,15 @@ export class ChatGateway implements OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
     @MessageBody("info")
     info: { channelId: number; password: string | undefined }
-  ): Promise<ChannelChatResponseDto[]> {
+  ): Promise<ChannelChatResponse[]> {
     let channelUser: ChannelUser;
     try {
-      channelUser = await this.channelService.findUser(info.channelId, jwt.id);
+      channelUser = await this.channelService.findUserOrFail(
+        info.channelId,
+        jwt.id
+      );
     } catch {
-      const channel: ChannelEntity = await this.channelService.findChannel(
+      const channel: Channel = await this.channelService.findChannelOrFail(
         info.channelId
       );
       if (
@@ -238,12 +233,12 @@ export class ChatGateway implements OnGatewayDisconnect {
     }
     client.join("c" + info.channelId);
     // client.broadcast
-    const chats: ChannelChatEntity[] = await this.channelService.findChats(
+    const chats: ChannelChat[] = await this.channelService.findChats(
       info.channelId,
       channelUser
     );
     return chats.map((chat) => {
-      return new ChannelChatResponseDto(chat);
+      return new ChannelChatResponse(chat);
     });
   }
 

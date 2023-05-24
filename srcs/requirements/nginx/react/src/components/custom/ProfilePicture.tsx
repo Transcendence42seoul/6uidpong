@@ -3,19 +3,17 @@ import axios, { AxiosResponse, AxiosError } from 'axios';
 import selectAuth from '../../features/auth/authSelector';
 import HoverButton from '../button/HoverButton';
 
-interface ProfileProps {
-  id: number;
-}
+const ProfilePicture: React.FC = () => {
+  const { accessToken, tokenInfo } = selectAuth();
+  const myId = tokenInfo?.id;
 
-const ProfilePicture: React.FC<ProfileProps> = ({ id }) => {
   const [image, setImage] = useState<string>('');
-  const { accessToken } = selectAuth();
 
   const handleSubmit = () => {
     console.log(image);
     axios
       .put(
-        `api/v1/users/${id}/image`,
+        `api/v1/users/${myId}/image`,
         { image },
         {
           headers: { Authorization: `Bearer ${accessToken}` },

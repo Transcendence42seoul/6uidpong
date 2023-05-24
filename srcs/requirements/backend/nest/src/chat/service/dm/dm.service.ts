@@ -63,7 +63,7 @@ export class DmService {
       .getRawMany();
   }
 
-  async findRoomUser(
+  async findUser(
     userId: number,
     interlocutorId: number
   ): Promise<DmRoomUserEntity> {
@@ -86,7 +86,7 @@ export class DmService {
       .getOneOrFail();
   }
 
-  async updateRoomUser(roomUser: DmRoomUserEntity): Promise<void> {
+  async updateUser(roomUser: DmRoomUserEntity): Promise<void> {
     const queryRunner = this.dataSource.createQueryRunner();
 
     await queryRunner.connect();
@@ -116,7 +116,7 @@ export class DmService {
     }
   }
 
-  async saveRoomUsers(
+  async saveUsers(
     userId: number,
     interlocutorId: number
   ): Promise<DmRoomUserEntity> {

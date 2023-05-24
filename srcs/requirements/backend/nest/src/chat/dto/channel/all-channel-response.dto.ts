@@ -3,7 +3,7 @@ export class AllChannelResponseDto {
 
   readonly title: string;
 
-  readonly isPublic: boolean;
-
   readonly memberCount: number;
+
+  readonly isLocked: boolean;
 }

@@ -1,20 +1,20 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { DataSource, Repository } from "typeorm";
-import { FriendResponseDto } from "../dto/friend-response.dto";
-import { FriendRequestEntity } from "../entity/friend-request.entity";
-import { FriendEntity } from "../entity/friend.entity";
+import { FriendResponse } from "../dto/friend-response.dto";
+import { FriendRequest } from "../entity/friend-request.entity";
+import { Friend } from "../entity/friend.entity";
 import { User } from "../entity/user.entity";
 
 @Injectable()
 export class FriendService {
   constructor(
-    @InjectRepository(FriendEntity)
-    private readonly friendRepository: Repository<FriendEntity>,
+    @InjectRepository(Friend)
+    private readonly friendRepository: Repository<Friend>,
     private readonly dataSource: DataSource
   ) {}
 
-  async find(userId: number): Promise<FriendResponseDto[]> {
+  async find(userId: number): Promise<FriendResponse[]> {
     return await this.friendRepository
       .createQueryBuilder("friends")
       .select([
@@ -41,16 +41,16 @@ export class FriendService {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      queryRunner.manager.findOneByOrFail(FriendRequestEntity, {
+      queryRunner.manager.findOneByOrFail(FriendRequest, {
         fromId: friendId,
         toId: userId,
       });
-      queryRunner.manager.delete(FriendRequestEntity, {
+      queryRunner.manager.delete(FriendRequest, {
         fromId: friendId,
         toId: userId,
       });
       queryRunner.manager.save(
-        FriendEntity,
+        Friend,
         {
           fromId: friendId,
           toId: userId,
@@ -68,10 +68,10 @@ export class FriendService {
   }
 
   async delete(userId: number, friendId: number): Promise<void> {
-    const result: FriendEntity = await this.friendRepository.findOneByOrFail([
+    const friend: Friend = await this.friendRepository.findOneByOrFail([
       { fromId: userId, toId: friendId },
       { fromId: friendId, toId: userId },
     ]);
-    await this.friendRepository.remove(result);
+    await this.friendRepository.remove(friend);
   }
 }

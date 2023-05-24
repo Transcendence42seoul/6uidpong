@@ -1,6 +1,6 @@
 import { User } from "../entity/user.entity";
 
-export class UserResponseDto {
+export class UserResponse {
   constructor(entity: User) {
     this.id = entity.id;
     this.nickname = entity.nickname;

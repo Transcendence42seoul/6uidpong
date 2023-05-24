@@ -20,16 +20,16 @@ import { UserService } from "../service/user.service";
 import { JwtAccessGuard } from "src/auth/guard/jwt-access.guard";
 import { AuthService } from "src/auth/service/auth.service";
 import { User } from "../entity/user.entity";
-import { UpdateImageDto } from "../dto/update-image.dto";
-import { UpdateNicknameDto } from "../dto/update-nickname.dto";
-import { UpdateTwoFactorAuthRequest } from "../dto/update-2fa.dto";
-import { UserResponseDto } from "../dto/user-response.dto";
+import { UpdateImageRequest } from "../dto/update-image-request.dto";
+import { UpdateNicknameRequest } from "../dto/update-nickname-request.dto";
+import { Update2FARequest } from "../dto/update-2fa-request.dto";
+import { UserResponse } from "../dto/user-response.dto";
 import { Pagination } from "src/utils/pagination/pagination";
 import { FriendService } from "../service/friend.service";
 import { FriendRequestService } from "../service/friend-request.service";
-import { FriendResponseDto } from "../dto/friend-response.dto";
-import { FriendRequestEntity } from "../entity/friend-request.entity";
-import { FriendRequestResponseDto } from "../dto/friend-request-response.dto";
+import { FriendResponse } from "../dto/friend-response.dto";
+import { FriendRequest } from "../entity/friend-request.entity";
+import { FriendRequestResponse } from "../dto/friend-request-response.dto";
 import { PermissionGuard } from "src/auth/guard/permission.guard";
 
 @Controller("api/v1/users")
@@ -46,47 +46,37 @@ export class UserController {
   async findAllUser(
     @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query("size", new DefaultValuePipe(10), ParseIntPipe) size: number
-  ): Promise<Pagination<UserResponseDto>> {
-    const [entities, total]: [User[], number] = await this.userService.findAll({
+  ): Promise<Pagination<UserResponse>> {
+    const [users, total]: [User[], number] = await this.userService.findAll({
       page,
       size,
     });
-    const dtos: UserResponseDto[] = entities.map((entity) => {
-      return new UserResponseDto(entity);
+    const dtos: UserResponse[] = users.map((user) => {
+      return new UserResponse(user);
     });
-    return new Pagination<UserResponseDto>({ results: dtos, total });
+
+    return new Pagination<UserResponse>({ results: dtos, total });
   }
 
   @Get("/search")
   async searchUser(
-    @Query("nickname") nickname: string,
-    @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number,
-    @Query("size", new DefaultValuePipe(10), ParseIntPipe) size: number
-  ): Promise<UserResponseDto[]> {
-    // ): Promise<Pagination<UserResponseDto>> {
-    const [entities, total]: [User[], number] = await this.userService.search(
-      nickname,
-      {
-        page,
-        size,
-      }
-    );
-    const dtos: UserResponseDto[] = entities.map((entity) => {
-      return new UserResponseDto(entity);
+    @Query("nickname") nickname: string
+  ): Promise<UserResponse[]> {
+    const entities: User[] = await this.userService.search(nickname);
+
+    return entities.map((entity) => {
+      return new UserResponse(entity);
     });
-    return dtos;
-    // return new Pagination<UserResponseDto>({ results: dtos, total });
   }
 
   @Get("/:id")
-  async findUser(
-    @Param("id", ParseIntPipe) id: number
-  ): Promise<UserResponseDto> {
+  async findUser(@Param("id", ParseIntPipe) id: number): Promise<UserResponse> {
     try {
-      const entity: User = await this.userService.findOneOrFail(id);
-      return new UserResponseDto(entity);
-    } catch (EntityNotFoundError) {
-      throw new NotFoundException();
+      const user: User = await this.userService.findOneOrFail(id);
+
+      return new UserResponse(user);
+    } catch {
+      throw new NotFoundException("user not exists");
     }
   }
 
@@ -95,9 +85,9 @@ export class UserController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateNickname(
     @Param("id", ParseIntPipe) id: number,
-    @Body() { nickname }: UpdateNicknameDto
+    @Body() body: UpdateNicknameRequest
   ): Promise<void> {
-    await this.userService.updateNickname(id, nickname);
+    await this.userService.updateNickname(id, body.nickname);
   }
 
   @Put("/:id/image")
@@ -105,9 +95,9 @@ export class UserController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateImage(
     @Param("id", ParseIntPipe) id: number,
-    @Body() { image }: UpdateImageDto
+    @Body() body: UpdateImageRequest
   ): Promise<void> {
-    await this.userService.updateImage(id, image);
+    await this.userService.updateImage(id, body.image);
   }
 
   @Put("/:id/email/code")
@@ -117,8 +107,8 @@ export class UserController {
     try {
       const { email } = await this.userService.findOneOrFail(id);
       await this.authService.send2FACode(id, email);
-    } catch (EntityNotFoundError) {
-      throw new NotFoundException();
+    } catch {
+      throw new NotFoundException("user not exists");
     }
   }
 
@@ -127,14 +117,9 @@ export class UserController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async update2FA(
     @Param("id", ParseIntPipe) id: number,
-    @Body() body: UpdateTwoFactorAuthRequest
+    @Body() body: Update2FARequest
   ): Promise<void> {
-    try {
-      await this.authService.validate2FACode(id, body.code);
-    } catch {
-      throw new UnauthorizedException("invalid code");
-    }
-
+    await this.authService.validate2FACode(id, body.code);
     await this.userService.updateIsTwoFactor(id, body.is2FA);
   }
 
@@ -142,7 +127,7 @@ export class UserController {
   @UseGuards(PermissionGuard)
   async findFriends(
     @Param("id", ParseIntPipe) userId: number
-  ): Promise<FriendResponseDto[]> {
+  ): Promise<FriendResponse[]> {
     return await this.friendService.find(userId);
   }
 
@@ -153,11 +138,7 @@ export class UserController {
     @Param("id", ParseIntPipe) userId: number,
     @Body("friendId", ParseIntPipe) friendId: number
   ): Promise<void> {
-    try {
-      await this.friendService.save(userId, friendId);
-    } catch {
-      throw new BadRequestException();
-    }
+    await this.friendService.save(userId, friendId);
   }
 
   @Delete("/:id/friends/:friendId")
@@ -167,23 +148,19 @@ export class UserController {
     @Param("id", ParseIntPipe) userId: number,
     @Param("friendId", ParseIntPipe) friendId: number
   ): Promise<void> {
-    try {
-      await this.friendService.delete(userId, friendId);
-    } catch {
-      throw new NotFoundException();
-    }
+    await this.friendService.delete(userId, friendId);
   }
 
   @Get("/:id/friend-requests")
   @UseGuards(PermissionGuard)
   async findFriendRequests(
     @Param("id", ParseIntPipe) userId: number
-  ): Promise<FriendRequestResponseDto[]> {
-    const entities: FriendRequestEntity[] =
+  ): Promise<FriendRequestResponse[]> {
+    const friendRequests: FriendRequest[] =
       await this.friendRequestService.find(userId);
 
-    return entities.map((entity) => {
-      return new FriendRequestResponseDto(entity);
+    return friendRequests.map((friendRequest) => {
+      return new FriendRequestResponse(friendRequest);
     });
   }
 

@@ -1,7 +1,7 @@
-import { FriendRequestEntity } from "../entity/friend-request.entity";
+import { FriendRequest } from "../entity/friend-request.entity";
 
-export class FriendRequestResponseDto {
-  constructor(entity: FriendRequestEntity) {
+export class FriendRequestResponse {
+  constructor(entity: FriendRequest) {
     this.id = entity.from.id;
     this.nickname = entity.from.nickname;
     this.image = entity.from.image;

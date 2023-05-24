@@ -29,10 +29,7 @@ export class UserService {
     return await this.userRepository.findOneOrFail({ where: { socketId: id } });
   }
 
-  async search(
-    nickname: string,
-    options: PaginationOptions
-  ): Promise<[User[], number]> {
+  async search(nickname: string): Promise<User[]> {
     return this.userRepository
       .createQueryBuilder()
       .select()
@@ -45,15 +42,13 @@ export class UserService {
               ELSE 4 \
         END"
       )
-      .limit(options.size)
-      .offset(options.size * (options.page - 1))
       .setParameters({
         includedNickname: `%${nickname}%`,
         nickname: nickname,
         startNickname: `${nickname}%`,
         endNickname: `%${nickname}`,
       })
-      .getManyAndCount();
+      .getMany();
   }
 
   async save(profile: any): Promise<User> {

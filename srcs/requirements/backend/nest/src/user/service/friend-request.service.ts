@@ -1,16 +1,16 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { FriendRequestEntity } from "../entity/friend-request.entity";
+import { FriendRequest } from "../entity/friend-request.entity";
 
 @Injectable()
 export class FriendRequestService {
   constructor(
-    @InjectRepository(FriendRequestEntity)
-    private readonly friendRequestRepository: Repository<FriendRequestEntity>
+    @InjectRepository(FriendRequest)
+    private readonly friendRequestRepository: Repository<FriendRequest>
   ) {}
 
-  async find(userId: number): Promise<FriendRequestEntity[]> {
+  async find(userId: number): Promise<FriendRequest[]> {
     return await this.friendRequestRepository.find({
       relations: {
         from: true,
@@ -24,7 +24,7 @@ export class FriendRequestService {
     });
   }
 
-  async save(fromId: number, toId: number): Promise<FriendRequestEntity> {
+  async save(fromId: number, toId: number): Promise<FriendRequest> {
     return await this.friendRequestRepository.save({
       fromId,
       toId,

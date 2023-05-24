@@ -1,6 +1,6 @@
 import { IsBoolean, IsNotEmpty, IsString } from "class-validator";
 
-export class UpdateTwoFactorAuthRequest {
+export class Update2FARequest {
   @IsString()
   @IsNotEmpty()
   readonly code: string;

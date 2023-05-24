@@ -8,7 +8,7 @@ import {
 } from "typeorm";
 
 @Entity("friend_requests")
-export class FriendRequestEntity {
+export class FriendRequest {
   @PrimaryColumn({ name: "from_id" })
   fromId: number;
 

@@ -1,4 +1,4 @@
-export class FriendResponseDto {
+export class FriendResponse {
   readonly id: number;
 
   readonly nickname: string;

@@ -3,7 +3,7 @@ import { ChannelUser } from "src/chat/entity/channel/channel-user.entity";
 import { DmChatEntity } from "src/chat/entity/dm/dm-chat.entity";
 import { DmRoomUser } from "src/chat/entity/dm/dm-room-user.entity";
 import { Column, Entity, Index, OneToMany, PrimaryColumn } from "typeorm";
-import { FriendRequestEntity } from "./friend-request.entity";
+import { FriendRequest } from "./friend-request.entity";
 
 @Entity("users")
 export class User {
@@ -53,6 +53,6 @@ export class User {
   @OneToMany(() => ChannelChatEntity, (chat) => chat.user)
   channelChats: ChannelChatEntity[];
 
-  @OneToMany(() => FriendRequestEntity, (friendRequest) => friendRequest.from)
-  friendRequests: FriendRequestEntity[];
+  @OneToMany(() => FriendRequest, (friendRequest) => friendRequest.from)
+  friendRequests: FriendRequest[];
 }

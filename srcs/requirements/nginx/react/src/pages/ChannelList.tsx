@@ -25,7 +25,7 @@ const ChannelList: React.FC<ChannelListProps> = ({ socket }) => {
   const [channels, setChannels] = useState<Channel[]>([]);
 
   const handleAllChannelsClick = () => {
-    navigate('/channel/all');
+    navigate('/all-channels');
   };
 
   const handleChannelDoubleClick = ({ id }: Channel) => {

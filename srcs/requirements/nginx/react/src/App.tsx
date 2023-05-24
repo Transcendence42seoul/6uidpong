@@ -81,7 +81,7 @@ const App: React.FC = () => {
       <Routes>
         <Route path="/" element={<Main />} />
         <Route path="/channel" element={<ChannelList socket={socket} />} />
-        <Route path="/channel/all" element={<AllChannels socket={socket} />} />
+        <Route path="/all-channels" element={<AllChannels socket={socket} />} />
         <Route path="/dm" element={<DmRoomList socket={socket} />} />
         <Route path="/dm/:roomId" element={<DmRoom socket={socket} />} />
         <Route path="/friend-requests" element={<FriendRequests />} />

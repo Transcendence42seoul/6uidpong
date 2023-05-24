@@ -23,7 +23,7 @@ const AllChannels: React.FC<AllChannelsProps> = ({ socket }) => {
   };
 
   const handleCreateChannelClick = () => {
-    navigate('/channel/create');
+    navigate('/channel-settings');
   };
 
   useEffect(() => {

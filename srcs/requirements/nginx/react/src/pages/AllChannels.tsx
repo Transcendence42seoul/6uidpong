@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
 import ListContainer from '../components/container/ListContainer';
+import ListInfoPanel from '../components/container/ListInfoPanel';
 import ListTitle from '../components/container/ListTitle';
 import ImageSrc from '../constants/ImageSrc';
 import { Channel } from './ChannelList';
@@ -45,7 +46,9 @@ const AllChannels: React.FC<AllChannelsProps> = ({ socket }) => {
                 <img src={ImageSrc.LOCK} alt="LOCK" className="h-5 w-5" />
               )}
             </div>
-            <span className="text-sm text-gray-600">{`${memberCount} members`}</span>
+            <ListInfoPanel>
+              <span className="text-sm text-gray-600">{`${memberCount} members`}</span>
+            </ListInfoPanel>
           </li>
         );
       })}

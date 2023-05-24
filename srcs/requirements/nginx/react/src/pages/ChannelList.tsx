@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
 import HoverButton from '../components/button/HoverButton';
 import ListContainer from '../components/container/ListContainer';
+import ListInfoPanel from '../components/container/ListInfoPanel';
 import ListTitle from '../components/container/ListTitle';
 import { isTest, mockChannels } from '../mock'; // test
 
@@ -61,14 +62,9 @@ const ChannelList: React.FC<ChannelListProps> = ({ socket }) => {
             <div className="flex items-center">
               <span>{title}</span>
             </div>
-            <div className="flex items-center">
-              {newMsgCount > 0 && (
-                <div className="mr-3 rounded-full bg-red-500 text-white">
-                  {newMsgCount}
-                </div>
-              )}
+            <ListInfoPanel notification={newMsgCount}>
               <span className="text-sm text-gray-600">{`${memberCount} members`}</span>
-            </div>
+            </ListInfoPanel>
           </li>
         );
       })}

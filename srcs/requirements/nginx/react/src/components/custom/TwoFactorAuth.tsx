@@ -4,7 +4,7 @@ import selectAuth from '../../features/auth/authSelector';
 import HoverButton from '../button/HoverButton';
 import Modal from '../modal/Modal';
 
-const TwoFactorAuth: React.FC<TwoFactorAuthProps> = () => {
+const TwoFactorAuth: React.FC = () => {
   const { accessToken, tokenInfo } = selectAuth();
   const myId = tokenInfo?.id;
 

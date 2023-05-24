@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
 import CircularImage from '../components/container/CircularImage';
 import ListContainer from '../components/container/ListContainer';
+import ListInfoPanel from '../components/container/ListInfoPanel';
 import ListTitle from '../components/container/ListTitle';
 import formatTime from '../utils/formatTime';
 import { Chat } from './DmRoom';
@@ -165,16 +166,11 @@ const DmRoomList: React.FC<DmRoomListProps> = ({ socket }) => {
                   <p className="text-sm text-gray-600">{lastMessage}</p>
                 </div>
               </div>
-              <div className="flex items-center">
-                {newMsgCount > 0 && (
-                  <div className="mr-3 rounded-full bg-red-500 text-white">
-                    {newMsgCount}
-                  </div>
-                )}
+              <ListInfoPanel notification={newMsgCount}>
                 <span className="text-sm text-gray-600">
                   {formatTime(lastMessageTime)}
                 </span>
-              </div>
+              </ListInfoPanel>
             </li>
           );
         })}

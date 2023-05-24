@@ -3,18 +3,16 @@ import axios, { AxiosResponse, AxiosError } from 'axios';
 import selectAuth from '../../features/auth/authSelector';
 import HoverButton from '../button/HoverButton';
 
-interface NicknameProps {
-  id: number;
-}
+const Nickname: React.FC = () => {
+  const { accessToken, tokenInfo } = selectAuth();
+  const myId = tokenInfo?.id;
 
-const Nickname: React.FC<NicknameProps> = ({ id }) => {
   const [nickname, setNickname] = useState<string>('');
-  const { accessToken } = selectAuth();
 
   const handleNickname = () => {
     axios
       .put(
-        `api/v1/users/${id}/nickname`,
+        `api/v1/users/${myId}/nickname`,
         { nickname },
         {
           headers: { Authorization: `Bearer ${accessToken}` },

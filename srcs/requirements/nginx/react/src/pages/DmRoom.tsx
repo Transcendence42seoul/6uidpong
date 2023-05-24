@@ -14,6 +14,7 @@ import CircularImage from '../components/container/CircularImage';
 import Message from '../components/container/Message';
 import MessageBox from '../components/container/MessageBox';
 import MessageForm from '../components/container/MessageForm';
+import selectAuth from '../features/auth/authSelector';
 import formatTime from '../utils/formatTime';
 import { isTest, mockChats, mockLocationState } from '../mock'; // test
 
@@ -28,7 +29,6 @@ export interface Chat {
 }
 
 interface DmRoomProps {
-  myId: number;
   socket: Socket;
 }
 
@@ -36,7 +36,7 @@ interface LocationState {
   interlocutorId: number;
 }
 
-const DmRoom: React.FC<DmRoomProps> = ({ myId, socket }) => {
+const DmRoom: React.FC<DmRoomProps> = ({ socket }) => {
   const location = useLocation();
   const { interlocutorId }: LocationState = isTest
     ? mockLocationState
@@ -44,6 +44,9 @@ const DmRoom: React.FC<DmRoomProps> = ({ myId, socket }) => {
 
   const { roomId: roomIdString } = useParams<{ roomId: string }>();
   const roomId = Number(roomIdString);
+
+  const { tokenInfo } = selectAuth();
+  const myId = tokenInfo?.id;
 
   const chatContainer = useRef<HTMLDivElement>(null);
   const [chats, setChats] = useState<Chat[]>([]);

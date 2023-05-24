@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
-import Image from '../../constants/Image';
+import ImageSrc from '../../constants/ImageSrc';
 
 const Modal = ({
   isOpen,
@@ -23,7 +23,7 @@ const Modal = ({
           <div
             className="inline-block transform rounded-lg border-8 bg-white p-7 px-8 py-6 text-left align-middle shadow-xl transition-all group-hover:scale-105 group-hover:border-pink-300 group-hover:bg-pink-300 sm:my-8 sm:h-3/4 sm:w-2/3 sm:max-w-xl sm:align-middle"
             style={{
-              backgroundImage: `url(${Image.MODAL_IMAGE})`,
+              backgroundImage: `url(${ImageSrc.MODAL_IMAGE})`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               pointerEvents: 'none',

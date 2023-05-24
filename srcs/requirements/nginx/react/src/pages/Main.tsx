@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import HoverButton from '../components/button/HoverButton';
 import ContentBox from '../components/container/ContentBox';
-import Image from '../constants/Image';
+import ImageSrc from '../constants/ImageSrc';
 
 const Main: React.FC = () => {
   const navigate = useNavigate();
@@ -15,7 +15,11 @@ const Main: React.FC = () => {
     <div className="flex min-h-screen items-center justify-center text-white">
       <button className="group mx-10 w-1/3" onClick={handleGameClick}>
         <ContentBox className="border-8 p-7 group-hover:scale-105 group-hover:border-pink-300 group-hover:bg-pink-300 group-hover:opacity-70">
-          <img src={Image.GAME} alt="GAME" className="group-hover:opacity-0" />
+          <img
+            src={ImageSrc.GAME}
+            alt="GAME"
+            className="group-hover:opacity-0"
+          />
           <h2 className="mt-7 text-4xl group-hover:text-black group-hover:opacity-50">
             GAME
           </h2>
@@ -23,7 +27,11 @@ const Main: React.FC = () => {
       </button>
       <div className="group relative mx-10 w-1/3">
         <ContentBox className="border-8 p-7 group-hover:scale-105 group-hover:border-pink-300 group-hover:bg-pink-300 group-hover:opacity-70">
-          <img src={Image.CHAT} alt="CHAT" className="group-hover:opacity-0" />
+          <img
+            src={ImageSrc.CHAT}
+            alt="CHAT"
+            className="group-hover:opacity-0"
+          />
           <h2 className="mt-7 text-4xl group-hover:text-black group-hover:opacity-50">
             CHAT
           </h2>

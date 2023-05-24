@@ -2,7 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
 import ListContainer from '../components/container/ListContainer';
+import ListInfoPanel from '../components/container/ListInfoPanel';
 import ListTitle from '../components/container/ListTitle';
+import ImageSrc from '../constants/ImageSrc';
 import { Channel } from './ChannelList';
 import { isTest, mockChannels } from '../mock'; // test
 
@@ -31,20 +33,22 @@ const AllChannels: React.FC<AllChannelsProps> = ({ socket }) => {
     <ListContainer>
       <ListTitle className="mb-3.5 ml-4">All Channels</ListTitle>
       {channels.map((channel) => {
-        const { id, title, isPublic, memberCount } = channel;
+        const { id, title, isLocked, memberCount } = channel;
         return (
           <li
             key={id}
             className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-2"
             onDoubleClick={() => handleChannelDoubleClick(channel)}
           >
-            <div className="flex items-center">
-              {/* isPublic 아이콘 */}
+            <div className="flex items-center space-x-1">
               <span>{title}</span>
+              {isLocked && (
+                <img src={ImageSrc.LOCK} alt="LOCK" className="h-5 w-5" />
+              )}
             </div>
-            <div className="flex items-center">
+            <ListInfoPanel>
               <span className="text-sm text-gray-600">{`${memberCount} members`}</span>
-            </div>
+            </ListInfoPanel>
           </li>
         );
       })}

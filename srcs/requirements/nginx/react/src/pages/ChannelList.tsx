@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
 import HoverButton from '../components/button/HoverButton';
 import ListContainer from '../components/container/ListContainer';
+import ListInfoPanel from '../components/container/ListInfoPanel';
 import ListTitle from '../components/container/ListTitle';
 import { isTest, mockChannels } from '../mock'; // test
 
@@ -13,7 +14,7 @@ interface ChannelListProps {
 export interface Channel {
   id: number;
   title: string;
-  isPublic: boolean;
+  isLocked: boolean;
   newMsgCount: number;
   memberCount: number;
 }
@@ -51,7 +52,7 @@ const ChannelList: React.FC<ChannelListProps> = ({ socket }) => {
         </HoverButton>
       </div>
       {channels.map((channel) => {
-        const { id, title, isPublic, newMsgCount, memberCount } = channel;
+        const { id, title, newMsgCount, memberCount } = channel;
         return (
           <li
             key={id}
@@ -59,17 +60,11 @@ const ChannelList: React.FC<ChannelListProps> = ({ socket }) => {
             onDoubleClick={() => handleChannelDoubleClick(channel)}
           >
             <div className="flex items-center">
-              {/* isPublic 아이콘 */}
               <span>{title}</span>
             </div>
-            <div className="flex items-center">
-              {newMsgCount > 0 && (
-                <div className="mr-3 rounded-full bg-red-500 text-white">
-                  {newMsgCount}
-                </div>
-              )}
+            <ListInfoPanel notification={newMsgCount}>
               <span className="text-sm text-gray-600">{`${memberCount} members`}</span>
-            </div>
+            </ListInfoPanel>
           </li>
         );
       })}

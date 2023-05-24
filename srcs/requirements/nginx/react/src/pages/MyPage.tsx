@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import HoverButton from '../components/button/HoverButton';
 import CircularImage from '../components/container/CircularImage';
 import ContentBox from '../components/container/ContentBox';
+import selectAuth from '../features/auth/authSelector';
 import useCallApi from '../utils/useCallApi';
 import { User } from './UserProfile';
 
@@ -12,13 +13,16 @@ interface Stats {
 }
 
 interface MyPageProps {
-  id: number;
   stats: Stats;
 }
 
-const MyPage: React.FC<MyPageProps> = ({ id, stats }) => {
+const MyPage: React.FC<MyPageProps> = ({ stats }) => {
   const callApi = useCallApi();
   const navigate = useNavigate();
+
+  const { tokenInfo } = selectAuth();
+  const myId = tokenInfo?.id;
+
   const [user, setUser] = useState<User | null>(null);
 
   const handleChangeProfileClick = () => navigate('/profile-settings');
@@ -27,7 +31,7 @@ const MyPage: React.FC<MyPageProps> = ({ id, stats }) => {
   useEffect(() => {
     const fetchUserData = async () => {
       const config = {
-        url: `/api/v1/users/${id}`,
+        url: `/api/v1/users/${myId}`,
       };
       const data: User = await callApi(config);
       setUser(data);

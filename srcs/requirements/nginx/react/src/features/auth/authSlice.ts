@@ -6,7 +6,7 @@ interface TokenInfo {
   nickname: string;
 }
 
-interface AuthState {
+export interface AuthState {
   id: number | null;
   is2FA: boolean | null;
   accessToken: string | null;
@@ -19,8 +19,6 @@ const initialState: AuthState = {
   accessToken: null,
   tokenInfo: null,
 };
-
-export type State = typeof initialState;
 
 const authSlice = createSlice({
   name: 'auth',

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
+import HoverButton from '../components/button/HoverButton';
 import ListContainer from '../components/container/ListContainer';
 import ListInfoPanel from '../components/container/ListInfoPanel';
 import ListTitle from '../components/container/ListTitle';
@@ -21,6 +22,10 @@ const AllChannels: React.FC<AllChannelsProps> = ({ socket }) => {
     navigate(`/channel/${id}`);
   };
 
+  const handleCreateChannelClick = () => {
+    navigate('/channel/create');
+  };
+
   useEffect(() => {
     const channelListHandler = (channelList: Channel[]) => {
       setChannels([...channelList]);
@@ -31,7 +36,15 @@ const AllChannels: React.FC<AllChannelsProps> = ({ socket }) => {
 
   return (
     <ListContainer>
-      <ListTitle className="mb-3.5 ml-4">All Channels</ListTitle>
+      <div className="flex items-end">
+        <ListTitle className="mb-4 ml-4">All Channels</ListTitle>
+        <HoverButton
+          onClick={handleCreateChannelClick}
+          className="mb-3.5 ml-auto px-2.5 py-2 text-sm"
+        >
+          Create
+        </HoverButton>
+      </div>
       {channels.map((channel) => {
         const { id, title, isLocked, memberCount } = channel;
         return (

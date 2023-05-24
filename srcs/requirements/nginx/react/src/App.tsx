@@ -8,6 +8,7 @@ import dispatchAuth from './features/auth/authAction';
 import selectAuth from './features/auth/authSelector';
 import AllChannels from './pages/AllChannels';
 import ChannelList from './pages/ChannelList';
+import ChannelSettings from './pages/ChannelSettings';
 import DmRoom from './pages/DmRoom';
 import DmRoomList from './pages/DmRoomList';
 import FriendRequests from './pages/FriendRequests';
@@ -80,8 +81,12 @@ const App: React.FC = () => {
     <Layout>
       <Routes>
         <Route path="/" element={<Main />} />
-        <Route path="/channel" element={<ChannelList socket={socket} />} />
         <Route path="/all-channels" element={<AllChannels socket={socket} />} />
+        <Route path="/channel" element={<ChannelList socket={socket} />} />
+        <Route
+          path="/channel-settings"
+          element={<ChannelSettings socket={socket} />}
+        />
         <Route path="/dm" element={<DmRoomList socket={socket} />} />
         <Route path="/dm/:roomId" element={<DmRoom socket={socket} />} />
         <Route path="/friend-requests" element={<FriendRequests />} />

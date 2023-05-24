@@ -27,9 +27,11 @@ const Header: React.FC = () => {
   const handleSearchResults = async (data: User[]) => {
     setSearchResults([...data]);
   };
+
   const handleShowSearchResults = async (nickname: string) => {
     setShowSearchResults(!!nickname);
   };
+
   const handleSearchChange = async (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {

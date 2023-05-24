@@ -1,4 +1,4 @@
-import { UserEntity } from "src/user/entity/user.entity";
+import { User } from "src/user/entity/user.entity";
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
 import { ChannelEntity } from "./channel.entity";
 
@@ -17,11 +17,11 @@ export class MuteEntity {
   @JoinColumn({ name: "channel_id" })
   channel: ChannelEntity;
 
-  @ManyToOne(() => UserEntity, {
+  @ManyToOne(() => User, {
     onUpdate: "CASCADE",
   })
   @JoinColumn({ name: "user_id" })
-  user: UserEntity;
+  user: User;
 
   @Column({ name: "limited_at" })
   limitedAt: Date;

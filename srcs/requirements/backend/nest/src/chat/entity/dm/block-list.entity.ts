@@ -1,4 +1,4 @@
-import { UserEntity } from "src/user/entity/user.entity";
+import { User } from "src/user/entity/user.entity";
 import { Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
 
 @Entity("block_list")
@@ -9,15 +9,15 @@ export class BlockEntity {
   @PrimaryColumn({ name: "blocked_user_id" })
   blockedUserId: number;
 
-  @ManyToOne(() => UserEntity, {
+  @ManyToOne(() => User, {
     onUpdate: "CASCADE",
   })
   @JoinColumn({ name: "user_id" })
-  user: UserEntity;
+  user: User;
 
-  @ManyToOne(() => UserEntity, {
+  @ManyToOne(() => User, {
     onUpdate: "CASCADE",
   })
   @JoinColumn({ name: "blocked_user_id" })
-  blockedUser: UserEntity;
+  blockedUser: User;
 }

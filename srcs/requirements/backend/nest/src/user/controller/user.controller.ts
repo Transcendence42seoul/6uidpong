@@ -19,10 +19,10 @@ import {
 import { UserService } from "../service/user.service";
 import { JwtAccessGuard } from "src/auth/guard/jwt-access.guard";
 import { AuthService } from "src/auth/service/auth.service";
-import { UserEntity } from "../entity/user.entity";
+import { User } from "../entity/user.entity";
 import { UpdateImageDto } from "../dto/update-image.dto";
 import { UpdateNicknameDto } from "../dto/update-nickname.dto";
-import { UpdateTwoFactorAuthDto } from "../dto/update-2fa.dto";
+import { UpdateTwoFactorAuthRequest } from "../dto/update-2fa.dto";
 import { UserResponseDto } from "../dto/user-response.dto";
 import { Pagination } from "src/utils/pagination/pagination";
 import { FriendService } from "../service/friend.service";
@@ -47,8 +47,10 @@ export class UserController {
     @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query("size", new DefaultValuePipe(10), ParseIntPipe) size: number
   ): Promise<Pagination<UserResponseDto>> {
-    const [entities, total]: [UserEntity[], number] =
-      await this.userService.findAll({ page, size });
+    const [entities, total]: [User[], number] = await this.userService.findAll({
+      page,
+      size,
+    });
     const dtos: UserResponseDto[] = entities.map((entity) => {
       return new UserResponseDto(entity);
     });
@@ -62,11 +64,13 @@ export class UserController {
     @Query("size", new DefaultValuePipe(10), ParseIntPipe) size: number
   ): Promise<UserResponseDto[]> {
     // ): Promise<Pagination<UserResponseDto>> {
-    const [entities, total]: [UserEntity[], number] =
-      await this.userService.search(nickname, {
+    const [entities, total]: [User[], number] = await this.userService.search(
+      nickname,
+      {
         page,
         size,
-      });
+      }
+    );
     const dtos: UserResponseDto[] = entities.map((entity) => {
       return new UserResponseDto(entity);
     });
@@ -79,7 +83,7 @@ export class UserController {
     @Param("id", ParseIntPipe) id: number
   ): Promise<UserResponseDto> {
     try {
-      const entity: UserEntity = await this.userService.findOne(id);
+      const entity: User = await this.userService.findOneOrFail(id);
       return new UserResponseDto(entity);
     } catch (EntityNotFoundError) {
       throw new NotFoundException();
@@ -109,10 +113,10 @@ export class UserController {
   @Put("/:id/email/code")
   @UseGuards(PermissionGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
-  async sendCodeByEmail(@Param("id", ParseIntPipe) id: number): Promise<void> {
+  async send2FACode(@Param("id", ParseIntPipe) id: number): Promise<void> {
     try {
-      const { email } = await this.userService.findOne(id);
-      await this.authService.sendCodeByEmail(id, email);
+      const { email } = await this.userService.findOneOrFail(id);
+      await this.authService.send2FACode(id, email);
     } catch (EntityNotFoundError) {
       throw new NotFoundException();
     }
@@ -123,10 +127,10 @@ export class UserController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async update2FA(
     @Param("id", ParseIntPipe) id: number,
-    @Body() body: UpdateTwoFactorAuthDto
+    @Body() body: UpdateTwoFactorAuthRequest
   ): Promise<void> {
     try {
-      await this.authService.validateCode(id, body.code);
+      await this.authService.validate2FACode(id, body.code);
     } catch {
       throw new UnauthorizedException("invalid code");
     }

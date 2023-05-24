@@ -9,11 +9,11 @@ import {
   WsException,
 } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
-import { UserEntity } from "src/user/entity/user.entity";
+import { User } from "src/user/entity/user.entity";
 import { UserService } from "src/user/service/user.service";
 import { DmChatResponseDto } from "../dto/dm/dm-chat-response.dto";
 import { DmRoomsResponseDto } from "../dto/dm/dm-rooms-response.dto";
-import { DmRoomUserEntity } from "../entity/dm/dm-room-user.entity";
+import { DmRoomUser } from "../entity/dm/dm-room-user.entity";
 import { WsJwtAccessGuard } from "../guard/ws-jwt-access.guard";
 import { DmService } from "../service/dm/dm.service";
 import { ConnectionService } from "../service/connection.service";
@@ -27,7 +27,7 @@ import { BlockService } from "../service/dm/block.service";
 import { ChannelService } from "../service/channel/channel.service";
 import { ChannelEntity } from "../entity/channel/channel.entity";
 import { AllChannelResponseDto } from "../dto/channel/all-channel-response.dto";
-import { ChannelUserEntity } from "../entity/channel/channel-user.entity";
+import { ChannelUser } from "../entity/channel/channel-user.entity";
 import { MyChannelResponseDto } from "../dto/channel/my-channel-response.dto";
 import { ChannelChatEntity } from "../entity/channel/channel-chat.entity";
 import { ChannelChatResponseDto } from "../dto/channel/channel-chat-response.dto";
@@ -79,7 +79,7 @@ export class ChatGateway implements OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
     @MessageBody("interlocutorId") interlocutorId: number
   ): Promise<DmChatsResponseDto> {
-    let roomUser: DmRoomUserEntity;
+    let roomUser: DmRoomUser;
     try {
       roomUser = await this.dmService.findUser(jwt.id, interlocutorId);
       await this.dmService.updateUser(roomUser);
@@ -101,7 +101,7 @@ export class ChatGateway implements OnGatewayDisconnect {
     @MessageBody("to") to: { id: number; message: string }
   ): Promise<DmChatResponseDto> {
     try {
-      const recipient: UserEntity = await this.userService.findOne(to.id);
+      const recipient: User = await this.userService.findOneOrFail(to.id);
       if (await this.blockService.isBlocked(jwt.id, recipient.id)) {
         throw new WsException(
           "You can't send a message to the user you have blocked."
@@ -112,7 +112,7 @@ export class ChatGateway implements OnGatewayDisconnect {
           "You can't send a message because you have been blocked."
         );
       }
-      const recipientRoomUser: DmRoomUserEntity = await this.dmService.findUser(
+      const recipientRoomUser: DmRoomUser = await this.dmService.findUser(
         recipient.id,
         jwt.id
       );
@@ -162,8 +162,10 @@ export class ChatGateway implements OnGatewayDisconnect {
     @MessageBody("interlocutorId") interlocutorId: number
   ): Promise<void> {
     try {
-      const interlocutorRoomUser: DmRoomUserEntity =
-        await this.dmService.findUser(interlocutorId, jwt.id);
+      const interlocutorRoomUser: DmRoomUser = await this.dmService.findUser(
+        interlocutorId,
+        jwt.id
+      );
       if (interlocutorRoomUser.isExit) {
         await this.dmService.deleteRoom(interlocutorRoomUser.roomId);
       } else {
@@ -219,7 +221,7 @@ export class ChatGateway implements OnGatewayDisconnect {
     @MessageBody("info")
     info: { channelId: number; password: string | undefined }
   ): Promise<ChannelChatResponseDto[]> {
-    let channelUser: ChannelUserEntity;
+    let channelUser: ChannelUser;
     try {
       channelUser = await this.channelService.findUser(info.channelId, jwt.id);
     } catch {

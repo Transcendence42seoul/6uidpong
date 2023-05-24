@@ -2,17 +2,17 @@ import { ConflictException, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { PaginationOptions } from "src/utils/pagination/pagination.option";
 import { DataSource, Repository } from "typeorm";
-import { UserEntity } from "../entity/user.entity";
+import { User } from "../entity/user.entity";
 
 @Injectable()
 export class UserService {
   constructor(
-    @InjectRepository(UserEntity)
-    private readonly userRepository: Repository<UserEntity>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
     private readonly dataSource: DataSource
   ) {}
 
-  async findAll(options: PaginationOptions): Promise<[UserEntity[], number]> {
+  async findAll(options: PaginationOptions): Promise<[User[], number]> {
     return await this.userRepository.findAndCount({
       take: options.size,
       skip: options.size * (options.page - 1),
@@ -22,7 +22,7 @@ export class UserService {
     });
   }
 
-  async findOne(id: number | string): Promise<UserEntity> {
+  async findOneOrFail(id: number | string): Promise<User> {
     if (typeof id === "number") {
       return await this.userRepository.findOneOrFail({ where: { id: id } });
     }
@@ -32,7 +32,7 @@ export class UserService {
   async search(
     nickname: string,
     options: PaginationOptions
-  ): Promise<[UserEntity[], number]> {
+  ): Promise<[User[], number]> {
     return this.userRepository
       .createQueryBuilder()
       .select()
@@ -56,7 +56,7 @@ export class UserService {
       .getManyAndCount();
   }
 
-  async save(profile: any): Promise<UserEntity> {
+  async save(profile: any): Promise<User> {
     return await this.userRepository.save({
       id: profile.id,
       nickname: `undefined-${profile.id}`,
@@ -71,13 +71,13 @@ export class UserService {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      const user: UserEntity = await queryRunner.manager.findOneBy(UserEntity, {
+      const user: User = await queryRunner.manager.findOneBy(User, {
         nickname,
       });
       if (user) {
         throw new ConflictException();
       }
-      await queryRunner.manager.update(UserEntity, id, { nickname });
+      await queryRunner.manager.update(User, id, { nickname });
 
       await queryRunner.commitTransaction();
     } catch (error) {

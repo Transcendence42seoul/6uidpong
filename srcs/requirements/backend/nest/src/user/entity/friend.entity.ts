@@ -1,4 +1,4 @@
-import { UserEntity } from "src/user/entity/user.entity";
+import { User } from "src/user/entity/user.entity";
 import {
   CreateDateColumn,
   Entity,
@@ -15,17 +15,17 @@ export class FriendEntity {
   @PrimaryColumn({ name: "to_id" })
   toId: number;
 
-  @ManyToOne(() => UserEntity, {
+  @ManyToOne(() => User, {
     onUpdate: "CASCADE",
   })
   @JoinColumn({ name: "from_id" })
-  from: UserEntity;
+  from: User;
 
-  @ManyToOne(() => UserEntity, {
+  @ManyToOne(() => User, {
     onUpdate: "CASCADE",
   })
   @JoinColumn({ name: "to_id" })
-  to: UserEntity;
+  to: User;
 
   @CreateDateColumn({ name: "created_at" })
   createdAt: Date;

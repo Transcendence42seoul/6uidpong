@@ -1,4 +1,4 @@
-import { UserEntity } from "src/user/entity/user.entity";
+import { User } from "src/user/entity/user.entity";
 import {
   Column,
   CreateDateColumn,
@@ -21,11 +21,11 @@ export class ChannelChatEntity {
   @JoinColumn({ name: "channel_id" })
   channel: ChannelEntity;
 
-  @ManyToOne(() => UserEntity, (user) => user.channelChats, {
+  @ManyToOne(() => User, (user) => user.channelChats, {
     onUpdate: "CASCADE",
   })
   @JoinColumn({ name: "user_id" })
-  user: UserEntity;
+  user: User;
 
   @Column()
   message: string;

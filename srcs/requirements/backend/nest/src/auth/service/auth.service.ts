@@ -17,7 +17,7 @@ export class AuthService {
     private readonly cacheManager: Cache
   ) {}
 
-  async generateAccessToken(userId: number): Promise<string> {
+  async genAccessToken(userId: number): Promise<string> {
     const payload: Object = {
       id: userId,
     };
@@ -29,7 +29,7 @@ export class AuthService {
     return accessToken;
   }
 
-  async generateRefreshToken(userId: number): Promise<string> {
+  async genRefreshToken(userId: number): Promise<string> {
     const payload: Object = {
       id: userId,
     };
@@ -41,7 +41,7 @@ export class AuthService {
     return refreshToken;
   }
 
-  async sendCodeByEmail(userId: number, email: string): Promise<void> {
+  async send2FACode(userId: number, email: string): Promise<void> {
     const emailUser: string = process.env.EMAIL_USER;
     const emailPass: string = process.env.EMAIL_PASS;
 
@@ -75,9 +75,9 @@ export class AuthService {
     await this.cacheManager.set(userId.toString(), code, 300000);
   }
 
-  async validateCode(userId: number, code: string): Promise<void> {
+  async validate2FACode(userId: number, code: string): Promise<void> {
     if ((await this.cacheManager.get(userId.toString())) != code) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException("invalid 2fa code");
     }
     await this.cacheManager.del(userId.toString());
   }

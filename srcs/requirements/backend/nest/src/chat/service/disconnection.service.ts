@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { UserEntity } from "src/user/entity/user.entity";
+import { User } from "src/user/entity/user.entity";
 import { DataSource } from "typeorm";
 
 @Injectable()
@@ -13,10 +13,10 @@ export class DisconnectionService {
     await queryRunner.startTransaction();
     try {
       const findOptions: Object = { socketId: socketId };
-      await queryRunner.manager.update(UserEntity, findOptions, {
+      await queryRunner.manager.update(User, findOptions, {
         status: "offline",
       });
-      await queryRunner.manager.update(UserEntity, findOptions, {
+      await queryRunner.manager.update(User, findOptions, {
         socketId: "",
       });
 

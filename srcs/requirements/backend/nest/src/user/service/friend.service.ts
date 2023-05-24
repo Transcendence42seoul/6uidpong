@@ -4,7 +4,7 @@ import { DataSource, Repository } from "typeorm";
 import { FriendResponseDto } from "../dto/friend-response.dto";
 import { FriendRequestEntity } from "../entity/friend-request.entity";
 import { FriendEntity } from "../entity/friend.entity";
-import { UserEntity } from "../entity/user.entity";
+import { User } from "../entity/user.entity";
 
 @Injectable()
 export class FriendService {
@@ -24,7 +24,7 @@ export class FriendService {
         "users.status   AS status",
       ])
       .innerJoin(
-        UserEntity,
+        User,
         "users",
         "users.id = CASE WHEN friends.from_id = :userId THEN friends.to_id \
                          WHEN friends.to_id = :userId THEN friends.from_id \

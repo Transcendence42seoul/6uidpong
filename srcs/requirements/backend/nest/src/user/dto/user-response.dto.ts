@@ -1,7 +1,7 @@
-import { UserEntity } from "../entity/user.entity";
+import { User } from "../entity/user.entity";
 
 export class UserResponseDto {
-  constructor(entity: UserEntity) {
+  constructor(entity: User) {
     this.id = entity.id;
     this.nickname = entity.nickname;
     this.email = entity.email;

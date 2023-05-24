@@ -1,4 +1,4 @@
-import { UserEntity } from "src/user/entity/user.entity";
+import { User } from "src/user/entity/user.entity";
 import {
   Column,
   CreateDateColumn,
@@ -21,11 +21,11 @@ export class DmChatEntity {
   @JoinColumn({ name: "room_id" })
   room: DmRoomEntity;
 
-  @ManyToOne(() => UserEntity, (user) => user.dmChats, {
+  @ManyToOne(() => User, (user) => user.dmChats, {
     onUpdate: "CASCADE",
   })
   @JoinColumn({ name: "user_id" })
-  user: UserEntity;
+  user: User;
 
   @Column()
   message: string;

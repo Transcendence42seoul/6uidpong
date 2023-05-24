@@ -3,7 +3,6 @@ import {
   Get,
   Req,
   Res,
-  UnauthorizedException,
   HttpStatus,
   UseGuards,
   Post,
@@ -14,11 +13,11 @@ import { AuthService } from "../service/auth.service";
 import { UserService } from "src/user/service/user.service";
 import { JwtRefreshGuard } from "../guard/jwt-refresh.guard";
 import { FtGuard } from "../guard/ft.guard";
-import { TwoFactorAuthDto } from "../dto/two-factor-auth.dto";
-import { UserEntity } from "src/user/entity/user.entity";
+import { TwoFactorAuthRequest } from "../dto/two-factor-auth-request.dto";
+import { User } from "src/user/entity/user.entity";
 import { EntityNotFoundError } from "typeorm";
-
-const OAUTH_42_LOGIN_URL = `https://api.intra.42.fr/oauth/authorize?client_id=${process.env.OAUTH_42_CLIENT_ID}&redirect_uri=https://${process.env.HOST_NAME}/auth/social/callback/forty-two&response_type=code&scope=public`;
+import { CallbackResponse } from "../dto/callback-response.dto";
+import { AccessTokenResponse } from "../dto/access-token-response.dto";
 
 @Controller("api/v1/auth")
 export class AuthController {
@@ -29,7 +28,11 @@ export class AuthController {
 
   @Get("/social/redirect/forty-two")
   redirectFortytwo(@Res() res: Response): void {
-    res.status(HttpStatus.FOUND).redirect(OAUTH_42_LOGIN_URL);
+    res
+      .status(HttpStatus.FOUND)
+      .redirect(
+        `https://api.intra.42.fr/oauth/authorize?client_id=${process.env.OAUTH_42_CLIENT_ID}&redirect_uri=https://${process.env.HOST_NAME}/auth/social/callback/forty-two&response_type=code&scope=public`
+      );
   }
 
   @Post("/social/callback/forty-two")
@@ -37,32 +40,22 @@ export class AuthController {
   async callbackFortytwo(
     @Req() req: any,
     @Res({ passthrough: true }) res: Response
-  ): Promise<Object> {
-    let user: UserEntity;
+  ): Promise<CallbackResponse> {
+    let user: User;
     try {
-      user = await this.userService.findOne(req.user.id);
+      user = await this.userService.findOneOrFail(req.user.id);
       res.status(HttpStatus.OK);
       if (user.is2FA) {
-        this.authService.sendCodeByEmail(user.id, user.email);
-
-        return { is2FA: true, id: user.id, accessToken: null };
+        this.authService.send2FACode(user.id, user.email);
+        return new CallbackResponse(true, user.id);
       }
-    } catch (error) {
-      if (!(error instanceof EntityNotFoundError)) {
-        throw error;
+    } catch (e) {
+      if (!(e instanceof EntityNotFoundError)) {
+        throw e;
       }
       user = await this.userService.save(req.user);
-      res.status(HttpStatus.CREATED);
-      res.setHeader("Location", `/api/v1/users/${user.id}`);
     }
-
-    const accessToken: string = await this.authService.generateAccessToken(
-      user.id
-    );
-    const refreshToken: string = await this.authService.generateRefreshToken(
-      user.id
-    );
-    res.cookie("refresh", refreshToken, {
+    res.cookie("refresh", await this.authService.genRefreshToken(user.id), {
       httpOnly: true,
       maxAge: 60 * 60 * 24 * 7,
       secure: true,
@@ -70,28 +63,20 @@ export class AuthController {
       path: "/api/v1/auth/token/refresh",
     });
 
-    return { is2FA: false, id: user.id, accessToken: accessToken };
+    return new CallbackResponse(
+      false,
+      user.id,
+      await this.authService.genAccessToken(user.id)
+    );
   }
 
   @Post("/2fa")
   async TwoFactorAuthentication(
-    @Body() body: TwoFactorAuthDto,
+    @Body() body: TwoFactorAuthRequest,
     @Res({ passthrough: true }) res: Response
-  ): Promise<Object> {
-    try {
-      await this.authService.validateCode(body.id, body.code);
-    } catch {
-      throw new UnauthorizedException("invalid 2fa code");
-    }
-
-    const accessToken: string = await this.authService.generateAccessToken(
-      body.id
-    );
-    const refreshToken: string = await this.authService.generateRefreshToken(
-      body.id
-    );
-
-    res.cookie("refresh", refreshToken, {
+  ): Promise<AccessTokenResponse> {
+    await this.authService.validate2FACode(body.id, body.code);
+    res.cookie("refresh", await this.authService.genRefreshToken(body.id), {
       httpOnly: true,
       maxAge: 60 * 60 * 24 * 7,
       secure: true,
@@ -99,16 +84,16 @@ export class AuthController {
       path: "/api/v1/auth/token/refresh",
     });
 
-    return { accessToken: accessToken };
+    return new AccessTokenResponse(
+      await this.authService.genAccessToken(body.id)
+    );
   }
 
   @Get("/token/refresh")
   @UseGuards(JwtRefreshGuard)
-  async refreshToken(@Req() req: any): Promise<Object> {
-    const accessToken: string = await this.authService.generateAccessToken(
-      req.user.id
+  async refreshToken(@Req() req: any): Promise<AccessTokenResponse> {
+    return new AccessTokenResponse(
+      await this.authService.genAccessToken(req.user.id)
     );
-
-    return { accessToken: accessToken };
   }
 }

@@ -1,10 +1,10 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { UserEntity } from "src/user/entity/user.entity";
+import { User } from "src/user/entity/user.entity";
 import { Repository, MoreThanOrEqual, DataSource } from "typeorm";
 import { DmRoomsResponseDto } from "../../dto/dm/dm-rooms-response.dto";
 import { DmChatEntity } from "../../entity/dm/dm-chat.entity";
-import { DmRoomUserEntity } from "../../entity/dm/dm-room-user.entity";
+import { DmRoomUser } from "../../entity/dm/dm-room-user.entity";
 import { DmRoomEntity } from "../../entity/dm/dm-room.entity";
 
 @Injectable()
@@ -12,8 +12,8 @@ export class DmService {
   constructor(
     @InjectRepository(DmRoomEntity)
     private readonly roomRepository: Repository<DmRoomEntity>,
-    @InjectRepository(DmRoomUserEntity)
-    private readonly roomUserRepository: Repository<DmRoomUserEntity>,
+    @InjectRepository(DmRoomUser)
+    private readonly roomUserRepository: Repository<DmRoomUser>,
     @InjectRepository(DmChatEntity)
     private readonly chatRepository: Repository<DmChatEntity>,
     private readonly dataSource: DataSource
@@ -33,7 +33,7 @@ export class DmService {
       .addSelect((subQuery) => {
         return subQuery
           .select("sub.new_msg_count")
-          .from(DmRoomUserEntity, "sub")
+          .from(DmRoomUser, "sub")
           .where("sub.user_id = :userId")
           .andWhere("sub.room_id = dm_chats.room_id");
       }, "newMsgCount")
@@ -44,7 +44,7 @@ export class DmService {
             .addSelect("MAX(sub_dm_chats.created_at)", "max_created_at")
             .from(DmChatEntity, "sub_dm_chats")
             .innerJoin(
-              DmRoomUserEntity,
+              DmRoomUser,
               "room_users",
               "room_users.user_id = :userId AND room_users.is_exit = false AND room_users.room_id = sub_dm_chats.room_id"
             )
@@ -53,20 +53,17 @@ export class DmService {
         "dm_chats.room_id = last_chats.room_id AND dm_chats.created_at = last_chats.max_created_at"
       )
       .innerJoin(
-        DmRoomUserEntity,
+        DmRoomUser,
         "room_users",
         "dm_chats.room_id = room_users.room_id AND room_users.user_id != :userId"
       )
-      .innerJoin(UserEntity, "users", "room_users.user_id = users.id")
+      .innerJoin(User, "users", "room_users.user_id = users.id")
       .orderBy("dm_chats.created_at", "DESC")
       .setParameter("userId", userId)
       .getRawMany();
   }
 
-  async findUser(
-    userId: number,
-    interlocutorId: number
-  ): Promise<DmRoomUserEntity> {
+  async findUser(userId: number, interlocutorId: number): Promise<DmRoomUser> {
     return await this.roomUserRepository
       .createQueryBuilder("room_user")
       .select()
@@ -74,7 +71,7 @@ export class DmService {
         (subQuery) =>
           subQuery
             .select("d.room_id")
-            .from(DmRoomUserEntity, "d")
+            .from(DmRoomUser, "d")
             .where("d.user_id IN (:userId, :interlocutorId)")
             .groupBy("d.room_id")
             .having("COUNT(DISTINCT d.user_id) = 2"),
@@ -86,7 +83,7 @@ export class DmService {
       .getOneOrFail();
   }
 
-  async updateUser(roomUser: DmRoomUserEntity): Promise<void> {
+  async updateUser(roomUser: DmRoomUser): Promise<void> {
     const queryRunner = this.dataSource.createQueryRunner();
 
     await queryRunner.connect();
@@ -97,12 +94,12 @@ export class DmService {
         userId: roomUser.userId,
       };
       if (roomUser.isExit) {
-        await queryRunner.manager.update(DmRoomUserEntity, findOptions, {
+        await queryRunner.manager.update(DmRoomUser, findOptions, {
           isExit: false,
           createdAt: new Date(),
         });
       } else if (roomUser.newMsgCount > 0) {
-        await queryRunner.manager.update(DmRoomUserEntity, findOptions, {
+        await queryRunner.manager.update(DmRoomUser, findOptions, {
           newMsgCount: 0,
         });
       }
@@ -116,10 +113,7 @@ export class DmService {
     }
   }
 
-  async saveUsers(
-    userId: number,
-    interlocutorId: number
-  ): Promise<DmRoomUserEntity> {
+  async saveUsers(userId: number, interlocutorId: number): Promise<DmRoomUser> {
     const queryRunner = this.dataSource.createQueryRunner();
 
     await queryRunner.connect();
@@ -133,8 +127,8 @@ export class DmService {
         new DmRoomEntity(),
         saveOptions
       );
-      const newRoomUser: DmRoomUserEntity = await queryRunner.manager.save(
-        DmRoomUserEntity,
+      const newRoomUser: DmRoomUser = await queryRunner.manager.save(
+        DmRoomUser,
         {
           roomId: newRoom.id,
           userId: userId,
@@ -142,7 +136,7 @@ export class DmService {
         saveOptions
       );
       await queryRunner.manager.save(
-        DmRoomUserEntity,
+        DmRoomUser,
         {
           roomId: newRoom.id,
           userId: interlocutorId,
@@ -160,7 +154,7 @@ export class DmService {
     }
   }
 
-  async findChats(roomUser: DmRoomUserEntity): Promise<DmChatEntity[]> {
+  async findChats(roomUser: DmRoomUser): Promise<DmChatEntity[]> {
     return await this.chatRepository.find({
       relations: {
         user: true,
@@ -181,7 +175,7 @@ export class DmService {
   async saveChat(
     senderId: number,
     message: string,
-    recipientRoomUser: DmRoomUserEntity,
+    recipientRoomUser: DmRoomUser,
     isNotJoin: boolean
   ): Promise<DmChatEntity> {
     const queryRunner = this.dataSource.createQueryRunner();
@@ -204,7 +198,7 @@ export class DmService {
       );
       if (recipientRoomUser.isExit) {
         await queryRunner.manager.update(
-          DmRoomUserEntity,
+          DmRoomUser,
           {
             userId: recipientRoomUser.userId,
             roomId: recipientRoomUser.roomId,
@@ -217,7 +211,7 @@ export class DmService {
       }
       if (isNotJoin) {
         await queryRunner.manager.increment(
-          DmRoomUserEntity,
+          DmRoomUser,
           {
             userId: recipientRoomUser.userId,
             roomId: recipientRoomUser.roomId,

@@ -1,4 +1,4 @@
-import { UserEntity } from "src/user/entity/user.entity";
+import { User } from "src/user/entity/user.entity";
 import {
   Column,
   CreateDateColumn,
@@ -10,7 +10,7 @@ import {
 import { ChannelEntity } from "./channel.entity";
 
 @Entity("channel_users")
-export class ChannelUserEntity {
+export class ChannelUser {
   @PrimaryColumn({ name: "channel_id" })
   channelId: number;
 
@@ -24,11 +24,11 @@ export class ChannelUserEntity {
   @JoinColumn({ name: "channel_id" })
   channel: ChannelEntity;
 
-  @ManyToOne(() => UserEntity, (user) => user.dmRoomUsers, {
+  @ManyToOne(() => User, (user) => user.dmRoomUsers, {
     onUpdate: "CASCADE",
   })
   @JoinColumn({ name: "user_id" })
-  user: UserEntity;
+  user: User;
 
   @Column({ name: "new_msg_count", default: 0 })
   newMsgCount: number;

@@ -4,7 +4,7 @@ import { AllChannelResponseDto } from "src/chat/dto/channel/all-channel-response
 import { CreateChannelDto } from "src/chat/dto/channel/create-channel.dto";
 import { MyChannelResponseDto } from "src/chat/dto/channel/my-channel-response.dto";
 import { ChannelChatEntity } from "src/chat/entity/channel/channel-chat.entity";
-import { ChannelUserEntity } from "src/chat/entity/channel/channel-user.entity";
+import { ChannelUser } from "src/chat/entity/channel/channel-user.entity";
 import { ChannelEntity } from "src/chat/entity/channel/channel.entity";
 import * as bcryptjs from "bcryptjs";
 import { DataSource, MoreThanOrEqual, Repository } from "typeorm";
@@ -14,8 +14,8 @@ export class ChannelService {
   constructor(
     @InjectRepository(ChannelEntity)
     private readonly channelRepository: Repository<ChannelEntity>,
-    @InjectRepository(ChannelUserEntity)
-    private readonly channelUserRepository: Repository<ChannelUserEntity>,
+    @InjectRepository(ChannelUser)
+    private readonly channelUserRepository: Repository<ChannelUser>,
     @InjectRepository(ChannelChatEntity)
     private readonly chatRepository: Repository<ChannelChatEntity>,
     private readonly dataSource: DataSource
@@ -68,7 +68,7 @@ export class ChannelService {
         (subQuery) =>
           subQuery
             .select(["sub.channel_id", "count(*) AS count"])
-            .from(ChannelUserEntity, "sub")
+            .from(ChannelUser, "sub")
             .groupBy("sub.channel_id"),
         "member_count",
         "channel_users.channel_id = member_count.channel_id"
@@ -79,10 +79,7 @@ export class ChannelService {
       .getRawMany();
   }
 
-  async findUser(
-    channelId: number,
-    userId: number
-  ): Promise<ChannelUserEntity> {
+  async findUser(channelId: number, userId: number): Promise<ChannelUser> {
     return await this.channelUserRepository.findOneOrFail({
       where: {
         channelId,
@@ -91,10 +88,7 @@ export class ChannelService {
     });
   }
 
-  async saveUser(
-    channelId: number,
-    userId: number
-  ): Promise<ChannelUserEntity> {
+  async saveUser(channelId: number, userId: number): Promise<ChannelUser> {
     return await this.channelUserRepository.save({
       channelId,
       userId,
@@ -103,7 +97,7 @@ export class ChannelService {
 
   async findChats(
     channelId: number,
-    channelUser: ChannelUserEntity
+    channelUser: ChannelUser
   ): Promise<ChannelChatEntity[]> {
     return await this.chatRepository.find({
       relations: {
@@ -145,7 +139,7 @@ export class ChannelService {
         saveOptions
       );
       await queryRunner.manager.save(
-        ChannelUserEntity,
+        ChannelUser,
         {
           channelId: newChannel.id,
           userId,

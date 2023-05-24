@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { UserEntity } from "src/user/entity/user.entity";
+import { User } from "src/user/entity/user.entity";
 import { DataSource } from "typeorm";
 
 @Injectable()
@@ -12,10 +12,10 @@ export class ConnectionService {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      await queryRunner.manager.update(UserEntity, userId, {
+      await queryRunner.manager.update(User, userId, {
         status: "online",
       });
-      await queryRunner.manager.update(UserEntity, userId, {
+      await queryRunner.manager.update(User, userId, {
         socketId: socketId,
       });
 

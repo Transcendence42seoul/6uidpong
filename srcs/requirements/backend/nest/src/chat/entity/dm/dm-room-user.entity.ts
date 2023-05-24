@@ -1,4 +1,4 @@
-import { UserEntity } from "src/user/entity/user.entity";
+import { User } from "src/user/entity/user.entity";
 import {
   Column,
   CreateDateColumn,
@@ -10,7 +10,7 @@ import {
 import { DmRoomEntity } from "./dm-room.entity";
 
 @Entity("dm_room_users")
-export class DmRoomUserEntity {
+export class DmRoomUser {
   @PrimaryColumn({ name: "room_id" })
   roomId: number;
 
@@ -24,11 +24,11 @@ export class DmRoomUserEntity {
   @JoinColumn({ name: "room_id" })
   room: DmRoomEntity;
 
-  @ManyToOne(() => UserEntity, (user) => user.dmRoomUsers, {
+  @ManyToOne(() => User, (user) => user.dmRoomUsers, {
     onUpdate: "CASCADE",
   })
   @JoinColumn({ name: "user_id" })
-  user: UserEntity;
+  user: User;
 
   @Column({ name: "is_exit", type: "boolean", default: false })
   isExit: boolean;

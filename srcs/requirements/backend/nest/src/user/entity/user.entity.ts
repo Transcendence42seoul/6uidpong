@@ -1,12 +1,12 @@
 import { ChannelChatEntity } from "src/chat/entity/channel/channel-chat.entity";
-import { ChannelUserEntity } from "src/chat/entity/channel/channel-user.entity";
+import { ChannelUser } from "src/chat/entity/channel/channel-user.entity";
 import { DmChatEntity } from "src/chat/entity/dm/dm-chat.entity";
-import { DmRoomUserEntity } from "src/chat/entity/dm/dm-room-user.entity";
+import { DmRoomUser } from "src/chat/entity/dm/dm-room-user.entity";
 import { Column, Entity, Index, OneToMany, PrimaryColumn } from "typeorm";
 import { FriendRequestEntity } from "./friend-request.entity";
 
 @Entity("users")
-export class UserEntity {
+export class User {
   @PrimaryColumn()
   id: number;
 
@@ -41,14 +41,14 @@ export class UserEntity {
   @Index()
   socketId: string;
 
-  @OneToMany(() => DmRoomUserEntity, (dmRoomUser) => dmRoomUser.user)
-  dmRoomUsers: DmRoomUserEntity[];
+  @OneToMany(() => DmRoomUser, (dmRoomUser) => dmRoomUser.user)
+  dmRoomUsers: DmRoomUser[];
 
   @OneToMany(() => DmChatEntity, (chat) => chat.user)
   dmChats: DmChatEntity[];
 
-  @OneToMany(() => ChannelUserEntity, (channelUser) => channelUser.user)
-  channelUsers: ChannelUserEntity[];
+  @OneToMany(() => ChannelUser, (channelUser) => channelUser.user)
+  channelUsers: ChannelUser[];
 
   @OneToMany(() => ChannelChatEntity, (chat) => chat.user)
   channelChats: ChannelChatEntity[];

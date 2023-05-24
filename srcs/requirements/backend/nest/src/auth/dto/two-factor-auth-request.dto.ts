@@ -1,6 +1,6 @@
 import { IsInt, IsNotEmpty, IsString } from "class-validator";
 
-export class TwoFactorAuthDto {
+export class TwoFactorAuthRequest {
   @IsNotEmpty()
   @IsInt()
   readonly id: number;

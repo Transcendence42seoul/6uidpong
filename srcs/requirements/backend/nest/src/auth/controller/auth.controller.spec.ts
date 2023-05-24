@@ -1,5 +1,5 @@
 import { Test } from "@nestjs/testing";
-import { UserEntity } from "src/user/entity/user.entity";
+import { User } from "src/user/entity/user.entity";
 import { UserService } from "src/user/service/user.service";
 import { AuthService } from "../service/auth.service";
 import { AuthController } from "./auth.controller";
@@ -22,20 +22,16 @@ describe("AuthController", () => {
         {
           provide: AuthService,
           useValue: {
-            sendCodeByEmail: jest.fn(),
-            generateAccessToken: jest
-              .fn()
-              .mockResolvedValue("test_access_token"),
-            generateRefreshToken: jest
-              .fn()
-              .mockResolvedValue("test_refresh_token"),
-            validateCode: jest.fn(),
+            send2FACode: jest.fn(),
+            genAccessToken: jest.fn().mockResolvedValue("test_access_token"),
+            genRefreshToken: jest.fn().mockResolvedValue("test_refresh_token"),
+            validate2FACode: jest.fn(),
           },
         },
         {
           provide: UserService,
           useValue: {
-            findOne: jest.fn(),
+            findOneOrFail: jest.fn(),
             save: jest.fn(),
           },
         },
@@ -75,12 +71,12 @@ describe("AuthController", () => {
   describe("callbackFortytwo", () => {
     it("should return is2FA: true, id: user.id, accessToken: null", async () => {
       // Arrange
-      const user = new UserEntity();
+      const user = new User();
       user.id = 110731;
       user.email = "mock";
       user.is2FA = true;
 
-      jest.spyOn(userService, "findOne").mockResolvedValue(user);
+      jest.spyOn(userService, "findOneOrFail").mockResolvedValue(user);
 
       const req = { user: { id: 110731 } };
       const res: any = {
@@ -100,11 +96,11 @@ describe("AuthController", () => {
     });
     it("should return is2FA: false, id: user.id, accessToken: accessToken", async () => {
       // Arrange
-      const user = new UserEntity();
+      const user = new User();
       user.id = 110731;
       user.is2FA = false;
 
-      jest.spyOn(userService, "findOne").mockResolvedValue(user);
+      jest.spyOn(userService, "findOneOrFail").mockResolvedValue(user);
 
       const req = { user: { id: 110731 } };
       const res: any = {
@@ -132,11 +128,11 @@ describe("AuthController", () => {
     });
     it("should create a new user if the user does not exist", async () => {
       // Arrange
-      const user = new UserEntity();
+      const user = new User();
       user.id = 110731;
 
       jest.spyOn(userService, "save").mockResolvedValue(user);
-      jest.spyOn(userService, "findOne").mockResolvedValue(null);
+      jest.spyOn(userService, "findOneOrFail").mockResolvedValue(null);
 
       const req = { user: { id: 110731 } };
       const res: any = {
@@ -171,22 +167,22 @@ describe("AuthController", () => {
   describe("TwoFactorAuthentication", () => {
     it("should throw an UnauthorizedException if the code is invalid", async () => {
       // Arrange
-      const twoFactorAuthDto = {
+      const TwoFactorAuthRequest = {
         id: 110731,
         code: "123456",
       };
       const res: any = {};
 
-      jest.spyOn(authService, "validateCode");
+      jest.spyOn(authService, "validate2FACode");
 
       // Assert
       await expect(
-        authController.TwoFactorAuthentication(twoFactorAuthDto, res)
+        authController.TwoFactorAuthentication(TwoFactorAuthRequest, res)
       ).rejects.toThrow(UnauthorizedException);
     });
     it("should return an access token if the 2FA code is valid", async () => {
       // Arrange
-      const twoFactorAuthDto = {
+      const TwoFactorAuthRequest = {
         id: 110731,
         code: "123456",
       };
@@ -194,11 +190,11 @@ describe("AuthController", () => {
         cookie: jest.fn(),
       };
 
-      jest.spyOn(authService, "validateCode");
+      jest.spyOn(authService, "validate2FACode");
 
       // Act
       const result = await authController.TwoFactorAuthentication(
-        twoFactorAuthDto,
+        TwoFactorAuthRequest,
         res
       );
 
@@ -223,7 +219,7 @@ describe("AuthController", () => {
 
       // Assert
       expect(result).toStrictEqual({ accessToken: "test_access_token" });
-      expect(authService.generateAccessToken).toHaveBeenCalledWith(req.user.id);
+      expect(authService.genAccessToken).toHaveBeenCalledWith(req.user.id);
     });
   });
 });

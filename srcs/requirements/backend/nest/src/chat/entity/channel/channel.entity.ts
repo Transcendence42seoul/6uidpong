@@ -6,7 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { ChannelChatEntity } from "./channel-chat.entity";
-import { ChannelUserEntity } from "./channel-user.entity";
+import { ChannelUser } from "./channel-user.entity";
 
 @Entity("channels")
 export class ChannelEntity {
@@ -25,8 +25,8 @@ export class ChannelEntity {
   @CreateDateColumn({ name: "created_at" })
   createdAt: Date;
 
-  @OneToMany(() => ChannelUserEntity, (channelUser) => channelUser.channel)
-  channelUsers: ChannelUserEntity[];
+  @OneToMany(() => ChannelUser, (channelUser) => channelUser.channel)
+  channelUsers: ChannelUser[];
 
   @OneToMany(() => ChannelChatEntity, (chat) => chat.channel)
   chats: ChannelChatEntity[];

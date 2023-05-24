@@ -1,13 +1,7 @@
 import { Dispatch } from 'redux';
-import { setAuth } from './authSlice';
+import { AuthState, setAuth } from './authSlice';
 
-interface AuthInfo {
-  id: number | null;
-  is2FA: boolean;
-  accessToken: string | null;
-}
-
-const dispatchAuth = async (data: AuthInfo | null, dispatch: Dispatch) => {
+const dispatchAuth = async (data: AuthState | null, dispatch: Dispatch) => {
   dispatch(setAuth(data));
 };
 

@@ -313,4 +313,19 @@ export class ChatGateway implements OnGatewayDisconnect {
       .to("c" + channelId)
       .emit("leave-channel-user", { nickname: user.nickname });
   }
+
+  @SubscribeMessage("invite-channel")
+  async inviteChannel(
+    @WsJwtPayload() jwt: JwtPayload,
+    @ConnectedSocket() client: Socket,
+    @MessageBody("info")
+    info: { channelId: number; userId: number }
+  ): Promise<void> {
+    await this.channelService.findUserOrFail(info.channelId, jwt.id);
+    await this.channelService.saveUser(info.channelId, info.userId);
+    const user: User = await this.userService.findOneOrFail(info.userId);
+    client.broadcast
+      .to("c" + info.channelId)
+      .emit("newly-joined-user", { nickname: user.nickname });
+  }
 }

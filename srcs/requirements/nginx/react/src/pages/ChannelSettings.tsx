@@ -1,4 +1,5 @@
 import React, { ChangeEvent, useCallback, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
 import HoverButton from '../components/button/HoverButton';
 import ContentBox from '../components/container/ContentBox';
@@ -8,12 +9,26 @@ interface ChannelSettingsProps {
 }
 
 const ChannelSettings: React.FC<ChannelSettingsProps> = ({ socket }) => {
+  const navigate = useNavigate();
+
   const [isPasswordEnabled, setIsPasswordEnabled] = useState<boolean>(false);
   const [isPublic, setIsPublic] = useState<boolean>(true);
   const [password, setPassword] = useState<string | undefined>(undefined);
   const [title, setTitle] = useState<string>('');
 
-  const handleCreateClick = () => {};
+  const handleConfirmClick = async () => {
+    const channel = {
+      title,
+      password,
+      isPublic,
+    };
+    const channelIdHandler = (id: number) => {
+      navigate(`/channel/${id}`, {
+        state: { password },
+      });
+    };
+    socket.emit('create-channel', channel, channelIdHandler);
+  };
 
   const handlePasswordChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
@@ -95,8 +110,8 @@ const ChannelSettings: React.FC<ChannelSettingsProps> = ({ socket }) => {
           </label>
           <span>Private</span>
         </div>
-        <HoverButton onClick={handleCreateClick} className="w-full border p-2">
-          Create
+        <HoverButton onClick={handleConfirmClick} className="w-full border p-2">
+          Confirm
         </HoverButton>
       </ContentBox>
     </div>

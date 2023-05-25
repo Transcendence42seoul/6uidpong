@@ -13,8 +13,8 @@ interface LocationState {
 }
 
 const Channel: React.FC<ChannelProps> = ({ socket }) => {
-  const location = useLocation();
-  const { password }: LocationState = location.state; // test
+  const { state } = useLocation();
+  const { password }: LocationState = state;
 
   const { channelId: channelIdString } = useParams<{ channelId: string }>();
   const channelId = Number(channelIdString);

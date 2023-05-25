@@ -13,8 +13,8 @@ interface LocationState {
 }
 
 const DmRoom: React.FC<DmRoomProps> = ({ socket }) => {
-  const location = useLocation();
-  const { interlocutorId }: LocationState = location.state;
+  const { state } = useLocation();
+  const { interlocutorId }: LocationState = state;
 
   const { roomId: roomIdString } = useParams<{ roomId: string }>();
   const roomId = Number(roomIdString);

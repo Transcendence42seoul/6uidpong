@@ -236,10 +236,11 @@ export class ChatGateway implements OnGatewayDisconnect {
       }
       channelUser = await this.channelService.saveUser(info.channelId, jwt.id);
     }
-    client.join("c" + info.channelId);
+    const room: string = "c" + info.channelId;
+    client.join(room);
     const user: User = await this.userService.findOneOrFail(jwt.id);
     client.broadcast
-      .to("c" + info.channelId)
+      .to(room)
       .emit("newly-joined-user", { nickname: user.nickname });
     const chats: ChannelChat[] = await this.channelService.findChats(
       info.channelId,
@@ -253,7 +254,6 @@ export class ChatGateway implements OnGatewayDisconnect {
   @SubscribeMessage("send-channel-message")
   async sendMessageToChannel(
     @WsJwtPayload() jwt: JwtPayload,
-    @ConnectedSocket() client: Socket,
     @MessageBody("to")
     to: { channelId: number; message: string }
   ): Promise<void> {
@@ -265,21 +265,23 @@ export class ChatGateway implements OnGatewayDisconnect {
     if (channelUsers.length === channelUsersWithoutMe.length) {
       throw new WsException("user not channel member");
     }
-    const channelSockets = await this.server
-      .in("c" + to.channelId)
-      .fetchSockets();
+    const room: string = "c" + to.channelId;
+    const channelSockets = await this.server.in(room).fetchSockets();
+    const notJoinUsers: ChannelUser[] = channelUsersWithoutMe.filter(
+      (channelUser) => {
+        !channelSockets.find((socket) => {
+          socket.id === channelUser.user.socketId;
+        });
+      }
+    );
     const chat: ChannelChat = await this.channelService.saveChat(
       jwt.it,
       to.channelId,
       to.message,
-      channelUsersWithoutMe.filter((channelUser) => {
-        !channelSockets.find((socket) => {
-          socket.id === channelUser.user.socketId;
-        });
-      })
+      notJoinUsers
     );
-    client
-      .to("c" + to.channelId)
+    this.server
+      .to(room)
       .emit("new-channel-message", new ChannelChatResponse(chat));
   }
 
@@ -309,7 +311,7 @@ export class ChatGateway implements OnGatewayDisconnect {
     await this.channelService.deleteUser(channelId, jwt.id);
     client.leave("c" + channelId);
     const user: User = await this.userService.findOneOrFail(jwt.id);
-    client
+    this.server
       .to("c" + channelId)
       .emit("leave-channel-user", { nickname: user.nickname });
   }
@@ -317,15 +319,42 @@ export class ChatGateway implements OnGatewayDisconnect {
   @SubscribeMessage("invite-channel")
   async inviteChannel(
     @WsJwtPayload() jwt: JwtPayload,
-    @ConnectedSocket() client: Socket,
     @MessageBody("info")
     info: { channelId: number; userId: number }
   ): Promise<void> {
     await this.channelService.findUserOrFail(info.channelId, jwt.id);
     await this.channelService.saveUser(info.channelId, info.userId);
     const user: User = await this.userService.findOneOrFail(info.userId);
-    client.broadcast
+    this.server
       .to("c" + info.channelId)
       .emit("newly-joined-user", { nickname: user.nickname });
+  }
+
+  @SubscribeMessage("kick-channel-user")
+  async kickChannelUser(
+    @WsJwtPayload() jwt: JwtPayload,
+    @MessageBody("info")
+    info: { channelId: number; userId: number }
+  ): Promise<void> {
+    const channelUser: ChannelUser = await this.channelService.findUserOrFail(
+      info.channelId,
+      jwt.id
+    );
+    if (!channelUser.isAdmin) {
+      throw new WsException("permission denied");
+    }
+    const kickUser: User = await this.userService.findOneOrFail(info.userId);
+    await this.channelService.deleteUser(info.channelId, kickUser.id);
+    if (kickUser.status === "online") {
+      const room: string = "c" + info.channelId;
+      const channelSockets = await this.server.in(room).fetchSockets();
+      const kickUserSocket = channelSockets.find(
+        (socket) => socket.id === kickUser.socketId
+      );
+      if (kickUserSocket) {
+        kickUserSocket.leave(room);
+        kickUserSocket.emit("kicked-channel");
+      }
+    }
   }
 }

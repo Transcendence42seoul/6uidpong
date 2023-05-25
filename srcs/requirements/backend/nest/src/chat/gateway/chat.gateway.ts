@@ -253,7 +253,33 @@ export class ChatGateway implements OnGatewayDisconnect {
   @SubscribeMessage("send-channel-message")
   async sendMessageToChannel(
     @WsJwtPayload() jwt: JwtPayload,
+    @ConnectedSocket() client: Socket,
     @MessageBody("to")
     to: { channelId: number; message: string }
-  ): Promise<void> {}
+  ): Promise<void> {
+    const channelUsers: ChannelUser[] =
+      await this.channelService.findUsersOrFail(to.channelId);
+    const channelUsersWithoutMe: ChannelUser[] = channelUsers.filter(
+      (channelUser) => channelUser.userId !== jwt.id
+    );
+    if (channelUsers.length === channelUsersWithoutMe.length) {
+      throw new WsException("user not channel member");
+    }
+    const channelSockets = await this.server
+      .in("c" + to.channelId)
+      .fetchSockets();
+    const chat: ChannelChat = await this.channelService.saveChat(
+      jwt.it,
+      to.channelId,
+      to.message,
+      channelUsersWithoutMe.filter((channelUser) => {
+        !channelSockets.find((socket) => {
+          socket.id === channelUser.user.socketId;
+        });
+      })
+    );
+    client
+      .to("c" + to.channelId)
+      .emit("new-message", new ChannelChatResponse(chat));
+  }
 }

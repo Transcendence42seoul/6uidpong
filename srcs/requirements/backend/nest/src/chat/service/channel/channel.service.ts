@@ -7,6 +7,8 @@ import { ChannelUser } from "src/chat/entity/channel/channel-user.entity";
 import { Channel } from "src/chat/entity/channel/channel.entity";
 import * as bcryptjs from "bcryptjs";
 import { DataSource, MoreThanOrEqual, Repository } from "typeorm";
+import { WsException } from "@nestjs/websockets";
+import { channel } from "diagnostics_channel";
 
 @Injectable()
 export class ChannelService {
@@ -156,6 +158,65 @@ export class ChannelService {
 
       await queryRunner.commitTransaction();
       return newChannel;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  async findUsersOrFail(channelId: number): Promise<ChannelUser[]> {
+    const ret: ChannelUser[] = await this.channelUserRepository.find({
+      relations: {
+        user: true,
+      },
+      where: {
+        channelId,
+      },
+    });
+    if (ret.length === 0) {
+      throw new WsException("invalid channel id");
+    }
+    return ret;
+  }
+
+  async saveChat(
+    userId: number,
+    channelId: number,
+    message: string,
+    notJoinUsers: ChannelUser[]
+  ): Promise<ChannelChat> {
+    const queryRunner = this.dataSource.createQueryRunner();
+
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      const saveOptions: Object = {
+        transaction: false,
+      };
+      const chat: ChannelChat = await queryRunner.manager.save(
+        ChannelChat,
+        {
+          user: {
+            id: userId,
+          },
+          channel: {
+            id: channelId,
+          },
+          message,
+        },
+        saveOptions
+      );
+      await queryRunner.manager.increment(
+        ChannelUser,
+        notJoinUsers,
+        "newMsgCount",
+        1
+      );
+
+      await queryRunner.commitTransaction();
+      return chat;
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;

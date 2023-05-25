@@ -7,6 +7,7 @@ import LoginAuth from './components/custom/LoginAuth';
 import dispatchAuth from './features/auth/authAction';
 import selectAuth from './features/auth/authSelector';
 import AllChannels from './pages/AllChannels';
+import Channel from './pages/Channel';
 import ChannelList from './pages/ChannelList';
 import ChannelSettings from './pages/ChannelSettings';
 import DmRoom from './pages/DmRoom';
@@ -83,6 +84,10 @@ const App: React.FC = () => {
         <Route path="/" element={<Main />} />
         <Route path="/all-channels" element={<AllChannels socket={socket} />} />
         <Route path="/channel" element={<ChannelList socket={socket} />} />
+        <Route
+          path="/channel/:channelId"
+          element={<Channel socket={socket} />}
+        />
         <Route
           path="/channel-settings"
           element={<ChannelSettings socket={socket} />}

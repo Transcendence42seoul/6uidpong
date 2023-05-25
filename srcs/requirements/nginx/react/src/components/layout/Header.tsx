@@ -80,7 +80,7 @@ const Header: React.FC = () => {
         />
         {showSearchResults && (
           <ul
-            className="absolute z-10 flex w-full flex-col rounded border-2 bg-black bg-white px-2.5 pb-2 pt-1.5 shadow-md"
+            className="absolute z-10 flex w-full flex-col rounded border-2 bg-white px-2.5 pb-2 pt-1.5 shadow-md"
             ref={searchResultsRef}
           >
             {searchResults.map((user) => {

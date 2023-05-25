@@ -1,13 +1,18 @@
 import React from 'react';
 import { useLocation, useParams } from 'react-router-dom';
+import { Socket } from 'socket.io-client';
 
 import ChatRoom from '../components/container/ChatRoom';
+
+interface DmRoomProps {
+  socket: Socket;
+}
 
 interface LocationState {
   interlocutorId: number;
 }
 
-const DmRoom: React.FC = () => {
+const DmRoom: React.FC<DmRoomProps> = ({ socket }) => {
   const location = useLocation();
   const { interlocutorId }: LocationState = location.state;
 
@@ -29,7 +34,7 @@ const DmRoom: React.FC = () => {
     data: { toId: interlocutorId },
   };
 
-  return <ChatRoom join={join} leave={leave} send={send} />;
+  return <ChatRoom join={join} leave={leave} send={send} socket={socket} />;
 };
 
 export default DmRoom;

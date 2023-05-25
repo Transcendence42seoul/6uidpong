@@ -6,7 +6,6 @@ import { io } from 'socket.io-client';
 
 import LoginAuth from './components/custom/LoginAuth';
 import dispatchAuth from './features/auth/authAction';
-import dispatchSocket from './features/socket/socketAction';
 import selectAuth from './features/auth/authSelector';
 import Layout from './Layout';
 import AllChannels from './pages/AllChannels';
@@ -28,27 +27,18 @@ import redirect from './utils/redirect';
 import { isTest, mockAuthState } from './mock'; // test
 
 const App: React.FC = () => {
-  const dispatch = useDispatch();
+  const stats = {
+    recentHistory: ['Win', 'Loss', 'Win', 'Win', 'Loss'],
+  };
 
   const [loading, setLoading] = useState<boolean>(false);
   const { id, is2FA, accessToken, tokenInfo } = isTest
     ? mockAuthState
     : selectAuth(); // test
 
-  const stats = {
-    recentHistory: ['Win', 'Loss', 'Win', 'Win', 'Loss'],
-  }; // test
-
+  const dispatch = useDispatch();
   const handleLoading = async () => {
     setLoading(true);
-  };
-
-  const initSocket = async () => {
-    const socket = io({ auth: { token: accessToken } });
-    socket.on('connect', () => {
-      socket.emit('connection');
-    });
-    await dispatchSocket({ socket }, dispatch);
   };
 
   useEffect(() => {
@@ -84,22 +74,35 @@ const App: React.FC = () => {
     }
     return <Login />;
   }
-  initSocket();
+
+  const socket = io({ auth: { token: accessToken } });
+  socket.on('connect', () => {
+    socket.emit('connection');
+  });
 
   return (
     <Layout>
       <Routes>
         <Route path="/" element={<Main />} />
-        <Route path="/all-channels" element={<AllChannels />} />
-        <Route path="/channel" element={<ChannelList />} />
-        <Route path="/channel/:channelId" element={<Channel />} />
-        <Route path="/channel-settings" element={<ChannelSettings />} />
-        <Route path="/dm" element={<DmRoomList />} />
-        <Route path="/dm/:roomId" element={<DmRoom />} />
+        <Route path="/all-channels" element={<AllChannels socket={socket} />} />
+        <Route path="/channel" element={<ChannelList socket={socket} />} />
+        <Route
+          path="/channel/:channelId"
+          element={<Channel socket={socket} />}
+        />
+        <Route
+          path="/channel-settings"
+          element={<ChannelSettings socket={socket} />}
+        />
+        <Route path="/dm" element={<DmRoomList socket={socket} />} />
+        <Route path="/dm/:roomId" element={<DmRoom socket={socket} />} />
         <Route path="/friend-requests" element={<FriendRequests />} />
         <Route path="/friends-list" element={<FriendsList />} />
         <Route path="/my-page" element={<MyPage stats={stats} />} />
-        <Route path="/profile/:userId" element={<UserProfile />} />
+        <Route
+          path="/profile/:userId"
+          element={<UserProfile socket={socket} />}
+        />
         <Route path="/profile-settings" element={<ProfileSettings />} />
       </Routes>
     </Layout>

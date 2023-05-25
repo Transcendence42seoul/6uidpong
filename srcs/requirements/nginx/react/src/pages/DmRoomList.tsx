@@ -1,17 +1,21 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Socket } from 'socket.io-client';
 
 import CircularImage from '../components/container/CircularImage';
 import ListContainer from '../components/container/ListContainer';
 import ListInfoPanel from '../components/container/ListInfoPanel';
 import ListTitle from '../components/container/ListTitle';
-import selectSocket from '../features/socket/socketSelector';
 import formatTime from '../utils/formatTime';
 
 import type Chat from '../interfaces/Chat';
 import type Position from '../interfaces/Position';
 
 import { isTest, mockRooms } from '../mock'; // test
+
+interface DmRoomListProps {
+  socket: Socket;
+}
 
 interface Room {
   roomId: number;
@@ -23,10 +27,8 @@ interface Room {
   newMsgCount: number;
 }
 
-const DmRoomList: React.FC = () => {
+const DmRoomList: React.FC<DmRoomListProps> = ({ socket }) => {
   const navigate = useNavigate();
-
-  const { socket } = selectSocket();
 
   const menuRef = useRef<HTMLUListElement>(null);
   const [rooms, setRooms] = useState<Room[]>([]);
@@ -47,7 +49,7 @@ const DmRoomList: React.FC = () => {
   };
 
   const handleDeleteClick = (interlocutorId: number) => {
-    socket?.emit('delete-dm-room', { interlocutorId });
+    socket.emit('delete-dm-room', { interlocutorId });
     setRooms([
       ...rooms.filter((room) => room.interlocutorId !== interlocutorId),
     ]);
@@ -64,7 +66,7 @@ const DmRoomList: React.FC = () => {
     const roomListHandler = (roomList: Room[]) => {
       setRooms([...roomList]);
     };
-    socket?.emit('find-dm-rooms', roomListHandler);
+    socket.emit('find-dm-rooms', roomListHandler);
     setRooms(isTest ? mockRooms : rooms); // test
   }, []);
 
@@ -91,9 +93,9 @@ const DmRoomList: React.FC = () => {
       roomToUpdate.newMsgCount += 1;
       setRooms([...rooms]);
     };
-    socket?.on('send-dm', messageHandler);
+    socket.on('send-dm', messageHandler);
     return () => {
-      socket?.off('send-dm', messageHandler);
+      socket.off('send-dm', messageHandler);
     };
   }, [rooms]);
 

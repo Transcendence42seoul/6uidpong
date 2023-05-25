@@ -5,18 +5,11 @@ import HoverButton from '../components/button/HoverButton';
 import ListContainer from '../components/container/ListContainer';
 import ListInfoPanel from '../components/container/ListInfoPanel';
 import ListTitle from '../components/container/ListTitle';
+import type Channel from '../interfaces/Channel';
 import { isTest, mockChannels } from '../mock'; // test
 
 interface ChannelListProps {
   socket: Socket;
-}
-
-export interface Channel {
-  id: number;
-  title: string;
-  isLocked: boolean;
-  newMsgCount: number;
-  memberCount: number;
 }
 
 const ChannelList: React.FC<ChannelListProps> = ({ socket }) => {

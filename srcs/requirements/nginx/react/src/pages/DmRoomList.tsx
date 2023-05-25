@@ -6,16 +6,12 @@ import ListContainer from '../components/container/ListContainer';
 import ListInfoPanel from '../components/container/ListInfoPanel';
 import ListTitle from '../components/container/ListTitle';
 import formatTime from '../utils/formatTime';
-import { Chat } from './DmRoom';
+import type Chat from '../interfaces/Chat';
+import type Position from '../interfaces/Position';
 import { isTest, mockRooms } from '../mock'; // test
 
 interface DmRoomListProps {
   socket: Socket;
-}
-
-export interface Position {
-  x: number;
-  y: number;
 }
 
 interface Room {

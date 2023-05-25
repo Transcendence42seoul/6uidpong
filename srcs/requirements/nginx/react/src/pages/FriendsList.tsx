@@ -5,8 +5,8 @@ import CircularImage from '../components/container/CircularImage';
 import ListTitle from '../components/container/ListTitle';
 import selectAuth from '../features/auth/authSelector';
 import useCallApi from '../utils/useCallApi';
-import { Position } from './DmRoomList';
-import { User } from './UserProfile';
+import type Position from '../interfaces/Position';
+import type User from '../interfaces/User';
 import { isTest, mockUsers } from '../mock'; // test
 
 const FriendsList: React.FC = () => {

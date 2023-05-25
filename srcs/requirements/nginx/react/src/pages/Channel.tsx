@@ -15,7 +15,7 @@ import MessageBox from '../components/container/MessageBox';
 import MessageForm from '../components/container/MessageForm';
 import selectAuth from '../features/auth/authSelector';
 import formatTime from '../utils/formatTime';
-import { Chat } from './DmRoom';
+import type Chat from '../interfaces/Chat';
 
 interface ChannelProps {
   socket: Socket;

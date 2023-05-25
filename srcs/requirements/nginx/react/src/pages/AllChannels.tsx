@@ -6,7 +6,7 @@ import ListContainer from '../components/container/ListContainer';
 import ListInfoPanel from '../components/container/ListInfoPanel';
 import ListTitle from '../components/container/ListTitle';
 import ImageSrc from '../constants/ImageSrc';
-import { Channel } from './ChannelList';
+import type Channel from '../interfaces/Channel';
 import { isTest, mockChannels } from '../mock'; // test
 
 interface AllChannelsProps {

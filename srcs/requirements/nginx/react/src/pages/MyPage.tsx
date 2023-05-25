@@ -6,7 +6,7 @@ import CircularImage from '../components/container/CircularImage';
 import ContentBox from '../components/container/ContentBox';
 import selectAuth from '../features/auth/authSelector';
 import useCallApi from '../utils/useCallApi';
-import { User } from './UserProfile';
+import type User from '../interfaces/User';
 
 interface Stats {
   recentHistory: string[];

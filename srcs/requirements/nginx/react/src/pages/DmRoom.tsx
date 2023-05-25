@@ -16,17 +16,8 @@ import MessageBox from '../components/container/MessageBox';
 import MessageForm from '../components/container/MessageForm';
 import selectAuth from '../features/auth/authSelector';
 import formatTime from '../utils/formatTime';
+import type Chat from '../interfaces/Chat';
 import { isTest, mockChats, mockLocationState } from '../mock'; // test
-
-export interface Chat {
-  id: number;
-  roomId: number;
-  userId: number;
-  nickname: string;
-  image: string;
-  message: string;
-  createdAt: string;
-}
 
 interface DmRoomProps {
   socket: Socket;

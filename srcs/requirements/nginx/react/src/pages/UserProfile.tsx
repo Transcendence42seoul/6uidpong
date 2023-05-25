@@ -7,16 +7,7 @@ import CircularImage from '../components/container/CircularImage';
 import ContentBox from '../components/container/ContentBox';
 import selectAuth from '../features/auth/authSelector';
 import useCallApi from '../utils/useCallApi';
-
-export interface User {
-  id: number;
-  nickname: string;
-  image: string;
-  status: string;
-  winStat: number;
-  loseStat: number;
-  ladderScore: number;
-}
+import type User from '../interfaces/User';
 
 interface UserProfileProps {
   socket: Socket;

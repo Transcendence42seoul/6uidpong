@@ -3,7 +3,7 @@ import CircularImage from '../components/container/CircularImage';
 import ListTitle from '../components/container/ListTitle';
 import selectAuth from '../features/auth/authSelector';
 import useCallApi from '../utils/useCallApi';
-import { User } from './UserProfile';
+import type User from '../interfaces/User';
 import { isTest, mockFriendRequests } from '../mock'; // test
 
 const FriendRequests: React.FC = () => {

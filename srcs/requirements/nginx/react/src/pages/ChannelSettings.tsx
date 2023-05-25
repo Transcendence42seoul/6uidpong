@@ -133,7 +133,7 @@ const ChannelSettings: React.FC<ChannelSettingsProps> = ({ socket }) => {
         <div className="flex space-x-4">
           <HoverButton
             onClick={handleConfirmClick}
-            className="border bg-blue-700 p-2 hover:text-blue-700"
+            className="border bg-blue-800 p-2 hover:text-blue-800"
           >
             Confirm
           </HoverButton>
@@ -144,7 +144,7 @@ const ChannelSettings: React.FC<ChannelSettingsProps> = ({ socket }) => {
         {channelId && (
           <HoverButton
             onClick={handleDeleteClick}
-            className="w-[61%] border bg-red-700 p-2 hover:text-red-700"
+            className="w-[61%] border bg-red-800 p-2 hover:text-red-800"
           >
             Delete
           </HoverButton>

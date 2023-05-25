@@ -282,4 +282,20 @@ export class ChatGateway implements OnGatewayDisconnect {
       .to("c" + to.channelId)
       .emit("new-message", new ChannelChatResponse(chat));
   }
+
+  @SubscribeMessage("delete-channel")
+  async deleteChannel(
+    @WsJwtPayload() jwt: JwtPayload,
+    @MessageBody("channelId")
+    channelId: number
+  ): Promise<void> {
+    const channelUser: ChannelUser = await this.channelService.findUserOrFail(
+      channelId,
+      jwt.id
+    );
+    if (!channelUser.isOwner) {
+      throw new WsException("permission denied");
+    }
+    await this.channelService.deleteChannel(channelId);
+  }
 }

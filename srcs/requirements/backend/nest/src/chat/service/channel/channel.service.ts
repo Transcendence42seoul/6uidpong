@@ -8,7 +8,6 @@ import { Channel } from "src/chat/entity/channel/channel.entity";
 import * as bcryptjs from "bcryptjs";
 import { DataSource, MoreThanOrEqual, Repository } from "typeorm";
 import { WsException } from "@nestjs/websockets";
-import { channel } from "diagnostics_channel";
 
 @Injectable()
 export class ChannelService {
@@ -223,5 +222,9 @@ export class ChannelService {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  async deleteChannel(id: number): Promise<void> {
+    await this.channelRepository.delete(id);
   }
 }

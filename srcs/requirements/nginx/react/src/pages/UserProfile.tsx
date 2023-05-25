@@ -1,27 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Socket } from 'socket.io-client';
 
 import AlertWithCloseButton from '../components/alert/AlertWithCloseButton';
 import HoverButton from '../components/button/HoverButton';
 import CircularImage from '../components/container/CircularImage';
 import ContentBox from '../components/container/ContentBox';
 import selectAuth from '../features/auth/authSelector';
+import selectSocket from '../features/socket/socketSelector';
 import useCallApi from '../utils/useCallApi';
 
 import type User from '../interfaces/User';
 
-interface UserProfileProps {
-  socket: Socket;
-}
-
-const UserProfile: React.FC<UserProfileProps> = ({ socket }) => {
+const UserProfile: React.FC = () => {
   const callApi = useCallApi();
   const navigate = useNavigate();
   const { userId } = useParams<{ userId: string }>();
   const interlocutorId = Number(userId);
 
   const { tokenInfo } = selectAuth();
+  const { socket } = selectSocket();
   const myId = tokenInfo?.id;
 
   const [showAlert, setShowAlert] = useState<boolean>(false);
@@ -32,7 +29,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ socket }) => {
   };
 
   const handleBlockClick = () => {
-    socket.emit('block-dm-user', { interlocutorId });
+    socket?.emit('block-dm-user', { interlocutorId });
     setShowAlert(true);
   };
 
@@ -41,7 +38,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ socket }) => {
       navigate(`/dm/${roomId}`, {
         state: { interlocutorId },
       });
-    socket.emit('join-dm', { interlocutorId }, roomIdHandler);
+    socket?.emit('join-dm', { interlocutorId }, roomIdHandler);
   };
 
   const handleFriendRequestClick = () => {

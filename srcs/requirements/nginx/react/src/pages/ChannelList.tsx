@@ -1,22 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Socket } from 'socket.io-client';
 
 import HoverButton from '../components/button/HoverButton';
 import ListContainer from '../components/container/ListContainer';
 import ListInfoPanel from '../components/container/ListInfoPanel';
 import ListTitle from '../components/container/ListTitle';
+import selectSocket from '../features/socket/socketSelector';
 
 import type Channel from '../interfaces/Channel';
 
 import { isTest, mockChannels } from '../mock'; // test
 
-interface ChannelListProps {
-  socket: Socket;
-}
-
-const ChannelList: React.FC<ChannelListProps> = ({ socket }) => {
+const ChannelList: React.FC = () => {
   const navigate = useNavigate();
+
+  const { socket } = selectSocket();
 
   const [channels, setChannels] = useState<Channel[]>([]);
 
@@ -32,7 +30,7 @@ const ChannelList: React.FC<ChannelListProps> = ({ socket }) => {
     const channelListHandler = (channelList: Channel[]) => {
       setChannels([...channelList]);
     };
-    socket.emit('find-my-channels', channelListHandler);
+    socket?.emit('find-my-channels', channelListHandler);
     setChannels(isTest ? mockChannels : channels); // test
   }, []);
 

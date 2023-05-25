@@ -1,16 +1,14 @@
 import React, { ChangeEvent, useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Socket } from 'socket.io-client';
 
 import HoverButton from '../components/button/HoverButton';
 import ContentBox from '../components/container/ContentBox';
+import selectSocket from '../features/socket/socketSelector';
 
-interface ChannelSettingsProps {
-  socket: Socket;
-}
-
-const ChannelSettings: React.FC<ChannelSettingsProps> = ({ socket }) => {
+const ChannelSettings: React.FC = () => {
   const navigate = useNavigate();
+
+  const { socket } = selectSocket();
 
   const [isPasswordEnabled, setIsPasswordEnabled] = useState<boolean>(false);
   const [isPublic, setIsPublic] = useState<boolean>(true);
@@ -28,7 +26,7 @@ const ChannelSettings: React.FC<ChannelSettingsProps> = ({ socket }) => {
         state: { password },
       });
     };
-    socket.emit('create-channel', channel, channelIdHandler);
+    socket?.emit('create-channel', channel, channelIdHandler);
   };
 
   const handleEnablePasswordChange = () => {

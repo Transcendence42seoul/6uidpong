@@ -1,18 +1,13 @@
 import React from 'react';
 import { useLocation, useParams } from 'react-router-dom';
-import { Socket } from 'socket.io-client';
 
 import ChatRoom from '../components/container/ChatRoom';
-
-interface ChannelProps {
-  socket: Socket;
-}
 
 interface LocationState {
   password: string | undefined;
 }
 
-const Channel: React.FC<ChannelProps> = ({ socket }) => {
+const Channel: React.FC = () => {
   const location = useLocation();
   const { password }: LocationState = location.state; // test
 
@@ -34,7 +29,7 @@ const Channel: React.FC<ChannelProps> = ({ socket }) => {
     data: { toId: channelId },
   };
 
-  return <ChatRoom join={join} leave={leave} send={send} socket={socket} />;
+  return <ChatRoom join={join} leave={leave} send={send} />;
 };
 
 export default Channel;

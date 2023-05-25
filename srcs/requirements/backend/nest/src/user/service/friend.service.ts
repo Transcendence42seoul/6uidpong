@@ -1,10 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { DataSource, Repository } from "typeorm";
-import { FriendResponse } from "../dto/friend-response.dto";
 import { FriendRequest } from "../entity/friend-request.entity";
 import { Friend } from "../entity/friend.entity";
-import { User } from "../entity/user.entity";
 
 @Injectable()
 export class FriendService {

@@ -23,7 +23,9 @@ const ChannelSettings: React.FC<ChannelSettingsProps> = ({ socket }) => {
       isPublic,
     };
     const channelIdHandler = (id: number) => {
-      navigate(`/channel/${id}`);
+      navigate(`/channel/${id}`, {
+        state: { password },
+      });
     };
     socket.emit('create-channel', channel, channelIdHandler);
   };

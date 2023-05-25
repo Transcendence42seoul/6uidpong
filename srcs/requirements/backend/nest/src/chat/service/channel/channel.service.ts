@@ -120,7 +120,7 @@ export class ChannelService {
   async createChannel(
     userId: number,
     body: ChannelCreateRequest
-  ): Promise<any> {
+  ): Promise<Channel> {
     const queryRunner = this.dataSource.createQueryRunner();
 
     await queryRunner.connect();
@@ -155,6 +155,7 @@ export class ChannelService {
       );
 
       await queryRunner.commitTransaction();
+      return newChannel;
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;

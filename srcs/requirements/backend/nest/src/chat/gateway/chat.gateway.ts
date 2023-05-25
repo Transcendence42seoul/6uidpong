@@ -32,6 +32,7 @@ import { ChannelChat } from "../entity/channel/channel-chat.entity";
 import { ChannelChatResponse } from "../dto/channel/channel-chat-response.dto";
 import { ChannelCreateRequest } from "../dto/channel/channel-create-request.dto";
 import * as bcryptjs from "bcryptjs";
+import { ChannelCreateResponse } from "../dto/channel/channel-create-response.dto";
 
 @WebSocketGateway(80, {
   cors: {
@@ -202,8 +203,12 @@ export class ChatGateway implements OnGatewayDisconnect {
     @WsJwtPayload() jwt: JwtPayload,
     @MessageBody()
     body: ChannelCreateRequest
-  ): Promise<void> {
-    await this.channelService.createChannel(jwt.id, body);
+  ): Promise<ChannelCreateResponse> {
+    const newChannel: Channel = await this.channelService.createChannel(
+      jwt.id,
+      body
+    );
+    return new ChannelCreateResponse(newChannel);
   }
 
   @SubscribeMessage("join-channel")

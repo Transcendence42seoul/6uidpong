@@ -30,6 +30,10 @@ const ChannelSettings: React.FC<ChannelSettingsProps> = ({ socket }) => {
     socket.emit('create-channel', channel, channelIdHandler);
   };
 
+  const handleEnablePasswordChange = () => {
+    setIsPasswordEnabled(!isPasswordEnabled);
+  };
+
   const handlePasswordChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       setPassword(event.target.value);
@@ -43,6 +47,10 @@ const ChannelSettings: React.FC<ChannelSettingsProps> = ({ socket }) => {
     },
     [],
   );
+
+  const handleToggleChange = () => {
+    setIsPublic(!isPublic);
+  };
 
   return (
     <div className="flex flex-col items-center p-4">
@@ -79,7 +87,7 @@ const ChannelSettings: React.FC<ChannelSettingsProps> = ({ socket }) => {
               type="checkbox"
               id="enable-password"
               checked={isPasswordEnabled}
-              onChange={() => setIsPasswordEnabled(!isPasswordEnabled)}
+              onChange={handleEnablePasswordChange}
               className="mr-2"
             />
             Enable
@@ -94,7 +102,7 @@ const ChannelSettings: React.FC<ChannelSettingsProps> = ({ socket }) => {
                 id="toggle"
                 className="sr-only"
                 checked={isPublic}
-                onChange={() => setIsPublic(!isPublic)}
+                onChange={handleToggleChange}
               />
               <div
                 className={`h-7 w-12 rounded-full transition ${

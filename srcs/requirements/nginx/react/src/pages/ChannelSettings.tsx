@@ -1,5 +1,5 @@
 import React, { ChangeEvent, useCallback, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
 
 import HoverButton from '../components/button/HoverButton';
@@ -11,11 +11,17 @@ interface ChannelSettingsProps {
 
 const ChannelSettings: React.FC<ChannelSettingsProps> = ({ socket }) => {
   const navigate = useNavigate();
+  const { state } = useLocation();
+  const channelId = state?.channelId;
 
   const [isPasswordEnabled, setIsPasswordEnabled] = useState<boolean>(false);
   const [isPublic, setIsPublic] = useState<boolean>(true);
   const [password, setPassword] = useState<string | undefined>(undefined);
   const [title, setTitle] = useState<string>('');
+
+  const handleCancelClick = () => {
+    navigate(-1);
+  };
 
   const handleConfirmClick = async () => {
     const channel = {
@@ -29,6 +35,11 @@ const ChannelSettings: React.FC<ChannelSettingsProps> = ({ socket }) => {
       });
     };
     socket.emit('create-channel', channel, channelIdHandler);
+  };
+
+  const handleDeleteClick = () => {
+    socket.emit('delete-channel', { channelId });
+    navigate('/channel');
   };
 
   const handleEnablePasswordChange = () => {
@@ -119,9 +130,25 @@ const ChannelSettings: React.FC<ChannelSettingsProps> = ({ socket }) => {
           </label>
           <span>Private</span>
         </div>
-        <HoverButton onClick={handleConfirmClick} className="w-full border p-2">
-          Confirm
-        </HoverButton>
+        <div className="flex space-x-4">
+          <HoverButton
+            onClick={handleConfirmClick}
+            className="border bg-blue-700 p-2 hover:text-blue-700"
+          >
+            Confirm
+          </HoverButton>
+          <HoverButton onClick={handleCancelClick} className="border p-2">
+            Cancel
+          </HoverButton>
+        </div>
+        {channelId && (
+          <HoverButton
+            onClick={handleDeleteClick}
+            className="w-[61%] border bg-red-700 p-2 hover:text-red-700"
+          >
+            Delete
+          </HoverButton>
+        )}
       </ContentBox>
     </div>
   );

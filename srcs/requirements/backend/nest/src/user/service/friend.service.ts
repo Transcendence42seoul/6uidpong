@@ -14,25 +14,29 @@ export class FriendService {
     private readonly dataSource: DataSource
   ) {}
 
-  async find(userId: number): Promise<FriendResponse[]> {
-    return await this.friendRepository
-      .createQueryBuilder("friends")
-      .select([
-        "users.id       AS id",
-        "users.nickname AS nickname",
-        "users.image    AS image",
-        "users.status   AS status",
-      ])
-      .innerJoin(
-        User,
-        "users",
-        "users.id = CASE WHEN friends.from_id = :userId THEN friends.to_id \
-                         WHEN friends.to_id = :userId THEN friends.from_id \
-                         END",
-        { userId }
-      )
-      .orderBy("users.nickname", "ASC")
-      .getRawMany();
+  async find(userId: number): Promise<Friend[]> {
+    return await this.friendRepository.find({
+      relations: {
+        friend: true,
+      },
+      where: {
+        userId,
+      },
+      order: {
+        friend: {
+          nickname: "ASC",
+        },
+      },
+    });
+  }
+
+  async findOneOrFail(userId: number, friendId: number): Promise<Friend> {
+    return await this.friendRepository.findOneOrFail({
+      where: {
+        userId,
+        friendId,
+      },
+    });
   }
 
   async save(userId: number, friendId: number): Promise<void> {
@@ -45,18 +49,26 @@ export class FriendService {
         fromId: friendId,
         toId: userId,
       });
-      queryRunner.manager.delete(FriendRequest, {
-        fromId: friendId,
-        toId: userId,
-      });
-      queryRunner.manager.save(
-        Friend,
+      queryRunner.manager.delete(FriendRequest, [
         {
           fromId: friendId,
           toId: userId,
         },
-        { transaction: false }
-      );
+        {
+          fromId: userId,
+          toId: friendId,
+        },
+      ]);
+      queryRunner.manager.insert(Friend, [
+        {
+          userId,
+          friendId,
+        },
+        {
+          userId: friendId,
+          friendId: userId,
+        },
+      ]);
 
       await queryRunner.commitTransaction();
     } catch (error) {
@@ -68,10 +80,23 @@ export class FriendService {
   }
 
   async delete(userId: number, friendId: number): Promise<void> {
-    const friend: Friend = await this.friendRepository.findOneByOrFail([
-      { fromId: userId, toId: friendId },
-      { fromId: friendId, toId: userId },
-    ]);
-    await this.friendRepository.remove(friend);
+    const queryRunner = this.dataSource.createQueryRunner();
+
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      await queryRunner.manager.delete(Friend, { userId, friendId });
+      await queryRunner.manager.delete(Friend, {
+        userId: friendId,
+        friendId: userId,
+      });
+
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
   }
 }

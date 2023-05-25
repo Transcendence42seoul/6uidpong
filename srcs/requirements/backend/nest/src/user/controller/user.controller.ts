@@ -8,13 +8,12 @@ import {
   ParseIntPipe,
   HttpCode,
   HttpStatus,
-  UnauthorizedException,
   NotFoundException,
   Query,
   Post,
-  BadRequestException,
   Delete,
   DefaultValuePipe,
+  BadRequestException,
 } from "@nestjs/common";
 import { UserService } from "../service/user.service";
 import { JwtAccessGuard } from "src/auth/guard/jwt-access.guard";
@@ -31,6 +30,7 @@ import { FriendResponse } from "../dto/friend-response.dto";
 import { FriendRequest } from "../entity/friend-request.entity";
 import { FriendRequestResponse } from "../dto/friend-request-response.dto";
 import { PermissionGuard } from "src/auth/guard/permission.guard";
+import { Friend } from "../entity/friend.entity";
 
 @Controller("api/v1/users")
 @UseGuards(JwtAccessGuard)
@@ -128,7 +128,11 @@ export class UserController {
   async findFriends(
     @Param("id", ParseIntPipe) userId: number
   ): Promise<FriendResponse[]> {
-    return await this.friendService.find(userId);
+    const friends: Friend[] = await this.friendService.find(userId);
+
+    return friends.map((friend) => {
+      return new FriendResponse(friend);
+    });
   }
 
   @Post("/:id/friends")
@@ -171,7 +175,13 @@ export class UserController {
     @Param("id", ParseIntPipe) fromId: number,
     @Body("toId", ParseIntPipe) toId: number
   ): Promise<void> {
-    await this.friendRequestService.save(fromId, toId);
+    try {
+      await this.friendService.findOneOrFail(fromId, toId);
+    } catch {
+      await this.friendRequestService.save(fromId, toId);
+      return;
+    }
+    throw new BadRequestException("already friends");
   }
 
   @Delete("/:id/friend-requests/:toId")

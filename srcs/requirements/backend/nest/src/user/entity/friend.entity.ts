@@ -9,23 +9,23 @@ import {
 
 @Entity("friends")
 export class Friend {
-  @PrimaryColumn({ name: "from_id" })
-  fromId: number;
+  @PrimaryColumn({ name: "user_id" })
+  userId: number;
 
-  @PrimaryColumn({ name: "to_id" })
-  toId: number;
-
-  @ManyToOne(() => User, {
-    onUpdate: "CASCADE",
-  })
-  @JoinColumn({ name: "from_id" })
-  from: User;
+  @PrimaryColumn({ name: "friend_id" })
+  friendId: number;
 
   @ManyToOne(() => User, {
     onUpdate: "CASCADE",
   })
-  @JoinColumn({ name: "to_id" })
-  to: User;
+  @JoinColumn({ name: "user_id" })
+  user: User;
+
+  @ManyToOne(() => User, {
+    onUpdate: "CASCADE",
+  })
+  @JoinColumn({ name: "friend_id" })
+  friend: User;
 
   @CreateDateColumn({ name: "created_at" })
   createdAt: Date;

@@ -20,6 +20,8 @@ import MessageForm from './MessageForm';
 import type Chat from '../../interfaces/Chat';
 import type SocketEvent from '../../interfaces/SocketEvent';
 
+import { isTest, mockChats } from '../../mock'; // test
+
 interface ChatRoomProps {
   join: SocketEvent;
   leave: SocketEvent;
@@ -78,6 +80,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send, socket }) => {
       setChats([...prevChats]);
     };
     socket.emit(join.name, join.data, chatsHandler);
+    setChats(isTest ? mockChats : chats); // test
     return () => {
       socket.emit(leave.name, leave.data);
     };

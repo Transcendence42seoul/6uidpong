@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
+
 import HoverButton from '../components/button/HoverButton';
 import ListContainer from '../components/container/ListContainer';
 import ListInfoPanel from '../components/container/ListInfoPanel';
 import ListTitle from '../components/container/ListTitle';
 import ImageSrc from '../constants/ImageSrc';
+
 import type Channel from '../interfaces/Channel';
+
 import { isTest, mockChannels } from '../mock'; // test
 
 interface AllChannelsProps {

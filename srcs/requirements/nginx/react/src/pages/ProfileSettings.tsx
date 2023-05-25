@@ -1,4 +1,5 @@
 import React from 'react';
+
 import ContentBox from '../components/container/ContentBox';
 import Nickname from '../components/custom/Nickname';
 import ProfilePicture from '../components/custom/ProfilePicture';

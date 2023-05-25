@@ -1,9 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User } from '../../pages/UserProfile';
+
 import useCallApi from '../../utils/useCallApi';
 import HoverButton from '../button/HoverButton';
 import CircularImage from '../container/CircularImage';
+
+import type User from '../../interfaces/User';
+
 import { isTest, mockUsers } from '../../mock'; // test
 
 const Header: React.FC = () => {

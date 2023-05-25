@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
+
 import HoverButton from '../components/button/HoverButton';
 import CircularImage from '../components/container/CircularImage';
 import ContentBox from '../components/container/ContentBox';
 import selectAuth from '../features/auth/authSelector';
 import useCallApi from '../utils/useCallApi';
+
 import type User from '../interfaces/User';
 
 interface Stats {

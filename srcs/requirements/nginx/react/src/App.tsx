@@ -3,9 +3,11 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { Routes, Route } from 'react-router-dom';
 import { io } from 'socket.io-client';
+
 import LoginAuth from './components/custom/LoginAuth';
 import dispatchAuth from './features/auth/authAction';
 import selectAuth from './features/auth/authSelector';
+import Layout from './Layout';
 import AllChannels from './pages/AllChannels';
 import Channel from './pages/Channel';
 import ChannelList from './pages/ChannelList';
@@ -21,7 +23,7 @@ import MyPage from './pages/MyPage';
 import ProfileSettings from './pages/ProfileSettings';
 import UserProfile from './pages/UserProfile';
 import redirect from './utils/redirect';
-import Layout from './Layout';
+
 import { isTest, mockAuthState } from './mock'; // test
 
 const App: React.FC = () => {

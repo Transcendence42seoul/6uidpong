@@ -1,13 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
+
 import CircularImage from '../components/container/CircularImage';
 import ListContainer from '../components/container/ListContainer';
 import ListInfoPanel from '../components/container/ListInfoPanel';
 import ListTitle from '../components/container/ListTitle';
 import formatTime from '../utils/formatTime';
+
 import type Chat from '../interfaces/Chat';
 import type Position from '../interfaces/Position';
+
 import { isTest, mockRooms } from '../mock'; // test
 
 interface DmRoomListProps {

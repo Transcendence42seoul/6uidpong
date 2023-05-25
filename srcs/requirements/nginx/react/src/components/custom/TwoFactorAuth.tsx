@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
 import axios, { AxiosResponse, AxiosError } from 'axios';
+import React, { useState } from 'react';
+
 import selectAuth from '../../features/auth/authSelector';
 import HoverButton from '../button/HoverButton';
 import Modal from '../modal/Modal';

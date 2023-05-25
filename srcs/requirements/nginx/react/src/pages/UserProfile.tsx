@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
+
 import AlertWithCloseButton from '../components/alert/AlertWithCloseButton';
 import HoverButton from '../components/button/HoverButton';
 import CircularImage from '../components/container/CircularImage';
 import ContentBox from '../components/container/ContentBox';
 import selectAuth from '../features/auth/authSelector';
 import useCallApi from '../utils/useCallApi';
+
 import type User from '../interfaces/User';
 
 interface UserProfileProps {

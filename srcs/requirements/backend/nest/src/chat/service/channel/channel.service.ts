@@ -227,4 +227,8 @@ export class ChannelService {
   async deleteChannel(id: number): Promise<void> {
     await this.channelRepository.delete(id);
   }
+
+  async deleteUser(channelId: number, userId: number): Promise<void> {
+    await this.channelUserRepository.delete({ channelId, userId });
+  }
 }

@@ -280,7 +280,7 @@ export class ChatGateway implements OnGatewayDisconnect {
     );
     client
       .to("c" + to.channelId)
-      .emit("new-message", new ChannelChatResponse(chat));
+      .emit("new-channel-message", new ChannelChatResponse(chat));
   }
 
   @SubscribeMessage("delete-channel")
@@ -297,5 +297,20 @@ export class ChatGateway implements OnGatewayDisconnect {
       throw new WsException("permission denied");
     }
     await this.channelService.deleteChannel(channelId);
+  }
+
+  @SubscribeMessage("leave-channel")
+  async leaveChannel(
+    @WsJwtPayload() jwt: JwtPayload,
+    @ConnectedSocket() client: Socket,
+    @MessageBody("channelId")
+    channelId: number
+  ): Promise<void> {
+    await this.channelService.deleteUser(channelId, jwt.id);
+    client.leave("c" + channelId);
+    const user: User = await this.userService.findOneOrFail(jwt.id);
+    client
+      .to("c" + channelId)
+      .emit("leave-channel-user", { nickname: user.nickname });
   }
 }

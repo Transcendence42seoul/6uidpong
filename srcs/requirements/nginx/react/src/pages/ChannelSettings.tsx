@@ -13,7 +13,7 @@ const ChannelSettings: React.FC<ChannelSettingsProps> = ({ socket }) => {
   const [password, setPassword] = useState<string | undefined>(undefined);
   const [title, setTitle] = useState<string>('');
 
-  const handleCreateClick = () => {};
+  const handleConfirmClick = () => {};
 
   const handlePasswordChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
@@ -95,8 +95,8 @@ const ChannelSettings: React.FC<ChannelSettingsProps> = ({ socket }) => {
           </label>
           <span>Private</span>
         </div>
-        <HoverButton onClick={handleCreateClick} className="w-full border p-2">
-          Create
+        <HoverButton onClick={handleConfirmClick} className="w-full border p-2">
+          Confirm
         </HoverButton>
       </ContentBox>
     </div>

@@ -1,108 +1,23 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import useCallApi from '../../utils/useCallApi';
 import HoverButton from '../button/HoverButton';
-import CircularImage from '../container/CircularImage';
 
-import type User from '../../interfaces/User';
-
-import { isTest, mockUsers } from '../../mock'; // test
+import UserSearchBar from '../container/UserSearchBar';
 
 const Header: React.FC = () => {
-  const callApi = useCallApi();
   const navigate = useNavigate();
-
-  const searchResultsRef = useRef<HTMLUListElement>(null);
-  const [search, setSearch] = useState<string>('');
-  const [searchResults, setSearchResults] = useState<User[]>([]);
-  const [showSearchResults, setShowSearchResults] = useState<boolean>(false);
 
   const handleHomeClick = () => navigate('/');
   const handleMyPageClick = () => navigate('/my-page');
-  const handleSearchClick = () => setShowSearchResults(true);
-  const handleUserClick = (id: number) => {
-    setSearch('');
-    setShowSearchResults(false);
-    navigate(`/profile/${id}`);
-  };
-
-  const handleSearchResults = async (data: User[]) => {
-    setSearchResults([...data]);
-  };
-
-  const handleShowSearchResults = async (nickname: string) => {
-    setShowSearchResults(!!nickname);
-  };
-
-  const handleSearchChange = async (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const nickname = event.target.value;
-    setSearch(nickname);
-    const config = {
-      url: '/api/v1/users/search',
-      params: { nickname },
-    };
-    const data: User[] = isTest ? mockUsers : await callApi(config); // test
-    await handleSearchResults(data);
-    await handleShowSearchResults(nickname);
-  };
-
-  useEffect(() => {
-    const handleOutsideClick = (event: MouseEvent) => {
-      if (
-        showSearchResults &&
-        !searchResultsRef.current?.contains(event.target as Node)
-      ) {
-        setShowSearchResults(false);
-      }
-    };
-    document.addEventListener('mousedown', handleOutsideClick);
-    return () => {
-      document.removeEventListener('mousedown', handleOutsideClick);
-    };
-  }, [showSearchResults]);
+  const onUserClick = (id: number) => navigate(`/profile/${id}`);
 
   return (
     <div className="flex items-center justify-between p-4">
       <HoverButton onClick={handleHomeClick} className="rounded border-2 p-2.5">
         Home
       </HoverButton>
-      <div className="relative w-[40%]">
-        <input
-          type="text"
-          placeholder="Search users"
-          value={search}
-          onChange={handleSearchChange}
-          onClick={handleSearchClick}
-          className="w-full rounded border border-white p-2 shadow"
-        />
-        {showSearchResults && (
-          <ul
-            className="absolute z-10 flex w-full flex-col rounded border-2 bg-white px-2.5 pb-2 pt-1.5 shadow-md"
-            ref={searchResultsRef}
-          >
-            {searchResults.map((user) => {
-              const { id, nickname, image } = user;
-              return (
-                <button
-                  key={nickname}
-                  className="flex space-x-2 border-b border-gray-300 py-1 hover:bg-gray-200"
-                  onClick={() => handleUserClick(id)}
-                >
-                  <CircularImage
-                    src={image}
-                    alt={nickname}
-                    className="h-6 w-6 align-bottom"
-                  />
-                  <span className="w-[90%] truncate text-left">{nickname}</span>
-                </button>
-              );
-            })}
-          </ul>
-        )}
-      </div>
+      <UserSearchBar onUserClick={onUserClick} className="w-[40%]" />
       <HoverButton
         onClick={handleMyPageClick}
         className="rounded border-2 p-2.5"

@@ -140,17 +140,15 @@ export class ChannelService {
       const saveOptions: Object = {
         transaction: false,
       };
-      const encrypted: string = await bcryptjs.hash(
-        body.password,
-        await bcryptjs.genSalt()
-      );
-
       const newChannel: Channel = await queryRunner.manager.save(
         Channel,
         {
           title: body.title,
           isPublic: body.isPublic,
-          password: encrypted,
+          password:
+            typeof body.password === undefined
+              ? null
+              : await bcryptjs.hash(body.password, await bcryptjs.genSalt()),
         },
         saveOptions
       );

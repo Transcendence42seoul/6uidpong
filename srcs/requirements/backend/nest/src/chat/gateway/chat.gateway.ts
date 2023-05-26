@@ -388,8 +388,8 @@ export class ChatGateway implements OnGatewayDisconnect {
       throw new WsException("permission denied");
     }
     await this.channelService.deleteUser(info.channelId, info.userId);
+    const room: string = "c" + info.channelId;
     if (kickChannelUser.user.status === "online") {
-      const room: string = "c" + info.channelId;
       const channelSockets = await this.server.in(room).fetchSockets();
       const kickUserSocket = channelSockets.find(
         (socket) => socket.id === kickChannelUser.user.socketId
@@ -399,6 +399,9 @@ export class ChatGateway implements OnGatewayDisconnect {
         kickUserSocket.emit("kicked-channel");
       }
     }
+    this.server
+      .to(room)
+      .emit("newly-kicked-user", { nickname: kickChannelUser.user.nickname });
   }
 
   @SubscribeMessage("update-password")
@@ -415,5 +418,6 @@ export class ChatGateway implements OnGatewayDisconnect {
       throw new WsException("permission denied");
     }
     await this.channelService.updatePassword(info.channelId, info.password);
+    this.server.to("c" + info.channelId).emit("update-password");
   }
 }

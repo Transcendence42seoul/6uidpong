@@ -60,7 +60,7 @@ const Channel: React.FC<ChannelProps> = ({ socket }) => {
 
   return (
     <>
-      <div className="flex justify-end space-x-1.5 px-4">
+      <div className="mx-auto flex max-w-[1024px] justify-end space-x-1.5 px-4">
         <HoverButton
           onClick={handleInviteClick}
           className="rounded border bg-blue-800 p-1.5 hover:text-blue-800"

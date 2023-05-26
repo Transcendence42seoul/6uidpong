@@ -4,7 +4,7 @@ import { Socket } from 'socket.io-client';
 
 import HoverButton from '../components/button/HoverButton';
 import ChatRoom from '../components/container/ChatRoom';
-import UserSearchModal from '../components/modal/UserSearchModal';
+import UserSelectModal from '../components/modal/UserSelectModal';
 
 interface ChannelProps {
   socket: Socket;
@@ -51,28 +51,40 @@ const Channel: React.FC<ChannelProps> = ({ socket }) => {
 
   return (
     <>
-      <div className="mx-auto flex max-w-[1024px] justify-end space-x-1.5 px-4">
-        <HoverButton
-          onClick={handleInviteClick}
-          className="rounded border bg-blue-800 p-1.5 hover:text-blue-800"
-        >
-          Invite
-        </HoverButton>
-        <HoverButton
-          onClick={handleSettingsClick}
-          className="rounded border p-1.5"
-        >
-          Settings
-        </HoverButton>
-        <HoverButton
-          onClick={handleExitClick}
-          className="rounded border bg-red-800 p-1.5 hover:text-red-800"
-        >
-          Exit
-        </HoverButton>
+      <div className="mx-auto flex max-w-[1024px] justify-between space-x-1.5 px-4">
+        <div>
+          <HoverButton
+            onClick={handleSettingsClick}
+            className="rounded border p-1.5"
+          >
+            Settings
+          </HoverButton>
+          <HoverButton
+            onClick={handleSettingsClick}
+            className="rounded border p-1.5"
+          >
+            Manage
+          </HoverButton>
+        </div>
+        <div className="space-x-1.5">
+          <HoverButton
+            onClick={handleInviteClick}
+            className="rounded border bg-blue-800 p-1.5 hover:text-blue-800"
+          >
+            Invite
+          </HoverButton>
+          <HoverButton
+            onClick={handleExitClick}
+            className="rounded border bg-red-800 p-1.5 hover:text-red-800"
+          >
+            Exit
+          </HoverButton>
+        </div>
       </div>
       <ChatRoom join={join} leave={leave} send={send} socket={socket} />
-      {showInviteModal && <UserSearchModal setShowModal={setShowInviteModal} />}
+      {showInviteModal && (
+        <UserSelectModal title="Invite" setShowModal={setShowInviteModal} />
+      )}
     </>
   );
 };

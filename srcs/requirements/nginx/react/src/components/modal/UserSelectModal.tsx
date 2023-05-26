@@ -6,20 +6,19 @@ import UserSearchBar from '../container/UserSearchBar';
 
 import type User from '../../interfaces/User';
 
-interface UserSearchModalProps {
+interface UserSelectModalProps {
+  title: string;
   setShowModal: (showModal: boolean) => void;
 }
 
-const UserSearchModal: React.FC<UserSearchModalProps> = ({ setShowModal }) => {
+const UserSelectModal: React.FC<UserSelectModalProps> = ({
+  title,
+  setShowModal,
+}) => {
   const [selectedUsers, setSelectedUsers] = useState<Set<User>>(new Set());
 
-  const handleCancelClick = () => {
-    setShowModal(false);
-  };
-
-  const handleConfirmClick = () => {
-    setShowModal(false);
-  };
+  const handleCancelClick = () => setShowModal(false);
+  const handleConfirmClick = () => setShowModal(false);
 
   const onUserClick = (user: User) => {
     setSelectedUsers((prevUsers) => new Set(prevUsers).add(user));
@@ -29,7 +28,7 @@ const UserSearchModal: React.FC<UserSearchModalProps> = ({ setShowModal }) => {
     <div className="fixed inset-0 flex justify-center space-x-8 bg-black bg-opacity-50 pt-40">
       <UserSearchBar onUserClick={onUserClick} />
       <div>
-        <h1 className="m-1 text-lg font-bold text-white">Invite</h1>
+        <h1 className="m-1 text-lg font-bold text-white">{title}</h1>
         <ul>
           {[...selectedUsers].map((user) => {
             const { id, nickname, image } = user;
@@ -58,4 +57,4 @@ const UserSearchModal: React.FC<UserSearchModalProps> = ({ setShowModal }) => {
   );
 };
 
-export default UserSearchModal;
+export default UserSelectModal;

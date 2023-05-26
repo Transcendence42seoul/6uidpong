@@ -80,7 +80,6 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send, socket }) => {
   useEffect(() => {
     const chatHandler = (chat: Chat) => {
       setChats((prevChats) => [...prevChats, chat]);
-      setNewMsgCount(0);
     };
     socket.on(send.name, chatHandler);
     return () => {

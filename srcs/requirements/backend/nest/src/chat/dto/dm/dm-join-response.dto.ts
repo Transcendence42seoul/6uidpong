@@ -5,9 +5,7 @@ export class DmJoinResponse {
   constructor(roomId: number, newMsgCount: number, entities: DmChat[]) {
     this.roomId = roomId;
     this.newMsgCount = newMsgCount;
-    this.chats = entities.map((entity) => {
-      return new DmChatResponse(entity);
-    });
+    this.chats = entities.map((entity) => new DmChatResponse(entity));
   }
   readonly roomId: number;
 

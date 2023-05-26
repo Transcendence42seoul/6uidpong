@@ -233,9 +233,7 @@ export class ChatGateway implements OnGatewayDisconnect {
       info.channelId,
       channelUser
     );
-    return chats.map((chat) => {
-      return new ChannelChatResponse(chat);
-    });
+    return chats.map((chat) => new ChannelChatResponse(chat));
   }
 
   @SubscribeMessage("send-channel-message")
@@ -327,9 +325,7 @@ export class ChatGateway implements OnGatewayDisconnect {
     const from: User = await this.userService.findOneOrFail(jwt.id);
     this.server.to("c" + info.channelId).emit("newly-joined-users", {
       from: from.nickname,
-      to: to.map((user) => {
-        return user.nickname;
-      }),
+      to: to.map((user) => user.nickname),
     });
   }
 

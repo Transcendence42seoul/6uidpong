@@ -51,9 +51,7 @@ export class UserController {
       page,
       size,
     });
-    const dtos: UserResponse[] = users.map((user) => {
-      return new UserResponse(user);
-    });
+    const dtos: UserResponse[] = users.map((user) => new UserResponse(user));
 
     return new Pagination<UserResponse>({ results: dtos, total });
   }
@@ -64,9 +62,7 @@ export class UserController {
   ): Promise<UserResponse[]> {
     const entities: User[] = await this.userService.search(nickname);
 
-    return entities.map((entity) => {
-      return new UserResponse(entity);
-    });
+    return entities.map((entity) => new UserResponse(entity));
   }
 
   @Get("/:id")
@@ -130,9 +126,7 @@ export class UserController {
   ): Promise<FriendResponse[]> {
     const friends: Friend[] = await this.friendService.find(userId);
 
-    return friends.map((friend) => {
-      return new FriendResponse(friend);
-    });
+    return friends.map((friend) => new FriendResponse(friend));
   }
 
   @Post("/:id/friends")
@@ -163,9 +157,9 @@ export class UserController {
     const friendRequests: FriendRequest[] =
       await this.friendRequestService.find(userId);
 
-    return friendRequests.map((friendRequest) => {
-      return new FriendRequestResponse(friendRequest);
-    });
+    return friendRequests.map(
+      (friendRequest) => new FriendRequestResponse(friendRequest)
+    );
   }
 
   @Post("/:id/friend-requests")

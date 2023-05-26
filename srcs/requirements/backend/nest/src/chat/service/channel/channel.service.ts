@@ -104,9 +104,7 @@ export class ChannelService {
     userIds: number[]
   ): Promise<ChannelUser[]> {
     return await this.channelUserRepository.save(
-      userIds.map((userId) => {
-        return { channelId, userId };
-      })
+      userIds.map((userId) => ({ channelId, userId }))
     );
   }
 

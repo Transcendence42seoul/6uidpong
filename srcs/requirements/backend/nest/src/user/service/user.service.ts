@@ -30,11 +30,7 @@ export class UserService {
   }
 
   async find(ids: number[]): Promise<User[]> {
-    return await this.userRepository.findBy(
-      ids.map((id) => {
-        return { id };
-      })
-    );
+    return await this.userRepository.findBy(ids.map((id) => ({ id })));
   }
 
   async search(nickname: string): Promise<User[]> {

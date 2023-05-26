@@ -322,7 +322,7 @@ export class ChatGateway implements OnGatewayDisconnect {
     }
     await this.channelService.saveUsers(info.channelId, info.userIds);
     const from: User = await this.userService.findOneOrFail(jwt.id);
-    this.server.to("c" + info.channelId).emit("newly-joined-users", {
+    this.server.to("c" + info.channelId).emit("invited-users", {
       from: from.nickname,
       to: to.map((user) => user.nickname),
     });

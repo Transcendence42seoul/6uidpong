@@ -100,48 +100,44 @@ export class ChatGateway implements OnGatewayDisconnect {
     @WsJwtPayload() jwt: JwtPayload,
     @MessageBody("to") to: { id: number; message: string }
   ): Promise<DmChatResponse> {
-    try {
-      const recipient: User = await this.userService.findOneOrFail(to.id);
-      if (await this.blockService.isBlocked(jwt.id, recipient.id)) {
-        throw new WsException(
-          "You can't send a message to the user you have blocked."
-        );
-      }
-      if (await this.blockService.isBlocked(recipient.id, jwt.id)) {
-        throw new WsException(
-          "You can't send a message because you have been blocked."
-        );
-      }
-      const recipientRoomUser: DmRoomUser = await this.dmService.findUserOrFail(
-        recipient.id,
-        jwt.id
+    const recipient: User = await this.userService.findOneOrFail(to.id);
+    if (await this.blockService.isBlocked(jwt.id, recipient.id)) {
+      throw new WsException(
+        "You can't send a message to the user you have blocked."
       );
-      const roomSockets = await this.server
-        .in("d" + recipientRoomUser.roomId)
-        .fetchSockets();
-      const isNotJoin: boolean = !roomSockets.find(
-        (socket) => socket.id === recipient.socketId
-      );
-
-      const { id: chatId } = await this.dmService.saveChat(
-        jwt.id,
-        to.message,
-        recipientRoomUser,
-        isNotJoin
-      );
-      const chat: DmChatResponse = new DmChatResponse(
-        await this.dmService.findChat(chatId)
-      );
-      if (recipient.status === "online") {
-        const recipientSocket = await this.server
-          .in(recipient.socketId)
-          .fetchSockets();
-        recipientSocket[0].emit("send-dm", chat);
-      }
-      return chat;
-    } catch (e) {
-      throw e;
     }
+    if (await this.blockService.isBlocked(recipient.id, jwt.id)) {
+      throw new WsException(
+        "You can't send a message because you have been blocked."
+      );
+    }
+    const recipientRoomUser: DmRoomUser = await this.dmService.findUserOrFail(
+      recipient.id,
+      jwt.id
+    );
+    const roomSockets = await this.server
+      .in("d" + recipientRoomUser.roomId)
+      .fetchSockets();
+    const isNotJoin: boolean = !roomSockets.find(
+      (socket) => socket.id === recipient.socketId
+    );
+
+    const { id: chatId } = await this.dmService.saveChat(
+      jwt.id,
+      to.message,
+      recipientRoomUser,
+      isNotJoin
+    );
+    const chat: DmChatResponse = new DmChatResponse(
+      await this.dmService.findChat(chatId)
+    );
+    if (recipient.status === "online") {
+      const recipientSocket = await this.server
+        .in(recipient.socketId)
+        .fetchSockets();
+      recipientSocket[0].emit("send-dm", chat);
+    }
+    return chat;
   }
 
   @SubscribeMessage("leave-dm")

@@ -9,7 +9,7 @@ const Login: React.FC = () => {
   };
 
   return (
-    <>
+    <div className="min-h-screen bg-cat-pong bg-cover bg-no-repeat">
       <h1 className="mt-0 pt-14 text-center text-3xl text-white">6u!dpong</h1>
       <div className="flex items-center justify-center">
         <HoverButton
@@ -19,7 +19,7 @@ const Login: React.FC = () => {
           42 LOGIN
         </HoverButton>
       </div>
-    </>
+    </div>
   );
 };
 

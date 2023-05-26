@@ -6,7 +6,7 @@ interface ListContainerProps {
 
 const ListContainer: React.FC<ListContainerProps> = ({ children }) => {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100">
+    <div className="flex min-h-screen flex-col items-center justify-center">
       <ul className="w-full max-w-3xl">{children}</ul>
     </div>
   );

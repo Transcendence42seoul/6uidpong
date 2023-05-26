@@ -6,5 +6,5 @@
 
 body {
   @apply min-h-screen bg-cover bg-center font-press-start-2p;
-  background-image: url('https://i.imgur.com/0w2jJxu.gif');
+  background-color: #211f20;
 }

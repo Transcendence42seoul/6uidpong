@@ -8,7 +8,7 @@ import type User from '../../interfaces/User';
 import { isTest, mockUsers } from '../../mock'; // test
 
 interface UserSearchBarProps {
-  onUserClick: (id: number) => void;
+  onUserClick: (user: User) => void;
   className?: string;
 }
 
@@ -27,10 +27,10 @@ const UserSearchBar: React.FC<UserSearchBarProps> = ({
     setShowSearchResults(true);
   };
 
-  const handleUserClick = (id: number) => {
+  const handleUserClick = (user: User) => {
     setSearch('');
     setShowSearchResults(false);
-    onUserClick(id);
+    onUserClick(user);
   };
 
   const handleSearchResults = async (data: User[]) => {
@@ -86,12 +86,12 @@ const UserSearchBar: React.FC<UserSearchBarProps> = ({
           ref={searchResultsRef}
         >
           {searchResults.map((user) => {
-            const { id, nickname, image } = user;
+            const { nickname, image } = user;
             return (
               <button
                 key={nickname}
                 className="flex space-x-2 border-b border-gray-300 py-1 hover:bg-gray-200"
-                onClick={() => handleUserClick(id)}
+                onClick={() => handleUserClick(user)}
               >
                 <CircularImage
                   src={image}

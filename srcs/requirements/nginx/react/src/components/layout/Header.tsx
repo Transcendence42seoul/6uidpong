@@ -2,15 +2,16 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import HoverButton from '../button/HoverButton';
-
 import UserSearchBar from '../container/UserSearchBar';
+
+import type User from '../../interfaces/User';
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
 
   const handleHomeClick = () => navigate('/');
   const handleMyPageClick = () => navigate('/my-page');
-  const onUserClick = (id: number) => navigate(`/profile/${id}`);
+  const onUserClick = ({ id }: User) => navigate(`/profile/${id}`);
 
   return (
     <div className="flex items-center justify-between p-4">

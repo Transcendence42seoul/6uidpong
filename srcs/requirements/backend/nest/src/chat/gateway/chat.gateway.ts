@@ -347,6 +347,34 @@ export class ChatGateway implements OnGatewayDisconnect {
     });
   }
 
+  @SubscribeMessage("update-channel-admin")
+  async updateChannelAdmin(
+    @WsJwtPayload() jwt: JwtPayload,
+    @MessageBody("info")
+    info: { channelId: number; userId: number; value: boolean }
+  ): Promise<void> {
+    const channelUser: ChannelUser = await this.channelService.findUserOrFail(
+      info.channelId,
+      jwt.id
+    );
+    const targetChannelUser: ChannelUser =
+      await this.channelService.findUserOrFail(info.channelId, info.userId);
+    if (!channelUser.isOwner || targetChannelUser.isOwner) {
+      throw new WsException("permission denied");
+    }
+    await this.channelService.updateIsAdmin(
+      info.channelId,
+      info.userId,
+      info.value
+    );
+    const event: string = info.value
+      ? "add-channel-admin"
+      : "delete-channel-admin";
+    this.server
+      .to("c" + info.channelId)
+      .emit(event, { nickname: targetChannelUser.user.nickname });
+  }
+
   @SubscribeMessage("invite-channel")
   async inviteChannel(
     @WsJwtPayload() jwt: JwtPayload,

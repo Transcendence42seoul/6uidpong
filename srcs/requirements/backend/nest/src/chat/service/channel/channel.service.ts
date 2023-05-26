@@ -283,4 +283,17 @@ export class ChannelService {
       await queryRunner.release();
     }
   }
+
+  async updateIsAdmin(
+    channelId: number,
+    userId: number,
+    value: boolean
+  ): Promise<void> {
+    await this.channelUserRepository.update(
+      { channelId, userId },
+      {
+        isAdmin: value,
+      }
+    );
+  }
 }

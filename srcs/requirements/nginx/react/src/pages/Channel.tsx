@@ -52,20 +52,12 @@ const Channel: React.FC<ChannelProps> = ({ socket }) => {
   return (
     <>
       <div className="mx-auto flex max-w-[1024px] justify-between space-x-1.5 px-4">
-        <div className="space-x-1.5">
-          <HoverButton
-            onClick={handleSettingsClick}
-            className="rounded border p-1.5"
-          >
-            Manage
-          </HoverButton>
-          <HoverButton
-            onClick={handleSettingsClick}
-            className="rounded border p-1.5"
-          >
-            Settings
-          </HoverButton>
-        </div>
+        <HoverButton
+          onClick={handleSettingsClick}
+          className="rounded border p-1.5"
+        >
+          Settings
+        </HoverButton>
         <div className="space-x-1.5">
           <HoverButton
             onClick={handleInviteClick}

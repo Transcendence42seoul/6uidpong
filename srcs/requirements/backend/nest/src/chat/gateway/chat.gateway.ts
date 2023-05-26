@@ -355,4 +355,13 @@ export class ChatGateway implements OnGatewayDisconnect {
       }
     }
   }
+
+  @SubscribeMessage("update-channel")
+  async updateChannel(
+    @WsJwtPayload() jwt: JwtPayload,
+    @MessageBody()
+    body: ChannelCreateRequest
+  ): Promise<void> {
+    
+  }
 }

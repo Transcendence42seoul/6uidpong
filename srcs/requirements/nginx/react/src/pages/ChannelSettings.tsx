@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
 
 import HoverButton from '../components/button/HoverButton';
+import ChannelManagePanel from '../components/container/ChannelManagePanel';
 import ContentBox from '../components/container/ContentBox';
 
 interface ChannelSettingsProps {
@@ -65,8 +66,8 @@ const ChannelSettings: React.FC<ChannelSettingsProps> = ({ socket }) => {
   };
 
   return (
-    <div className="flex flex-col items-center p-4">
-      <ContentBox className="w-full max-w-md space-y-6 px-6 pb-5 pt-4">
+    <div className="flex items-center justify-center space-x-4 p-4">
+      <ContentBox className="max-w-md space-y-6 px-6 pb-5 pt-4">
         <label htmlFor="title">
           Title
           <input
@@ -150,6 +151,7 @@ const ChannelSettings: React.FC<ChannelSettingsProps> = ({ socket }) => {
           </HoverButton>
         )}
       </ContentBox>
+      {channelId && <ChannelManagePanel />}
     </div>
   );
 };

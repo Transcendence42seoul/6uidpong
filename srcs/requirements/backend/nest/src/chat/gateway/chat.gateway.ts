@@ -99,7 +99,7 @@ export class ChatGateway implements OnGatewayDisconnect {
   async sendDM(
     @WsJwtPayload() jwt: JwtPayload,
     @MessageBody("to") to: { id: number; message: string }
-  ): Promise<DmChatResponse> {
+  ): Promise<void> {
     const recipient: User = await this.userService.findOneOrFail(to.id);
     if (await this.blockService.isBlocked(jwt.id, recipient.id)) {
       throw new WsException(
@@ -115,9 +115,8 @@ export class ChatGateway implements OnGatewayDisconnect {
       recipient.id,
       jwt.id
     );
-    const roomSockets = await this.server
-      .in("d" + recipientRoomUser.roomId)
-      .fetchSockets();
+    const room: string = "d" + recipientRoomUser.roomId;
+    const roomSockets = await this.server.in(room).fetchSockets();
     const isNotJoin: boolean = !roomSockets.find(
       (socket) => socket.id === recipient.socketId
     );
@@ -128,16 +127,8 @@ export class ChatGateway implements OnGatewayDisconnect {
       recipientRoomUser,
       isNotJoin
     );
-    const chat: DmChatResponse = new DmChatResponse(
-      await this.dmService.findChat(chatId)
-    );
-    if (recipient.status === "online") {
-      const recipientSocket = await this.server
-        .in(recipient.socketId)
-        .fetchSockets();
-      recipientSocket[0].emit("send-dm", chat);
-    }
-    return chat;
+    const chat: DmChat = await this.dmService.findChat(chatId);
+    this.server.to(room).emit("send-dm", new DmChatResponse(chat));
   }
 
   @SubscribeMessage("leave-dm")
@@ -250,10 +241,9 @@ export class ChatGateway implements OnGatewayDisconnect {
   @SubscribeMessage("send-channel-message")
   async sendMessageToChannel(
     @WsJwtPayload() jwt: JwtPayload,
-    @ConnectedSocket() client: Socket,
     @MessageBody("to")
     to: { channelId: number; message: string }
-  ): Promise<ChannelChatResponse> {
+  ): Promise<void> {
     const channelUsers: ChannelUser[] =
       await this.channelService.findUsersOrFail(to.channelId);
     const channelUsersWithoutMe: ChannelUser[] = channelUsers.filter(
@@ -271,16 +261,15 @@ export class ChatGateway implements OnGatewayDisconnect {
         });
       }
     );
-    const chat: ChannelChatResponse = new ChannelChatResponse(
-      await this.channelService.saveChat(
-        jwt.it,
-        to.channelId,
-        to.message,
-        notJoinUsers
-      )
+    const chat: ChannelChat = await this.channelService.saveChat(
+      jwt.it,
+      to.channelId,
+      to.message,
+      notJoinUsers
     );
-    client.broadcast.to(room).emit("new-channel-message", chat);
-    return chat;
+    this.server
+      .to(room)
+      .emit("new-channel-message", new ChannelChatResponse(chat));
   }
 
   @SubscribeMessage("delete-channel")

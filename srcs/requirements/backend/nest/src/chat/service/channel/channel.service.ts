@@ -247,4 +247,40 @@ export class ChannelService {
           : await bcryptjs.hash(password, await bcryptjs.genSalt()),
     });
   }
+
+  async transferOwnership(
+    channelId: number,
+    oldOwner: number,
+    newOwner: number
+  ): Promise<void> {
+    const queryRunner = this.dataSource.createQueryRunner();
+
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      queryRunner.manager.update(
+        ChannelUser,
+        { channelId, userId: newOwner },
+        {
+          isOwner: true,
+          isAdmin: true,
+        }
+      );
+      queryRunner.manager.update(
+        ChannelUser,
+        { channelId, userId: oldOwner },
+        {
+          isOwner: false,
+          isAdmin: false,
+        }
+      );
+
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+  }
 }

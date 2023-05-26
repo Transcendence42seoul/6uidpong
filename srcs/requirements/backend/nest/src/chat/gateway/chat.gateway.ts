@@ -308,11 +308,43 @@ export class ChatGateway implements OnGatewayDisconnect {
       channelId,
       jwt.id
     );
+    if (channelUser.isOwner) {
+      throw new WsException(
+        "The owner cannot exit the channel. Please transfer ownership to another user and try again."
+      );
+    }
     await this.channelService.deleteUser(channelId, jwt.id);
     client.leave("c" + channelId);
     this.server
       .to("c" + channelId)
       .emit("leave-channel-user", { nickname: channelUser.user.nickname });
+  }
+
+  @SubscribeMessage("transfer-ownership")
+  async transferOwnership(
+    @WsJwtPayload() jwt: JwtPayload,
+    @MessageBody("info")
+    info: { channelId: number; userId: number }
+  ): Promise<void> {
+    const channelUser: ChannelUser = await this.channelService.findUserOrFail(
+      info.channelId,
+      jwt.id
+    );
+    if (!channelUser.isOwner) {
+      throw new WsException("permission denied");
+    }
+    await this.channelService.transferOwnership(
+      info.channelId,
+      jwt.id,
+      info.userId
+    );
+    const newOwnerUser: User = await this.userService.findOneOrFail(
+      info.userId
+    );
+    this.server.to("c" + info.channelId).emit("transfer-ownership", {
+      old: channelUser.user.nickname,
+      new: newOwnerUser.nickname,
+    });
   }
 
   @SubscribeMessage("invite-channel")

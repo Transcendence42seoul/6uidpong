@@ -475,8 +475,6 @@ export class ChatGateway implements OnGatewayDisconnect {
       info.channelId,
       jwt.id
     );
-    const targetChannelUser: ChannelUser =
-      await this.channelService.findUserOrFail(info.channelId, info.userId);
     if (!channelUser.isAdmin) {
       throw new WsException("permission denied");
     }

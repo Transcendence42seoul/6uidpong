@@ -85,6 +85,9 @@ export class ChannelService {
     userId: number
   ): Promise<ChannelUser> {
     return await this.channelUserRepository.findOneOrFail({
+      relations: {
+        user: true,
+      },
       where: {
         channelId,
         userId,
@@ -173,8 +176,8 @@ export class ChannelService {
     }
   }
 
-  async findUsersOrFail(channelId: number): Promise<ChannelUser[]> {
-    const ret: ChannelUser[] = await this.channelUserRepository.find({
+  async findUsers(channelId: number): Promise<ChannelUser[]> {
+    return await this.channelUserRepository.find({
       relations: {
         user: true,
       },
@@ -182,10 +185,6 @@ export class ChannelService {
         channelId,
       },
     });
-    if (ret.length === 0) {
-      throw new WsException("invalid channel id");
-    }
-    return ret;
   }
 
   async saveChat(

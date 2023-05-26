@@ -6,6 +6,8 @@ import HoverButton from '../components/button/HoverButton';
 import ChatRoom from '../components/container/ChatRoom';
 import UserSelectModal from '../components/modal/UserSelectModal';
 
+import type User from '../interfaces/User';
+
 interface ChannelProps {
   socket: Socket;
 }
@@ -49,6 +51,8 @@ const Channel: React.FC<ChannelProps> = ({ socket }) => {
     });
   };
 
+  const onConfirmClick = (users: Set<User>) => {};
+
   return (
     <>
       <div className="mx-auto flex max-w-[1024px] justify-between space-x-1.5 px-4">
@@ -75,7 +79,11 @@ const Channel: React.FC<ChannelProps> = ({ socket }) => {
       </div>
       <ChatRoom join={join} leave={leave} send={send} socket={socket} />
       {showInviteModal && (
-        <UserSelectModal title="Invite" setShowModal={setShowInviteModal} />
+        <UserSelectModal
+          title="Invite"
+          onConfirmClick={onConfirmClick}
+          setShowModal={setShowInviteModal}
+        />
       )}
     </>
   );

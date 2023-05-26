@@ -8,17 +8,25 @@ import type User from '../../interfaces/User';
 
 interface UserSelectModalProps {
   title: string;
+  onConfirmClick: (users: Set<User>) => void;
   setShowModal: (showModal: boolean) => void;
 }
 
 const UserSelectModal: React.FC<UserSelectModalProps> = ({
   title,
+  onConfirmClick,
   setShowModal,
 }) => {
   const [selectedUsers, setSelectedUsers] = useState<Set<User>>(new Set());
 
-  const handleCancelClick = () => setShowModal(false);
-  const handleConfirmClick = () => setShowModal(false);
+  const handleCancelClick = () => {
+    setShowModal(false);
+  };
+
+  const handleConfirmClick = () => {
+    onConfirmClick(selectedUsers);
+    setShowModal(false);
+  };
 
   const onUserClick = (user: User) => {
     setSelectedUsers((prevUsers) => new Set(prevUsers).add(user));

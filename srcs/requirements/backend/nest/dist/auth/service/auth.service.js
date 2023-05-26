@@ -24,19 +24,19 @@ let AuthService = class AuthService {
         this.jwtService = jwtService;
         this.cacheManager = cacheManager;
     }
-    async generateAccessToken(id) {
+    async genAccessToken(userId) {
         const payload = {
-            id: id,
+            id: userId,
         };
         const accessToken = await this.jwtService.signAsync(payload, {
             secret: process.env.JWT_ACCESS_SECRET_KEY,
-            expiresIn: "2m",
+            expiresIn: "20m",
         });
         return accessToken;
     }
-    async generateRefreshToken(id) {
+    async genRefreshToken(userId) {
         const payload = {
-            id: id,
+            id: userId,
         };
         const refreshToken = await this.jwtService.signAsync(payload, {
             secret: process.env.JWT_REFRESH_SECRET_KEY,
@@ -44,7 +44,7 @@ let AuthService = class AuthService {
         });
         return refreshToken;
     }
-    async sendCodeByEmail(id, email) {
+    async send2FACode(userId, email) {
         const emailUser = process.env.EMAIL_USER;
         const emailPass = process.env.EMAIL_PASS;
         const transporter = nodemailer.createTransport({
@@ -64,22 +64,19 @@ let AuthService = class AuthService {
             subject: "Verification Code",
             text: `Your verification code is: ${code}`,
         };
-        await transporter.sendMail(mailOptions, (error, info) => {
+        await transporter.sendMail(mailOptions, (error) => {
             if (error) {
                 console.error(error);
-            }
-            else {
-                console.log("Email sent: " + info.response);
+                throw new common_1.InternalServerErrorException("mail send failed");
             }
         });
-        await this.cacheManager.set(id.toString(), code, 300000);
+        await this.cacheManager.set(userId.toString(), code, 300000);
     }
-    async validateCode(id, code) {
-        if ((await this.cacheManager.get(id.toString())) != code) {
-            return false;
+    async validate2FACode(userId, code) {
+        if ((await this.cacheManager.get(userId.toString())) != code) {
+            throw new common_1.UnauthorizedException("invalid 2fa code");
         }
-        this.cacheManager.del(id.toString());
-        return true;
+        await this.cacheManager.del(userId.toString());
     }
 };
 AuthService = __decorate([

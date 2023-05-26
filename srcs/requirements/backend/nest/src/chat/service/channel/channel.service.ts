@@ -239,4 +239,13 @@ export class ChannelService {
   async deleteUser(channelId: number, userId: number): Promise<void> {
     await this.channelUserRepository.delete({ channelId, userId });
   }
+
+  async updatePassword(channelId: number, password: string | undefined) {
+    await this.channelRepository.update(channelId, {
+      password:
+        typeof password === undefined
+          ? null
+          : await bcryptjs.hash(password, await bcryptjs.genSalt()),
+    });
+  }
 }

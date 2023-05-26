@@ -13,8 +13,6 @@ export class ChannelCreateRequest {
   @Matches(/^[a-zA-Z0-9]+$/)
   readonly title: string;
 
-  @IsString()
-  @Length(0, 30)
   readonly password: string | undefined;
 
   @IsNotEmpty()

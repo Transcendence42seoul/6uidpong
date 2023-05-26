@@ -19,6 +19,7 @@ const auth_service_1 = require("../service/auth.service");
 const ft_guard_1 = require("../guard/ft.guard");
 const jwt_access_guard_1 = require("../guard/jwt-access.guard");
 const jwt_refresh_guard_1 = require("../guard/jwt-refresh.guard");
+const permission_guard_1 = require("../guard/permission.guard");
 let AuthModule = class AuthModule {
 };
 AuthModule = __decorate([
@@ -28,11 +29,17 @@ AuthModule = __decorate([
             jwt_1.JwtModule.register({
                 global: true,
             }),
-            typeorm_1.TypeOrmModule.forFeature([user_entity_1.UserEntity]),
+            typeorm_1.TypeOrmModule.forFeature([user_entity_1.User]),
             axios_1.HttpModule,
             cache_manager_1.CacheModule.register(),
         ],
-        providers: [auth_service_1.AuthService, jwt_access_guard_1.JwtAccessGuard, jwt_refresh_guard_1.JwtRefreshGuard, ft_guard_1.FtGuard],
+        providers: [
+            auth_service_1.AuthService,
+            jwt_access_guard_1.JwtAccessGuard,
+            jwt_refresh_guard_1.JwtRefreshGuard,
+            ft_guard_1.FtGuard,
+            permission_guard_1.PermissionGuard,
+        ],
         exports: [auth_service_1.AuthService],
         controllers: [auth_controller_1.AuthController],
     })

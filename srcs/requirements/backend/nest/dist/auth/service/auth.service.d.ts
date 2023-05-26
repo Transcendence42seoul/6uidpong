@@ -4,8 +4,8 @@ export declare class AuthService {
     private readonly jwtService;
     private readonly cacheManager;
     constructor(jwtService: JwtService, cacheManager: Cache);
-    generateAccessToken(id: number): Promise<string>;
-    generateRefreshToken(id: number): Promise<any>;
-    sendCodeByEmail(id: number, email: string): Promise<void>;
-    validateCode(id: number, code: string): Promise<boolean>;
+    genAccessToken(userId: number): Promise<string>;
+    genRefreshToken(userId: number): Promise<string>;
+    send2FACode(userId: number, email: string): Promise<void>;
+    validate2FACode(userId: number, code: string): Promise<void>;
 }

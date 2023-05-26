@@ -356,12 +356,19 @@ export class ChatGateway implements OnGatewayDisconnect {
     }
   }
 
-  @SubscribeMessage("update-channel")
+  @SubscribeMessage("update-password")
   async updateChannel(
     @WsJwtPayload() jwt: JwtPayload,
-    @MessageBody()
-    body: ChannelCreateRequest
+    @MessageBody("info")
+    info: { channelId: number; password: string | undefined }
   ): Promise<void> {
-    
+    const channelUser: ChannelUser = await this.channelService.findUserOrFail(
+      info.channelId,
+      jwt.id
+    );
+    if (!channelUser.isOwner) {
+      throw new WsException("permission denied");
+    }
+    await this.channelService.updatePassword(info.channelId, info.password);
   }
 }

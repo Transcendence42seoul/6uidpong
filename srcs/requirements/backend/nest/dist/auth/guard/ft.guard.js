@@ -21,7 +21,7 @@ let FtGuard = class FtGuard {
     async canActivate(context) {
         const request = context.switchToHttp().getRequest();
         const code = request.body.code;
-        if (!code) {
+        if (typeof code === null) {
             throw new common_1.BadRequestException();
         }
         try {

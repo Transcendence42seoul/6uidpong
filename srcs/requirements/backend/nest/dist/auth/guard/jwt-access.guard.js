@@ -20,7 +20,7 @@ let JwtAccessGuard = class JwtAccessGuard {
     async canActivate(context) {
         const request = context.switchToHttp().getRequest();
         const token = this.extractTokenFromHeader(request);
-        if (!token) {
+        if (typeof token === undefined) {
             throw new common_1.UnauthorizedException();
         }
         try {
@@ -29,11 +29,8 @@ let JwtAccessGuard = class JwtAccessGuard {
             });
             request["user"] = payload;
         }
-        catch (_a) {
+        catch (error) {
             throw new common_1.UnauthorizedException();
-        }
-        if (request.params.id != request.user.id) {
-            throw new common_1.NotFoundException();
         }
         return true;
     }

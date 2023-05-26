@@ -13,15 +13,19 @@ const user_entity_1 = require("../entity/user.entity");
 const user_service_1 = require("../service/user.service");
 const user_controller_1 = require("../controller/user.controller");
 const auth_module_1 = require("../../auth/module/auth.module");
+const friend_request_entity_1 = require("../entity/friend-request.entity");
+const friend_request_service_1 = require("../service/friend-request.service");
+const friend_entity_1 = require("../entity/friend.entity");
+const friend_service_1 = require("../service/friend.service");
 let UserModule = class UserModule {
 };
 UserModule = __decorate([
     (0, common_1.Module)({
         imports: [
-            typeorm_1.TypeOrmModule.forFeature([user_entity_1.UserEntity]),
+            typeorm_1.TypeOrmModule.forFeature([user_entity_1.User, friend_entity_1.Friend, friend_request_entity_1.FriendRequest]),
             (0, common_1.forwardRef)(() => auth_module_1.AuthModule),
         ],
-        providers: [user_service_1.UserService],
+        providers: [user_service_1.UserService, friend_service_1.FriendService, friend_request_service_1.FriendRequestService],
         exports: [user_service_1.UserService],
         controllers: [user_controller_1.UserController],
     })

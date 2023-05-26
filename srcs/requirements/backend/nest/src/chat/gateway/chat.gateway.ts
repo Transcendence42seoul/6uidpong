@@ -303,6 +303,15 @@ export class ChatGateway implements OnGatewayDisconnect {
 
   @SubscribeMessage("leave-channel")
   async leaveChannel(
+    @ConnectedSocket() client: Socket,
+    @MessageBody("channelId")
+    channelId: number
+  ): Promise<void> {
+    client.leave("c" + channelId);
+  }
+
+  @SubscribeMessage("exit-channel")
+  async exitChannel(
     @WsJwtPayload() jwt: JwtPayload,
     @ConnectedSocket() client: Socket,
     @MessageBody("channelId")

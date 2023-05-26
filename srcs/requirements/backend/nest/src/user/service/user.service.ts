@@ -1,7 +1,7 @@
 import { ConflictException, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { PaginationOptions } from "src/utils/pagination/pagination.option";
-import { DataSource, Repository } from "typeorm";
+import { DataSource, EntityNotFoundError, Repository } from "typeorm";
 import { User } from "../entity/user.entity";
 
 @Injectable()
@@ -24,9 +24,17 @@ export class UserService {
 
   async findOneOrFail(id: number | string): Promise<User> {
     if (typeof id === "number") {
-      return await this.userRepository.findOneOrFail({ where: { id: id } });
+      return await this.userRepository.findOneOrFail({ where: { id } });
     }
     return await this.userRepository.findOneOrFail({ where: { socketId: id } });
+  }
+
+  async find(ids: number[]): Promise<User[]> {
+    return await this.userRepository.findBy(
+      ids.map((id) => {
+        return { id };
+      })
+    );
   }
 
   async search(nickname: string): Promise<User[]> {

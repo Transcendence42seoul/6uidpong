@@ -329,14 +329,21 @@ export class ChatGateway implements OnGatewayDisconnect {
   async inviteChannel(
     @WsJwtPayload() jwt: JwtPayload,
     @MessageBody("info")
-    info: { channelId: number; userId: number }
+    info: { channelId: number; userIds: number[] }
   ): Promise<void> {
     await this.channelService.findUserOrFail(info.channelId, jwt.id);
-    await this.channelService.saveUser(info.channelId, info.userId);
-    const user: User = await this.userService.findOneOrFail(info.userId);
-    this.server
-      .to("c" + info.channelId)
-      .emit("newly-joined-user", { nickname: user.nickname });
+    const to: User[] = await this.userService.find(info.userIds);
+    if (to.length === 0) {
+      throw new WsException("user not exists");
+    }
+    await this.channelService.saveUsers(info.channelId, info.userIds);
+    const from: User = await this.userService.findOneOrFail(jwt.id);
+    this.server.to("c" + info.channelId).emit("newly-joined-users", {
+      from: { nickname: from.nickname },
+      to: to.map((user) => {
+        return { nickname: user.nickname };
+      }),
+    });
   }
 
   @SubscribeMessage("kick-channel-user")

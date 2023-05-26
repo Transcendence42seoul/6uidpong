@@ -8,6 +8,7 @@ import { Channel } from "src/chat/entity/channel/channel.entity";
 import * as bcryptjs from "bcryptjs";
 import { DataSource, MoreThanOrEqual, Repository } from "typeorm";
 import { WsException } from "@nestjs/websockets";
+import { channel } from "diagnostics_channel";
 
 @Injectable()
 export class ChannelService {
@@ -96,6 +97,17 @@ export class ChannelService {
       channelId,
       userId,
     });
+  }
+
+  async saveUsers(
+    channelId: number,
+    userIds: number[]
+  ): Promise<ChannelUser[]> {
+    return await this.channelUserRepository.save(
+      userIds.map((userId) => {
+        return { channelId, userId };
+      })
+    );
   }
 
   async findChats(

@@ -254,9 +254,10 @@ export class ChatGateway implements OnGatewayDisconnect {
   @SubscribeMessage("send-channel-message")
   async sendMessageToChannel(
     @WsJwtPayload() jwt: JwtPayload,
+    @ConnectedSocket() client: Socket,
     @MessageBody("to")
     to: { channelId: number; message: string }
-  ): Promise<void> {
+  ): Promise<ChannelChatResponse> {
     const channelUsers: ChannelUser[] =
       await this.channelService.findUsersOrFail(to.channelId);
     const channelUsersWithoutMe: ChannelUser[] = channelUsers.filter(
@@ -274,15 +275,16 @@ export class ChatGateway implements OnGatewayDisconnect {
         });
       }
     );
-    const chat: ChannelChat = await this.channelService.saveChat(
-      jwt.it,
-      to.channelId,
-      to.message,
-      notJoinUsers
+    const chat: ChannelChatResponse = new ChannelChatResponse(
+      await this.channelService.saveChat(
+        jwt.it,
+        to.channelId,
+        to.message,
+        notJoinUsers
+      )
     );
-    this.server
-      .to(room)
-      .emit("new-channel-message", new ChannelChatResponse(chat));
+    client.broadcast.to(room).emit("new-channel-message", chat);
+    return chat;
   }
 
   @SubscribeMessage("delete-channel")
@@ -339,9 +341,9 @@ export class ChatGateway implements OnGatewayDisconnect {
     await this.channelService.saveUsers(info.channelId, info.userIds);
     const from: User = await this.userService.findOneOrFail(jwt.id);
     this.server.to("c" + info.channelId).emit("newly-joined-users", {
-      from: { nickname: from.nickname },
+      from: from.nickname,
       to: to.map((user) => {
-        return { nickname: user.nickname };
+        return user.nickname;
       }),
     });
   }

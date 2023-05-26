@@ -405,7 +405,7 @@ export class ChatGateway implements OnGatewayDisconnect {
   }
 
   @SubscribeMessage("update-password")
-  async updateChannel(
+  async updatePassword(
     @WsJwtPayload() jwt: JwtPayload,
     @MessageBody("info")
     info: { channelId: number; password: string | undefined }

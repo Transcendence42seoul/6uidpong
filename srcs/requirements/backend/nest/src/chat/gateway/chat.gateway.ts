@@ -33,6 +33,9 @@ import { ChannelChatResponse } from "../dto/channel/channel-chat-response.dto";
 import { ChannelCreateRequest } from "../dto/channel/channel-create-request.dto";
 import * as bcryptjs from "bcryptjs";
 import { ChannelCreateResponse } from "../dto/channel/channel-create-response.dto";
+import { channel } from "diagnostics_channel";
+import { UserResponse } from "src/user/dto/user-response.dto";
+import { Ban } from "../entity/channel/ban.entity";
 
 @WebSocketGateway(80, {
   cors: {
@@ -212,6 +215,11 @@ export class ChatGateway implements OnGatewayDisconnect {
         jwt.id
       );
     } catch {
+      if (await this.channelService.isBan(info.channelId, jwt.id)) {
+        throw new WsException(
+          "I am unable to access the channel as I have been banned."
+        );
+      }
       const channel: Channel = await this.channelService.findChannelOrFail(
         info.channelId
       );
@@ -430,6 +438,66 @@ export class ChatGateway implements OnGatewayDisconnect {
     this.server
       .to(room)
       .emit("newly-kicked-user", { nickname: kickChannelUser.user.nickname });
+  }
+
+  @SubscribeMessage("ban-channel-user")
+  async banChanneluser(
+    @WsJwtPayload() jwt: JwtPayload,
+    @MessageBody("info")
+    info: { channelId: number; userId: number }
+  ): Promise<void> {
+    const channelUser: ChannelUser = await this.channelService.findUserOrFail(
+      info.channelId,
+      jwt.id
+    );
+    const targetChannelUser: ChannelUser =
+      await this.channelService.findUserOrFail(info.channelId, info.userId);
+    if (
+      !channelUser.isAdmin ||
+      targetChannelUser.isOwner ||
+      (!channelUser.isOwner && targetChannelUser.isAdmin)
+    ) {
+      throw new WsException("permission denied");
+    }
+    await this.channelService.ban(info.channelId, info.userId);
+    this.server
+      .to("c" + info.channelId)
+      .emit("newly-banned-user", { nickname: targetChannelUser.user.nickname });
+  }
+
+  @SubscribeMessage("unban-channel-user")
+  async unbanChanneluser(
+    @WsJwtPayload() jwt: JwtPayload,
+    @MessageBody("info")
+    info: { channelId: number; userId: number }
+  ): Promise<void> {
+    const channelUser: ChannelUser = await this.channelService.findUserOrFail(
+      info.channelId,
+      jwt.id
+    );
+    const targetChannelUser: ChannelUser =
+      await this.channelService.findUserOrFail(info.channelId, info.userId);
+    if (!channelUser.isAdmin) {
+      throw new WsException("permission denied");
+    }
+    await this.channelService.unban(info.channelId, info.userId);
+  }
+
+  @SubscribeMessage("find-channel-ban-users")
+  async findChannelBanUsers(
+    @WsJwtPayload() jwt: JwtPayload,
+    @MessageBody("channelId")
+    channelId: number
+  ): Promise<UserResponse[]> {
+    const channelUser: ChannelUser = await this.channelService.findUserOrFail(
+      channelId,
+      jwt.id
+    );
+    if (!channelUser.isAdmin) {
+      throw new WsException("permission denied");
+    }
+    const banUsers: Ban[] = await this.channelService.findBanUsers(channelId);
+    return banUsers.map((ban) => new UserResponse(ban.user));
   }
 
   @SubscribeMessage("update-password")

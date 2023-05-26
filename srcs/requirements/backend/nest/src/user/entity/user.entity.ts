@@ -1,3 +1,4 @@
+import { Ban } from "src/chat/entity/channel/ban.entity";
 import { ChannelChat } from "src/chat/entity/channel/channel-chat.entity";
 import { ChannelUser } from "src/chat/entity/channel/channel-user.entity";
 import { DmChat } from "src/chat/entity/dm/dm-chat.entity";
@@ -50,6 +51,9 @@ export class User {
 
   @OneToMany(() => ChannelUser, (channelUser) => channelUser.user)
   channelUsers: ChannelUser[];
+
+  @OneToMany(() => Ban, (ban) => ban.user)
+  bans: Ban[];
 
   @OneToMany(() => ChannelChat, (chat) => chat.user)
   channelChats: ChannelChat[];

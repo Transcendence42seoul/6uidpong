@@ -7,8 +7,7 @@ import { ChannelUser } from "src/chat/entity/channel/channel-user.entity";
 import { Channel } from "src/chat/entity/channel/channel.entity";
 import * as bcryptjs from "bcryptjs";
 import { DataSource, MoreThanOrEqual, Repository } from "typeorm";
-import { WsException } from "@nestjs/websockets";
-import { channel } from "diagnostics_channel";
+import { Ban } from "src/chat/entity/channel/ban.entity";
 
 @Injectable()
 export class ChannelService {
@@ -19,6 +18,8 @@ export class ChannelService {
     private readonly channelUserRepository: Repository<ChannelUser>,
     @InjectRepository(ChannelChat)
     private readonly chatRepository: Repository<ChannelChat>,
+    @InjectRepository(Ban)
+    private readonly banRepository: Repository<Ban>,
     private readonly dataSource: DataSource
   ) {}
 
@@ -91,6 +92,22 @@ export class ChannelService {
       where: {
         channelId,
         userId,
+      },
+    });
+  }
+
+  async findBanUsers(channelId: number): Promise<Ban[]> {
+    return await this.banRepository.find({
+      relations: {
+        user: true,
+      },
+      where: {
+        channelId,
+      },
+      order: {
+        user: {
+          nickname: "ASC",
+        },
       },
     });
   }
@@ -295,5 +312,33 @@ export class ChannelService {
         isAdmin: value,
       }
     );
+  }
+
+  async isBan(channelId: number, userId: number): Promise<boolean> {
+    return (await this.banRepository.countBy({ channelId, userId }))
+      ? true
+      : false;
+  }
+
+  async ban(channelId: number, userId: number): Promise<void> {
+    const queryRunner = this.dataSource.createQueryRunner();
+
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      await queryRunner.manager.delete(ChannelUser, { channelId, userId });
+      await queryRunner.manager.insert(Ban, { channelId, userId });
+
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  async unban(channelId: number, userId: number): Promise<void> {
+    await this.banRepository.delete({ channelId, userId });
   }
 }

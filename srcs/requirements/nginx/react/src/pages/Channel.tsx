@@ -51,6 +51,8 @@ const Channel: React.FC<ChannelProps> = ({ socket }) => {
     setShowInviteModal(true);
   };
 
+  const handleLeaveClick = () => {};
+
   const handleSettingsClick = () => {
     navigate('/channel-settings', {
       state: { channelId },
@@ -75,6 +77,12 @@ const Channel: React.FC<ChannelProps> = ({ socket }) => {
           className="rounded border p-1.5"
         >
           Settings
+        </HoverButton>
+        <HoverButton
+          onClick={handleLeaveClick}
+          className="rounded border bg-red-800 p-1.5 hover:text-red-800"
+        >
+          Leave
         </HoverButton>
       </div>
       <ChatRoom join={join} leave={leave} send={send} socket={socket} />

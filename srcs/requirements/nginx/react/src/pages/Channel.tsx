@@ -6,6 +6,10 @@ import HoverButton from '../components/button/HoverButton';
 import ChatRoom from '../components/container/ChatRoom';
 import UserSearchBar from '../components/container/UserSearchBar';
 
+import type User from '../interfaces/User';
+import CircularImage from '../components/container/CircularImage';
+import ListTitle from '../components/container/ListTitle';
+
 interface ChannelProps {
   socket: Socket;
 }
@@ -19,7 +23,7 @@ const Channel: React.FC<ChannelProps> = ({ socket }) => {
   const channelId = Number(channelIdString);
 
   const [showInviteModal, setShowInviteModal] = useState<boolean>(false);
-  const [inviteIds, setInviteIds] = useState<number[]>([]);
+  const [inviteUsers, setInviteUsers] = useState<User[]>([]);
 
   const join = {
     name: 'join-channel',
@@ -54,8 +58,8 @@ const Channel: React.FC<ChannelProps> = ({ socket }) => {
     });
   };
 
-  const onUserClick = (id: number) => {
-    setInviteIds([...inviteIds, id]);
+  const onUserClick = (user: User) => {
+    setInviteUsers([...inviteUsers, user]);
   };
 
   return (
@@ -76,20 +80,38 @@ const Channel: React.FC<ChannelProps> = ({ socket }) => {
       </div>
       <ChatRoom join={join} leave={leave} send={send} socket={socket} />
       {showInviteModal && (
-        <div className="fixed inset-0 flex items-center justify-center space-x-0.5 bg-black bg-opacity-50">
+        <div className="fixed inset-0 flex justify-center space-x-8 bg-black bg-opacity-50 pt-40">
           <UserSearchBar onUserClick={onUserClick} />
-          <HoverButton
-            onClick={handleConfirmClick}
-            className="rounded border bg-blue-800 p-2 hover:text-blue-800"
-          >
-            Confirm
-          </HoverButton>
-          <HoverButton
-            onClick={handleCancelClick}
-            className="rounded border p-2"
-          >
-            Cancel
-          </HoverButton>
+          <div>
+            <h1 className="m-1 text-lg font-bold text-white">Invite</h1>
+            <ul>
+              {inviteUsers.map((user) => {
+                const { id, nickname, image } = user;
+                return (
+                  <li
+                    key={id}
+                    className="flex items-center space-x-2.5 border-b bg-white px-3 py-2"
+                  >
+                    <CircularImage
+                      src={image}
+                      alt={nickname}
+                      className="h-6 w-6"
+                    />
+                    <span className="text-sm">{nickname}</span>
+                  </li>
+                );
+              })}
+            </ul>
+            <HoverButton
+              onClick={handleConfirmClick}
+              className="border bg-blue-800 p-2 hover:text-blue-800"
+            >
+              Confirm
+            </HoverButton>
+            <HoverButton onClick={handleCancelClick} className="border p-2">
+              Cancel
+            </HoverButton>
+          </div>
         </div>
       )}
     </>

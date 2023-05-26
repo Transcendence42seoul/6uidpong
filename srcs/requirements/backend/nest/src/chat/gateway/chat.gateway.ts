@@ -338,6 +338,8 @@ export class ChatGateway implements OnGatewayDisconnect {
       info.channelId,
       jwt.id
     );
+    const targetChannelUser: ChannelUser =
+      await this.channelService.findUserOrFail(info.channelId, info.userId);
     if (!channelUser.isOwner) {
       throw new WsException("permission denied");
     }
@@ -346,12 +348,9 @@ export class ChatGateway implements OnGatewayDisconnect {
       jwt.id,
       info.userId
     );
-    const newOwnerUser: User = await this.userService.findOneOrFail(
-      info.userId
-    );
     this.server.to("c" + info.channelId).emit("transfer-ownership", {
       old: channelUser.user.nickname,
-      new: newOwnerUser.nickname,
+      new: targetChannelUser.user.nickname,
     });
   }
 

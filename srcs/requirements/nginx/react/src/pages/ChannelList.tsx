@@ -42,7 +42,7 @@ const ChannelList: React.FC<ChannelListProps> = ({ socket }) => {
         <ListTitle className="mb-4 ml-4">My Channels</ListTitle>
         <HoverButton
           onClick={handleAllChannelsClick}
-          className="mb-3.5 ml-auto px-2.5 py-2 text-sm"
+          className="mb-3.5 ml-auto border px-2.5 py-2 text-sm"
         >
           All Channels
         </HoverButton>
@@ -52,7 +52,7 @@ const ChannelList: React.FC<ChannelListProps> = ({ socket }) => {
         return (
           <li
             key={id}
-            className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-2"
+            className="flex items-center justify-between border-b border-gray-200 bg-gray-50 px-4 py-2"
             onDoubleClick={() => handleChannelDoubleClick(channel)}
           >
             <div className="flex items-center">

@@ -133,7 +133,7 @@ const DmRoomList: React.FC<DmRoomListProps> = ({ socket }) => {
           return (
             <li
               key={roomId}
-              className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-2"
+              className="flex items-center justify-between border-b border-gray-200 bg-gray-50 px-4 py-2"
               onContextMenu={handleContextMenu}
               onDoubleClick={() => handleRoomDoubleClick(room)}
             >

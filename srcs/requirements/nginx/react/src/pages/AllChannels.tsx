@@ -43,7 +43,7 @@ const AllChannels: React.FC<AllChannelsProps> = ({ socket }) => {
         <ListTitle className="mb-4 ml-4">All Channels</ListTitle>
         <HoverButton
           onClick={handleCreateChannelClick}
-          className="mb-3.5 ml-auto px-2.5 py-2 text-sm"
+          className="mb-3.5 ml-auto border px-2.5 py-2 text-sm"
         >
           Create
         </HoverButton>

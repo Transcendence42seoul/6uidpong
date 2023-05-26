@@ -253,11 +253,10 @@ export class ChatGateway implements OnGatewayDisconnect {
     const room: string = "c" + to.channelId;
     const channelSockets = await this.server.in(room).fetchSockets();
     const notJoinUsers: ChannelUser[] = channelUsersWithoutMe.filter(
-      (channelUser) => {
-        !channelSockets.find((socket) => {
-          socket.id === channelUser.user.socketId;
-        });
-      }
+      (channelUser) =>
+        !channelSockets.find(
+          (socket) => socket.id === channelUser.user.socketId
+        )
     );
     const chat: ChannelChat = await this.channelService.saveChat(
       jwt.it,

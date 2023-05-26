@@ -4,11 +4,10 @@ import { Socket } from 'socket.io-client';
 
 import HoverButton from '../components/button/HoverButton';
 import ChatRoom from '../components/container/ChatRoom';
+import CircularImage from '../components/container/CircularImage';
 import UserSearchBar from '../components/container/UserSearchBar';
 
 import type User from '../interfaces/User';
-import CircularImage from '../components/container/CircularImage';
-import ListTitle from '../components/container/ListTitle';
 
 interface ChannelProps {
   socket: Socket;
@@ -23,7 +22,7 @@ const Channel: React.FC<ChannelProps> = ({ socket }) => {
   const channelId = Number(channelIdString);
 
   const [showInviteModal, setShowInviteModal] = useState<boolean>(false);
-  const [inviteUsers, setInviteUsers] = useState<User[]>([]);
+  const [inviteUsers, setInviteUsers] = useState<Set<User>>(new Set());
 
   const join = {
     name: 'join-channel',
@@ -59,7 +58,7 @@ const Channel: React.FC<ChannelProps> = ({ socket }) => {
   };
 
   const onUserClick = (user: User) => {
-    setInviteUsers([...inviteUsers, user]);
+    setInviteUsers((prevUsers) => new Set(prevUsers).add(user));
   };
 
   return (
@@ -85,7 +84,7 @@ const Channel: React.FC<ChannelProps> = ({ socket }) => {
           <div>
             <h1 className="m-1 text-lg font-bold text-white">Invite</h1>
             <ul>
-              {inviteUsers.map((user) => {
+              {[...inviteUsers].map((user) => {
                 const { id, nickname, image } = user;
                 return (
                   <li

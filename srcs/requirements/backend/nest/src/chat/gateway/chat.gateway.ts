@@ -516,7 +516,6 @@ export class ChatGateway implements OnGatewayDisconnect {
 
   @SubscribeMessage("find-channel-users")
   async findChannelUsers(
-    @WsJwtPayload() jwt: JwtPayload,
     @MessageBody("channelId")
     channelId: number
   ): Promise<ChannelUserResponse[]> {
@@ -530,7 +529,6 @@ export class ChatGateway implements OnGatewayDisconnect {
 
   @SubscribeMessage("find-channel-admins")
   async findChannelAdmins(
-    @WsJwtPayload() jwt: JwtPayload,
     @MessageBody("channelId")
     channelId: number
   ): Promise<ChannelUserResponse[]> {

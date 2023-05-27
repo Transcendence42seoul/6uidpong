@@ -17,6 +17,8 @@ import { ChannelChat } from "../entity/channel/channel-chat.entity";
 import { ChannelService } from "../service/channel/channel.service";
 import { Mute } from "../entity/channel/mute.entity";
 import { Ban } from "../entity/channel/ban.entity";
+import { BanService } from "../service/channel/ban.service";
+import { MuteService } from "../service/channel/mute.service";
 
 @Module({
   imports: [
@@ -36,6 +38,8 @@ import { Ban } from "../entity/channel/ban.entity";
   providers: [
     DmService,
     ChannelService,
+    BanService,
+    MuteService,
     BlockService,
     ConnectionService,
     DisconnectionService,

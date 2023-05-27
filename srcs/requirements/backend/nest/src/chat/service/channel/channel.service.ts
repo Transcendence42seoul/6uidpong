@@ -25,8 +25,6 @@ export class ChannelService {
     private readonly channelUserRepository: Repository<ChannelUser>,
     @InjectRepository(ChannelChat)
     private readonly chatRepository: Repository<ChannelChat>,
-    @InjectRepository(Ban)
-    private readonly banRepository: Repository<Ban>,
     @InjectRepository(Mute)
     private readonly muteRepository: Repository<Mute>,
     private readonly dataSource: DataSource
@@ -101,22 +99,6 @@ export class ChannelService {
       where: {
         channelId,
         userId,
-      },
-    });
-  }
-
-  async findBanUsers(channelId: number): Promise<Ban[]> {
-    return await this.banRepository.find({
-      relations: {
-        user: true,
-      },
-      where: {
-        channelId,
-      },
-      order: {
-        user: {
-          nickname: "ASC",
-        },
       },
     });
   }
@@ -321,40 +303,5 @@ export class ChannelService {
         isAdmin: value,
       }
     );
-  }
-
-  async isBan(channelId: number, userId: number): Promise<boolean> {
-    return (await this.banRepository.countBy({ channelId, userId }))
-      ? true
-      : false;
-  }
-
-  async ban(channelId: number, userId: number): Promise<void> {
-    const queryRunner = this.dataSource.createQueryRunner();
-
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-    try {
-      await queryRunner.manager.delete(ChannelUser, { channelId, userId });
-      await queryRunner.manager.insert(Ban, { channelId, userId });
-
-      await queryRunner.commitTransaction();
-    } catch (error) {
-      await queryRunner.rollbackTransaction();
-      throw error;
-    } finally {
-      await queryRunner.release();
-    }
-  }
-
-  async unban(channelId: number, userId: number): Promise<void> {
-    await this.banRepository.delete({ channelId, userId });
-  }
-
-  @Cron("0 * * * *")
-  async deleteTimeoutMuteUsers(): Promise<void> {
-    await this.muteRepository.delete({
-      limitedAt: LessThanOrEqual(new Date()),
-    });
   }
 }

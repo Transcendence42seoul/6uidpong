@@ -36,6 +36,8 @@ import { ChannelCreateResponse } from "../dto/channel/channel-create-response.dt
 import { channel } from "diagnostics_channel";
 import { UserResponse } from "src/user/dto/user-response.dto";
 import { Ban } from "../entity/channel/ban.entity";
+import { BanService } from "../service/channel/ban.service";
+import { MuteService } from "../service/channel/mute.service";
 
 @WebSocketGateway(80, {
   cors: {
@@ -54,6 +56,8 @@ export class ChatGateway implements OnGatewayDisconnect {
     private readonly dmService: DmService,
     private readonly blockService: BlockService,
     private readonly channelService: ChannelService,
+    private readonly banService: BanService,
+    private readonly muteService: MuteService,
     private readonly userService: UserService
   ) {}
 
@@ -215,7 +219,7 @@ export class ChatGateway implements OnGatewayDisconnect {
         jwt.id
       );
     } catch {
-      if (await this.channelService.isBan(info.channelId, jwt.id)) {
+      if (await this.banService.has(info.channelId, jwt.id)) {
         throw new WsException(
           "I am unable to access the channel as I have been banned."
         );
@@ -249,6 +253,9 @@ export class ChatGateway implements OnGatewayDisconnect {
     @MessageBody("to")
     to: { channelId: number; message: string }
   ): Promise<void> {
+    if (await this.muteService.has(to.channelId, jwt.id)) {
+      throw new WsException("can't send because muted user.");
+    }
     const channelUsers: ChannelUser[] = await this.channelService.findUsers(
       to.channelId
     );
@@ -439,6 +446,32 @@ export class ChatGateway implements OnGatewayDisconnect {
       .emit("newly-kicked-user", { nickname: kickChannelUser.user.nickname });
   }
 
+  @SubscribeMessage("mute-channel-user")
+  async muteChanneluser(
+    @WsJwtPayload() jwt: JwtPayload,
+    @MessageBody("info")
+    info: { channelId: number; userId: number; limitedAt: Date }
+  ): Promise<void> {
+    const channelUser: ChannelUser = await this.channelService.findUserOrFail(
+      info.channelId,
+      jwt.id
+    );
+    const targetChannelUser: ChannelUser =
+      await this.channelService.findUserOrFail(info.channelId, info.userId);
+    if (
+      !channelUser.isAdmin ||
+      targetChannelUser.isOwner ||
+      (!channelUser.isOwner && targetChannelUser.isAdmin)
+    ) {
+      throw new WsException("permission denied");
+    }
+    await this.muteService.mute(info.channelId, info.userId, info.limitedAt);
+    this.server.to("c" + info.channelId).emit("newly-mute-user", {
+      nickname: targetChannelUser.user.nickname,
+      limitedAt: info.limitedAt,
+    });
+  }
+
   @SubscribeMessage("ban-channel-user")
   async banChanneluser(
     @WsJwtPayload() jwt: JwtPayload,
@@ -458,7 +491,7 @@ export class ChatGateway implements OnGatewayDisconnect {
     ) {
       throw new WsException("permission denied");
     }
-    await this.channelService.ban(info.channelId, info.userId);
+    await this.banService.ban(info.channelId, info.userId);
     this.server
       .to("c" + info.channelId)
       .emit("newly-banned-user", { nickname: targetChannelUser.user.nickname });
@@ -477,7 +510,7 @@ export class ChatGateway implements OnGatewayDisconnect {
     if (!channelUser.isAdmin) {
       throw new WsException("permission denied");
     }
-    await this.channelService.unban(info.channelId, info.userId);
+    await this.banService.unban(info.channelId, info.userId);
   }
 
   @SubscribeMessage("find-channel-users")
@@ -507,7 +540,7 @@ export class ChatGateway implements OnGatewayDisconnect {
     if (!channelUser.isAdmin) {
       throw new WsException("permission denied");
     }
-    const banUsers: Ban[] = await this.channelService.findBanUsers(channelId);
+    const banUsers: Ban[] = await this.banService.findUsers(channelId);
     return banUsers.map((ban) => new UserResponse(ban.user));
   }
 

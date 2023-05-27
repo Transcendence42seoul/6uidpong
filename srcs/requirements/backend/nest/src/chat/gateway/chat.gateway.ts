@@ -238,9 +238,7 @@ export class ChatGateway implements OnGatewayDisconnect {
       );
     } catch {
       if (await this.banService.has(info.channelId, jwt.id)) {
-        throw new WsException(
-          "I am unable to access the channel as I have been banned."
-        );
+        throw new WsException("can't join because banned.");
       }
       const channel: Channel = await this.channelService.findChannelOrFail(
         info.channelId

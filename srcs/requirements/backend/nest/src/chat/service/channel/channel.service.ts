@@ -192,6 +192,30 @@ export class ChannelService {
       where: {
         channelId,
       },
+      order: {
+        createdAt: "ASC",
+        user: {
+          nickname: "ASC",
+        },
+      },
+    });
+  }
+
+  async findAdmins(channelId: number): Promise<ChannelUser[]> {
+    return await this.channelUserRepository.find({
+      relations: {
+        user: true,
+      },
+      where: {
+        channelId,
+        isAdmin: true,
+      },
+      order: {
+        createdAt: "ASC",
+        user: {
+          nickname: "ASC",
+        },
+      },
     });
   }
 

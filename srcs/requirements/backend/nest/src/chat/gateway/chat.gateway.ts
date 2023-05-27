@@ -38,6 +38,7 @@ import { UserResponse } from "src/user/dto/user-response.dto";
 import { Ban } from "../entity/channel/ban.entity";
 import { BanService } from "../service/channel/ban.service";
 import { MuteService } from "../service/channel/mute.service";
+import { ChannelUserResponse } from "../dto/channel/channel-user-response.dto";
 
 @WebSocketGateway(80, {
   cors: {
@@ -518,12 +519,26 @@ export class ChatGateway implements OnGatewayDisconnect {
     @WsJwtPayload() jwt: JwtPayload,
     @MessageBody("channelId")
     channelId: number
-  ): Promise<UserResponse[]> {
+  ): Promise<ChannelUserResponse[]> {
     const channelUsers: ChannelUser[] = await this.channelService.findUsers(
       channelId
     );
     return channelUsers.map(
-      (channelUser) => new UserResponse(channelUser.user)
+      (channelUser) => new ChannelUserResponse(channelUser)
+    );
+  }
+
+  @SubscribeMessage("find-channel-admins")
+  async findChannelAdmins(
+    @WsJwtPayload() jwt: JwtPayload,
+    @MessageBody("channelId")
+    channelId: number
+  ): Promise<ChannelUserResponse[]> {
+    const channelAdmins: ChannelUser[] = await this.channelService.findAdmins(
+      channelId
+    );
+    return channelAdmins.map(
+      (channelUser) => new ChannelUserResponse(channelUser)
     );
   }
 

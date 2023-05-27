@@ -38,6 +38,8 @@ import { BanService } from "../service/channel/ban.service";
 import { MuteService } from "../service/channel/mute.service";
 import { ChannelUserResponse } from "../dto/channel/channel-user-response.dto";
 import { BanResponse } from "../dto/channel/ban-response.dto";
+import { Block } from "../entity/dm/block.entity";
+import { BlockResponse } from "../dto/dm/block-response.dto";
 
 @WebSocketGateway(80, {
   cors: {
@@ -178,6 +180,14 @@ export class ChatGateway implements OnGatewayDisconnect {
     @MessageBody("interlocutorId") interlocutorId: number
   ): Promise<void> {
     await this.blockService.insert(jwt.id, interlocutorId);
+  }
+
+  @SubscribeMessage("find-block-users")
+  async findBlockUsers(
+    @WsJwtPayload() jwt: JwtPayload
+  ): Promise<BlockResponse[]> {
+    const blocks: Block[] = await this.blockService.find(jwt.id);
+    return blocks.map((block) => new BlockResponse(block));
   }
 
   @SubscribeMessage("unblock-dm-user")

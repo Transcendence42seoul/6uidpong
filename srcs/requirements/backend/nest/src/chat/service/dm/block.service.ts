@@ -10,6 +10,19 @@ export class BlockService {
     private readonly blockRepository: Repository<Block>
   ) {}
 
+  async find(userId: number): Promise<Block[]> {
+    return await this.blockRepository.find({
+      where: {
+        userId,
+      },
+      order: {
+        blockedUser: {
+          nickname: "ASC",
+        },
+      },
+    });
+  }
+
   async insert(userId: number, interlocutorId: number): Promise<void> {
     await this.blockRepository.insert({
       userId: userId,

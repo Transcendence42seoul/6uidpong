@@ -1,6 +1,7 @@
 import { Ban } from "src/chat/entity/channel/ban.entity";
 import { ChannelChat } from "src/chat/entity/channel/channel-chat.entity";
 import { ChannelUser } from "src/chat/entity/channel/channel-user.entity";
+import { Block } from "src/chat/entity/dm/block.entity";
 import { DmChat } from "src/chat/entity/dm/dm-chat.entity";
 import { DmRoomUser } from "src/chat/entity/dm/dm-room-user.entity";
 import { Column, Entity, Index, OneToMany, PrimaryColumn } from "typeorm";
@@ -51,6 +52,9 @@ export class User {
 
   @OneToMany(() => ChannelUser, (channelUser) => channelUser.user)
   channelUsers: ChannelUser[];
+
+  @OneToMany(() => Block, (block) => block.blockedUser)
+  blocks: Block[];
 
   @OneToMany(() => Ban, (ban) => ban.user)
   bans: Ban[];

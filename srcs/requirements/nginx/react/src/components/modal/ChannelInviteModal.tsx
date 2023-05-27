@@ -2,20 +2,20 @@ import React, { useState } from 'react';
 
 import HoverButton from '../button/HoverButton';
 import CircularImage from '../container/CircularImage';
-import UserSearchBar from '../container/UserSearchBar';
+import UserList from '../container/UserList';
 
 import type User from '../../interfaces/User';
 
 interface ChannelInviteModalProps {
   title: string;
-  userList: User[];
+  users: User[];
   onConfirmClick: (users: Set<User>) => void;
   setShowModal: (showModal: boolean) => void;
 }
 
 const ChannelInviteModal: React.FC<ChannelInviteModalProps> = ({
   title,
-  userList,
+  users,
   onConfirmClick,
   setShowModal,
 }) => {
@@ -36,7 +36,7 @@ const ChannelInviteModal: React.FC<ChannelInviteModalProps> = ({
 
   return (
     <div className="fixed inset-0 flex justify-center space-x-8 bg-black bg-opacity-50 pt-40">
-      <UserSearchBar userList={userList} onUserClick={onUserClick} />
+      <UserList users={users} onUserClick={onUserClick} />
       <div>
         <h1 className="m-1 text-lg font-bold text-white">{title}</h1>
         <ul>

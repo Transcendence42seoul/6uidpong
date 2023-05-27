@@ -98,7 +98,7 @@ const Channel: React.FC<ChannelProps> = ({ socket }) => {
       {showInviteModal && (
         <ChannelInviteModal
           title="Invite"
-          userList={allUsers}
+          users={allUsers}
           onConfirmClick={onConfirmClick}
           setShowModal={setShowInviteModal}
         />

@@ -1,47 +1,74 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
+import useCallApi from '../../utils/useCallApi';
 import CircularImage from './CircularImage';
 
 import type User from '../../interfaces/User';
 
+import { isTest, mockUsers } from '../../mock'; // test
+
 interface UserSearchBarProps {
-  userList: User[];
   onUserClick: (user: User) => void;
   className?: string;
 }
 
 const UserSearchBar: React.FC<UserSearchBarProps> = ({
-  userList,
   onUserClick,
   className = '',
 }) => {
+  const callApi = useCallApi();
+
   const searchResultsRef = useRef<HTMLUListElement>(null);
   const [search, setSearch] = useState<string>('');
-  const [searchResults, setSearchResults] = useState<User[]>(userList);
+  const [searchResults, setSearchResults] = useState<User[]>([]);
+  const [showSearchResults, setShowSearchResults] = useState<boolean>(false);
+
+  const handleSearchClick = () => {
+    setShowSearchResults(true);
+  };
 
   const handleUserClick = (user: User) => {
     setSearch('');
+    setShowSearchResults(false);
     onUserClick(user);
   };
 
-  const handleSearchResults = async (users: User[]) => {
-    setSearchResults([...users]);
+  const handleSearchResults = async (data: User[]) => {
+    setSearchResults([...data]);
+  };
+
+  const handleShowSearchResults = async (nickname: string) => {
+    setShowSearchResults(!!nickname);
   };
 
   const handleSearchChange = async (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    const keyword = event.target.value;
-    setSearch(keyword);
-    if (keyword) {
-      const results = userList.filter((user) => {
-        return user.nickname.startsWith(keyword);
-      });
-      await handleSearchResults(results);
-    } else {
-      await handleSearchResults(userList);
-    }
+    const nickname = event.target.value;
+    setSearch(nickname);
+    const config = {
+      url: '/api/v1/users/search',
+      params: { nickname },
+    };
+    const data: User[] = isTest ? mockUsers : await callApi(config); // test
+    await handleSearchResults(data);
+    await handleShowSearchResults(nickname);
   };
+
+  useEffect(() => {
+    const handleOutsideClick = (event: MouseEvent) => {
+      if (
+        showSearchResults &&
+        !searchResultsRef.current?.contains(event.target as Node)
+      ) {
+        setShowSearchResults(false);
+      }
+    };
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+    };
+  }, [showSearchResults]);
 
   return (
     <div className={`relative ${className}`}>
@@ -50,30 +77,33 @@ const UserSearchBar: React.FC<UserSearchBarProps> = ({
         placeholder="Search users"
         value={search}
         onChange={handleSearchChange}
+        onClick={handleSearchClick}
         className="w-full rounded border border-white p-2 shadow"
       />
-      <ul
-        className="absolute z-10 flex w-full flex-col rounded border-2 bg-white px-2.5 pb-2 pt-1.5 shadow-md"
-        ref={searchResultsRef}
-      >
-        {searchResults.map((user) => {
-          const { nickname, image } = user;
-          return (
-            <button
-              key={nickname}
-              className="flex space-x-2 border-b border-gray-300 py-1 hover:bg-gray-200"
-              onClick={() => handleUserClick(user)}
-            >
-              <CircularImage
-                src={image}
-                alt={nickname}
-                className="h-6 w-6 align-bottom"
-              />
-              <span className="w-[90%] truncate text-left">{nickname}</span>
-            </button>
-          );
-        })}
-      </ul>
+      {showSearchResults && (
+        <ul
+          className="absolute z-10 flex w-full flex-col rounded border-2 bg-white px-2.5 pb-2 pt-1.5 shadow-md"
+          ref={searchResultsRef}
+        >
+          {searchResults.map((user) => {
+            const { nickname, image } = user;
+            return (
+              <button
+                key={nickname}
+                className="flex space-x-2 border-b border-gray-300 py-1 hover:bg-gray-200"
+                onClick={() => handleUserClick(user)}
+              >
+                <CircularImage
+                  src={image}
+                  alt={nickname}
+                  className="h-6 w-6 align-bottom"
+                />
+                <span className="w-[90%] truncate text-left">{nickname}</span>
+              </button>
+            );
+          })}
+        </ul>
+      )}
     </div>
   );
 };

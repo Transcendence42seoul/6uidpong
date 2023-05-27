@@ -24,11 +24,12 @@ export class FriendRequestService {
     });
   }
 
-  async save(fromId: number, toId: number): Promise<FriendRequest> {
-    return await this.friendRequestRepository.save({
+  async insert(fromId: number, toId: number): Promise<FriendRequest> {
+    await this.friendRequestRepository.insert({
       fromId,
       toId,
     });
+    return await this.friendRequestRepository.findOneBy({ fromId, toId });
   }
 
   async delete(fromId: number, toId: number): Promise<void> {

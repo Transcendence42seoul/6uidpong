@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "src/user/entity/user.entity";
-import { Repository, MoreThanOrEqual, DataSource } from "typeorm";
+import { Repository, MoreThanOrEqual, DataSource, InsertResult } from "typeorm";
 import { DmRoomResponse } from "../../dto/dm/dm-rooms-response.dto";
 import { DmChat } from "../../entity/dm/dm-chat.entity";
 import { DmRoomUser } from "../../entity/dm/dm-room-user.entity";
@@ -116,39 +116,36 @@ export class DmService {
     }
   }
 
-  async saveUsers(userId: number, interlocutorId: number): Promise<DmRoomUser> {
+  async insertUsers(
+    userId: number,
+    interlocutorId: number
+  ): Promise<DmRoomUser> {
     const queryRunner = this.dataSource.createQueryRunner();
 
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      const saveOptions: Object = {
-        transaction: false,
-      };
-      const newRoom: DmRoom = await queryRunner.manager.save(
+      const newRoom: InsertResult = await queryRunner.manager.insert(
         DmRoom,
-        new DmRoom(),
-        saveOptions
+        new DmRoom()
       );
-      const newRoomUser: DmRoomUser = await queryRunner.manager.save(
-        DmRoomUser,
+      await queryRunner.manager.insert(DmRoomUser, [
         {
-          roomId: newRoom.id,
-          userId: userId,
-        },
-        saveOptions
-      );
-      await queryRunner.manager.save(
-        DmRoomUser,
-        {
-          roomId: newRoom.id,
+          roomId: newRoom.identifiers[0].id,
           userId: interlocutorId,
         },
-        saveOptions
-      );
+        {
+          roomId: newRoom.identifiers[0].id,
+          userId,
+        },
+      ]);
 
       await queryRunner.commitTransaction();
-      return newRoomUser;
+
+      return await this.roomUserRepository.findOneBy({
+        roomId: newRoom.identifiers[0].id,
+        userId,
+      });
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;
@@ -175,7 +172,7 @@ export class DmService {
     });
   }
 
-  async saveChat(
+  async insertChat(
     senderId: number,
     message: string,
     recipientRoomUser: DmRoomUser,
@@ -186,19 +183,15 @@ export class DmService {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      const newChat: DmChat = await queryRunner.manager.save(
-        DmChat,
-        {
-          user: {
-            id: senderId,
-          },
-          room: {
-            id: recipientRoomUser.roomId,
-          },
-          message,
+      const newChat: InsertResult = await queryRunner.manager.insert(DmChat, {
+        user: {
+          id: senderId,
         },
-        { transaction: false }
-      );
+        room: {
+          id: recipientRoomUser.roomId,
+        },
+        message,
+      });
       if (recipientRoomUser.isExit) {
         await queryRunner.manager.update(
           DmRoomUser,
@@ -208,7 +201,7 @@ export class DmService {
           },
           {
             isExit: false,
-            createdAt: newChat.createdAt,
+            createdAt: newChat.generatedMaps[0].createdAt,
           }
         );
       }
@@ -225,7 +218,10 @@ export class DmService {
       }
 
       await queryRunner.commitTransaction();
-      return newChat;
+
+      return await this.chatRepository.findOneBy({
+        id: newChat.identifiers[0].id,
+      });
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;

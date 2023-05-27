@@ -34,7 +34,7 @@ export class UserService {
   }
 
   async search(nickname: string): Promise<User[]> {
-    return this.userRepository
+    return await this.userRepository
       .createQueryBuilder()
       .select()
       .where("nickname ILIKE :includedNickname")
@@ -55,13 +55,14 @@ export class UserService {
       .getMany();
   }
 
-  async save(profile: any): Promise<User> {
-    return await this.userRepository.save({
+  async insert(profile: any): Promise<User> {
+    await this.userRepository.insert({
       id: profile.id,
       nickname: `undefined-${profile.id}`,
       email: profile.email,
       image: profile.image.link,
     });
+    return await this.userRepository.findOneBy({ id: profile.id });
   }
 
   async updateNickname(id: number, nickname: string): Promise<void> {

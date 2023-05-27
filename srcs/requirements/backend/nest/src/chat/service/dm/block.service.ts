@@ -10,8 +10,8 @@ export class BlockService {
     private readonly blockRepository: Repository<Block>
   ) {}
 
-  async save(userId: number, interlocutorId: number): Promise<void> {
-    await this.blockRepository.save({
+  async insert(userId: number, interlocutorId: number): Promise<void> {
+    await this.blockRepository.insert({
       userId: userId,
       blockedUserId: interlocutorId,
     });
@@ -24,7 +24,7 @@ export class BlockService {
     });
   }
 
-  async isBlocked(userId: number, interlocutorId: number): Promise<boolean> {
+  async has(userId: number, interlocutorId: number): Promise<boolean> {
     return (await this.blockRepository.countBy({
       userId: userId,
       blockedUserId: interlocutorId,

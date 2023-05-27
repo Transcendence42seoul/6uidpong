@@ -53,7 +53,7 @@ export class AuthController {
       if (!(e instanceof EntityNotFoundError)) {
         throw e;
       }
-      user = await this.userService.save(req.user);
+      user = await this.userService.insert(req.user);
     }
     res.cookie("refresh", await this.authService.genRefreshToken(user.id), {
       httpOnly: true,

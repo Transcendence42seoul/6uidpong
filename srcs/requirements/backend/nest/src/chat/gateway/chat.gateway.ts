@@ -94,7 +94,7 @@ export class ChatGateway implements OnGatewayDisconnect {
       if (!(e instanceof EntityNotFoundError)) {
         throw e;
       }
-      roomUser = await this.dmService.saveUsers(jwt.id, interlocutorId);
+      roomUser = await this.dmService.insertUsers(jwt.id, interlocutorId);
     }
     const roomName: string = "d" + roomUser.roomId;
     client.join(roomName);
@@ -109,12 +109,12 @@ export class ChatGateway implements OnGatewayDisconnect {
     @MessageBody("to") to: { id: number; message: string }
   ): Promise<DmChatResponse> {
     const recipient: User = await this.userService.findOneOrFail(to.id);
-    if (await this.blockService.isBlocked(jwt.id, recipient.id)) {
+    if (await this.blockService.has(jwt.id, recipient.id)) {
       throw new WsException(
         "You can't send a message to the user you have blocked."
       );
     }
-    if (await this.blockService.isBlocked(recipient.id, jwt.id)) {
+    if (await this.blockService.has(recipient.id, jwt.id)) {
       throw new WsException(
         "You can't send a message because you have been blocked."
       );
@@ -129,7 +129,7 @@ export class ChatGateway implements OnGatewayDisconnect {
       (socket) => socket.id === recipient.socketId
     );
 
-    const { id: chatId } = await this.dmService.saveChat(
+    const { id: chatId } = await this.dmService.insertChat(
       jwt.id,
       to.message,
       recipientRoomUser,
@@ -177,7 +177,7 @@ export class ChatGateway implements OnGatewayDisconnect {
     @WsJwtPayload() jwt: JwtPayload,
     @MessageBody("interlocutorId") interlocutorId: number
   ): Promise<void> {
-    await this.blockService.save(jwt.id, interlocutorId);
+    await this.blockService.insert(jwt.id, interlocutorId);
   }
 
   @SubscribeMessage("unblock-dm-user")
@@ -241,7 +241,10 @@ export class ChatGateway implements OnGatewayDisconnect {
       ) {
         throw new WsException("invalid password");
       }
-      channelUser = await this.channelService.saveUser(info.channelId, jwt.id);
+      channelUser = await this.channelService.insertUser(
+        info.channelId,
+        jwt.id
+      );
     }
     const roomName: string = "c" + info.channelId;
     client.join(roomName);
@@ -282,7 +285,7 @@ export class ChatGateway implements OnGatewayDisconnect {
       (channelUser) =>
         !sockets.some((socket) => socket.id === channelUser.user.socketId)
     );
-    const chat: ChannelChat = await this.channelService.saveChat(
+    const chat: ChannelChat = await this.channelService.insertChat(
       jwt.it,
       to.channelId,
       to.message,
@@ -416,7 +419,7 @@ export class ChatGateway implements OnGatewayDisconnect {
     if (to.length === 0) {
       throw new WsException("user not exists");
     }
-    await this.channelService.saveUsers(info.channelId, info.userIds);
+    await this.channelService.insertUsers(info.channelId, info.userIds);
     const roomName: string = "c" + info.channelId;
     this.server.to(roomName).emit("invited-users", {
       from: channelUser.user.nickname,

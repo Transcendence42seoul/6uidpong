@@ -6,14 +6,7 @@ import { ChannelChat } from "src/chat/entity/channel/channel-chat.entity";
 import { ChannelUser } from "src/chat/entity/channel/channel-user.entity";
 import { Channel } from "src/chat/entity/channel/channel.entity";
 import * as bcryptjs from "bcryptjs";
-import {
-  DataSource,
-  MoreThanOrEqual,
-  Repository,
-  LessThanOrEqual,
-} from "typeorm";
-import { Ban } from "src/chat/entity/channel/ban.entity";
-import { Cron } from "@nestjs/schedule";
+import { DataSource, MoreThanOrEqual, Repository, InsertResult } from "typeorm";
 import { Mute } from "src/chat/entity/channel/mute.entity";
 
 @Injectable()
@@ -103,20 +96,21 @@ export class ChannelService {
     });
   }
 
-  async saveUser(channelId: number, userId: number): Promise<ChannelUser> {
-    return await this.channelUserRepository.save({
+  async insertUser(channelId: number, userId: number): Promise<ChannelUser> {
+    await this.channelUserRepository.insert({
       channelId,
       userId,
     });
+    return await this.channelUserRepository.findOneBy({ channelId, userId });
   }
 
-  async saveUsers(
+  async insertUsers(
     channelId: number,
     userIds: number[]
   ): Promise<ChannelUser[]> {
-    return await this.channelUserRepository.save(
-      userIds.map((userId) => ({ channelId, userId }))
-    );
+    const info: Object[] = userIds.map((userId) => ({ channelId, userId }));
+    await this.channelUserRepository.insert(info);
+    return await this.channelUserRepository.findBy(info);
   }
 
   async findChats(
@@ -148,10 +142,7 @@ export class ChannelService {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      const saveOptions: Object = {
-        transaction: false,
-      };
-      const newChannel: Channel = await queryRunner.manager.save(
+      const newChannel: InsertResult = await queryRunner.manager.insert(
         Channel,
         {
           title: body.title,
@@ -160,22 +151,20 @@ export class ChannelService {
             typeof body.password === undefined
               ? null
               : await bcryptjs.hash(body.password, await bcryptjs.genSalt()),
-        },
-        saveOptions
+        }
       );
-      await queryRunner.manager.save(
-        ChannelUser,
-        {
-          channelId: newChannel.id,
-          userId,
-          isOwner: true,
-          isAdmin: true,
-        },
-        saveOptions
-      );
+      await queryRunner.manager.insert(ChannelUser, {
+        channelId: newChannel.identifiers[0].id,
+        userId,
+        isOwner: true,
+        isAdmin: true,
+      });
 
       await queryRunner.commitTransaction();
-      return newChannel;
+
+      return await this.channelRepository.findOneBy({
+        id: newChannel.identifiers[0].id,
+      });
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;
@@ -219,7 +208,7 @@ export class ChannelService {
     });
   }
 
-  async saveChat(
+  async insertChat(
     userId: number,
     channelId: number,
     message: string,
@@ -230,10 +219,7 @@ export class ChannelService {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      const saveOptions: Object = {
-        transaction: false,
-      };
-      const chat: ChannelChat = await queryRunner.manager.save(
+      const newChat: InsertResult = await queryRunner.manager.insert(
         ChannelChat,
         {
           user: {
@@ -243,8 +229,7 @@ export class ChannelService {
             id: channelId,
           },
           message,
-        },
-        saveOptions
+        }
       );
       await queryRunner.manager.increment(
         ChannelUser,
@@ -254,7 +239,10 @@ export class ChannelService {
       );
 
       await queryRunner.commitTransaction();
-      return chat;
+
+      return await this.chatRepository.findOneBy({
+        id: newChat.identifiers[0].id,
+      });
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;

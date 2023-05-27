@@ -37,7 +37,7 @@ export class FriendService {
     });
   }
 
-  async save(userId: number, friendId: number): Promise<void> {
+  async insert(userId: number, friendId: number): Promise<void> {
     const queryRunner = this.dataSource.createQueryRunner();
 
     await queryRunner.connect();

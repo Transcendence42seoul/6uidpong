@@ -47,7 +47,7 @@ export class UserController {
     @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query("size", new DefaultValuePipe(10), ParseIntPipe) size: number
   ): Promise<UserResponse[]> {
-  // ): Promise<Pagination<UserResponse>> {
+    // ): Promise<Pagination<UserResponse>> {
     const [users, total]: [User[], number] = await this.userService.findAll({
       page,
       size,
@@ -134,11 +134,11 @@ export class UserController {
   @Post("/:id/friends")
   @UseGuards(PermissionGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
-  async saveFriend(
+  async createFriend(
     @Param("id", ParseIntPipe) userId: number,
     @Body("friendId", ParseIntPipe) friendId: number
   ): Promise<void> {
-    await this.friendService.save(userId, friendId);
+    await this.friendService.insert(userId, friendId);
   }
 
   @Delete("/:id/friends/:friendId")
@@ -167,25 +167,25 @@ export class UserController {
   @Post("/:id/friend-requests")
   @UseGuards(PermissionGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
-  async saveFriendRequest(
+  async createFriendRequest(
     @Param("id", ParseIntPipe) fromId: number,
     @Body("toId", ParseIntPipe) toId: number
   ): Promise<void> {
     try {
       await this.friendService.findOneOrFail(fromId, toId);
     } catch {
-      await this.friendRequestService.save(fromId, toId);
+      await this.friendRequestService.insert(fromId, toId);
       return;
     }
     throw new BadRequestException("already friends");
   }
 
-  @Delete("/:id/friend-requests/:toId")
+  @Delete("/:id/friend-requests/:fromId")
   @UseGuards(PermissionGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteFriendRequest(
-    @Param("id", ParseIntPipe) fromId: number,
-    @Param("toId", ParseIntPipe) toId: number
+    @Param("id", ParseIntPipe) toId: number,
+    @Param("fromId", ParseIntPipe) fromId: number
   ): Promise<void> {
     await this.friendRequestService.delete(fromId, toId);
   }

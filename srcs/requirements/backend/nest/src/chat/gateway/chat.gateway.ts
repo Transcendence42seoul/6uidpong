@@ -96,7 +96,8 @@ export class ChatGateway implements OnGatewayDisconnect {
       }
       roomUser = await this.dmService.saveUsers(jwt.id, interlocutorId);
     }
-    client.join("d" + roomUser.roomId);
+    const roomName: string = "d" + roomUser.roomId;
+    client.join(roomName);
     const chats: DmChat[] = await this.dmService.findChats(roomUser);
 
     return new DmJoinResponse(roomUser.roomId, roomUser.newMsgCount, chats);
@@ -122,7 +123,7 @@ export class ChatGateway implements OnGatewayDisconnect {
       recipient.id,
       jwt.id
     );
-    const roomName: string = "c" + recipientRoomUser.roomId;
+    const roomName: string = "d" + recipientRoomUser.roomId;
     const sockets = await this.server.in(roomName).fetchSockets();
     const isJoined: boolean = sockets.some(
       (socket) => socket.id === recipient.socketId
@@ -148,7 +149,8 @@ export class ChatGateway implements OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
     @MessageBody("roomId") roomId: number
   ): Promise<void> {
-    client.leave("d" + roomId);
+    const roomName: string = "d" + roomId;
+    client.leave(roomName);
   }
 
   @SubscribeMessage("delete-dm-room")
@@ -166,7 +168,8 @@ export class ChatGateway implements OnGatewayDisconnect {
     } else {
       await this.dmService.exitRoom(interRoomUser.roomId, jwt.id);
     }
-    client.leave("d" + interRoomUser.roomId);
+    const roomName: string = "d" + interRoomUser.roomId;
+    client.leave(roomName);
   }
 
   @SubscribeMessage("block-dm-user")

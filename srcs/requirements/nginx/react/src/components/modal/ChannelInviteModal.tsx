@@ -1,24 +1,26 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
+import useCallApi from '../../utils/useCallApi';
 import HoverButton from '../button/HoverButton';
 import CircularImage from '../container/CircularImage';
 import UserList from '../container/UserList';
 
 import type User from '../../interfaces/User';
 
+import { isTest, mockUsers } from '../../mock'; // test
+
 interface ChannelInviteModalProps {
-  title: string;
-  users: User[];
   onConfirmClick: (users: Set<User>) => void;
   setShowModal: (showModal: boolean) => void;
 }
 
 const ChannelInviteModal: React.FC<ChannelInviteModalProps> = ({
-  title,
-  users,
   onConfirmClick,
   setShowModal,
 }) => {
+  const callApi = useCallApi();
+
+  const [allUsers, setAllUsers] = useState<User[]>([]);
   const [selectedUsers, setSelectedUsers] = useState<Set<User>>(new Set());
 
   const handleCancelClick = () => {
@@ -34,11 +36,22 @@ const ChannelInviteModal: React.FC<ChannelInviteModalProps> = ({
     setSelectedUsers((prevUsers) => new Set(prevUsers).add(user));
   };
 
+  useEffect(() => {
+    const fetchUsersData = async () => {
+      const config = {
+        url: '/api/v1/users',
+      };
+      const data: User[] = isTest ? mockUsers : await callApi(config); // test
+      setAllUsers(data);
+    };
+    fetchUsersData();
+  }, []);
+
   return (
     <div className="fixed inset-0 flex justify-center space-x-8 bg-black bg-opacity-50 pt-40">
-      <UserList users={users} onUserClick={onUserClick} />
+      <UserList users={allUsers} onUserClick={onUserClick} />
       <div>
-        <h1 className="m-1 text-lg font-semibold text-white">{title}</h1>
+        <h1 className="m-1 text-lg font-semibold text-white">Invite</h1>
         <ul>
           {[...selectedUsers].map((user) => {
             const { id, nickname, image } = user;

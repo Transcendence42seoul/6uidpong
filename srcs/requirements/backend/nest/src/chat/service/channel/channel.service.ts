@@ -223,7 +223,7 @@ export class ChannelService {
     userId: number,
     channelId: number,
     message: string,
-    notJoinUsers: ChannelUser[]
+    notJoinedUsers: ChannelUser[]
   ): Promise<ChannelChat> {
     const queryRunner = this.dataSource.createQueryRunner();
 
@@ -248,7 +248,7 @@ export class ChannelService {
       );
       await queryRunner.manager.increment(
         ChannelUser,
-        notJoinUsers,
+        notJoinedUsers,
         "newMsgCount",
         1
       );

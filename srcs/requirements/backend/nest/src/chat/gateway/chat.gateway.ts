@@ -33,7 +33,6 @@ import { ChannelChatResponse } from "../dto/channel/channel-chat-response.dto";
 import { ChannelCreateRequest } from "../dto/channel/channel-create-request.dto";
 import * as bcryptjs from "bcryptjs";
 import { ChannelCreateResponse } from "../dto/channel/channel-create-response.dto";
-import { UserResponse } from "src/user/dto/user-response.dto";
 import { Ban } from "../entity/channel/ban.entity";
 import { BanService } from "../service/channel/ban.service";
 import { MuteService } from "../service/channel/mute.service";
@@ -107,7 +106,7 @@ export class ChatGateway implements OnGatewayDisconnect {
   async sendDM(
     @WsJwtPayload() jwt: JwtPayload,
     @MessageBody("to") to: { id: number; message: string }
-  ): Promise<void> {
+  ): Promise<DmChatResponse> {
     const recipient: User = await this.userService.findOneOrFail(to.id);
     if (await this.blockService.isBlocked(jwt.id, recipient.id)) {
       throw new WsException(
@@ -123,9 +122,9 @@ export class ChatGateway implements OnGatewayDisconnect {
       recipient.id,
       jwt.id
     );
-    const room: string = "d" + recipientRoomUser.roomId;
-    const roomSockets = await this.server.in(room).fetchSockets();
-    const isNotJoin: boolean = !roomSockets.find(
+    const roomName: string = "c" + recipientRoomUser.roomId;
+    const sockets = await this.server.in(roomName).fetchSockets();
+    const isJoined: boolean = sockets.some(
       (socket) => socket.id === recipient.socketId
     );
 
@@ -133,10 +132,15 @@ export class ChatGateway implements OnGatewayDisconnect {
       jwt.id,
       to.message,
       recipientRoomUser,
-      isNotJoin
+      isJoined
     );
-    const chat: DmChat = await this.dmService.findChat(chatId);
-    this.server.to(room).emit("send-dm", new DmChatResponse(chat));
+    const chat: DmChatResponse = new DmChatResponse(
+      await this.dmService.findChat(chatId)
+    );
+    if (recipient.status === "online") {
+      this.server.to(recipient.socketId).emit("send-dm", chat);
+    }
+    return chat;
   }
 
   @SubscribeMessage("leave-dm")
@@ -236,10 +240,10 @@ export class ChatGateway implements OnGatewayDisconnect {
       }
       channelUser = await this.channelService.saveUser(info.channelId, jwt.id);
     }
-    const room: string = "c" + info.channelId;
-    client.join(room);
+    const roomName: string = "c" + info.channelId;
+    client.join(roomName);
     client.broadcast
-      .to(room)
+      .to(roomName)
       .emit("newly-joined-user", { nickname: channelUser.user.nickname });
     const chats: ChannelChat[] = await this.channelService.findChats(
       info.channelId,
@@ -269,23 +273,24 @@ export class ChatGateway implements OnGatewayDisconnect {
     if (channelUsers.length === channelUsersWithoutMe.length) {
       throw new WsException("user not channel member");
     }
-    const room: string = "c" + to.channelId;
-    const channelSockets = await this.server.in(room).fetchSockets();
-    const notJoinUsers: ChannelUser[] = channelUsersWithoutMe.filter(
+    const roomName: string = "c" + to.channelId;
+    const sockets = await this.server.in(roomName).fetchSockets();
+    const notJoinedUsers: ChannelUser[] = channelUsersWithoutMe.filter(
       (channelUser) =>
-        !channelSockets.find(
-          (socket) => socket.id === channelUser.user.socketId
-        )
+        !sockets.some((socket) => socket.id === channelUser.user.socketId)
     );
     const chat: ChannelChat = await this.channelService.saveChat(
       jwt.it,
       to.channelId,
       to.message,
-      notJoinUsers
+      notJoinedUsers
     );
+    const onlineSockets: string[] = channelUsers
+      .filter((channelUser) => channelUser.user.status === "online")
+      .map((onlineChannelUser) => onlineChannelUser.user.socketId);
     this.server
-      .to(room)
-      .emit("new-channel-message", new ChannelChatResponse(chat));
+      .to(onlineSockets)
+      .emit("send-channel-message", new ChannelChatResponse(chat));
   }
 
   @SubscribeMessage("delete-channel")
@@ -310,7 +315,8 @@ export class ChatGateway implements OnGatewayDisconnect {
     @MessageBody("channelId")
     channelId: number
   ): Promise<void> {
-    client.leave("c" + channelId);
+    const roomName: string = "c" + channelId;
+    client.leave(roomName);
   }
 
   @SubscribeMessage("exit-channel")
@@ -330,9 +336,10 @@ export class ChatGateway implements OnGatewayDisconnect {
       );
     }
     await this.channelService.deleteUser(channelId, jwt.id);
-    client.leave("c" + channelId);
+    const roomName: string = "c" + channelId;
+    client.leave(roomName);
     this.server
-      .to("c" + channelId)
+      .to(roomName)
       .emit("leave-channel-user", { nickname: channelUser.user.nickname });
   }
 
@@ -356,7 +363,8 @@ export class ChatGateway implements OnGatewayDisconnect {
       jwt.id,
       info.userId
     );
-    this.server.to("c" + info.channelId).emit("transfer-ownership", {
+    const roomName: string = "c" + info.channelId;
+    this.server.to(roomName).emit("transfer-ownership", {
       old: channelUser.user.nickname,
       new: targetChannelUser.user.nickname,
     });
@@ -385,8 +393,9 @@ export class ChatGateway implements OnGatewayDisconnect {
     const event: string = info.value
       ? "add-channel-admin"
       : "delete-channel-admin";
+    const roomName: string = "c" + info.channelId;
     this.server
-      .to("c" + info.channelId)
+      .to(roomName)
       .emit(event, { nickname: targetChannelUser.user.nickname });
   }
 
@@ -405,7 +414,8 @@ export class ChatGateway implements OnGatewayDisconnect {
       throw new WsException("user not exists");
     }
     await this.channelService.saveUsers(info.channelId, info.userIds);
-    this.server.to("c" + info.channelId).emit("invited-users", {
+    const roomName: string = "c" + info.channelId;
+    this.server.to(roomName).emit("invited-users", {
       from: channelUser.user.nickname,
       to: to.map((user) => user.nickname),
     });
@@ -431,19 +441,19 @@ export class ChatGateway implements OnGatewayDisconnect {
       throw new WsException("permission denied");
     }
     await this.channelService.deleteUser(info.channelId, info.userId);
-    const room: string = "c" + info.channelId;
+    const roomName: string = "c" + info.channelId;
     if (kickChannelUser.user.status === "online") {
-      const channelSockets = await this.server.in(room).fetchSockets();
+      const channelSockets = await this.server.in(roomName).fetchSockets();
       const kickUserSocket = channelSockets.find(
         (socket) => socket.id === kickChannelUser.user.socketId
       );
       if (kickUserSocket) {
-        kickUserSocket.leave(room);
+        kickUserSocket.leave(roomName);
         kickUserSocket.emit("kicked-channel");
       }
     }
     this.server
-      .to(room)
+      .to(roomName)
       .emit("newly-kicked-user", { nickname: kickChannelUser.user.nickname });
   }
 
@@ -467,7 +477,8 @@ export class ChatGateway implements OnGatewayDisconnect {
       throw new WsException("permission denied");
     }
     await this.muteService.mute(info.channelId, info.userId, info.limitedAt);
-    this.server.to("c" + info.channelId).emit("newly-mute-user", {
+    const roomName: string = "c" + info.channelId;
+    this.server.to(roomName).emit("newly-mute-user", {
       nickname: targetChannelUser.user.nickname,
       limitedAt: info.limitedAt,
     });
@@ -493,8 +504,9 @@ export class ChatGateway implements OnGatewayDisconnect {
       throw new WsException("permission denied");
     }
     await this.banService.ban(info.channelId, info.userId);
+    const roomName: string = "c" + info.channelId;
     this.server
-      .to("c" + info.channelId)
+      .to(roomName)
       .emit("newly-banned-user", { nickname: targetChannelUser.user.nickname });
   }
 
@@ -563,6 +575,7 @@ export class ChatGateway implements OnGatewayDisconnect {
       throw new WsException("permission denied");
     }
     await this.channelService.updatePassword(info.channelId, info.password);
-    this.server.to("c" + info.channelId).emit("update-password");
+    const roomName: string = "c" + info.channelId;
+    this.server.to(roomName).emit("update-password");
   }
 }

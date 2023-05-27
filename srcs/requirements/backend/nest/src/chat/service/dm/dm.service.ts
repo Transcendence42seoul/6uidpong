@@ -179,7 +179,7 @@ export class DmService {
     senderId: number,
     message: string,
     recipientRoomUser: DmRoomUser,
-    isNotJoin: boolean
+    isJoined: boolean
   ): Promise<DmChat> {
     const queryRunner = this.dataSource.createQueryRunner();
 
@@ -212,7 +212,7 @@ export class DmService {
           }
         );
       }
-      if (isNotJoin) {
+      if (!isJoined) {
         await queryRunner.manager.increment(
           DmRoomUser,
           {

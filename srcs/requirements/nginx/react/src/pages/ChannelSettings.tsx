@@ -38,11 +38,6 @@ const ChannelSettings: React.FC<ChannelSettingsProps> = ({ socket }) => {
     socket.emit('create-channel', channel, channelIdHandler);
   };
 
-  const handleDeleteClick = () => {
-    socket.emit('delete-channel', { channelId });
-    navigate('/channel');
-  };
-
   const handleEnablePasswordChange = () => {
     setIsPasswordEnabled(!isPasswordEnabled);
   };
@@ -142,16 +137,10 @@ const ChannelSettings: React.FC<ChannelSettingsProps> = ({ socket }) => {
             Cancel
           </HoverButton>
         </div>
-        {channelId && (
-          <HoverButton
-            onClick={handleDeleteClick}
-            className="w-[61%] border bg-red-800 p-2 hover:text-red-800"
-          >
-            Delete
-          </HoverButton>
-        )}
       </ContentBox>
-      {channelId && <ChannelManagePanel />}
+      {channelId && (
+        <ChannelManagePanel channelId={channelId} socket={socket} />
+      )}
     </div>
   );
 };

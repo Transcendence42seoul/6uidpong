@@ -480,6 +480,20 @@ export class ChatGateway implements OnGatewayDisconnect {
     await this.channelService.unban(info.channelId, info.userId);
   }
 
+  @SubscribeMessage("find-channel-users")
+  async findChannelUsers(
+    @WsJwtPayload() jwt: JwtPayload,
+    @MessageBody("channelId")
+    channelId: number
+  ): Promise<UserResponse[]> {
+    const channelUsers: ChannelUser[] = await this.channelService.findUsers(
+      channelId
+    );
+    return channelUsers.map(
+      (channelUser) => new UserResponse(channelUser.user)
+    );
+  }
+
   @SubscribeMessage("find-channel-ban-users")
   async findChannelBanUsers(
     @WsJwtPayload() jwt: JwtPayload,

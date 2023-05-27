@@ -39,6 +39,11 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send, socket }) => {
   const [newMsgCount, setNewMsgCount] = useState<number>(0);
   const [showAlert, setShowAlert] = useState<boolean>(false);
 
+  const addChat = (chat: Chat) => {
+    setChats((prevChats) => [...prevChats, chat]);
+    setNewMsgCount(0);
+  };
+
   const handleInputMsgChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       setInputMsg(event.target.value);
@@ -53,7 +58,11 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send, socket }) => {
       event.preventDefault();
       if (!inputMsg) return;
       const sendData = { to: { id: send.data.toId, message: inputMsg } };
-      socket.emit(send.name, sendData);
+      const chatHandler = (chat: Chat) => {
+        addChat(chat);
+        setInputMsg('');
+      };
+      socket.emit(send.name, sendData, chatHandler);
     },
     [inputMsg],
   );
@@ -78,9 +87,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send, socket }) => {
   }, []);
 
   useEffect(() => {
-    const chatHandler = (chat: Chat) => {
-      setChats((prevChats) => [...prevChats, chat]);
-    };
+    const chatHandler = (chat: Chat) => addChat(chat);
     socket.on(send.name, chatHandler);
     return () => {
       socket.off(send.name, chatHandler);

@@ -15,6 +15,8 @@ import { Channel } from "../entity/channel/channel.entity";
 import { ChannelUser } from "../entity/channel/channel-user.entity";
 import { ChannelChat } from "../entity/channel/channel-chat.entity";
 import { ChannelService } from "../service/channel/channel.service";
+import { Mute } from "../entity/channel/mute.entity";
+import { Ban } from "../entity/channel/ban.entity";
 
 @Module({
   imports: [
@@ -26,6 +28,8 @@ import { ChannelService } from "../service/channel/channel.service";
       Channel,
       ChannelUser,
       ChannelChat,
+      Ban,
+      Mute,
     ]),
     UserModule,
   ],

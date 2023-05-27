@@ -6,8 +6,15 @@ import { ChannelChat } from "src/chat/entity/channel/channel-chat.entity";
 import { ChannelUser } from "src/chat/entity/channel/channel-user.entity";
 import { Channel } from "src/chat/entity/channel/channel.entity";
 import * as bcryptjs from "bcryptjs";
-import { DataSource, MoreThanOrEqual, Repository } from "typeorm";
+import {
+  DataSource,
+  MoreThanOrEqual,
+  Repository,
+  LessThanOrEqual,
+} from "typeorm";
 import { Ban } from "src/chat/entity/channel/ban.entity";
+import { Cron } from "@nestjs/schedule";
+import { Mute } from "src/chat/entity/channel/mute.entity";
 
 @Injectable()
 export class ChannelService {
@@ -20,6 +27,8 @@ export class ChannelService {
     private readonly chatRepository: Repository<ChannelChat>,
     @InjectRepository(Ban)
     private readonly banRepository: Repository<Ban>,
+    @InjectRepository(Mute)
+    private readonly muteRepository: Repository<Mute>,
     private readonly dataSource: DataSource
   ) {}
 
@@ -340,5 +349,12 @@ export class ChannelService {
 
   async unban(channelId: number, userId: number): Promise<void> {
     await this.banRepository.delete({ channelId, userId });
+  }
+
+  @Cron("0 * * * *")
+  async deleteTimeoutMuteUsers(): Promise<void> {
+    await this.muteRepository.delete({
+      limitedAt: LessThanOrEqual(new Date()),
+    });
   }
 }

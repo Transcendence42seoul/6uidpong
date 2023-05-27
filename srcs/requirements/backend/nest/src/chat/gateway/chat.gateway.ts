@@ -110,38 +110,27 @@ export class ChatGateway implements OnGatewayDisconnect {
     @WsJwtPayload() jwt: JwtPayload,
     @MessageBody("to") to: { id: number; message: string }
   ): Promise<DmChatResponse> {
-    const recipient: User = await this.userService.findOneOrFail(to.id);
-    if (await this.blockService.has(jwt.id, recipient.id)) {
-      throw new WsException(
-        "You can't send a message to the user you have blocked."
-      );
-    }
-    if (await this.blockService.has(recipient.id, jwt.id)) {
-      throw new WsException(
-        "You can't send a message because you have been blocked."
-      );
-    }
-    const recipientRoomUser: DmRoomUser = await this.dmService.findUserOrFail(
-      recipient.id,
+    await this.blockService.validate(jwt.id, to.id);
+    const recipient: DmRoomUser = await this.dmService.findUserOrFail(
+      to.id,
       jwt.id
     );
-    const roomName: string = "d" + recipientRoomUser.roomId;
+    const roomName: string = "d" + recipient.roomId;
     const sockets = await this.server.in(roomName).fetchSockets();
     const isJoined: boolean = sockets.some(
-      (socket) => socket.id === recipient.socketId
+      (socket) => socket.id === recipient.user.socketId
     );
-
     const { id: chatId } = await this.dmService.insertChat(
       jwt.id,
       to.message,
-      recipientRoomUser,
+      recipient,
       isJoined
     );
     const chat: DmChatResponse = new DmChatResponse(
       await this.dmService.findChat(chatId)
     );
-    if (recipient.status === "online") {
-      this.server.to(recipient.socketId).emit("send-dm", chat);
+    if (recipient.user.status === "online") {
+      this.server.to(recipient.user.socketId).emit("send-dm", chat);
     }
     return chat;
   }
@@ -237,9 +226,7 @@ export class ChatGateway implements OnGatewayDisconnect {
         jwt.id
       );
     } catch {
-      if (await this.banService.has(info.channelId, jwt.id)) {
-        throw new WsException("can't join because banned.");
-      }
+      await this.banService.validate(info.channelId, jwt.id);
       const channel: Channel = await this.channelService.findChannelOrFail(
         info.channelId
       );
@@ -272,9 +259,7 @@ export class ChatGateway implements OnGatewayDisconnect {
     @MessageBody("to")
     to: { channelId: number; message: string }
   ): Promise<void> {
-    if (await this.muteService.has(to.channelId, jwt.id)) {
-      throw new WsException("can't send because muted user.");
-    }
+    await this.muteService.validate(to.channelId, jwt.id);
     const channelUsers: ChannelUser[] = await this.channelService.findUsers(
       to.channelId
     );

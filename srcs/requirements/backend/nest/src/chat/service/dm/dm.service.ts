@@ -81,6 +81,7 @@ export class DmService {
         "match_room_user",
         "room_user.room_id = match_room_user.room_id"
       )
+      .innerJoin("room_user.user", "user")
       .where("room_user.user_id = :userId")
       .setParameters({ userId, interlocutorId })
       .getOneOrFail();
@@ -175,7 +176,7 @@ export class DmService {
   async insertChat(
     senderId: number,
     message: string,
-    recipientRoomUser: DmRoomUser,
+    recipient: DmRoomUser,
     isJoined: boolean
   ): Promise<DmChat> {
     const queryRunner = this.dataSource.createQueryRunner();
@@ -188,16 +189,16 @@ export class DmService {
           id: senderId,
         },
         room: {
-          id: recipientRoomUser.roomId,
+          id: recipient.roomId,
         },
         message,
       });
-      if (recipientRoomUser.isExit) {
+      if (recipient.isExit) {
         await queryRunner.manager.update(
           DmRoomUser,
           {
-            userId: recipientRoomUser.userId,
-            roomId: recipientRoomUser.roomId,
+            userId: recipient.userId,
+            roomId: recipient.roomId,
           },
           {
             isExit: false,
@@ -209,8 +210,8 @@ export class DmService {
         await queryRunner.manager.increment(
           DmRoomUser,
           {
-            userId: recipientRoomUser.userId,
-            roomId: recipientRoomUser.roomId,
+            userId: recipient.userId,
+            roomId: recipient.roomId,
           },
           "newMsgCount",
           1

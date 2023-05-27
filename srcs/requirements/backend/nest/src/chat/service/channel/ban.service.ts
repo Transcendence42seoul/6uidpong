@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import { WsException } from "@nestjs/websockets";
 import { Ban } from "src/chat/entity/channel/ban.entity";
 import { ChannelUser } from "src/chat/entity/channel/channel-user.entity";
 import { DataSource, Repository } from "typeorm";
@@ -28,10 +29,12 @@ export class BanService {
     });
   }
 
-  async has(channelId: number, userId: number): Promise<boolean> {
-    return (await this.banRepository.countBy({ channelId, userId }))
-      ? true
-      : false;
+  async validate(channelId: number, userId: number): Promise<void> {
+    const pk: Object = { channelId, userId };
+    const ban: Ban | null = await this.banRepository.findOneBy(pk);
+    if (typeof ban !== null) {
+      throw new WsException("can't join because banned.");
+    }
   }
 
   async ban(channelId: number, userId: number): Promise<void> {

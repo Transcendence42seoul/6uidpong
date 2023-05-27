@@ -16,9 +16,6 @@ const ChannelManagePanel: React.FC<ChannelManagePanelProps> = ({
 }) => {
   const navigate = useNavigate();
 
-  const [showManageAdminsModal, setShowManageAdminsModal] =
-    useState<boolean>(false);
-
   const [showManageMembersModal, setShowManageMembersModal] =
     useState<boolean>(false);
 
@@ -27,30 +24,18 @@ const ChannelManagePanel: React.FC<ChannelManagePanelProps> = ({
     navigate('/channel');
   };
 
-  const handleManageAdminsClick = () => {
-    setShowManageAdminsModal(true);
-  };
-
   const handleManageMembersClick = () => {
     setShowManageMembersModal(true);
   };
 
   return (
     <ContentBox className="w-full max-w-sm space-y-4 p-7">
-      <div>
-        <HoverButton
-          onClick={handleManageMembersClick}
-          className="w-full max-w-xs border p-2"
-        >
-          Manage Members
-        </HoverButton>
-        <HoverButton
-          onClick={handleManageAdminsClick}
-          className="w-full max-w-xs border p-2"
-        >
-          Manage Admins
-        </HoverButton>
-      </div>
+      <HoverButton
+        onClick={handleManageMembersClick}
+        className="w-full max-w-xs border p-2"
+      >
+        Manage Members
+      </HoverButton>
       <HoverButton
         onClick={handleDeleteChannelClick}
         className="w-full max-w-xs border bg-red-800 p-2 hover:text-red-800"

@@ -50,18 +50,19 @@ const ChannelInviteModal: React.FC<ChannelInviteModalProps> = ({
   return (
     <div className="fixed inset-0 flex justify-center space-x-8 bg-black bg-opacity-50 pt-40">
       <UserListWithSearchBar users={allUsers} onUserClick={onUserClick} />
-      <UserList title="Invite" users={selectedUsers} />
-      <div className="flex">
-        <HoverButton
-          onClick={handleConfirmClick}
-          className="border bg-blue-800 p-2 hover:text-blue-800"
-        >
-          Confirm
-        </HoverButton>
-        <HoverButton onClick={handleCancelClick} className="border p-2">
-          Cancel
-        </HoverButton>
-      </div>
+      <UserList title="Invite" users={selectedUsers}>
+        <div className="flex">
+          <HoverButton
+            onClick={handleConfirmClick}
+            className="border bg-blue-800 p-2 hover:text-blue-800"
+          >
+            Confirm
+          </HoverButton>
+          <HoverButton onClick={handleCancelClick} className="border p-2">
+            Cancel
+          </HoverButton>
+        </div>
+      </UserList>
     </div>
   );
 };

@@ -6,12 +6,17 @@ import type User from '../../interfaces/User';
 
 interface UserListProps {
   title: string;
-  users: User[] | Set<User>;
+  users: Set<User> | User[];
+  children?: React.ReactNode;
 }
 
-const UserList: React.FC<UserListProps> = ({ title, users }) => {
+const UserList: React.FC<UserListProps> = ({
+  title,
+  users,
+  children = null,
+}) => {
   return (
-    <>
+    <div>
       <h1 className="m-1 text-lg font-semibold text-white">{title}</h1>
       <ul>
         {[...users].map((user) => {
@@ -27,7 +32,8 @@ const UserList: React.FC<UserListProps> = ({ title, users }) => {
           );
         })}
       </ul>
-    </>
+      {children}
+    </div>
   );
 };
 

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
 
 import HoverButton from '../button/HoverButton';
+import ChannelManageModal from '../modal/ChannelManageModal';
 import ContentBox from './ContentBox';
 
 interface ChannelManagePanelProps {
@@ -16,8 +17,7 @@ const ChannelManagePanel: React.FC<ChannelManagePanelProps> = ({
 }) => {
   const navigate = useNavigate();
 
-  const [showManageMembersModal, setShowManageMembersModal] =
-    useState<boolean>(false);
+  const [showManageModal, setShowManageModal] = useState<boolean>(false);
 
   const handleDeleteChannelClick = () => {
     socket.emit('delete-channel', { channelId });
@@ -25,24 +25,33 @@ const ChannelManagePanel: React.FC<ChannelManagePanelProps> = ({
   };
 
   const handleManageMembersClick = () => {
-    setShowManageMembersModal(true);
+    setShowManageModal(true);
   };
 
   return (
-    <ContentBox className="w-full max-w-sm space-y-4 p-7">
-      <HoverButton
-        onClick={handleManageMembersClick}
-        className="w-full max-w-xs border p-2"
-      >
-        Manage Members
-      </HoverButton>
-      <HoverButton
-        onClick={handleDeleteChannelClick}
-        className="w-full max-w-xs border bg-red-800 p-2 hover:text-red-800"
-      >
-        Delete Channel
-      </HoverButton>
-    </ContentBox>
+    <>
+      <ContentBox className="w-full max-w-sm space-y-4 p-7">
+        <HoverButton
+          onClick={handleManageMembersClick}
+          className="w-full max-w-xs border p-2"
+        >
+          Manage Members
+        </HoverButton>
+        <HoverButton
+          onClick={handleDeleteChannelClick}
+          className="w-full max-w-xs border bg-red-800 p-2 hover:text-red-800"
+        >
+          Delete Channel
+        </HoverButton>
+      </ContentBox>
+      {showManageModal && (
+        <ChannelManageModal
+          channelId={channelId}
+          setShowModal={setShowManageModal}
+          socket={socket}
+        />
+      )}
+    </>
   );
 };
 

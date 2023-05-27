@@ -10,6 +10,8 @@ import useCallApi from '../utils/useCallApi';
 
 import type User from '../interfaces/User';
 
+import { isTest, mockUsers } from '../mock'; // test
+
 interface Stats {
   recentHistory: string[];
 }
@@ -35,7 +37,7 @@ const MyPage: React.FC<MyPageProps> = ({ stats }) => {
       const config = {
         url: `/api/v1/users/${myId}`,
       };
-      const data: User = await callApi(config);
+      const data: User = isTest ? mockUsers[0] : await callApi(config); // test
       setUser(data);
     };
     fetchUserData();

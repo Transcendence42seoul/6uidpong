@@ -11,6 +11,8 @@ import useCallApi from '../utils/useCallApi';
 
 import type User from '../interfaces/User';
 
+import { isTest, mockUsers } from '../mock'; // test
+
 interface UserProfileProps {
   socket: Socket;
 }
@@ -58,7 +60,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ socket }) => {
       const config = {
         url: `/api/v1/users/${interlocutorId}`,
       };
-      const data: User = await callApi(config);
+      const data: User = isTest ? mockUsers[0] : await callApi(config); // test
       setUser(data);
     };
     fetchUserData();

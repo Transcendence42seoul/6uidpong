@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 import useCallApi from '../../utils/useCallApi';
 import HoverButton from '../button/HoverButton';
-import CircularImage from '../container/CircularImage';
+import UserList from '../container/UserList';
 import UserListWithSearchBar from '../container/UserListWithSearchBar';
 
 import type User from '../../interfaces/User';
@@ -50,22 +50,8 @@ const ChannelInviteModal: React.FC<ChannelInviteModalProps> = ({
   return (
     <div className="fixed inset-0 flex justify-center space-x-8 bg-black bg-opacity-50 pt-40">
       <UserListWithSearchBar users={allUsers} onUserClick={onUserClick} />
-      <div>
-        <h1 className="m-1 text-lg font-semibold text-white">Invite</h1>
-        <ul>
-          {[...selectedUsers].map((user) => {
-            const { id, nickname, image } = user;
-            return (
-              <li
-                key={id}
-                className="flex items-center space-x-2.5 border-b bg-white px-3 py-2"
-              >
-                <CircularImage src={image} alt={nickname} className="h-6 w-6" />
-                <span className="text-sm">{nickname}</span>
-              </li>
-            );
-          })}
-        </ul>
+      <UserList title="Invite" users={selectedUsers} />
+      <div className="flex">
         <HoverButton
           onClick={handleConfirmClick}
           className="border bg-blue-800 p-2 hover:text-blue-800"

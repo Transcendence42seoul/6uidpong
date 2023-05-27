@@ -33,12 +33,12 @@ import { ChannelChatResponse } from "../dto/channel/channel-chat-response.dto";
 import { ChannelCreateRequest } from "../dto/channel/channel-create-request.dto";
 import * as bcryptjs from "bcryptjs";
 import { ChannelCreateResponse } from "../dto/channel/channel-create-response.dto";
-import { channel } from "diagnostics_channel";
 import { UserResponse } from "src/user/dto/user-response.dto";
 import { Ban } from "../entity/channel/ban.entity";
 import { BanService } from "../service/channel/ban.service";
 import { MuteService } from "../service/channel/mute.service";
 import { ChannelUserResponse } from "../dto/channel/channel-user-response.dto";
+import { BanResponse } from "../dto/channel/ban-response.dto";
 
 @WebSocketGateway(80, {
   cors: {
@@ -542,19 +542,11 @@ export class ChatGateway implements OnGatewayDisconnect {
 
   @SubscribeMessage("find-channel-ban-users")
   async findChannelBanUsers(
-    @WsJwtPayload() jwt: JwtPayload,
     @MessageBody("channelId")
     channelId: number
-  ): Promise<UserResponse[]> {
-    const channelUser: ChannelUser = await this.channelService.findUserOrFail(
-      channelId,
-      jwt.id
-    );
-    if (!channelUser.isAdmin) {
-      throw new WsException("permission denied");
-    }
+  ): Promise<BanResponse[]> {
     const banUsers: Ban[] = await this.banService.findUsers(channelId);
-    return banUsers.map((ban) => new UserResponse(ban.user));
+    return banUsers.map((ban) => new BanResponse(ban));
   }
 
   @SubscribeMessage("update-password")

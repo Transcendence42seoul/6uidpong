@@ -6,14 +6,16 @@ import UserSearchBar from '../container/UserSearchBar';
 
 import type User from '../../interfaces/User';
 
-interface UserSelectModalProps {
+interface ChannelInviteModalProps {
   title: string;
+  userList: User[];
   onConfirmClick: (users: Set<User>) => void;
   setShowModal: (showModal: boolean) => void;
 }
 
-const UserSelectModal: React.FC<UserSelectModalProps> = ({
+const ChannelInviteModal: React.FC<ChannelInviteModalProps> = ({
   title,
+  userList,
   onConfirmClick,
   setShowModal,
 }) => {
@@ -34,7 +36,7 @@ const UserSelectModal: React.FC<UserSelectModalProps> = ({
 
   return (
     <div className="fixed inset-0 flex justify-center space-x-8 bg-black bg-opacity-50 pt-40">
-      <UserSearchBar onUserClick={onUserClick} />
+      <UserSearchBar userList={userList} onUserClick={onUserClick} />
       <div>
         <h1 className="m-1 text-lg font-bold text-white">{title}</h1>
         <ul>
@@ -65,4 +67,4 @@ const UserSelectModal: React.FC<UserSelectModalProps> = ({
   );
 };
 
-export default UserSelectModal;
+export default ChannelInviteModal;

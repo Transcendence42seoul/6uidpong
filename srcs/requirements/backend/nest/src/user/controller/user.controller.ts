@@ -46,14 +46,16 @@ export class UserController {
   async findAllUser(
     @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query("size", new DefaultValuePipe(10), ParseIntPipe) size: number
-  ): Promise<Pagination<UserResponse>> {
+  ): Promise<UserResponse[]> {
+  // ): Promise<Pagination<UserResponse>> {
     const [users, total]: [User[], number] = await this.userService.findAll({
       page,
       size,
     });
     const dtos: UserResponse[] = users.map((user) => new UserResponse(user));
 
-    return new Pagination<UserResponse>({ results: dtos, total });
+    return dtos;
+    // return new Pagination<UserResponse>({ results: dtos, total });
   }
 
   @Get("/search")

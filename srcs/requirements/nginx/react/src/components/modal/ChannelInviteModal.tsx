@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import useCallApi from '../../utils/useCallApi';
 import HoverButton from '../button/HoverButton';
 import CircularImage from '../container/CircularImage';
-import UserList from '../container/UserList';
+import UserListWithSearchBar from '../container/UserListWithSearchBar';
 
 import type User from '../../interfaces/User';
 
@@ -49,7 +49,7 @@ const ChannelInviteModal: React.FC<ChannelInviteModalProps> = ({
 
   return (
     <div className="fixed inset-0 flex justify-center space-x-8 bg-black bg-opacity-50 pt-40">
-      <UserList users={allUsers} onUserClick={onUserClick} />
+      <UserListWithSearchBar users={allUsers} onUserClick={onUserClick} />
       <div>
         <h1 className="m-1 text-lg font-semibold text-white">Invite</h1>
         <ul>

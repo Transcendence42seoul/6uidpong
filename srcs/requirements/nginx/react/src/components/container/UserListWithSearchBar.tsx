@@ -4,13 +4,13 @@ import CircularImage from './CircularImage';
 
 import type User from '../../interfaces/User';
 
-interface UserListProps {
+interface UserListWithSearchBarProps {
   users: User[];
   onUserClick: (user: User) => void;
   className?: string;
 }
 
-const UserList: React.FC<UserListProps> = ({
+const UserListWithSearchBar: React.FC<UserListWithSearchBarProps> = ({
   users,
   onUserClick,
   className = '',
@@ -78,4 +78,4 @@ const UserList: React.FC<UserListProps> = ({
   );
 };
 
-export default UserList;
+export default UserListWithSearchBar;

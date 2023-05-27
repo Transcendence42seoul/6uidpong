@@ -21,7 +21,7 @@ const Main: React.FC = () => {
             alt="GAME"
             className="group-hover:opacity-0"
           />
-          <h2 className="mt-7 text-4xl group-hover:text-black group-hover:opacity-50">
+          <h2 className="mt-7 text-4xl font-semibold group-hover:text-black group-hover:opacity-50">
             GAME
           </h2>
         </ContentBox>
@@ -33,7 +33,7 @@ const Main: React.FC = () => {
             alt="CHAT"
             className="group-hover:opacity-0"
           />
-          <h2 className="mt-7 text-4xl group-hover:text-black group-hover:opacity-50">
+          <h2 className="mt-7 text-4xl font-semibold group-hover:text-black group-hover:opacity-50">
             CHAT
           </h2>
         </ContentBox>

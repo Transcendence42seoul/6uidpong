@@ -38,7 +38,7 @@ const ChannelInviteModal: React.FC<ChannelInviteModalProps> = ({
     <div className="fixed inset-0 flex justify-center space-x-8 bg-black bg-opacity-50 pt-40">
       <UserList users={users} onUserClick={onUserClick} />
       <div>
-        <h1 className="m-1 text-lg font-bold text-white">{title}</h1>
+        <h1 className="m-1 text-lg font-semibold text-white">{title}</h1>
         <ul>
           {[...selectedUsers].map((user) => {
             const { id, nickname, image } = user;

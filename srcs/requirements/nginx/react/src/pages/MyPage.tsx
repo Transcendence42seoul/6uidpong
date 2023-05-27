@@ -44,7 +44,7 @@ const MyPage: React.FC<MyPageProps> = ({ stats }) => {
   return (
     <div className="flex flex-col items-center space-y-4 p-4">
       <ContentBox className="w-full max-w-md border p-4">
-        <h2 className="mt-2 text-2xl font-bold">
+        <h2 className="mt-2 text-2xl font-semibold">
           {user?.nickname ?? 'Loading...'}
         </h2>
         <CircularImage
@@ -60,13 +60,13 @@ const MyPage: React.FC<MyPageProps> = ({ stats }) => {
         Change Profile
       </HoverButton>
       <ContentBox className="w-full max-w-md border p-4">
-        <h3 className="mb-2 text-xl font-bold">Stats</h3>
+        <h3 className="mb-2 text-xl font-semibold">Stats</h3>
         <p className="mb-1.5">Wins: {user?.winStat}</p>
         <p className="mb-1.5">Losses: {user?.loseStat}</p>
         <p>Ladder Score: {user?.ladderScore}</p>
       </ContentBox>
       <ContentBox className="w-full max-w-md border p-4">
-        <h3 className="mb-3 text-xl font-bold">Recent History</h3>
+        <h3 className="mb-3 text-xl font-semibold">Recent History</h3>
         <ul className="flex">
           {stats.recentHistory.map((history) => (
             <li

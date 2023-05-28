@@ -29,7 +29,7 @@ const FriendRequests: React.FC = () => {
 
   const handleRejectClick = (fromId: number) => {
     const config = {
-      url: `/api/v1/users/${fromId}/friend-requests/${myId}`,
+      url: `/api/v1/users/${myId}/friend-requests/${fromId}`,
       method: 'delete',
     };
     callApi(config);

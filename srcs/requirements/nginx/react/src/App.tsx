@@ -9,6 +9,7 @@ import dispatchAuth from './features/auth/authAction';
 import selectAuth from './features/auth/authSelector';
 import Layout from './Layout';
 import AllChannels from './pages/AllChannels';
+import BlockList from './pages/BlockList';
 import Channel from './pages/Channel';
 import ChannelList from './pages/ChannelList';
 import ChannelSettings from './pages/ChannelSettings';
@@ -85,6 +86,7 @@ const App: React.FC = () => {
       <Routes>
         <Route path="/" element={<Main />} />
         <Route path="/all-channels" element={<AllChannels socket={socket} />} />
+        <Route path="/block-list" element={<BlockList socket={socket} />} />
         <Route path="/channel" element={<ChannelList socket={socket} />} />
         <Route
           path="/channel/:channelId"

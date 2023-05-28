@@ -29,6 +29,7 @@ const MyPage: React.FC<MyPageProps> = ({ stats }) => {
 
   const [user, setUser] = useState<User | null>(null);
 
+  const handleBlockListClick = () => navigate('/block-list');
   const handleChangeProfileClick = () => navigate('/profile-settings');
   const handleFriendsListClick = () => navigate('/friends-list');
 
@@ -87,6 +88,12 @@ const MyPage: React.FC<MyPageProps> = ({ stats }) => {
         className="w-full max-w-md rounded border p-2.5"
       >
         Friends List
+      </HoverButton>
+      <HoverButton
+        onClick={handleBlockListClick}
+        className="w-full max-w-md rounded border p-2.5"
+      >
+        Block List
       </HoverButton>
     </div>
   );

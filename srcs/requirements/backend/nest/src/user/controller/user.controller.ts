@@ -46,16 +46,13 @@ export class UserController {
   async findAllUser(
     @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query("size", new DefaultValuePipe(10), ParseIntPipe) size: number
-  ): Promise<UserResponse[]> {
-    // ): Promise<Pagination<UserResponse>> {
+  ): Promise<Pagination<UserResponse>> {
     const [users, total]: [User[], number] = await this.userService.findAll({
       page,
       size,
     });
     const dtos: UserResponse[] = users.map((user) => new UserResponse(user));
-
-    return dtos;
-    // return new Pagination<UserResponse>({ results: dtos, total });
+    return new Pagination<UserResponse>({ results: dtos, total });
   }
 
   @Get("/search")
@@ -71,7 +68,6 @@ export class UserController {
   async findUser(@Param("id", ParseIntPipe) id: number): Promise<UserResponse> {
     try {
       const user: User = await this.userService.findOneOrFail(id);
-
       return new UserResponse(user);
     } catch {
       throw new NotFoundException("user not exists");
@@ -102,12 +98,8 @@ export class UserController {
   @UseGuards(PermissionGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async send2FACode(@Param("id", ParseIntPipe) id: number): Promise<void> {
-    try {
-      const { email } = await this.userService.findOneOrFail(id);
-      await this.authService.send2FACode(id, email);
-    } catch {
-      throw new NotFoundException("user not exists");
-    }
+    const { email } = await this.userService.findOneOrFail(id);
+    await this.authService.send2FACode(id, email);
   }
 
   @Put("/:id/is2FA")

@@ -31,7 +31,10 @@ export class MuteService {
     userId: number,
     limitedAt: Date
   ): Promise<void> {
-    await this.muteRepository.insert({ channelId, userId, limitedAt });
+    await this.muteRepository.upsert({ channelId, userId, limitedAt }, [
+      "channelId",
+      "userId",
+    ]);
   }
 
   @Cron("0 * * * *")

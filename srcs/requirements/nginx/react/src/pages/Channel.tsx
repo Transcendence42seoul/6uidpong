@@ -1,10 +1,15 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
 
 import HoverButton from '../components/button/HoverButton';
+import ChannelMemberList from '../components/container/ChannelMemberList';
 import ChatRoom from '../components/container/ChatRoom';
 import ChannelInviteModal from '../components/modal/ChannelInviteModal';
+
+import type User from '../interfaces/User';
+
+import { isTest, mockUsers } from '../mock'; // test
 
 interface ChannelProps {
   socket: Socket;
@@ -19,6 +24,7 @@ const Channel: React.FC<ChannelProps> = ({ socket }) => {
   const { channelId: channelIdString } = useParams<{ channelId: string }>();
   const channelId = Number(channelIdString);
 
+  const [members, setMembers] = useState<User[]>([]);
   const [showInviteModal, setShowInviteModal] = useState<boolean>(false);
 
   const join = {
@@ -50,31 +56,44 @@ const Channel: React.FC<ChannelProps> = ({ socket }) => {
     });
   };
 
+  const onMemberClick = () => {};
+
+  useEffect(() => {
+    const membersHandler = (memberList: User[]) => {
+      setMembers([...memberList]);
+    };
+    socket.emit('find-channel-users', { channelId }, membersHandler);
+    setMembers(isTest ? mockUsers : members); // test
+  }, []);
+
   return (
-    <>
-      <div className="mx-auto flex max-w-[1024px] justify-between space-x-1.5 px-4">
-        <HoverButton
-          onClick={handleSettingsClick}
-          className="rounded border p-1.5"
-        >
-          Settings
-        </HoverButton>
-        <div className="space-x-1.5">
+    <div className="flex space-x-1 px-4">
+      <ChannelMemberList members={members} onMemberClick={onMemberClick} />
+      <div className="w-full max-w-[1024px]">
+        <div className="flex justify-between space-x-1.5 px-4">
           <HoverButton
-            onClick={handleInviteClick}
-            className="rounded border bg-blue-800 p-1.5 hover:text-blue-800"
+            onClick={handleSettingsClick}
+            className="rounded border p-1.5"
           >
-            Invite
+            Settings
           </HoverButton>
-          <HoverButton
-            onClick={handleExitClick}
-            className="rounded border bg-red-800 p-1.5 hover:text-red-800"
-          >
-            Exit
-          </HoverButton>
+          <div className="space-x-1.5">
+            <HoverButton
+              onClick={handleInviteClick}
+              className="rounded border bg-blue-800 p-1.5 hover:text-blue-800"
+            >
+              Invite
+            </HoverButton>
+            <HoverButton
+              onClick={handleExitClick}
+              className="rounded border bg-red-800 p-1.5 hover:text-red-800"
+            >
+              Exit
+            </HoverButton>
+          </div>
         </div>
+        <ChatRoom join={join} leave={leave} send={send} socket={socket} />
       </div>
-      <ChatRoom join={join} leave={leave} send={send} socket={socket} />
       {showInviteModal && (
         <ChannelInviteModal
           channelId={channelId}
@@ -82,7 +101,7 @@ const Channel: React.FC<ChannelProps> = ({ socket }) => {
           socket={socket}
         />
       )}
-    </>
+    </div>
   );
 };
 

@@ -63,10 +63,10 @@ const DmRoomList: React.FC<DmRoomListProps> = ({ socket }) => {
   };
 
   useEffect(() => {
-    const roomListHandler = (roomList: Room[]) => {
+    const roomsHandler = (roomList: Room[]) => {
       setRooms([...roomList]);
     };
-    socket.emit('find-dm-rooms', roomListHandler);
+    socket.emit('find-dm-rooms', roomsHandler);
     setRooms(isTest ? mockRooms : rooms); // test
   }, []);
 

@@ -30,10 +30,10 @@ const AllChannels: React.FC<AllChannelsProps> = ({ socket }) => {
   };
 
   useEffect(() => {
-    const channelListHandler = (channelList: Channel[]) => {
+    const channelsHandler = (channelList: Channel[]) => {
       setChannels([...channelList]);
     };
-    socket.emit('find-all-channels', channelListHandler);
+    socket.emit('find-all-channels', channelsHandler);
     setChannels(isTest ? mockChannels : channels); // test
   }, []);
 

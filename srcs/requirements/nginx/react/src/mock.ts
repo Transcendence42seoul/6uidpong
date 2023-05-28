@@ -27,6 +27,8 @@ export const mockUsers = [
     winStat: 1,
     loseStat: 1,
     ladderScore: 1000,
+    isOwner: true,
+    isAdmin: true,
   },
   {
     id: 110731,
@@ -37,6 +39,8 @@ export const mockUsers = [
     winStat: 1,
     loseStat: 1,
     ladderScore: 1000,
+    isOwner: false,
+    isAdmin: true,
   },
   {
     id: 123456,
@@ -47,6 +51,8 @@ export const mockUsers = [
     winStat: 1,
     loseStat: 1,
     ladderScore: 1000,
+    isOwner: false,
+    isAdmin: false,
   },
 ];
 

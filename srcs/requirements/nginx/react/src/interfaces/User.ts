@@ -6,6 +6,8 @@ interface User {
   winStat: number;
   loseStat: number;
   ladderScore: number;
+  isOwner: boolean;
+  isAdmin: boolean;
 }
 
 export default User;

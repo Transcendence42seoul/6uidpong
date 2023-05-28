@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Socket } from 'socket.io-client';
 
 import useCallApi from '../../utils/useCallApi';
 import HoverButton from '../button/HoverButton';
@@ -10,13 +11,15 @@ import type User from '../../interfaces/User';
 import { isTest, mockUsers } from '../../mock'; // test
 
 interface ChannelInviteModalProps {
-  onConfirmClick: (users: Set<User>) => void;
+  channelId: number;
   setShowModal: (showModal: boolean) => void;
+  socket: Socket;
 }
 
 const ChannelInviteModal: React.FC<ChannelInviteModalProps> = ({
-  onConfirmClick,
+  channelId,
   setShowModal,
+  socket,
 }) => {
   const callApi = useCallApi();
 
@@ -28,7 +31,13 @@ const ChannelInviteModal: React.FC<ChannelInviteModalProps> = ({
   };
 
   const handleConfirmClick = () => {
-    onConfirmClick(selectedUsers);
+    const inviteChannelData = {
+      info: {
+        channelId,
+        userId: [...selectedUsers].map((user) => user.id),
+      },
+    };
+    socket.emit('invite-channel', inviteChannelData);
     setShowModal(false);
   };
 

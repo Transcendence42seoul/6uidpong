@@ -29,17 +29,15 @@ const ChannelManageModal: React.FC<ChannelManageModalProps> = ({
   setShowModal,
   socket,
 }) => {
-  const [adminUsers, setAdminUsers] = useState<User[]>([]);
-  const [bannedUsers, setBannedUsers] = useState<User[]>([]);
-  const [channelUsers, setChannelUsers] = useState<User[]>([]);
+  const [admins, setAdmins] = useState<User[]>([]);
+  const [banList, setBanList] = useState<User[]>([]);
+  const [members, setMembers] = useState<User[]>([]);
   const [owner, setOwner] = useState<User | null>(null);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [selected, setSelected] = useState<User | null>(null);
   const [sendData, setSendData] = useState<SendData | null>(null);
 
   const removeUser = () => {
-    setChannelUsers([
-      ...channelUsers.filter((user) => user.id !== selectedUser?.id),
-    ]);
+    setMembers([...members.filter((user) => user.id !== selected?.id)]);
   };
 
   const handleAssignAdminClick = () => {};
@@ -62,56 +60,56 @@ const ChannelManageModal: React.FC<ChannelManageModalProps> = ({
 
   const handleTransferOwnerClick = () => {
     socket.emit('transfer-ownership', sendData);
-    setOwner(selectedUser);
+    setOwner(selected);
   };
 
   const onUserClick = (user: User) => {
-    setSelectedUser(user);
+    setSelected(user);
   };
 
   useEffect(() => {
-    const channelAdminsHandler = (users: User[]) => {
-      setAdminUsers([...users]);
+    const adminsHandler = (users: User[]) => {
+      setAdmins([...users]);
     };
-    socket.emit('find-channel-admins', { channelId }, channelAdminsHandler);
-    setAdminUsers(isTest ? mockUsers : adminUsers); // test
+    socket.emit('find-channel-admins', { channelId }, adminsHandler);
+    setAdmins(isTest ? mockUsers : admins); // test
   }, []);
 
   useEffect(() => {
-    const bannedUsersHandler = (users: User[]) => {
-      setBannedUsers([...users]);
+    const banListHandler = (users: User[]) => {
+      setBanList([...users]);
     };
-    socket.emit('find-channel-ban-users', { channelId }, bannedUsersHandler);
-    setBannedUsers(isTest ? mockUsers : bannedUsers); // test
+    socket.emit('find-channel-ban-users', { channelId }, banListHandler);
+    setBanList(isTest ? mockUsers : banList); // test
   }, []);
 
   useEffect(() => {
-    const channelUsersHandler = (users: User[]) => {
-      setChannelUsers([...users]);
+    const membersHandler = (users: User[]) => {
+      setMembers([...users]);
     };
-    socket.emit('find-channel-users', { channelId }, channelUsersHandler);
-    setChannelUsers(isTest ? mockUsers : channelUsers); // test
+    socket.emit('find-channel-users', { channelId }, membersHandler);
+    setMembers(isTest ? mockUsers : members); // test
   }, []);
 
   useEffect(() => {
-    if (!selectedUser) return;
+    if (!selected) return;
     setSendData({
       info: {
         channelId,
-        userId: selectedUser.id,
+        userId: selected.id,
       },
     });
-  }, [selectedUser]);
+  }, [selected]);
 
   return (
     <div className="fixed inset-0 flex justify-center space-x-8 bg-black bg-opacity-50 pt-40">
-      <UserListWithSeacrhBar users={channelUsers} onUserClick={onUserClick} />
-      {selectedUser && (
+      <UserListWithSeacrhBar users={members} onUserClick={onUserClick} />
+      {selected && (
         <ContentBox className="max-h-96 max-w-xs border p-4">
-          <h2 className="text-lg font-semibold">{selectedUser.nickname}</h2>
+          <h2 className="text-lg font-semibold">{selected.nickname}</h2>
           <CircularImage
-            src={selectedUser.image}
-            alt={selectedUser.nickname}
+            src={selected.image}
+            alt={selected.nickname}
             className="m-2 h-32 w-32"
           />
           <div className="m-4 flex w-full">
@@ -150,8 +148,8 @@ const ChannelManageModal: React.FC<ChannelManageModalProps> = ({
       )}
       <div className="space-y-4">
         <div className="flex space-x-4">
-          <UserList title="Ban" users={bannedUsers} />
-          <UserList title="Admin" users={adminUsers} />
+          <UserList title="Ban" users={banList} />
+          <UserList title="Admin" users={admins} />
         </div>
         <HoverButton onClick={handleCloseClick} className="w-full border p-2">
           Close

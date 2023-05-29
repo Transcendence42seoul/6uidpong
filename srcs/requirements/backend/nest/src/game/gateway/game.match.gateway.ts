@@ -15,7 +15,6 @@ import { WsJwtPayload } from "../utils/ws-jwt-payload.decorator";
     credentials: true,
   },
 })
-
 export class GameMatchGateway {
   @WebSocketServer()
   server: Server;
@@ -26,17 +25,14 @@ export class GameMatchGateway {
   ) {}
 
   @SubscribeMessage("ladder-game-match")
-  handleConnectLadder(
-    @WsJwtPayload() jwt: JwtPayload,
-    client: Socket
-  ): void {
+  handleConnectLadder(@WsJwtPayload() jwt: JwtPayload, client: Socket): void {
     this.gameMatchService.handleLadderMatchStart(client);
-
   }
 
   @SubscribeMessage("ladder-game-match-cancel")
-  handleDisconnectLadder(@WsJwtPayload() jwt: JwtPayload,
-  client: Socket
+  handleDisconnectLadder(
+    @WsJwtPayload() jwt: JwtPayload,
+    client: Socket
   ): void {
     this.gameMatchService.handleLadderMatchcancel(client);
   }

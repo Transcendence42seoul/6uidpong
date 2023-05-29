@@ -15,7 +15,7 @@ export class FtGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const code: string | null = request.body.code;
-    if (typeof code === null) {
+    if (!code) {
       throw new BadRequestException();
     }
     try {

@@ -1,6 +1,6 @@
 import { Ban } from "src/chat/entity/channel/ban.entity";
-import { ChannelChat } from "src/chat/entity/channel/channel-chat.entity";
 import { ChannelUser } from "src/chat/entity/channel/channel-user.entity";
+import { ChannelChat } from "src/chat/entity/channel/chat.entity";
 import { Block } from "src/chat/entity/dm/block.entity";
 import { DmChat } from "src/chat/entity/dm/dm-chat.entity";
 import { DmRoomUser } from "src/chat/entity/dm/dm-room-user.entity";

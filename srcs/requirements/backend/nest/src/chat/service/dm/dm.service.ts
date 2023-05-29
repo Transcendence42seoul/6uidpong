@@ -2,10 +2,11 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "src/user/entity/user.entity";
 import { Repository, MoreThanOrEqual, DataSource, InsertResult } from "typeorm";
-import { DmRoomResponse } from "../../dto/dm/dm-rooms-response.dto";
+import { RoomResponse } from "../../dto/dm/room-response";
 import { DmChat } from "../../entity/dm/dm-chat.entity";
 import { DmRoomUser } from "../../entity/dm/dm-room-user.entity";
 import { DmRoom } from "../../entity/dm/dm-room.entity";
+import { BlockService } from "./block.service";
 
 @Injectable()
 export class DmService {
@@ -16,10 +17,11 @@ export class DmService {
     private readonly roomUserRepository: Repository<DmRoomUser>,
     @InjectRepository(DmChat)
     private readonly chatRepository: Repository<DmChat>,
+    private readonly blockService: BlockService,
     private readonly dataSource: DataSource
   ) {}
 
-  async findRooms(userId: number): Promise<DmRoomResponse[]> {
+  async findRooms(userId: number): Promise<RoomResponse[]> {
     return await this.chatRepository
       .createQueryBuilder("dm_chats")
       .select([
@@ -69,7 +71,6 @@ export class DmService {
   ): Promise<DmRoomUser> {
     return await this.roomUserRepository
       .createQueryBuilder("room_user")
-      .select()
       .innerJoin(
         (subQuery) =>
           subQuery
@@ -81,7 +82,7 @@ export class DmService {
         "match_room_user",
         "room_user.room_id = match_room_user.room_id"
       )
-      .innerJoin("room_user.user", "user")
+      .innerJoinAndSelect("room_user.user", "user")
       .where("room_user.user_id = :userId")
       .setParameters({ userId, interlocutorId })
       .getOneOrFail();

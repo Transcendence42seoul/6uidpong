@@ -13,11 +13,11 @@ import { AuthService } from "../service/auth.service";
 import { UserService } from "src/user/service/user.service";
 import { JwtRefreshGuard } from "../guard/jwt-refresh.guard";
 import { FtGuard } from "../guard/ft.guard";
-import { TwoFactorAuthRequest } from "../dto/two-factor-auth-request.dto";
+import { TwoFactorAuthRequest } from "../dto/two-factor-auth-request";
 import { User } from "src/user/entity/user.entity";
 import { EntityNotFoundError } from "typeorm";
-import { CallbackResponse } from "../dto/callback-response.dto";
-import { AccessTokenResponse } from "../dto/access-token-response.dto";
+import { CallbackResponse } from "../dto/callback-response";
+import { AccessTokenResponse } from "../dto/access-token-response";
 
 @Controller("api/v1/auth")
 export class AuthController {

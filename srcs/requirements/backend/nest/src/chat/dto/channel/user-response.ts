@@ -1,6 +1,6 @@
 import { ChannelUser } from "src/chat/entity/channel/channel-user.entity";
 
-export class ChannelUserResponse {
+export class UserResponse {
   constructor(entity: ChannelUser) {
     this.id = entity.user.id;
     this.nickname = entity.user.nickname;

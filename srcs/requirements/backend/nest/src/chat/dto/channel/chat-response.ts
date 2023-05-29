@@ -1,20 +1,13 @@
-import { DmChat } from "../../entity/dm/dm-chat.entity";
+import { ChannelChat } from "src/chat/entity/channel/chat.entity";
 
-export class DmChatResponse {
-  constructor(entity: DmChat) {
-    this.id = entity.id;
-    this.roomId = entity.room.id;
+export class ChatResponse {
+  constructor(entity: ChannelChat) {
     this.userId = entity.user.id;
     this.nickname = entity.user.nickname;
     this.image = entity.user.image;
     this.message = entity.message;
     this.createdAt = entity.createdAt;
   }
-
-  readonly id: number;
-
-  readonly roomId: number;
-
   readonly userId: number;
 
   readonly nickname: string;

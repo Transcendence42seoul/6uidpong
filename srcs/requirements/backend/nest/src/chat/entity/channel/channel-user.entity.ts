@@ -24,7 +24,7 @@ export class ChannelUser {
   @JoinColumn({ name: "channel_id" })
   channel: Channel;
 
-  @ManyToOne(() => User, (user) => user.dmRoomUsers, {
+  @ManyToOne(() => User, (user) => user.channelUsers, {
     onUpdate: "CASCADE",
   })
   @JoinColumn({ name: "user_id" })

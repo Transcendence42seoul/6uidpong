@@ -5,7 +5,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { ChannelChat } from "./channel-chat.entity";
+import { ChannelChat } from "./chat.entity";
 import { ChannelUser } from "./channel-user.entity";
 
 @Entity("channels")
@@ -16,7 +16,7 @@ export class Channel {
   @Column({ unique: true })
   title: string;
 
-  @Column({ nullable: true })
+  @Column()
   password: string;
 
   @Column({ name: "is_public", type: "boolean" })

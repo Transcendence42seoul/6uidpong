@@ -1,12 +1,13 @@
 import {
   IsBoolean,
+  IsEmpty,
   IsNotEmpty,
   IsString,
   Length,
   Matches,
 } from "class-validator";
 
-export class ChannelCreateRequest {
+export class CreateRequest {
   @IsNotEmpty()
   @IsString()
   @Length(4, 30)

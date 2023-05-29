@@ -1,14 +1,20 @@
-import { ChannelChat } from "src/chat/entity/channel/channel-chat.entity";
+import { DmChat } from "../../entity/dm/dm-chat.entity";
 
-export class ChannelChatResponse {
-  constructor(entity: ChannelChat) {
+export class ChatResponse {
+  constructor(entity: DmChat) {
+    this.id = entity.id;
+    this.roomId = entity.room.id;
     this.userId = entity.user.id;
     this.nickname = entity.user.nickname;
     this.image = entity.user.image;
     this.message = entity.message;
-    this.isSystem = entity.isSystem;
     this.createdAt = entity.createdAt;
   }
+
+  readonly id: number;
+
+  readonly roomId: number;
+
   readonly userId: number;
 
   readonly nickname: string;
@@ -16,8 +22,6 @@ export class ChannelChatResponse {
   readonly image: string;
 
   readonly message: string;
-
-  readonly isSystem: boolean;
 
   readonly createdAt: Date;
 }

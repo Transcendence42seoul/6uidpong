@@ -15,7 +15,7 @@ export class JwtAccessGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request: any = context.switchToHttp().getRequest();
     const token: string | undefined = this.extractTokenFromHeader(request);
-    if (typeof token === undefined) {
+    if (typeof token === "undefined") {
       throw new UnauthorizedException();
     }
     try {

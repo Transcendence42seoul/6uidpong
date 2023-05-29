@@ -31,8 +31,8 @@ export class BanService {
 
   async validate(channelId: number, userId: number): Promise<void> {
     const pk: Object = { channelId, userId };
-    const ban: Ban | null = await this.banRepository.findOneBy(pk);
-    if (typeof ban !== null) {
+    const ban: Ban = await this.banRepository.findOneBy(pk);
+    if (ban) {
       throw new WsException("can't join because banned.");
     }
   }

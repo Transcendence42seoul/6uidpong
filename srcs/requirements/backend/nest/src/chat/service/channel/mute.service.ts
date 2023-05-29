@@ -18,7 +18,7 @@ export class MuteService {
       userId,
     };
     const mute: Mute | null = await this.muteRepository.findOneBy(pk);
-    if (typeof mute !== null) {
+    if (mute) {
       if (mute.limitedAt > new Date()) {
         throw new WsException("can't send because muted user.");
       }

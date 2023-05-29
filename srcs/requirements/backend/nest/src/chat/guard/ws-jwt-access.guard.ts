@@ -10,7 +10,7 @@ export class WsJwtAccessGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const client: Socket = context.switchToWs().getClient<Socket>();
     const token: string | undefined = this.extractToken(client);
-    if (typeof token === undefined) {
+    if (typeof token === "undefined") {
       throw new WsException("token not exists");
     }
     try {

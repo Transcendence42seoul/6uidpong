@@ -1,13 +1,15 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { ChannelCreateRequest } from "src/chat/dto/channel/channel-create-request.dto";
-import { ChannelResponse } from "src/chat/dto/channel/channel-response.dto";
-import { ChannelChat } from "src/chat/entity/channel/channel-chat.entity";
+import { CreateRequest } from "src/chat/dto/channel/create-request";
+import { ChannelResponse } from "src/chat/dto/channel/channel-response";
+import { ChannelChat } from "src/chat/entity/channel/chat.entity";
 import { ChannelUser } from "src/chat/entity/channel/channel-user.entity";
 import { Channel } from "src/chat/entity/channel/channel.entity";
 import * as bcryptjs from "bcryptjs";
 import { DataSource, MoreThanOrEqual, Repository, InsertResult } from "typeorm";
-import { Mute } from "src/chat/entity/channel/mute.entity";
+import { WsException } from "@nestjs/websockets";
+import { Namespace } from "socket.io";
+import { ChatResponse } from "src/chat/dto/channel/chat-response";
 
 @Injectable()
 export class ChannelService {
@@ -18,8 +20,6 @@ export class ChannelService {
     private readonly channelUserRepository: Repository<ChannelUser>,
     @InjectRepository(ChannelChat)
     private readonly chatRepository: Repository<ChannelChat>,
-    @InjectRepository(Mute)
-    private readonly muteRepository: Repository<Mute>,
     private readonly dataSource: DataSource
   ) {}
 
@@ -30,9 +30,9 @@ export class ChannelService {
         "channel.id                   AS id",
         "channel.title                AS title",
         'count(*)                     AS "memberCount"',
-        'CASE WHEN channel.password IS NOT NULL THEN true \
-              ELSE false                                  \
-              END                     AS "isLocked"',
+        "CASE WHEN channel.password = '' THEN false \
+              ELSE true                             \
+              END                     AS \"isLocked\"",
       ])
       .innerJoin(
         "channel.channelUsers",
@@ -133,10 +133,7 @@ export class ChannelService {
     });
   }
 
-  async createChannel(
-    userId: number,
-    body: ChannelCreateRequest
-  ): Promise<Channel> {
+  async createChannel(userId: number, body: CreateRequest): Promise<Channel> {
     const queryRunner = this.dataSource.createQueryRunner();
 
     await queryRunner.connect();
@@ -148,8 +145,8 @@ export class ChannelService {
           title: body.title,
           isPublic: body.isPublic,
           password:
-            typeof body.password === undefined
-              ? null
+            typeof body.password === "undefined"
+              ? ""
               : await bcryptjs.hash(body.password, await bcryptjs.genSalt()),
         }
       );
@@ -208,12 +205,18 @@ export class ChannelService {
     });
   }
 
-  async insertChat(
+  async sendChat(
     userId: number,
     channelId: number,
     message: string,
-    notJoinedUsers: ChannelUser[]
-  ): Promise<ChannelChat> {
+    server: Namespace
+  ): Promise<void> {
+    const sockets = await server.in("c" + channelId).fetchSockets();
+    const channelUsers: ChannelUser[] = await this.findUsers(channelId);
+    const notJoinedUsers: ChannelUser[] = channelUsers.filter(
+      (channelUser) =>
+        !sockets.some((socket) => socket.id === channelUser.user.socketId)
+    );
     const queryRunner = this.dataSource.createQueryRunner();
 
     await queryRunner.connect();
@@ -237,12 +240,15 @@ export class ChannelService {
         "newMsgCount",
         1
       );
-
-      await queryRunner.commitTransaction();
-
-      return await this.chatRepository.findOneBy({
+      const onlineSockets: string[] = channelUsers
+        .filter((channelUser) => channelUser.user.status === "online")
+        .map((onlineChannelUser) => onlineChannelUser.user.socketId);
+      const chat: ChannelChat = await this.chatRepository.findOneBy({
         id: newChat.identifiers[0].id,
       });
+      server.to(onlineSockets).emit("send-channel", new ChatResponse(chat));
+
+      await queryRunner.commitTransaction();
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;
@@ -262,8 +268,8 @@ export class ChannelService {
   async updatePassword(channelId: number, password: string | undefined) {
     await this.channelRepository.update(channelId, {
       password:
-        typeof password === undefined
-          ? null
+        typeof password === "undefined"
+          ? ""
           : await bcryptjs.hash(password, await bcryptjs.genSalt()),
     });
   }
@@ -315,5 +321,18 @@ export class ChannelService {
         isAdmin: value,
       }
     );
+  }
+
+  async validatePassword(channelId: number, password: string): Promise<void> {
+    const channel: Channel = await this.channelRepository.findOneByOrFail({
+      id: channelId,
+    });
+    if (
+      channel.password.length !== 0 &&
+      (typeof password === "undefined" ||
+        !(await bcryptjs.compare(channel.password, password)))
+    ) {
+      throw new WsException("invalid password");
+    }
   }
 }

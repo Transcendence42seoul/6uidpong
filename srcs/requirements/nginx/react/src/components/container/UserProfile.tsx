@@ -7,11 +7,12 @@ import type User from '../../interfaces/User';
 
 interface UserProfileProps {
   user: User;
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
-const UserProfile: React.FC<UserProfileProps> = ({ user, children }) => {
+const UserProfile: React.FC<UserProfileProps> = ({ user, children = null }) => {
   const { nickname, image } = user;
+
   return (
     <div>
       <ContentBox className="p-4">

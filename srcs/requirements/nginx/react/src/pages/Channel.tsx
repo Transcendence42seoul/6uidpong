@@ -66,7 +66,7 @@ const Channel: React.FC<ChannelProps> = ({ socket }) => {
 
   return (
     <div className="flex space-x-1 px-4">
-      <ChannelMemberList members={members} />
+      <ChannelMemberList members={members} socket={socket} />
       <div className="w-full max-w-[1024px]">
         <div className="flex justify-between space-x-1.5 px-4">
           <HoverButton

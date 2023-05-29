@@ -1,17 +1,21 @@
 import React, { useRef, useState } from 'react';
+import { Socket } from 'socket.io-client';
 
-import MemberProfileModal from '../modal/MemberProfileModal';
+import ChannelMemberProfile from './ChannelMemberProfile';
 import CircularImage from './CircularImage';
+import ModalContainer from './ModalContainer';
 
 import type User from '../../interfaces/User';
 
 interface ChannelMemberListProps {
   members: User[];
+  socket: Socket;
   className?: string;
 }
 
 const ChannelMemberList: React.FC<ChannelMemberListProps> = ({
   members,
+  socket,
   className = '',
 }) => {
   const searchResultsRef = useRef<HTMLUListElement>(null);
@@ -80,7 +84,9 @@ const ChannelMemberList: React.FC<ChannelMemberListProps> = ({
         })}
       </ul>
       {selectedMember && showMemberProfileModal && (
-        <MemberProfileModal member={selectedMember} />
+        <ModalContainer setShowModal={setShowMemberProfileModal}>
+          <ChannelMemberProfile member={selectedMember} socket={socket} />
+        </ModalContainer>
       )}
     </div>
   );

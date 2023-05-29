@@ -22,7 +22,7 @@ import Login from './pages/Login';
 import Main from './pages/Main';
 import MyPage from './pages/MyPage';
 import ProfileSettings from './pages/ProfileSettings';
-import UserProfile from './pages/UserProfile';
+import UserProfile from './components/container/UserProfile';
 import redirect from './utils/redirect';
 
 import { isTest, mockAuthState } from './mock'; // test
@@ -82,7 +82,7 @@ const App: React.FC = () => {
   });
 
   return (
-    <Layout>
+    <Layout socket={socket}>
       <Routes>
         <Route path="/" element={<Main />} />
         <Route path="/all-channels" element={<AllChannels socket={socket} />} />
@@ -101,10 +101,6 @@ const App: React.FC = () => {
         <Route path="/friend-requests" element={<FriendRequests />} />
         <Route path="/friends-list" element={<FriendsList />} />
         <Route path="/my-page" element={<MyPage stats={stats} />} />
-        <Route
-          path="/profile/:userId"
-          element={<UserProfile socket={socket} />}
-        />
         <Route path="/profile-settings" element={<ProfileSettings />} />
       </Routes>
     </Layout>

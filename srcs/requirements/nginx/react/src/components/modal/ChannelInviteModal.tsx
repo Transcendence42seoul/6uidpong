@@ -3,6 +3,7 @@ import { Socket } from 'socket.io-client';
 
 import useCallApi from '../../utils/useCallApi';
 import HoverButton from '../button/HoverButton';
+import ModalContainer from '../container/ModalContainer';
 import UserList from '../container/UserList';
 import UserListWithSearchBar from '../container/UserListWithSearchBar';
 
@@ -57,7 +58,7 @@ const ChannelInviteModal: React.FC<ChannelInviteModalProps> = ({
   }, []);
 
   return (
-    <div className="fixed inset-0 flex justify-center space-x-8 bg-black bg-opacity-50 pt-40">
+    <ModalContainer>
       <UserListWithSearchBar users={allUsers} onUserClick={onUserClick} />
       <UserList title="Invite" users={selectedUsers}>
         <div className="flex">
@@ -72,7 +73,7 @@ const ChannelInviteModal: React.FC<ChannelInviteModalProps> = ({
           </HoverButton>
         </div>
       </UserList>
-    </div>
+    </ModalContainer>
   );
 };
 

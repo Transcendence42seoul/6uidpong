@@ -4,6 +4,7 @@ import { Socket } from 'socket.io-client';
 import HoverButton from '../button/HoverButton';
 import CircularImage from '../container/CircularImage';
 import ContentBox from '../container/ContentBox';
+import ModalContainer from '../container/ModalContainer';
 import UserListWithSeacrhBar from '../container/UserListWithSearchBar';
 
 import type User from '../../interfaces/User';
@@ -102,7 +103,7 @@ const ChannelManageModal: React.FC<ChannelManageModalProps> = ({
   }, [selected]);
 
   return (
-    <div className="fixed inset-0 flex justify-center space-x-8 bg-black bg-opacity-50 pt-40">
+    <ModalContainer>
       <UserListWithSeacrhBar users={members} onUserClick={onUserClick} />
       {selected && (
         <ContentBox className="max-h-96 max-w-xs border p-4">
@@ -155,7 +156,7 @@ const ChannelManageModal: React.FC<ChannelManageModalProps> = ({
           Close
         </HoverButton>
       </div>
-    </div>
+    </ModalContainer>
   );
 };
 

@@ -2,22 +2,22 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
 
-import AlertWithCloseButton from '../components/alert/AlertWithCloseButton';
-import HoverButton from '../components/button/HoverButton';
-import CircularImage from '../components/container/CircularImage';
-import ContentBox from '../components/container/ContentBox';
-import selectAuth from '../features/auth/authSelector';
-import useCallApi from '../utils/useCallApi';
+import selectAuth from '../../features/auth/authSelector';
+import useCallApi from '../../utils/useCallApi';
+import HoverButton from '../button/HoverButton';
+import CircularImage from './CircularImage';
+import ContentBox from './ContentBox';
 
-import type User from '../interfaces/User';
+import type User from '../../interfaces/User';
 
-import { isTest, mockUsers } from '../mock'; // test
+import { isTest, mockUsers } from '../../mock'; // test
 
 interface UserProfileProps {
   socket: Socket;
+  children: React.ReactNode;
 }
 
-const UserProfile: React.FC<UserProfileProps> = ({ socket }) => {
+const UserProfile: React.FC<UserProfileProps> = ({ socket, children }) => {
   const callApi = useCallApi();
   const navigate = useNavigate();
   const { userId } = useParams<{ userId: string }>();
@@ -26,16 +26,10 @@ const UserProfile: React.FC<UserProfileProps> = ({ socket }) => {
   const { tokenInfo } = selectAuth();
   const myId = tokenInfo?.id;
 
-  const [showAlert, setShowAlert] = useState<boolean>(false);
   const [user, setUser] = useState<User | null>(null);
-
-  const handleAlertClose = () => {
-    setShowAlert(false);
-  };
 
   const handleBlockClick = () => {
     socket.emit('block-dm-user', { interlocutorId });
-    setShowAlert(true);
   };
 
   const handleDmClick = () => {
@@ -65,15 +59,6 @@ const UserProfile: React.FC<UserProfileProps> = ({ socket }) => {
     };
     fetchUserData();
   }, [interlocutorId]);
-
-  useEffect(() => {
-    if (showAlert) {
-      const timeoutId = setTimeout(() => {
-        setShowAlert(false);
-      }, 2500);
-      return () => clearTimeout(timeoutId);
-    }
-  }, [showAlert]);
 
   return (
     <div className="flex flex-col items-center space-y-2 p-20">
@@ -113,12 +98,6 @@ const UserProfile: React.FC<UserProfileProps> = ({ socket }) => {
           </button>
         </div>
       </ContentBox>
-      {showAlert && (
-        <AlertWithCloseButton
-          message={`${user?.nickname} is blocked.`}
-          onClose={handleAlertClose}
-        />
-      )}
     </div>
   );
 };

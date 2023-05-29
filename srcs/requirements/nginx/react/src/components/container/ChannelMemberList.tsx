@@ -1,26 +1,29 @@
 import React, { useRef, useState } from 'react';
 
+import MemberProfileModal from '../modal/MemberProfileModal';
 import CircularImage from './CircularImage';
 
 import type User from '../../interfaces/User';
 
 interface ChannelMemberListProps {
   members: User[];
-  onMemberClick: (member: User) => void;
   className?: string;
 }
 
 const ChannelMemberList: React.FC<ChannelMemberListProps> = ({
   members,
-  onMemberClick,
   className = '',
 }) => {
   const searchResultsRef = useRef<HTMLUListElement>(null);
   const [search, setSearch] = useState<string>('');
   const [searchResults, setSearchResults] = useState<User[]>(members);
+  const [selectedMember, setSelectedMember] = useState<User | null>(null);
+  const [showMemberProfileModal, setShowMemberProfileModal] =
+    useState<boolean>(false);
 
   const handleMemberClick = (member: User) => {
-    onMemberClick(member);
+    setSelectedMember(member);
+    setShowMemberProfileModal(true);
   };
 
   const handleSearchResults = async (results: User[]) => {
@@ -76,6 +79,9 @@ const ChannelMemberList: React.FC<ChannelMemberListProps> = ({
           );
         })}
       </ul>
+      {selectedMember && showMemberProfileModal && (
+        <MemberProfileModal member={selectedMember} />
+      )}
     </div>
   );
 };

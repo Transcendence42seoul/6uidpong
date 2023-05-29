@@ -29,21 +29,19 @@ const ChannelManagePanel: React.FC<ChannelManagePanelProps> = ({
   };
 
   return (
-    <>
-      <ContentBox className="w-full max-w-sm space-y-4 p-7">
-        <HoverButton
-          onClick={handleManageMembersClick}
-          className="w-full max-w-xs border p-2"
-        >
-          Manage Members
-        </HoverButton>
-        <HoverButton
-          onClick={handleDeleteChannelClick}
-          className="w-full max-w-xs border bg-red-800 p-2 hover:text-red-800"
-        >
-          Delete Channel
-        </HoverButton>
-      </ContentBox>
+    <ContentBox className="w-full max-w-sm space-y-4 p-7">
+      <HoverButton
+        onClick={handleManageMembersClick}
+        className="w-full max-w-xs border p-2"
+      >
+        Manage Members
+      </HoverButton>
+      <HoverButton
+        onClick={handleDeleteChannelClick}
+        className="w-full max-w-xs border bg-red-800 p-2 hover:text-red-800"
+      >
+        Delete Channel
+      </HoverButton>
       {showManageModal && (
         <ChannelManageModal
           channelId={channelId}
@@ -51,7 +49,7 @@ const ChannelManagePanel: React.FC<ChannelManagePanelProps> = ({
           socket={socket}
         />
       )}
-    </>
+    </ContentBox>
   );
 };
 

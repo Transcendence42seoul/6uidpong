@@ -472,13 +472,24 @@ export class ChannelService {
     }
   }
 
-  async updateIsAdmin(
-    channelId: number,
+  async updateAdmin(
     userId: number,
-    value: boolean
+    info: { channelId: number; userId: number; value: boolean }
   ): Promise<void> {
+    const { channelId, userId: targetId, value } = info;
+    const channelUser: ChannelUser = await this.findUser(
+      info.channelId,
+      userId
+    );
+    const targetChannelUser: ChannelUser = await this.findUser(
+      channelId,
+      targetId
+    );
+    if (!channelUser.isOwner || targetChannelUser.isOwner) {
+      throw new WsException("permission denied");
+    }
     await this.channelUserRepository.update(
-      { channelId, userId },
+      { channelId, userId: targetId },
       {
         isAdmin: value,
       }

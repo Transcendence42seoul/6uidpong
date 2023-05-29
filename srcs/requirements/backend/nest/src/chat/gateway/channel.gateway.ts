@@ -125,22 +125,7 @@ export class ChannelGateway {
     @MessageBody("info")
     info: { channelId: number; userId: number; value: boolean }
   ): Promise<void> {
-    const channelUser: ChannelUser = await this.channelService.findUser(
-      info.channelId,
-      jwt.id
-    );
-    const targetChannelUser: ChannelUser = await this.channelService.findUser(
-      info.channelId,
-      info.userId
-    );
-    if (!channelUser.isOwner || targetChannelUser.isOwner) {
-      throw new WsException("permission denied");
-    }
-    await this.channelService.updateIsAdmin(
-      info.channelId,
-      info.userId,
-      info.value
-    );
+    await this.channelService.updateAdmin(jwt.id, info);
   }
 
   @SubscribeMessage("invite")

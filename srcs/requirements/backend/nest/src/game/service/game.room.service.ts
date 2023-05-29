@@ -80,6 +80,103 @@ export class GameRoomService {
     return roomInfo;
   }
 
+  broadcastState(roomInfo: gameRoomInfo) {
+    const {user1, user2, state} = roomInfo;
+
+    state.paddle1 += state.keyState1 * 4 * 3;
+    state.paddle2 += state.keyState1 * 4 * 3;
+
+    if (state.paddle1 > GameInfo.maxy) state.paddle1 = GameInfo.maxy;
+    else if (state.paddle1 < -GameInfo.maxy) state.paddle1 = -GameInfo.maxy;
+    if (state.paddle2 > GameInfo.maxy) state.paddle2 = GameInfo.maxy;
+    else if (state.paddle2 < -GameInfo.maxy) state.paddle2 = -GameInfo.maxy;
+
+    // wall
+    if (
+      state.ball.y >= GameInfo.height / 2 - GameInfo.ballrad &&
+      state.ball.dy > 0
+    ) {
+      state.ball.dy *= -1;
+      state.ball.y = (GameInfo.height / 2 - GameInfo.ballrad) * 2 - state.ball.y;
+    } else if (
+      state.ball.y <= -(GameInfo.height / 2 - GameInfo.ballrad) &&
+      state.ball.dy < 0
+    ) {
+      state.ball.dy *= -1;
+      state.ball.y = -(
+        (GameInfo.height / 2 - GameInfo.ballrad) * 2 +
+        state.ball.y
+      );
+    }
+
+    //  paddle
+    if (
+      state.ball.x <=
+        -(GameInfo.width / 2 - GameInfo.paddlex - GameInfo.ballrad) &&
+      state.paddle1 - GameInfo.paddley / 2 <= state.ball.y &&
+      state.paddle1 + GameInfo.paddley / 2 >= state.ball.y &&
+      state.ball.dx < 0
+    ) {
+      state.ball.x = -(
+        (GameInfo.width / 2 - GameInfo.paddlex - GameInfo.ballrad) * 2 +
+        state.ball.x
+      );
+      state.ball.dx *= -1;
+    } else if (
+      state.ball.x >= GameInfo.width / 2 - GameInfo.paddlex - GameInfo.ballrad &&
+      state.paddle2 - GameInfo.paddley / 2 <= state.ball.y &&
+      state.paddle2 + GameInfo.paddley / 2 >= state.ball.y &&
+      state.ball.dx > 0
+    ) {
+      state.ball.x =
+        (GameInfo.width / 2 - GameInfo.paddlex - GameInfo.ballrad) * 2 -
+        state.ball.x;
+      state.ball.dx *= -1;
+    }
+
+    //end
+    if (state.ball.x >= GameInfo.width / 2 - GameInfo.ballrad) {
+      state.score1 += 1;
+      state.paddle1 = 0;
+      state.paddle2 = 0;
+      state.ball = this.InitBallState();
+    } else if (state.ball.x <= -(GameInfo.width / 2 - GameInfo.ballrad)) {
+      state.score2 += 1;
+      state.paddle1 = 0;
+      state.paddle2 = 0;
+      state.ball = this.InitBallState();
+    }
+
+    const userGameRoomState: UserGameRoomState = this.makeUserState(state);
+
+    if (state.score1 >= 5) {
+      this.endGame(user1, user2, roomInfo, userGameRoomState);
+    } else if (state.score2 >= 5) {
+      this.endGame(user2, user1, roomInfo, userGameRoomState);
+    }
+
+    user1.emit('game-state', userGameRoomState);
+    user2.emit('game-state', userGameRoomState);
+  }
+
+  private async endGame(
+    winner: Socket,
+    loser: Socket,
+    roomInfo: gameRoomInfo,
+    userGameRoomState: UserGameRoomState,
+  ) {
+    const { roomId, user1, user2, broadcast } = roomInfo;
+
+    user1.emit('game-end', userGameRoomState);
+    user1.leave(roomId.toString());
+    user1.data.roomId = null;
+    user2.emit('game-end', userGameRoomState);
+    user2.leave(roomId.toString());
+    user2.data.roomId = null;
+    clearInterval(broadcast);
+    this.roomInfos[roomId] = null;
+  }
+
   async createRoom(user1: Socket, user2: Socket, mode: boolean) {
     const roomInfo: gameRoomInfo = await this.InitRoomState(user1, user2, mode);
     const roomId = roomInfo.roomId;

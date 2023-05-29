@@ -9,7 +9,6 @@ import { GameRoomService } from "../service/game.room.service";
     cors: {
       origin: [`https://${process.env.HOST_NAME}`],
       credentials: true,
-      namespace: "/game"
     },
   })
 export class GameRoomGateway {

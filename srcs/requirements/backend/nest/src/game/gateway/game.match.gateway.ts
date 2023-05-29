@@ -13,7 +13,6 @@ import { WsJwtPayload } from "../utils/ws-jwt-payload.decorator";
   cors: {
     origin: [`https://${process.env.HOST_NAME}`],
     credentials: true,
-    namespace: "/game"
   },
 })
 
@@ -32,15 +31,7 @@ export class GameMatchGateway {
     client: Socket
   ): void {
     this.gameMatchService.handleLadderMatchStart(client);
-    // const rooms = this.gameMatchService.getRooms();
-    // const result = rooms.filter(
-    //   ({ user1, user2 }) => jwt.id === user1 || jwt.id === user2
-    // );
-    // if (result) {
-    //   const user = await this.userService.findUserById(jwt.id);
-    //   client.join(result[0].id.toString());
-    //   this.server.emit(user.socketId, "ladder-game-matched");
-    // }
+
   }
 
   @SubscribeMessage("ladder-game-match-cancel")

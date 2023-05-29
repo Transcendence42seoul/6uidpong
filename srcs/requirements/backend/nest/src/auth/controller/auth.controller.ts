@@ -43,7 +43,7 @@ export class AuthController {
   ): Promise<CallbackResponse> {
     let user: User;
     try {
-      user = await this.userService.findOneOrFail(req.user.id);
+      user = await this.userService.findOne(req.user.id);
       res.status(HttpStatus.OK);
       if (user.is2FA) {
         this.authService.send2FACode(user.id, user.email);

@@ -1,9 +1,9 @@
 import { Injectable } from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
 import { InjectRepository } from "@nestjs/typeorm";
-import { WsException } from "@nestjs/websockets";
 import { Mute } from "src/chat/entity/channel/mute.entity";
 import { LessThanOrEqual, Repository } from "typeorm";
+import { ChannelService } from "./channel.service";
 
 @Injectable()
 export class MuteService {
@@ -12,21 +12,22 @@ export class MuteService {
     private readonly muteRepository: Repository<Mute>
   ) {}
 
-  async validate(channelId: number, userId: number): Promise<void> {
-    const pk: Object = {
+  async has(channelId: number, userId: number): Promise<boolean> {
+    const primaryKey = {
       channelId,
       userId,
     };
-    const mute: Mute | null = await this.muteRepository.findOneBy(pk);
-    if (mute) {
+    try {
+      const mute: Mute = await this.muteRepository.findOneByOrFail(primaryKey);
       if (mute.limitedAt > new Date()) {
-        throw new WsException("can't send because muted user.");
+        return true;
       }
-      await this.muteRepository.delete(pk);
-    }
+      await this.muteRepository.delete(primaryKey);
+    } catch {}
+    return false;
   }
 
-  async mute(
+  async upsert(
     channelId: number,
     userId: number,
     limitedAt: Date

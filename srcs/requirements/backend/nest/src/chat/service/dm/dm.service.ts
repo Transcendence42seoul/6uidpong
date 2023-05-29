@@ -79,7 +79,7 @@ export class DmService {
   ): Promise<JoinResponse> {
     let roomUser: DmRoomUser;
     try {
-      roomUser = await this.findUserOrFail(userId, interlocutorId);
+      roomUser = await this.findUser(userId, interlocutorId);
       await this.updateUser(roomUser);
     } catch (e) {
       if (!(e instanceof EntityNotFoundError)) {
@@ -97,14 +97,15 @@ export class DmService {
     to: { id: number; message: string },
     server: Namespace
   ): Promise<ChatResponse> {
-    const recipient: DmRoomUser = await this.findUserOrFail(to.id, userId);
+    const { id: toId, message } = to;
+    const recipient: DmRoomUser = await this.findUser(toId, userId);
     const sockets = await server.in("d" + recipient.roomId).fetchSockets();
     const isJoined: boolean = sockets.some(
       (socket) => socket.id === recipient.user.socketId
     );
     const chat: DmChat = await this.insertChat(
       userId,
-      to.message,
+      message,
       recipient,
       isJoined
     );
@@ -120,7 +121,7 @@ export class DmService {
     interlocutorId: number,
     client: Socket
   ): Promise<void> {
-    const interRoomUser: DmRoomUser = await this.findUserOrFail(
+    const interRoomUser: DmRoomUser = await this.findUser(
       interlocutorId,
       userId
     );
@@ -136,10 +137,7 @@ export class DmService {
     client.leave("d" + interRoomUser.roomId);
   }
 
-  async findUserOrFail(
-    userId: number,
-    interlocutorId: number
-  ): Promise<DmRoomUser> {
+  async findUser(userId: number, interlocutorId: number): Promise<DmRoomUser> {
     return await this.roomUserRepository
       .createQueryBuilder("room_user")
       .innerJoin(
@@ -301,17 +299,5 @@ export class DmService {
     } finally {
       await queryRunner.release();
     }
-  }
-
-  async findChat(id: number): Promise<DmChat> {
-    return await this.chatRepository.findOne({
-      relations: {
-        user: true,
-        room: true,
-      },
-      where: {
-        id: id,
-      },
-    });
   }
 }

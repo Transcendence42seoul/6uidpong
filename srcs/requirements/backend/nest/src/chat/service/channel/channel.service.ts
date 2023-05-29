@@ -8,8 +8,11 @@ import { Channel } from "src/chat/entity/channel/channel.entity";
 import * as bcryptjs from "bcryptjs";
 import { DataSource, MoreThanOrEqual, Repository, InsertResult } from "typeorm";
 import { WsException } from "@nestjs/websockets";
-import { Namespace } from "socket.io";
+import { Namespace, Socket } from "socket.io";
 import { ChatResponse } from "src/chat/dto/channel/chat-response";
+import { BanService } from "./ban.service";
+import { MuteService } from "./mute.service";
+import { Ban } from "src/chat/entity/channel/ban.entity";
 
 @Injectable()
 export class ChannelService {
@@ -20,6 +23,8 @@ export class ChannelService {
     private readonly channelUserRepository: Repository<ChannelUser>,
     @InjectRepository(ChannelChat)
     private readonly chatRepository: Repository<ChannelChat>,
+    private readonly banService: BanService,
+    private readonly muteService: MuteService,
     private readonly dataSource: DataSource
   ) {}
 
@@ -81,59 +86,7 @@ export class ChannelService {
       .getRawMany();
   }
 
-  async findUserOrFail(
-    channelId: number,
-    userId: number
-  ): Promise<ChannelUser> {
-    return await this.channelUserRepository.findOneOrFail({
-      relations: {
-        user: true,
-      },
-      where: {
-        channelId,
-        userId,
-      },
-    });
-  }
-
-  async insertUser(channelId: number, userId: number): Promise<ChannelUser> {
-    await this.channelUserRepository.insert({
-      channelId,
-      userId,
-    });
-    return await this.channelUserRepository.findOneBy({ channelId, userId });
-  }
-
-  async insertUsers(
-    channelId: number,
-    userIds: number[]
-  ): Promise<ChannelUser[]> {
-    const info: Object[] = userIds.map((userId) => ({ channelId, userId }));
-    await this.channelUserRepository.insert(info);
-    return await this.channelUserRepository.findBy(info);
-  }
-
-  async findChats(
-    channelId: number,
-    channelUser: ChannelUser
-  ): Promise<ChannelChat[]> {
-    return await this.chatRepository.find({
-      relations: {
-        user: true,
-      },
-      where: {
-        channel: {
-          id: channelId,
-        },
-        createdAt: MoreThanOrEqual(channelUser.createdAt),
-      },
-      order: {
-        createdAt: "ASC",
-      },
-    });
-  }
-
-  async createChannel(userId: number, body: CreateRequest): Promise<Channel> {
+  async create(userId: number, body: CreateRequest): Promise<Channel> {
     const queryRunner = this.dataSource.createQueryRunner();
 
     await queryRunner.connect();
@@ -167,6 +120,202 @@ export class ChannelService {
       throw error;
     } finally {
       await queryRunner.release();
+    }
+  }
+
+  async join(
+    userId: number,
+    info: { channelId: number; password: string },
+    client: Socket
+  ): Promise<ChatResponse[]> {
+    const { channelId, password } = info;
+    let channelUser: ChannelUser;
+    try {
+      channelUser = await this.findUser(channelId, userId);
+    } catch {
+      await this.authenticate(channelId, userId, password);
+      channelUser = await this.insertUser(channelId, userId);
+    }
+    client.join("c" + channelId);
+    const chats: ChannelChat[] = await this.findChats(channelUser);
+    return chats.map((chat) => new ChatResponse(chat));
+  }
+
+  async deleteChannel(channelId: number, userId: number): Promise<void> {
+    const channelUser: ChannelUser = await this.findUser(channelId, userId);
+    if (!channelUser.isOwner) {
+      throw new WsException("permission denied");
+    }
+    await this.channelRepository.delete(channelId);
+  }
+
+  async findUser(channelId: number, userId: number): Promise<ChannelUser> {
+    return await this.channelUserRepository.findOneOrFail({
+      relations: {
+        user: true,
+      },
+      where: {
+        channelId,
+        userId,
+      },
+    });
+  }
+
+  async insertUser(channelId: number, userId: number): Promise<ChannelUser> {
+    await this.channelUserRepository.insert({
+      channelId,
+      userId,
+    });
+    return await this.channelUserRepository.findOneBy({ channelId, userId });
+  }
+
+  async invite(
+    inviterId: number,
+    info: { channelId: number; userIds: number[] }
+  ): Promise<void> {
+    const { channelId, userIds } = info;
+    const channelUser: ChannelUser = await this.findUser(channelId, inviterId);
+    if (!channelUser.isAdmin) {
+      throw new WsException("permission denied");
+    }
+    await this.channelUserRepository.insert(
+      userIds.map((id) => ({ channelId, id }))
+    );
+  }
+
+  async kick(
+    userId: number,
+    info: { channelId: number; userId: number },
+    server: Namespace
+  ): Promise<void> {
+    const { channelId, userId: kickUserId } = info;
+    const channelUser: ChannelUser = await this.findUser(channelId, userId);
+    const kickChannelUser: ChannelUser = await this.findUser(
+      channelId,
+      kickUserId
+    );
+    if (
+      !channelUser.isAdmin ||
+      kickChannelUser.isOwner ||
+      (!channelUser.isOwner && kickChannelUser.isAdmin)
+    ) {
+      throw new WsException("permission denied");
+    }
+    await this.channelUserRepository.delete({ channelId, userId: kickUserId });
+    if (kickChannelUser.user.status === "online") {
+      const roomName: string = "c" + info.channelId;
+      const channelSockets = await server.in(roomName).fetchSockets();
+      const kickUserSocket = channelSockets.find(
+        (socket) => socket.id === kickChannelUser.user.socketId
+      );
+      if (kickUserSocket) {
+        kickUserSocket.leave(roomName);
+        kickUserSocket.emit("kicked-channel");
+      }
+    }
+  }
+
+  async mute(
+    userId: number,
+    info: { channelId: number; userId: number; limitedAt: Date }
+  ): Promise<void> {
+    const { channelId, userId: muteUserId, limitedAt } = info;
+    const channelUser: ChannelUser = await this.findUser(channelId, userId);
+    const muteChannelUser: ChannelUser = await this.findUser(
+      channelId,
+      muteUserId
+    );
+    if (
+      !channelUser.isAdmin ||
+      muteChannelUser.isOwner ||
+      (!channelUser.isOwner && muteChannelUser.isAdmin)
+    ) {
+      throw new WsException("permission denied");
+    }
+    await this.muteService.upsert(channelId, userId, limitedAt);
+  }
+
+  async ban(
+    userId: number,
+    info: { channelId: number; userId: number }
+  ): Promise<void> {
+    const { channelId, userId: banUserId } = info;
+    const channelUser: ChannelUser = await this.findUser(channelId, userId);
+    const banChannelUser: ChannelUser = await this.findUser(
+      channelId,
+      banUserId
+    );
+    if (
+      !channelUser.isAdmin ||
+      banChannelUser.isOwner ||
+      (!channelUser.isOwner && banChannelUser.isAdmin)
+    ) {
+      throw new WsException("permission denied");
+    }
+    const queryRunner = this.dataSource.createQueryRunner();
+
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      await queryRunner.manager.delete(ChannelUser, { channelId, banUserId });
+      await queryRunner.manager.insert(Ban, { channelId, userId: banUserId });
+
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  async unban(
+    userId: number,
+    info: { channelId: number; userId: number }
+  ): Promise<void> {
+    const channelUser: ChannelUser = await this.findUser(
+      info.channelId,
+      userId
+    );
+    if (!channelUser.isAdmin) {
+      throw new WsException("permission denied");
+    }
+    await this.banService.delete(info.channelId, info.userId);
+  }
+
+  async findChats(channelUser: ChannelUser): Promise<ChannelChat[]> {
+    const { channelId, createdAt } = channelUser;
+    return await this.chatRepository.find({
+      relations: {
+        user: true,
+      },
+      where: {
+        channel: {
+          id: channelId,
+        },
+        createdAt: MoreThanOrEqual(createdAt),
+      },
+      order: {
+        createdAt: "ASC",
+      },
+    });
+  }
+
+  async authenticate(
+    channelId: number,
+    userId: number,
+    password: string
+  ): Promise<void> {
+    if (await this.banService.has(channelId, userId)) {
+      throw new WsException("can't join because banned");
+    }
+    const channel: Channel = await this.findChannelOrFail(channelId);
+    if (
+      channel.password.length !== 0 &&
+      (typeof password === "undefined" ||
+        !(await bcryptjs.compare(channel.password, password)))
+    ) {
+      throw new WsException("invalid password");
     }
   }
 
@@ -205,15 +354,18 @@ export class ChannelService {
     });
   }
 
-  async sendChat(
+  async send(
     userId: number,
-    channelId: number,
-    message: string,
+    to: { channelId: number; message: string },
     server: Namespace
   ): Promise<void> {
+    if (await this.muteService.has(to.channelId, userId)) {
+      throw new WsException("can't send because muted user.");
+    }
+    const { channelId, message } = to;
     const sockets = await server.in("c" + channelId).fetchSockets();
     const channelUsers: ChannelUser[] = await this.findUsers(channelId);
-    const notJoinedUsers: ChannelUser[] = channelUsers.filter(
+    const notJoined: ChannelUser[] = channelUsers.filter(
       (channelUser) =>
         !sockets.some((socket) => socket.id === channelUser.user.socketId)
     );
@@ -236,7 +388,7 @@ export class ChannelService {
       );
       await queryRunner.manager.increment(
         ChannelUser,
-        notJoinedUsers,
+        notJoined,
         "newMsgCount",
         1
       );
@@ -257,15 +409,27 @@ export class ChannelService {
     }
   }
 
-  async deleteChannel(id: number): Promise<void> {
-    await this.channelRepository.delete(id);
+  async exit(channelId: number, userId: number, client: Socket): Promise<void> {
+    const channelUser: ChannelUser = await this.findUser(channelId, userId);
+    if (channelUser.isOwner) {
+      throw new WsException(
+        "The owner cannot exit the channel. Please transfer ownership to another user and try again."
+      );
+    }
+    const primaryKey = { channelId, userId };
+    await this.channelUserRepository.delete(primaryKey);
+    client.leave("c" + channelId);
   }
 
-  async deleteUser(channelId: number, userId: number): Promise<void> {
-    await this.channelUserRepository.delete({ channelId, userId });
-  }
-
-  async updatePassword(channelId: number, password: string | undefined) {
+  async updatePassword(
+    userId: number,
+    info: { channelId: number; password: string }
+  ) {
+    const { channelId, password } = info;
+    const channelUser: ChannelUser = await this.findUser(channelId, userId);
+    if (!channelUser.isOwner) {
+      throw new WsException("permission denied");
+    }
     await this.channelRepository.update(channelId, {
       password:
         typeof password === "undefined"
@@ -275,31 +439,29 @@ export class ChannelService {
   }
 
   async transferOwnership(
-    channelId: number,
-    oldOwner: number,
-    newOwner: number
+    userId: number,
+    info: { channelId: number; userId: number }
   ): Promise<void> {
+    const { channelId, userId: newOwnerId } = info;
+    const channelUser: ChannelUser = await this.findUser(channelId, userId);
+    if (!channelUser.isOwner) {
+      throw new WsException("permission denied");
+    }
     const queryRunner = this.dataSource.createQueryRunner();
 
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      queryRunner.manager.update(
-        ChannelUser,
-        { channelId, userId: newOwner },
-        {
-          isOwner: true,
-          isAdmin: true,
-        }
-      );
-      queryRunner.manager.update(
-        ChannelUser,
-        { channelId, userId: oldOwner },
-        {
-          isOwner: false,
-          isAdmin: false,
-        }
-      );
+      const oldOwnerPk = { channelId, userId: newOwnerId };
+      const newOwnerPk = { channelId, userId };
+      await queryRunner.manager.update(ChannelUser, oldOwnerPk, {
+        isOwner: false,
+        isAdmin: false,
+      });
+      await queryRunner.manager.update(ChannelUser, newOwnerPk, {
+        isOwner: true,
+        isAdmin: true,
+      });
 
       await queryRunner.commitTransaction();
     } catch (error) {
@@ -321,18 +483,5 @@ export class ChannelService {
         isAdmin: value,
       }
     );
-  }
-
-  async validatePassword(channelId: number, password: string): Promise<void> {
-    const channel: Channel = await this.channelRepository.findOneByOrFail({
-      id: channelId,
-    });
-    if (
-      channel.password.length !== 0 &&
-      (typeof password === "undefined" ||
-        !(await bcryptjs.compare(channel.password, password)))
-    ) {
-      throw new WsException("invalid password");
-    }
   }
 }

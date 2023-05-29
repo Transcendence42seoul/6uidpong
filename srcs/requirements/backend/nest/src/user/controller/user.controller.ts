@@ -67,7 +67,7 @@ export class UserController {
   @Get("/:id")
   async findUser(@Param("id", ParseIntPipe) id: number): Promise<UserResponse> {
     try {
-      const user: User = await this.userService.findOneOrFail(id);
+      const user: User = await this.userService.findOne(id);
       return new UserResponse(user);
     } catch {
       throw new NotFoundException("user not exists");
@@ -98,7 +98,7 @@ export class UserController {
   @UseGuards(PermissionGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async send2FACode(@Param("id", ParseIntPipe) id: number): Promise<void> {
-    const { email } = await this.userService.findOneOrFail(id);
+    const { email } = await this.userService.findOne(id);
     await this.authService.send2FACode(id, email);
   }
 
@@ -164,7 +164,7 @@ export class UserController {
     @Body("toId", ParseIntPipe) toId: number
   ): Promise<void> {
     try {
-      await this.friendService.findOneOrFail(fromId, toId);
+      await this.friendService.findOne(fromId, toId);
     } catch {
       await this.friendRequestService.insert(fromId, toId);
       return;

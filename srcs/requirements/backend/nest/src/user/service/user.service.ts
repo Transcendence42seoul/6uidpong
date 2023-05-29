@@ -22,7 +22,7 @@ export class UserService {
     });
   }
 
-  async findOneOrFail(id: number | string): Promise<User> {
+  async findOne(id: number | string): Promise<User> {
     if (typeof id === "number") {
       return await this.userRepository.findOneOrFail({ where: { id } });
     }

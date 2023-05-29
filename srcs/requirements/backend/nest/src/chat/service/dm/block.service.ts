@@ -38,7 +38,7 @@ export class BlockService {
     });
   }
 
-  async validate(userId: number, interlocutorId: number): Promise<void> {
+  async has(userId: number, interlocutorId: number): Promise<boolean> {
     if (
       await this.blockRepository.countBy([
         {
@@ -51,7 +51,8 @@ export class BlockService {
         },
       ])
     ) {
-      throw new WsException("blocked user");
+      return true;
     }
+    return false;
   }
 }

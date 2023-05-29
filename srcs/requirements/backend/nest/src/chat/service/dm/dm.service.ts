@@ -1,12 +1,20 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import { Namespace, Socket } from "socket.io";
+import { ChatResponse } from "src/chat/dto/dm/chat-response";
+import { JoinResponse } from "src/chat/dto/dm/join-response";
 import { User } from "src/user/entity/user.entity";
-import { Repository, MoreThanOrEqual, DataSource, InsertResult } from "typeorm";
+import {
+  Repository,
+  MoreThanOrEqual,
+  DataSource,
+  InsertResult,
+  EntityNotFoundError,
+} from "typeorm";
 import { RoomResponse } from "../../dto/dm/room-response";
 import { DmChat } from "../../entity/dm/dm-chat.entity";
 import { DmRoomUser } from "../../entity/dm/dm-room-user.entity";
 import { DmRoom } from "../../entity/dm/dm-room.entity";
-import { BlockService } from "./block.service";
 
 @Injectable()
 export class DmService {
@@ -17,7 +25,6 @@ export class DmService {
     private readonly roomUserRepository: Repository<DmRoomUser>,
     @InjectRepository(DmChat)
     private readonly chatRepository: Repository<DmChat>,
-    private readonly blockService: BlockService,
     private readonly dataSource: DataSource
   ) {}
 
@@ -63,6 +70,70 @@ export class DmService {
       .orderBy("dm_chats.created_at", "DESC")
       .setParameter("userId", userId)
       .getRawMany();
+  }
+
+  async join(
+    userId: number,
+    interlocutorId: number,
+    client: Socket
+  ): Promise<JoinResponse> {
+    let roomUser: DmRoomUser;
+    try {
+      roomUser = await this.findUserOrFail(userId, interlocutorId);
+      await this.updateUser(roomUser);
+    } catch (e) {
+      if (!(e instanceof EntityNotFoundError)) {
+        throw e;
+      }
+      roomUser = await this.createRoom(userId, interlocutorId);
+    }
+    client.join("d" + roomUser.roomId);
+    const chats: DmChat[] = await this.findChats(roomUser);
+    return new JoinResponse(roomUser.roomId, roomUser.newMsgCount, chats);
+  }
+
+  async send(
+    userId: number,
+    to: { id: number; message: string },
+    server: Namespace
+  ): Promise<ChatResponse> {
+    const recipient: DmRoomUser = await this.findUserOrFail(to.id, userId);
+    const sockets = await server.in("d" + recipient.roomId).fetchSockets();
+    const isJoined: boolean = sockets.some(
+      (socket) => socket.id === recipient.user.socketId
+    );
+    const chat: DmChat = await this.insertChat(
+      userId,
+      to.message,
+      recipient,
+      isJoined
+    );
+    const chatResponse: ChatResponse = new ChatResponse(chat);
+    if (recipient.user.status === "online") {
+      server.to(recipient.user.socketId).emit("send-dm", chatResponse);
+    }
+    return chatResponse;
+  }
+
+  async deleteRoom(
+    userId: number,
+    interlocutorId: number,
+    client: Socket
+  ): Promise<void> {
+    const interRoomUser: DmRoomUser = await this.findUserOrFail(
+      interlocutorId,
+      userId
+    );
+    if (interRoomUser.isExit) {
+      await this.roomRepository.delete(interRoomUser.roomId);
+    } else {
+      const primaryKey = { roomId: interRoomUser.roomId, userId };
+      await this.roomUserRepository.update(primaryKey, {
+        isExit: true,
+        newMsgCount: 0,
+      });
+    }
+    client.leave("d" + interRoomUser.roomId);
   }
 
   async findUserOrFail(
@@ -118,7 +189,7 @@ export class DmService {
     }
   }
 
-  async insertUsers(
+  async createRoom(
     userId: number,
     interlocutorId: number
   ): Promise<DmRoomUser> {
@@ -241,18 +312,6 @@ export class DmService {
       where: {
         id: id,
       },
-    });
-  }
-
-  async deleteRoom(id: number): Promise<void> {
-    this.roomRepository.delete(id);
-  }
-
-  async exitRoom(roomId: number, userId: number): Promise<void> {
-    const findOptions: Object = { roomId, userId };
-    await this.roomUserRepository.update(findOptions, {
-      isExit: true,
-      newMsgCount: 0,
     });
   }
 }

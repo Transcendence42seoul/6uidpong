@@ -5,11 +5,11 @@ import {
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
+  WsException,
 } from "@nestjs/websockets";
 import { Namespace, Socket } from "socket.io";
 import { ChatResponse } from "../dto/dm/chat-response";
 import { RoomResponse } from "../dto/dm/room-response";
-import { DmRoomUser } from "../entity/dm/dm-room-user.entity";
 import { WsJwtAccessGuard } from "../guard/ws-jwt-access.guard";
 import { DmService } from "../service/dm/dm.service";
 import { WsJwtPayload } from "../utils/decorator/ws-jwt-payload.decorator";
@@ -18,8 +18,6 @@ import { JoinResponse } from "../dto/dm/join-response";
 import { BlockService } from "../service/dm/block.service";
 import { Block } from "../entity/dm/block.entity";
 import { BlockResponse } from "../dto/dm/block-response";
-import { EntityNotFoundError } from "typeorm";
-import { DmChat } from "../entity/dm/dm-chat.entity";
 
 @WebSocketGateway(80, {
   namespace: "chat",
@@ -50,19 +48,7 @@ export class DmGateway {
     @ConnectedSocket() client: Socket,
     @MessageBody("interlocutorId") interlocutorId: number
   ): Promise<JoinResponse> {
-    let roomUser: DmRoomUser;
-    try {
-      roomUser = await this.dmService.findUserOrFail(jwt.id, interlocutorId);
-      await this.dmService.updateUser(roomUser);
-    } catch (e) {
-      if (!(e instanceof EntityNotFoundError)) {
-        throw e;
-      }
-      roomUser = await this.dmService.insertUsers(jwt.id, interlocutorId);
-    }
-    client.join("d" + roomUser.roomId);
-    const chats: DmChat[] = await this.dmService.findChats(roomUser);
-    return new JoinResponse(roomUser.roomId, roomUser.newMsgCount, chats);
+    return await this.dmService.join(jwt.it, interlocutorId, client);
   }
 
   @SubscribeMessage("send-dm")
@@ -70,28 +56,10 @@ export class DmGateway {
     @WsJwtPayload() jwt: JwtPayload,
     @MessageBody("to") to: { id: number; message: string }
   ): Promise<ChatResponse> {
-    await this.blockService.validate(jwt.id, to.id);
-    const recipient: DmRoomUser = await this.dmService.findUserOrFail(
-      to.id,
-      jwt.id
-    );
-    const sockets = await this.server.in("d" + recipient.roomId).fetchSockets();
-    const isJoined: boolean = sockets.some(
-      (socket) => socket.id === recipient.user.socketId
-    );
-    const { id: chatId } = await this.dmService.insertChat(
-      jwt.id,
-      to.message,
-      recipient,
-      isJoined
-    );
-    const chat: ChatResponse = new ChatResponse(
-      await this.dmService.findChat(chatId)
-    );
-    if (recipient.user.status === "online") {
-      this.server.to(recipient.user.socketId).emit("send-dm", chat);
+    if (await this.blockService.has(jwt.id, to.id)) {
+      throw new WsException("can't send because blocked");
     }
-    return chat;
+    return await this.dmService.send(jwt.id, to, this.server);
   }
 
   @SubscribeMessage("leave-dm")
@@ -108,16 +76,7 @@ export class DmGateway {
     @ConnectedSocket() client: Socket,
     @MessageBody("interlocutorId") interlocutorId: number
   ): Promise<void> {
-    const interRoomUser: DmRoomUser = await this.dmService.findUserOrFail(
-      interlocutorId,
-      jwt.id
-    );
-    if (interRoomUser.isExit) {
-      await this.dmService.deleteRoom(interRoomUser.roomId);
-    } else {
-      await this.dmService.exitRoom(interRoomUser.roomId, jwt.id);
-    }
-    client.leave("d" + interRoomUser.roomId);
+    await this.dmService.deleteRoom(jwt.id, interlocutorId, client);
   }
 
   @SubscribeMessage("find-block-users")

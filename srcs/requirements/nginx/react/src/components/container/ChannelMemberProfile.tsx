@@ -10,11 +10,13 @@ import type User from '../../interfaces/User';
 interface ChannelMemberProfileProps {
   member: User;
   socket: Socket;
+  className?: string;
 }
 
 const ChannelMemberProfile: React.FC<ChannelMemberProfileProps> = ({
   member,
   socket,
+  className = '',
 }) => {
   const { channelId: channelIdString } = useParams<{ channelId: string }>();
   const channelId = Number(channelIdString);
@@ -46,7 +48,7 @@ const ChannelMemberProfile: React.FC<ChannelMemberProfileProps> = ({
   };
 
   return (
-    <UserProfile user={member}>
+    <UserProfile user={member} className={className}>
       <div className="m-4 flex w-full">
         <HoverButton
           onClick={handleMuteClick}

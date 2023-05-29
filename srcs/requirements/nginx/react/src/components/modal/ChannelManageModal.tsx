@@ -103,7 +103,7 @@ const ChannelManageModal: React.FC<ChannelManageModalProps> = ({
   }, [selected]);
 
   return (
-    <ModalContainer>
+    <ModalContainer setShowModal={setShowModal}>
       <UserListWithSeacrhBar users={members} onUserClick={onUserClick} />
       {selected && (
         <ContentBox className="max-h-96 max-w-xs border p-4">

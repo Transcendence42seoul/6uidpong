@@ -30,15 +30,15 @@ const ChannelMemberProfile: React.FC<ChannelMemberProfileProps> = ({
   };
 
   const handleAssignAdminClick = () => {
-    socket.emit('update-channel-admin', sendData);
+    socket.emit('update-admin', sendData);
   };
 
   const handleBanClick = () => {
-    socket.emit('ban-channel-user', sendData);
+    socket.emit('ban', sendData);
   };
 
   const handleKickClick = () => {
-    socket.emit('kick-channel-user', sendData);
+    socket.emit('kick', sendData);
   };
 
   const handleMuteClick = () => {};

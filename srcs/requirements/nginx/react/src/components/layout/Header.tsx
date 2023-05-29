@@ -28,7 +28,7 @@ const Header: React.FC<HeaderProps> = ({ socket }) => {
     useState<boolean>(false);
 
   const handleBlockClick = () => {
-    socket.emit('block-dm-user', { interlocutorId });
+    socket.emit('block', { interlocutorId });
   };
 
   const handleDmClick = () => {

@@ -49,7 +49,7 @@ const DmRoomList: React.FC<DmRoomListProps> = ({ socket }) => {
   };
 
   const handleDeleteClick = (interlocutorId: number) => {
-    socket.emit('delete-dm-room', { interlocutorId });
+    socket.emit('delete-room', { interlocutorId });
     setRooms([
       ...rooms.filter((room) => room.interlocutorId !== interlocutorId),
     ]);

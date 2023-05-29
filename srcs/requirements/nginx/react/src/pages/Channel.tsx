@@ -33,12 +33,12 @@ const Channel: React.FC<ChannelProps> = ({ socket }) => {
   };
 
   const send = {
-    name: 'send-channel-message',
+    name: 'send-channel',
     data: { toId: channelId },
   };
 
   const handleExitClick = () => {
-    socket.emit('exit-channel', { channelId });
+    socket.emit('exit', { channelId });
   };
 
   const handleInviteClick = () => {

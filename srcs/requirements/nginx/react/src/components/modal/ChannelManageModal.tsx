@@ -44,7 +44,7 @@ const ChannelManageModal: React.FC<ChannelManageModalProps> = ({
   const handleAssignAdminClick = () => {};
 
   const handleBanClick = () => {
-    socket.emit('ban-channel-user', sendData);
+    socket.emit('ban', sendData);
     removeUser();
   };
 
@@ -53,7 +53,7 @@ const ChannelManageModal: React.FC<ChannelManageModalProps> = ({
   };
 
   const handleKickClick = () => {
-    socket.emit('kick-channel-user', sendData);
+    socket.emit('kick', sendData);
     removeUser();
   };
 
@@ -72,7 +72,7 @@ const ChannelManageModal: React.FC<ChannelManageModalProps> = ({
     const adminsHandler = (users: User[]) => {
       setAdmins([...users]);
     };
-    socket.emit('find-channel-admins', { channelId }, adminsHandler);
+    socket.emit('find-admins', { channelId }, adminsHandler);
     setAdmins(isTest ? mockUsers : admins); // test
   }, []);
 
@@ -80,7 +80,7 @@ const ChannelManageModal: React.FC<ChannelManageModalProps> = ({
     const banListHandler = (users: User[]) => {
       setBanList([...users]);
     };
-    socket.emit('find-channel-ban-users', { channelId }, banListHandler);
+    socket.emit('find-bans', { channelId }, banListHandler);
     setBanList(isTest ? mockUsers : banList); // test
   }, []);
 

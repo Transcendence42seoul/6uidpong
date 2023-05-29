@@ -369,7 +369,7 @@ export class ChatGateway implements OnGatewayDisconnect {
     });
   }
 
-  @SubscribeMessage("update-channel-admin")
+  @SubscribeMessage("update-admin")
   async updateChannelAdmin(
     @WsJwtPayload() jwt: JwtPayload,
     @MessageBody("info")

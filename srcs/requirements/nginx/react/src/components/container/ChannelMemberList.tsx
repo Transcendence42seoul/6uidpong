@@ -1,26 +1,46 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { Socket } from 'socket.io-client';
 
+import { useParams } from 'react-router-dom';
+import ChannelMemberProfile from './ChannelMemberProfile';
 import CircularImage from './CircularImage';
+import ModalContainer from './ModalContainer';
 
 import type User from '../../interfaces/User';
 
+import { isTest, mockUsers } from '../../mock'; // test
+
 interface ChannelMemberListProps {
-  members: User[];
-  onMemberClick: (member: User) => void;
+  socket: Socket;
   className?: string;
 }
 
 const ChannelMemberList: React.FC<ChannelMemberListProps> = ({
-  members,
-  onMemberClick,
+  socket,
   className = '',
 }) => {
+  const { channelId: channelIdString } = useParams<{ channelId: string }>();
+  const channelId = Number(channelIdString);
+
   const searchResultsRef = useRef<HTMLUListElement>(null);
+  const [members, setMembers] = useState<User[]>([]);
   const [search, setSearch] = useState<string>('');
   const [searchResults, setSearchResults] = useState<User[]>(members);
+  const [selectedMember, setSelectedMember] = useState<User | null>(null);
+  const [showMemberProfileModal, setShowMemberProfileModal] =
+    useState<boolean>(false);
 
   const handleMemberClick = (member: User) => {
-    onMemberClick(member);
+    setSelectedMember(member);
+    setShowMemberProfileModal(true);
+  };
+
+  const handleMembers = () => {
+    const membersHandler = (memberList: User[]) => {
+      setMembers([...memberList]);
+    };
+    socket.emit('find-channel-users', { channelId }, membersHandler);
+    setMembers(isTest ? mockUsers : members); // test
   };
 
   const handleSearchResults = async (results: User[]) => {
@@ -41,6 +61,14 @@ const ChannelMemberList: React.FC<ChannelMemberListProps> = ({
       await handleSearchResults(members);
     }
   };
+
+  useEffect(() => {
+    handleMembers();
+  }, []);
+
+  useEffect(() => {
+    handleMembers();
+  }, [showMemberProfileModal]);
 
   return (
     <div className={`relative ${className}`}>
@@ -76,6 +104,11 @@ const ChannelMemberList: React.FC<ChannelMemberListProps> = ({
           );
         })}
       </ul>
+      {selectedMember && showMemberProfileModal && (
+        <ModalContainer setShowModal={setShowMemberProfileModal} closeButton>
+          <ChannelMemberProfile member={selectedMember} socket={socket} />
+        </ModalContainer>
+      )}
     </div>
   );
 };

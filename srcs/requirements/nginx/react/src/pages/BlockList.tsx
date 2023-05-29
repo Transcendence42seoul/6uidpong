@@ -17,7 +17,7 @@ const BlockList: React.FC<BlockListProps> = ({ socket }) => {
   const [blockedUsers, setBlockedUsers] = useState<User[]>([]);
 
   const handleUnblockClick = (interlocutorId: number) => {
-    socket.emit('unblock-dm-user', { interlocutorId });
+    socket.emit('unblock', { interlocutorId });
     setBlockedUsers([
       ...blockedUsers.filter((user) => user.id !== interlocutorId),
     ]);

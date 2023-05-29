@@ -4,6 +4,7 @@ import { Socket } from 'socket.io-client';
 import HoverButton from '../button/HoverButton';
 import CircularImage from '../container/CircularImage';
 import ContentBox from '../container/ContentBox';
+import ModalContainer from '../container/ModalContainer';
 import UserListWithSeacrhBar from '../container/UserListWithSearchBar';
 
 import type User from '../../interfaces/User';
@@ -43,7 +44,7 @@ const ChannelManageModal: React.FC<ChannelManageModalProps> = ({
   const handleAssignAdminClick = () => {};
 
   const handleBanClick = () => {
-    socket.emit('ban-channel-user', sendData);
+    socket.emit('ban', sendData);
     removeUser();
   };
 
@@ -52,7 +53,7 @@ const ChannelManageModal: React.FC<ChannelManageModalProps> = ({
   };
 
   const handleKickClick = () => {
-    socket.emit('kick-channel-user', sendData);
+    socket.emit('kick', sendData);
     removeUser();
   };
 
@@ -71,7 +72,7 @@ const ChannelManageModal: React.FC<ChannelManageModalProps> = ({
     const adminsHandler = (users: User[]) => {
       setAdmins([...users]);
     };
-    socket.emit('find-channel-admins', { channelId }, adminsHandler);
+    socket.emit('find-admins', { channelId }, adminsHandler);
     setAdmins(isTest ? mockUsers : admins); // test
   }, []);
 
@@ -79,7 +80,7 @@ const ChannelManageModal: React.FC<ChannelManageModalProps> = ({
     const banListHandler = (users: User[]) => {
       setBanList([...users]);
     };
-    socket.emit('find-channel-ban-users', { channelId }, banListHandler);
+    socket.emit('find-bans', { channelId }, banListHandler);
     setBanList(isTest ? mockUsers : banList); // test
   }, []);
 
@@ -102,7 +103,7 @@ const ChannelManageModal: React.FC<ChannelManageModalProps> = ({
   }, [selected]);
 
   return (
-    <div className="fixed inset-0 flex justify-center space-x-8 bg-black bg-opacity-50 pt-40">
+    <ModalContainer setShowModal={setShowModal}>
       <UserListWithSeacrhBar users={members} onUserClick={onUserClick} />
       {selected && (
         <ContentBox className="max-h-96 max-w-xs border p-4">
@@ -155,7 +156,7 @@ const ChannelManageModal: React.FC<ChannelManageModalProps> = ({
           Close
         </HoverButton>
       </div>
-    </div>
+    </ModalContainer>
   );
 };
 

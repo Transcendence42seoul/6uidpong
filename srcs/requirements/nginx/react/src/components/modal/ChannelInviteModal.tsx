@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Socket } from 'socket.io-client';
 
+import { useParams } from 'react-router-dom';
 import useCallApi from '../../utils/useCallApi';
 import HoverButton from '../button/HoverButton';
+import ModalContainer from '../container/ModalContainer';
 import UserList from '../container/UserList';
 import UserListWithSearchBar from '../container/UserListWithSearchBar';
 
@@ -11,17 +13,18 @@ import type User from '../../interfaces/User';
 import { isTest, mockUsers } from '../../mock'; // test
 
 interface ChannelInviteModalProps {
-  channelId: number;
   setShowModal: (showModal: boolean) => void;
   socket: Socket;
 }
 
 const ChannelInviteModal: React.FC<ChannelInviteModalProps> = ({
-  channelId,
   setShowModal,
   socket,
 }) => {
   const callApi = useCallApi();
+
+  const { channelId: channelIdString } = useParams<{ channelId: string }>();
+  const channelId = Number(channelIdString);
 
   const [allUsers, setAllUsers] = useState<User[]>([]);
   const [selectedUsers, setSelectedUsers] = useState<Set<User>>(new Set());
@@ -34,10 +37,10 @@ const ChannelInviteModal: React.FC<ChannelInviteModalProps> = ({
     const inviteChannelData = {
       info: {
         channelId,
-        userId: [...selectedUsers].map((user) => user.id),
+        userIds: [...selectedUsers].map((user) => user.id),
       },
     };
-    socket.emit('invite-channel', inviteChannelData);
+    socket.emit('invite', inviteChannelData);
     setShowModal(false);
   };
 
@@ -57,7 +60,7 @@ const ChannelInviteModal: React.FC<ChannelInviteModalProps> = ({
   }, []);
 
   return (
-    <div className="fixed inset-0 flex justify-center space-x-8 bg-black bg-opacity-50 pt-40">
+    <ModalContainer setShowModal={setShowModal}>
       <UserListWithSearchBar users={allUsers} onUserClick={onUserClick} />
       <UserList title="Invite" users={selectedUsers}>
         <div className="flex">
@@ -72,7 +75,7 @@ const ChannelInviteModal: React.FC<ChannelInviteModalProps> = ({
           </HoverButton>
         </div>
       </UserList>
-    </div>
+    </ModalContainer>
   );
 };
 

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useParams } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
 
 import HoverButton from '../button/HoverButton';
@@ -15,6 +16,35 @@ const ChannelMemberProfile: React.FC<ChannelMemberProfileProps> = ({
   member,
   socket,
 }) => {
+  const { channelId: channelIdString } = useParams<{ channelId: string }>();
+  const channelId = Number(channelIdString);
+
+  const sendData = {
+    info: {
+      channelId,
+      userId: member.id,
+      value: true,
+    },
+  };
+
+  const handleAssignAdminClick = () => {
+    socket.emit('update-channel-admin', sendData);
+  };
+
+  const handleBanClick = () => {
+    socket.emit('ban-channel-user', sendData);
+  };
+
+  const handleKickClick = () => {
+    socket.emit('kick-channel-user', sendData);
+  };
+
+  const handleMuteClick = () => {};
+
+  const handleTransferOwnerClick = () => {
+    socket.emit('transfer-ownership', sendData);
+  };
+
   return (
     <UserProfile user={member}>
       <div className="m-4 flex w-full">

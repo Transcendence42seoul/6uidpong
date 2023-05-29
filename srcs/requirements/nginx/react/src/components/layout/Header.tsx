@@ -79,7 +79,7 @@ const Header: React.FC<HeaderProps> = ({ socket }) => {
         My Page
       </HoverButton>
       {selectedUser && showUserProfileModal && (
-        <ModalContainer setShowModal={setShowUserProfileModal}>
+        <ModalContainer setShowModal={setShowUserProfileModal} closeButton>
           <UserProfile user={selectedUser}>
             <p className="mt-1 text-sm">Wins: {selectedUser.winStat}</p>
             <p className="mt-1 text-sm">Losses: {selectedUser.loseStat}</p>

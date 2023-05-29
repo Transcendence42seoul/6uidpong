@@ -27,6 +27,32 @@ export class GameRoomService {
     };
   }
 
+  makeStartState(roomInfo: gameRoomInfo) {
+    const StartState: StartGameRoomState = {
+      user1Id: roomInfo.user1Id,
+      user2Id: roomInfo.user2Id,
+      paddle1: roomInfo.state.paddle1,
+      paddle2: roomInfo.state.paddle2,
+      ballx: roomInfo.state.ball.x,
+      bally: roomInfo.state.ball.y,
+      score1: roomInfo.state.score1,
+      score2: roomInfo.state.score2,
+    };
+    return StartState;
+  }
+
+  makeUserState(roomState: GameRoomState) {
+    const userState: UserGameRoomState = {
+      paddle1: roomState.paddle1,
+      paddle2: roomState.paddle2,
+      ballx: roomState.ball.x,
+      bally: roomState.ball.y,
+      score1: roomState.score1,
+      score2: roomState.score2,
+    };
+    return userState;
+  }
+
   private async InitRoomState(user1: Socket, user2: Socket, mode: boolean): Promise<gameRoomInfo> {  
     const roomId = this.roomNumber++;
 
@@ -63,6 +89,17 @@ export class GameRoomService {
     user1.data = { ...user1.data, roomId: roomId };
     user2.data = { ...user2.data, roomId: roomId };
 
+    const startState = this.makeStartState(roomInfo);
+    user1.emit('game-start', startState);
+    user2.emit('game-start', startState);
+    this.broadcastState = this.broadcastState.bind(this);
+    this.roomInfos[roomId] = roomInfo;
+    const broadcast = setInterval(
+      this.broadcastState,
+      20,
+      this.roomInfos[roomId],
+    );
+    this.roomInfos[roomId].broadcast = broadcast;
   }
 
   handleKeyState(client:Socket, keyCode: keyCode, keyState: number) {

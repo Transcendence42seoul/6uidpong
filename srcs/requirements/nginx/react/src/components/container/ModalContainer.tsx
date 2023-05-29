@@ -1,13 +1,42 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 interface ModalContainerProps {
+  setShowModal: (showModal: boolean) => void;
   children: React.ReactNode;
 }
 
-const ModalContainer: React.FC<ModalContainerProps> = ({ children }) => {
+const ModalContainer: React.FC<ModalContainerProps> = ({
+  setShowModal,
+  children,
+}) => {
+  const handleClickClose = () => {
+    setShowModal(false);
+  };
+
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (event.key === 'Escape') {
+      setShowModal(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
   return (
-    <div className="fixed inset-0 flex justify-center space-x-8 bg-black bg-opacity-50 pt-40">
-      {children}
+    <div className="fixed inset-0 z-50 flex justify-center space-x-8 bg-gray-900 bg-opacity-60 pt-40">
+      <div className="relative">
+        <button
+          className="absolute right-0 top-0 px-2 py-1 text-white"
+          onClick={handleClickClose}
+        >
+          x
+        </button>
+        {children}
+      </div>
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
 import { GameEntity } from "src/game/entity/game.entity";
 
 @Entity("users")
@@ -31,10 +31,10 @@ export class UserEntity {
   ladderScore: number;
 
   @OneToMany(
-  () => GameEntity,
-  (gameRecord) => {
-    gameRecord.user1, gameRecord.user2;
-  }
+    () => GameEntity,
+    (gameRecord) => {
+      gameRecord.user1, gameRecord.user2;
+    }
   )
   gameRecords: GameEntity[];
 }

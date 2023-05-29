@@ -6,6 +6,7 @@ export class ChannelChatResponse {
     this.nickname = entity.user.nickname;
     this.image = entity.user.image;
     this.message = entity.message;
+    this.isSystem = entity.isSystem;
     this.createdAt = entity.createdAt;
   }
   readonly userId: number;
@@ -15,6 +16,8 @@ export class ChannelChatResponse {
   readonly image: string;
 
   readonly message: string;
+
+  readonly isSystem: boolean;
 
   readonly createdAt: Date;
 }

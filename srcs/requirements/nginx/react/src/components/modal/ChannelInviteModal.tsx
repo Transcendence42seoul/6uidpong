@@ -37,7 +37,7 @@ const ChannelInviteModal: React.FC<ChannelInviteModalProps> = ({
     const inviteChannelData = {
       info: {
         channelId,
-        userId: [...selectedUsers].map((user) => user.id),
+        userIds: [...selectedUsers].map((user) => user.id),
       },
     };
     socket.emit('invite-channel', inviteChannelData);

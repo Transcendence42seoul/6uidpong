@@ -13,6 +13,9 @@ export class BlockService {
 
   async find(userId: number): Promise<Block[]> {
     return await this.blockRepository.find({
+      relations: {
+        blockedUser: true,
+      },
       where: {
         userId,
       },

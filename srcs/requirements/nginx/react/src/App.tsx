@@ -76,7 +76,7 @@ const App: React.FC = () => {
     return <Login />;
   }
 
-  const socket = io({ auth: { token: accessToken } });
+  const socket = io('/chat', { auth: { token: accessToken } });
   socket.on('connect', () => {
     socket.emit('connection');
   });

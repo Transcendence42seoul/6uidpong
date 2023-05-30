@@ -10,11 +10,12 @@ const Main: React.FC = () => {
 
   const handleChannelClick = () => navigate('/channel');
   const handleDmClick = () => navigate('/dm');
-  const handleGameClick = () => navigate('/game');
+  const handleLadderClick = () => navigate('/ladder');
+  const handleCustomClick = () => navigate('/custom');
 
   return (
     <div className="flex min-h-screen items-center justify-center text-white">
-      <button className="group mx-10 w-1/3" onClick={handleGameClick}>
+      <button className="group mx-10 w-1/3">
         <ContentBox className="border-8 p-7 group-hover:scale-105 group-hover:border-pink-300 group-hover:bg-pink-300 group-hover:opacity-70">
           <img
             src={ImageSrc.GAME}
@@ -25,6 +26,20 @@ const Main: React.FC = () => {
             GAME
           </h2>
         </ContentBox>
+        <div className="absolute inset-0 hidden flex-col justify-center group-hover:flex">
+          <HoverButton
+            onClick={handleCustomClick}
+            className="mb-10 h-1/4 w-full text-lg"
+          >
+            CUSTOM
+          </HoverButton>
+          <HoverButton
+            onClick={handleLadderClick}
+            className="h-1/4 w-full text-lg"
+          >
+            LADDER
+          </HoverButton>
+        </div>
       </button>
       <div className="group relative mx-10 w-1/3">
         <ContentBox className="border-8 p-7 group-hover:scale-105 group-hover:border-pink-300 group-hover:bg-pink-300 group-hover:opacity-70">

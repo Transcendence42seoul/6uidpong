@@ -17,7 +17,7 @@ const ChannelSettings: React.FC<ChannelSettingsProps> = ({ socket }) => {
 
   const [isPasswordEnabled, setIsPasswordEnabled] = useState<boolean>(false);
   const [isPublic, setIsPublic] = useState<boolean>(true);
-  const [password, setPassword] = useState<string | undefined>(undefined);
+  const [password, setPassword] = useState<string>('');
   const [title, setTitle] = useState<string>('');
 
   const handleCancelClick = () => {
@@ -27,7 +27,7 @@ const ChannelSettings: React.FC<ChannelSettingsProps> = ({ socket }) => {
   const handleConfirmClick = async () => {
     const channel = {
       title,
-      password,
+      password: isPasswordEnabled ? password : undefined,
       isPublic,
     };
     const channelIdHandler = (id: number) => {
@@ -38,7 +38,7 @@ const ChannelSettings: React.FC<ChannelSettingsProps> = ({ socket }) => {
     socket.emit('create-channel', channel, channelIdHandler);
   };
 
-  const handleEnablePasswordChange = () => {
+  const handleEnablePasswordChange = async () => {
     setIsPasswordEnabled(!isPasswordEnabled);
   };
 

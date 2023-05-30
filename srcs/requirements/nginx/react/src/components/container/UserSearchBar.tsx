@@ -3,6 +3,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import useCallApi from '../../utils/useCallApi';
 import CircularImage from './CircularImage';
 
+import selectAuth from '../../features/auth/authSelector';
+
 import type User from '../../interfaces/User';
 
 import { isTest, mockUsers } from '../../mock'; // test
@@ -16,6 +18,9 @@ const UserSearchBar: React.FC<UserSearchBarProps> = ({
   onUserClick,
   className = '',
 }) => {
+  const { tokenInfo } = selectAuth();
+  const myId = tokenInfo?.id;
+
   const callApi = useCallApi();
 
   const searchResultsRef = useRef<HTMLUListElement>(null);
@@ -33,8 +38,8 @@ const UserSearchBar: React.FC<UserSearchBarProps> = ({
     onUserClick(user);
   };
 
-  const handleSearchResults = async (data: User[]) => {
-    setSearchResults([...data]);
+  const handleSearchResults = async (users: User[]) => {
+    setSearchResults([...users.filter((user) => user.id !== myId)]);
   };
 
   const handleShowSearchResults = async (nickname: string) => {

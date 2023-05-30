@@ -13,6 +13,15 @@ interface ChannelMemberProfileProps {
   className?: string;
 }
 
+interface SendData {
+  info: {
+    channelId: number;
+    userId: number;
+    limitedAt: Date | null;
+    value: boolean | null;
+  };
+}
+
 const ChannelMemberProfile: React.FC<ChannelMemberProfileProps> = ({
   member,
   socket,
@@ -21,16 +30,19 @@ const ChannelMemberProfile: React.FC<ChannelMemberProfileProps> = ({
   const { channelId: channelIdString } = useParams<{ channelId: string }>();
   const channelId = Number(channelIdString);
 
-  const sendData = {
+  const sendData: SendData = {
     info: {
       channelId,
       userId: member.id,
-      value: true,
+      limitedAt: null,
+      value: null,
     },
   };
 
   const handleAssignAdminClick = () => {
+    sendData.info.value = true;
     socket.emit('update-admin', sendData);
+    sendData.info.value = null;
   };
 
   const handleBanClick = () => {
@@ -41,7 +53,12 @@ const ChannelMemberProfile: React.FC<ChannelMemberProfileProps> = ({
     socket.emit('kick', sendData);
   };
 
-  const handleMuteClick = () => {};
+  const handleMuteClick = () => {
+    const currentTime = new Date();
+    sendData.info.limitedAt = new Date(currentTime.getTime() + 30000); // 30초
+    socket.emit('mute', sendData);
+    sendData.info.limitedAt = null;
+  };
 
   const handleTransferOwnerClick = () => {
     socket.emit('transfer-ownership', sendData);

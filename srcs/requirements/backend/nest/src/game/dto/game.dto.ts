@@ -10,7 +10,7 @@ export interface Ball {
 export interface GameRoomState {
   keyState1: number;
   keyState2: number;
-  paddle1: number; 
+  paddle1: number;
   paddle2: number;
   ball: Ball;
   score1: number;
@@ -42,7 +42,7 @@ export interface gameRoomInfo {
   isLadder: boolean;
   user1: Socket;
   user2: Socket;
-  user1Id: number; 
+  user1Id: number;
   user2Id: number;
   state: GameRoomState;
   broadcast: NodeJS.Timeout;

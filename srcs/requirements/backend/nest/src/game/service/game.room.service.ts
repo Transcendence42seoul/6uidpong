@@ -1,6 +1,13 @@
 import { Injectable } from "@nestjs/common";
 import { Socket } from "socket.io";
-import { Ball, GameRoomState, StartGameRoomState, UserGameRoomState, gameRoomInfo, keyCode } from "../dto/game.dto";
+import {
+  Ball,
+  GameRoomState,
+  StartGameRoomState,
+  UserGameRoomState,
+  gameRoomInfo,
+  keyCode,
+} from "../dto/game.dto";
 
 const GameInfo = {
   width: 640,
@@ -53,7 +60,11 @@ export class GameRoomService {
     return userState;
   }
 
-  private async InitRoomState(user1: Socket, user2: Socket, mode: boolean): Promise<gameRoomInfo> {  
+  private async InitRoomState(
+    user1: Socket,
+    user2: Socket,
+    mode: boolean
+  ): Promise<gameRoomInfo> {
     const roomId = this.roomNumber++;
 
     const roomInfo: gameRoomInfo = {
@@ -81,7 +92,7 @@ export class GameRoomService {
   }
 
   broadcastState(roomInfo: gameRoomInfo) {
-    const {user1, user2, state} = roomInfo;
+    const { user1, user2, state } = roomInfo;
 
     state.paddle1 += state.keyState1 * 4 * 3;
     state.paddle2 += state.keyState1 * 4 * 3;
@@ -97,7 +108,8 @@ export class GameRoomService {
       state.ball.dy > 0
     ) {
       state.ball.dy *= -1;
-      state.ball.y = (GameInfo.height / 2 - GameInfo.ballrad) * 2 - state.ball.y;
+      state.ball.y =
+        (GameInfo.height / 2 - GameInfo.ballrad) * 2 - state.ball.y;
     } else if (
       state.ball.y <= -(GameInfo.height / 2 - GameInfo.ballrad) &&
       state.ball.dy < 0
@@ -123,7 +135,8 @@ export class GameRoomService {
       );
       state.ball.dx *= -1;
     } else if (
-      state.ball.x >= GameInfo.width / 2 - GameInfo.paddlex - GameInfo.ballrad &&
+      state.ball.x >=
+        GameInfo.width / 2 - GameInfo.paddlex - GameInfo.ballrad &&
       state.paddle2 - GameInfo.paddley / 2 <= state.ball.y &&
       state.paddle2 + GameInfo.paddley / 2 >= state.ball.y &&
       state.ball.dx > 0
@@ -155,22 +168,22 @@ export class GameRoomService {
       this.endGame(user2, user1, roomInfo, userGameRoomState);
     }
 
-    user1.emit('game-state', userGameRoomState);
-    user2.emit('game-state', userGameRoomState);
+    user1.emit("game-state", userGameRoomState);
+    user2.emit("game-state", userGameRoomState);
   }
 
   private async endGame(
     winner: Socket,
     loser: Socket,
     roomInfo: gameRoomInfo,
-    userGameRoomState: UserGameRoomState,
+    userGameRoomState: UserGameRoomState
   ) {
     const { roomId, user1, user2, broadcast } = roomInfo;
 
-    user1.emit('game-end', userGameRoomState);
+    user1.emit("game-end", userGameRoomState);
     user1.leave(roomId.toString());
     user1.data.roomId = null;
-    user2.emit('game-end', userGameRoomState);
+    user2.emit("game-end", userGameRoomState);
     user2.leave(roomId.toString());
     user2.data.roomId = null;
     clearInterval(broadcast);
@@ -187,19 +200,19 @@ export class GameRoomService {
     user2.data = { ...user2.data, roomId: roomId };
 
     const startState = this.makeStartState(roomInfo);
-    user1.emit('game-start', startState);
-    user2.emit('game-start', startState);
+    user1.emit("game-start", startState);
+    user2.emit("game-start", startState);
     this.broadcastState = this.broadcastState.bind(this);
     this.roomInfos[roomId] = roomInfo;
     const broadcast = setInterval(
       this.broadcastState,
       20,
-      this.roomInfos[roomId],
+      this.roomInfos[roomId]
     );
     this.roomInfos[roomId].broadcast = broadcast;
   }
 
-  handleKeyState(client:Socket, keyCode: keyCode, keyState: number) {
+  handleKeyState(client: Socket, keyCode: keyCode, keyState: number) {
     const roomId = client.data.roomId;
     const roomInfo = this.roomInfos.find((room) => room.roomId === roomId);
     if (roomInfo.user1 === client) {

@@ -7,7 +7,7 @@ import { Server, Socket } from "socket.io";
 import { JwtPayload } from "jsonwebtoken";
 import { UserService } from "src/user/service/user.service";
 import { GameMatchService } from "../service/game.match.service";
-import { WsJwtPayload } from "../utils/ws-jwt-payload.decorator";
+import { WsJwtPayload } from "src/chat/utils/decorator/ws-jwt-payload.decorator";
 
 @WebSocketGateway(80, {
   cors: {

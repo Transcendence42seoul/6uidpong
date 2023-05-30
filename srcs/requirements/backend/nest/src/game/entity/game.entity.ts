@@ -1,4 +1,4 @@
-import { UserEntity } from "src/user/entity/user.entity";
+import { User } from "src/user/entity/user.entity";
 import {
   Column,
   CreateDateColumn,
@@ -26,17 +26,17 @@ export class GameEntity {
   @Column()
   isSpeed: boolean;
 
-  @ManyToOne(() => UserEntity, (user) => user.gameRecords, {
+  @ManyToOne(() => User, (user) => user.gameRecords, {
     onDelete: "CASCADE",
   })
   @JoinColumn({ name: "user1_id" })
-  user1: UserEntity;
+  user1: User;
 
-  @ManyToOne(() => UserEntity, (user) => user.gameRecords, {
+  @ManyToOne(() => User, (user) => user.gameRecords, {
     onDelete: "CASCADE",
   })
   @JoinColumn({ name: "user2_id" })
-  user2: UserEntity;
+  user2: User;
 
   @Column({ name: "user1_score", default: 0 })
   user1Score: number;

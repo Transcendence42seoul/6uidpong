@@ -48,7 +48,7 @@ export class DmGateway {
     @ConnectedSocket() client: Socket,
     @MessageBody("interlocutorId") interlocutorId: number
   ): Promise<JoinResponse> {
-    return await this.dmService.join(jwt.it, interlocutorId, client);
+    return await this.dmService.join(jwt.id, interlocutorId, client);
   }
 
   @SubscribeMessage("send-dm")

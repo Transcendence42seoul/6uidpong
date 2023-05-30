@@ -1,8 +1,9 @@
 import axios from 'axios';
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import handleAuthInfo from '../../authInfo';
-import redirect from '../../redirect';
+
+import dispatchAuth from '../../features/auth/authAction';
+import redirect from '../../utils/redirect';
 import HoverButton from '../button/HoverButton';
 
 interface LoginAuthProps {
@@ -11,7 +12,7 @@ interface LoginAuthProps {
 
 const LoginAuth: React.FC<LoginAuthProps> = ({ id }) => {
   const dispatch = useDispatch();
-  const [code, setCode] = useState('');
+  const [code, setCode] = useState<string>('');
 
   const handleVerificationCode = async () => {
     try {
@@ -19,7 +20,7 @@ const LoginAuth: React.FC<LoginAuthProps> = ({ id }) => {
         id,
         code,
       });
-      await handleAuthInfo(data, dispatch);
+      await dispatchAuth(data, dispatch);
       alert('인증 완료');
       redirect('/');
     } catch {
@@ -28,7 +29,7 @@ const LoginAuth: React.FC<LoginAuthProps> = ({ id }) => {
   };
 
   return (
-    <div>
+    <>
       <h1 className="mt-5 text-2xl font-bold text-white">Verification Code</h1>
       <input
         type="text"
@@ -43,7 +44,7 @@ const LoginAuth: React.FC<LoginAuthProps> = ({ id }) => {
       >
         Submit
       </HoverButton>
-    </div>
+    </>
   );
 };
 

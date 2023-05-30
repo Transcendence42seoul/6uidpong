@@ -1,11 +1,21 @@
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { Ban } from "src/chat/entity/channel/ban.entity";
+import { ChannelUser } from "src/chat/entity/channel/channel-user.entity";
+import { ChannelChat } from "src/chat/entity/channel/chat.entity";
+import { Block } from "src/chat/entity/dm/block.entity";
+import { DmChat } from "src/chat/entity/dm/dm-chat.entity";
+import { DmRoomUser } from "src/chat/entity/dm/dm-room-user.entity";
+import { Column, Entity, Index, OneToMany, PrimaryColumn } from "typeorm";
+import { FriendRequest } from "./friend-request.entity";
+import { Friend } from "./friend.entity";
+import { GameEntity } from "src/game/entity/game.entity";
 
 @Entity("users")
-export class UserEntity {
+export class User {
   @PrimaryColumn()
   id: number;
 
   @Column({ unique: true })
+  @Index()
   nickname: string;
 
   @Column()
@@ -17,7 +27,9 @@ export class UserEntity {
   @Column({ name: "is_2fa", type: "boolean", default: false })
   is2FA: boolean;
 
-  @Column({ default: "offline" })
+  @Column({
+    default: "offline",
+  })
   status: string;
 
   @Column({ name: "win_stat", default: 0 })
@@ -28,4 +40,40 @@ export class UserEntity {
 
   @Column({ name: "ladder_score", default: 1000 })
   ladderScore: number;
+
+  @Column({ name: "socket_id", default: "" })
+  @Index()
+  socketId: string;
+
+  @OneToMany(() => DmRoomUser, (dmRoomUser) => dmRoomUser.user)
+  dmRoomUsers: DmRoomUser[];
+
+  @OneToMany(() => DmChat, (chat) => chat.user)
+  dmChats: DmChat[];
+
+  @OneToMany(() => ChannelUser, (channelUser) => channelUser.user)
+  channelUsers: ChannelUser[];
+
+  @OneToMany(() => Block, (block) => block.blockedUser)
+  blocks: Block[];
+
+  @OneToMany(() => Ban, (ban) => ban.user)
+  bans: Ban[];
+
+  @OneToMany(() => ChannelChat, (chat) => chat.user)
+  channelChats: ChannelChat[];
+
+  @OneToMany(() => Friend, (friend) => friend.friend)
+  friends: Friend[];
+
+  @OneToMany(() => FriendRequest, (friendRequest) => friendRequest.from)
+  friendRequests: FriendRequest[];
+
+  @OneToMany(
+    () => GameEntity,
+    (gameRecord) => {
+      gameRecord.user1, gameRecord.user2;
+    }
+  )
+  gameRecords: GameEntity[];
 }

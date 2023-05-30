@@ -10,5 +10,6 @@ exports.typeORMConfig = {
     database: process.env.DB_NAME,
     entities: [__dirname + "/../**/*.entity.{js,ts}"],
     synchronize: true,
+    logging: true,
 };
 //# sourceMappingURL=typeorm.config.js.map

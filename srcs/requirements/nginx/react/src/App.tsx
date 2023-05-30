@@ -1,32 +1,43 @@
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import handleAuthInfo from './authInfo';
-import redirect from './redirect';
-import { RootState } from './store';
+import { useDispatch } from 'react-redux';
+import { Routes, Route } from 'react-router-dom';
+import { io } from 'socket.io-client';
+
+import LoginAuth from './components/custom/LoginAuth';
+import dispatchAuth from './features/auth/authAction';
+import selectAuth from './features/auth/authSelector';
+import Layout from './Layout';
+import AllChannels from './pages/AllChannels';
+import BlockList from './pages/BlockList';
+import Channel from './pages/Channel';
+import ChannelList from './pages/ChannelList';
+import ChannelSettings from './pages/ChannelSettings';
+import DmRoom from './pages/DmRoom';
+import DmRoomList from './pages/DmRoomList';
+import FriendRequests from './pages/FriendRequests';
+import FriendsList from './pages/FriendsList';
 import Loading from './pages/Loading';
 import Login from './pages/Login';
 import Main from './pages/Main';
 import MyPage from './pages/MyPage';
-import Profile from './pages/Profile';
-import LoginAuth from './components/custom/LoginAuth';
+import ProfileSettings from './pages/ProfileSettings';
+import UserProfile from './components/container/UserProfile';
+import redirect from './utils/redirect';
+
+import { isTest, mockAuthState } from './mock'; // test
 
 const App: React.FC = () => {
   const stats = {
-    wins: 4,
-    losses: 2,
-    ladderScore: 4242,
     recentHistory: ['Win', 'Loss', 'Win', 'Win', 'Loss'],
   };
 
-  const { id, is2FA, tokenInfo } = useSelector(
-    (state: RootState) => state.auth,
-  );
+  const [loading, setLoading] = useState<boolean>(false);
+  const { id, is2FA, accessToken, tokenInfo } = isTest
+    ? mockAuthState
+    : selectAuth(); // test
 
   const dispatch = useDispatch();
-  const [loading, setLoading] = useState(false);
-
   const handleLoading = async () => {
     setLoading(true);
   };
@@ -40,8 +51,8 @@ const App: React.FC = () => {
         '/api/v1/auth/social/callback/forty-two',
         { code },
       );
-      await handleAuthInfo(data, dispatch);
-      const pathname = status === 201 ? '/profile' : '/';
+      await dispatchAuth(data, dispatch);
+      const pathname = status === 201 ? '/profile-settings' : '/';
       redirect(pathname, url);
     };
 
@@ -65,17 +76,34 @@ const App: React.FC = () => {
     return <Login />;
   }
 
+  const socket = io('/chat', { auth: { token: accessToken } });
+  socket.on('connect', () => {
+    socket.emit('connection');
+  });
+
   return (
-    <BrowserRouter>
+    <Layout socket={socket}>
       <Routes>
         <Route path="/" element={<Main />} />
-        <Route path="/profile" element={<Profile id={tokenInfo.id} />} />
+        <Route path="/all-channels" element={<AllChannels socket={socket} />} />
+        <Route path="/block-list" element={<BlockList socket={socket} />} />
+        <Route path="/channel" element={<ChannelList socket={socket} />} />
         <Route
-          path="/my-page"
-          element={<MyPage id={tokenInfo.id} stats={stats} />}
+          path="/channel/:channelId"
+          element={<Channel socket={socket} />}
         />
+        <Route
+          path="/channel-settings"
+          element={<ChannelSettings socket={socket} />}
+        />
+        <Route path="/dm" element={<DmRoomList socket={socket} />} />
+        <Route path="/dm/:roomId" element={<DmRoom socket={socket} />} />
+        <Route path="/friend-requests" element={<FriendRequests />} />
+        <Route path="/friends-list" element={<FriendsList />} />
+        <Route path="/my-page" element={<MyPage stats={stats} />} />
+        <Route path="/profile-settings" element={<ProfileSettings />} />
       </Routes>
-    </BrowserRouter>
+    </Layout>
   );
 };
 

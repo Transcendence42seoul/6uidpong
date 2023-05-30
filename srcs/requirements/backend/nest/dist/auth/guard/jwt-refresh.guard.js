@@ -20,7 +20,7 @@ let JwtRefreshGuard = class JwtRefreshGuard {
     async canActivate(context) {
         const request = context.switchToHttp().getRequest();
         const token = this.extractTokenFromCookies(request);
-        if (!token) {
+        if (typeof token === undefined) {
             throw new common_1.UnauthorizedException();
         }
         try {

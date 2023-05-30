@@ -1,18 +1,16 @@
-import React, { useState } from 'react';
 import axios, { AxiosResponse, AxiosError } from 'axios';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../store';
+import React, { useState } from 'react';
+
+import selectAuth from '../../features/auth/authSelector';
 import HoverButton from '../button/HoverButton';
 import Modal from '../modal/Modal';
 
-interface TwoFactorAuthProps {
-  id: number;
-}
+const TwoFactorAuth: React.FC = () => {
+  const { accessToken, tokenInfo } = selectAuth();
+  const myId = tokenInfo?.id;
 
-const TwoFactorAuth: React.FC<TwoFactorAuthProps> = ({ id }) => {
-  const [openModal, setOpenModal] = useState(false);
-  const { accessToken } = useSelector((state: RootState) => state.auth);
-  const [code, setCode] = useState('');
+  const [code, setCode] = useState<string>('');
+  const [openModal, setOpenModal] = useState<boolean>(false);
 
   const handleCloseModal = () => {
     setCode('');
@@ -24,7 +22,7 @@ const TwoFactorAuth: React.FC<TwoFactorAuthProps> = ({ id }) => {
     setOpenModal(true);
     // 이메일 보내는 POST 요청 처리
     axios
-      .put(`/api/v1/users/${id}/email/code`, null, {
+      .put(`/api/v1/users/${myId}/email/code`, null, {
         headers: { Authorization: `Bearer ${accessToken}` },
       })
       .then((response: AxiosResponse<void>) => {
@@ -40,7 +38,7 @@ const TwoFactorAuth: React.FC<TwoFactorAuthProps> = ({ id }) => {
 
     axios
       .put(
-        `/api/v1/users/${id}/is2fa`,
+        `/api/v1/users/${myId}/is2fa`,
         { code, is2FA: true },
         {
           headers: { Authorization: `Bearer ${accessToken}` },
@@ -57,7 +55,7 @@ const TwoFactorAuth: React.FC<TwoFactorAuthProps> = ({ id }) => {
   };
 
   return (
-    <div>
+    <>
       <HoverButton onClick={handleSetIs2faVerified}>인증 활성화</HoverButton>
       <Modal isOpen={openModal} onClose={handleCloseModal}>
         <div style={{ pointerEvents: 'auto' }}>
@@ -86,7 +84,7 @@ const TwoFactorAuth: React.FC<TwoFactorAuthProps> = ({ id }) => {
           )}
         </div>
       </Modal>
-    </div>
+    </>
   );
 };
 

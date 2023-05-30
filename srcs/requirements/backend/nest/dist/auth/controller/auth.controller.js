@@ -20,56 +20,58 @@ const auth_service_1 = require("../service/auth.service");
 const user_service_1 = require("../../user/service/user.service");
 const jwt_refresh_guard_1 = require("../guard/jwt-refresh.guard");
 const ft_guard_1 = require("../guard/ft.guard");
-const two_factor_auth_1 = require("../dto/two-factor.auth");
-const OAUTH_42_LOGIN_URL = `https://api.intra.42.fr/oauth/authorize?client_id=${process.env.OAUTH_42_CLIENT_ID}&redirect_uri=https://${process.env.HOST_NAME}/auth/social/callback/forty-two&response_type=code&scope=public`;
+const two_factor_auth_request_dto_1 = require("../dto/two-factor-auth-request.dto");
+const typeorm_1 = require("typeorm");
+const callback_response_dto_1 = require("../dto/callback-response.dto");
+const access_token_response_dto_1 = require("../dto/access-token-response.dto");
 let AuthController = class AuthController {
     constructor(authService, userService) {
         this.authService = authService;
         this.userService = userService;
     }
     redirectFortytwo(res) {
-        res.status(common_1.HttpStatus.FOUND).redirect(OAUTH_42_LOGIN_URL);
+        res
+            .status(common_1.HttpStatus.FOUND)
+            .redirect(`https://api.intra.42.fr/oauth/authorize?client_id=${process.env.OAUTH_42_CLIENT_ID}&redirect_uri=https://${process.env.HOST_NAME}/auth/social/callback/forty-two&response_type=code&scope=public`);
     }
     async callbackFortytwo(req, res) {
-        let user = await this.userService.findUserById(req.user.id);
-        if (user === null || user === void 0 ? void 0 : user.is2FA) {
-            this.authService.sendCodeByEmail(user.id, user.email);
-            return { is2FA: true, id: user.id, accessToken: null };
+        let user;
+        try {
+            user = await this.userService.findOneOrFail(req.user.id);
+            res.status(common_1.HttpStatus.OK);
+            if (user.is2FA) {
+                this.authService.send2FACode(user.id, user.email);
+                return new callback_response_dto_1.CallbackResponse(true, user.id);
+            }
         }
-        if (!user) {
-            user = await this.userService.createUser(req.user);
-            res.status(common_1.HttpStatus.CREATED);
-            res.setHeader("Location", `/api/v1/users/${user.id}`);
+        catch (e) {
+            if (!(e instanceof typeorm_1.EntityNotFoundError)) {
+                throw e;
+            }
+            user = await this.userService.save(req.user);
         }
-        const refreshToken = await this.authService.generateRefreshToken(user.id);
-        res.cookie("refresh", refreshToken, {
+        res.cookie("refresh", await this.authService.genRefreshToken(user.id), {
             httpOnly: true,
             maxAge: 60 * 60 * 24 * 7,
             secure: true,
             sameSite: "strict",
             path: "/api/v1/auth/token/refresh",
         });
-        const accessToken = await this.authService.generateAccessToken(user.id);
-        return { is2FA: false, id: user.id, accessToken: accessToken };
+        return new callback_response_dto_1.CallbackResponse(false, user.id, await this.authService.genAccessToken(user.id));
     }
     async TwoFactorAuthentication(body, res) {
-        if (!(await this.authService.validateCode(body.id, body.code))) {
-            throw new common_1.UnauthorizedException();
-        }
-        const refreshToken = await this.authService.generateRefreshToken(body.id);
-        res.cookie("refresh", refreshToken, {
+        await this.authService.validate2FACode(body.id, body.code);
+        res.cookie("refresh", await this.authService.genRefreshToken(body.id), {
             httpOnly: true,
             maxAge: 60 * 60 * 24 * 7,
             secure: true,
             sameSite: "strict",
             path: "/api/v1/auth/token/refresh",
         });
-        const accessToken = await this.authService.generateAccessToken(body.id);
-        return { accessToken: accessToken };
+        return new access_token_response_dto_1.AccessTokenResponse(await this.authService.genAccessToken(body.id));
     }
     async refreshToken(req) {
-        const accessToken = await this.authService.generateAccessToken(req.user.id);
-        return { accessToken: accessToken };
+        return new access_token_response_dto_1.AccessTokenResponse(await this.authService.genAccessToken(req.user.id));
     }
 };
 __decorate([
@@ -81,7 +83,6 @@ __decorate([
 ], AuthController.prototype, "redirectFortytwo", null);
 __decorate([
     (0, common_1.Post)("/social/callback/forty-two"),
-    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     (0, common_1.UseGuards)(ft_guard_1.FtGuard),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Res)({ passthrough: true })),
@@ -94,7 +95,7 @@ __decorate([
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Res)({ passthrough: true })),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [two_factor_auth_1.TwoFactorAuthDto, typeof (_c = typeof express_1.Response !== "undefined" && express_1.Response) === "function" ? _c : Object]),
+    __metadata("design:paramtypes", [two_factor_auth_request_dto_1.TwoFactorAuthRequest, typeof (_c = typeof express_1.Response !== "undefined" && express_1.Response) === "function" ? _c : Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "TwoFactorAuthentication", null);
 __decorate([

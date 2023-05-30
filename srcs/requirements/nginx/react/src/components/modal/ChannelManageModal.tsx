@@ -34,11 +34,11 @@ const ChannelManageModal: React.FC<ChannelManageModalProps> = ({
   const [banList, setBanList] = useState<User[]>([]);
   const [members, setMembers] = useState<User[]>([]);
   const [owner, setOwner] = useState<User | null>(null);
-  const [selected, setSelected] = useState<User | null>(null);
+  const [selectedMember, setSelectedMember] = useState<User | null>(null);
   const [sendData, setSendData] = useState<SendData | null>(null);
 
   const removeUser = () => {
-    setMembers([...members.filter((user) => user.id !== selected?.id)]);
+    setMembers([...members.filter((user) => user.id !== selectedMember?.id)]);
   };
 
   const handleAssignAdminClick = () => {};
@@ -61,11 +61,11 @@ const ChannelManageModal: React.FC<ChannelManageModalProps> = ({
 
   const handleTransferOwnerClick = () => {
     socket.emit('transfer-ownership', sendData);
-    setOwner(selected);
+    setOwner(selectedMember);
   };
 
   const onUserClick = (user: User) => {
-    setSelected(user);
+    setSelectedMember(user);
   };
 
   useEffect(() => {
@@ -93,24 +93,24 @@ const ChannelManageModal: React.FC<ChannelManageModalProps> = ({
   }, []);
 
   useEffect(() => {
-    if (!selected) return;
+    if (!selectedMember) return;
     setSendData({
       info: {
         channelId,
-        userId: selected.id,
+        userId: selectedMember.id,
       },
     });
-  }, [selected]);
+  }, [selectedMember]);
 
   return (
     <ModalContainer setShowModal={setShowModal}>
       <UserListWithSeacrhBar users={members} onUserClick={onUserClick} />
-      {selected && (
+      {selectedMember && (
         <ContentBox className="max-h-96 max-w-xs border p-4">
-          <h2 className="text-lg font-semibold">{selected.nickname}</h2>
+          <h2 className="text-lg font-semibold">{selectedMember.nickname}</h2>
           <CircularImage
-            src={selected.image}
-            alt={selected.nickname}
+            src={selectedMember.image}
+            alt={selectedMember.nickname}
             className="m-2 h-32 w-32"
           />
           <div className="m-4 flex w-full">

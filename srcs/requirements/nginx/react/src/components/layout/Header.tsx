@@ -36,6 +36,7 @@ const Header: React.FC<HeaderProps> = ({ socket }) => {
       navigate(`/dm/${roomId}`, {
         state: { interlocutorId },
       });
+    setShowUserProfileModal(false);
     socket.emit('join-dm', { interlocutorId }, roomIdHandler);
   };
 

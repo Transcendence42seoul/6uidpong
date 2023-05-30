@@ -49,7 +49,7 @@ const BlockList: React.FC<BlockListProps> = ({ socket }) => {
               />
               <span className="text-lg font-medium text-white">{nickname}</span>
               <HoverButton
-                className="ml-auto mr-2 rounded px-4 py-2"
+                className="ml-auto mr-2 rounded border px-4 py-2"
                 onClick={() => handleUnblockClick(id)}
               >
                 Unblock

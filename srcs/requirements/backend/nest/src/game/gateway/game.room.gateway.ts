@@ -3,20 +3,20 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from "@nestjs/websockets";
-import { Server } from "http";
-import { Socket } from "socket.io";
+import { Namespace, Socket } from "socket.io";
 import { keyCode } from "../dto/game.dto";
 import { GameRoomService } from "../service/game.room.service";
 
 @WebSocketGateway(80, {
   cors: {
+    namespace: "game",
     origin: [`https://${process.env.HOST_NAME}`],
     credentials: true,
   },
 })
 export class GameRoomGateway {
   @WebSocketServer()
-  server: Server;
+  server: Namespace;
 
   constructor(private gameRoomService: GameRoomService) {}
 

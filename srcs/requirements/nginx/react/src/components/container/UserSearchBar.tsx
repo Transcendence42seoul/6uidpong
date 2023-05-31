@@ -32,24 +32,31 @@ const UserSearchBar: React.FC<UserSearchBarProps> = ({
     onUserClick(user);
   };
 
-  const handleShowSearchResults = () => {
-    setShowSearchResults(!!search);
-  };
-
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(event.target.value);
+  };
+
+  const handleSearchResults = (users: User[]) => {
+    const results = users.filter((user) => user.id !== myId);
+    setSearchResults([...results]);
+  };
+
+  const handleShowSearchResults = () => {
+    setShowSearchResults(!!search);
   };
 
   useEffect(() => {
     const fetchUsersData = async () => {
       const config = {
         url: '/api/v1/users/search',
-        params: { search },
+        params: { nickname: search },
       };
       const data: User[] = isTest ? mockUsers : await callApi(config); // test
-      setSearchResults([...data.filter((user) => user.id !== myId)]);
+      handleSearchResults(data);
     };
-    fetchUsersData();
+    if (search) {
+      fetchUsersData();
+    }
     handleShowSearchResults();
   }, [search]);
 

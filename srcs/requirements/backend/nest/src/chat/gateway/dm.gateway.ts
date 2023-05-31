@@ -92,7 +92,7 @@ export class DmGateway {
     @WsJwtPayload() jwt: JwtPayload,
     @MessageBody("interlocutorId") interlocutorId: number
   ): Promise<void> {
-    await this.blockService.insert(jwt.id, interlocutorId);
+    await this.blockService.block(jwt.id, interlocutorId);
   }
 
   @SubscribeMessage("unblock")

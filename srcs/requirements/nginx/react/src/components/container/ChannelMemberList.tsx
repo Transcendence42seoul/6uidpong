@@ -69,7 +69,9 @@ const ChannelMemberList: React.FC<ChannelMemberListProps> = ({
   }, [members, search]);
 
   useEffect(() => {
-    handleMembers();
+    if (!showMemberProfileModal) {
+      handleMembers();
+    }
   }, [showMemberProfileModal]);
 
   return (

@@ -77,12 +77,6 @@ const ChannelMemberList: React.FC<ChannelMemberListProps> = ({
     handleSearchResults();
   }, [members, search]);
 
-  useEffect(() => {
-    if (!showMemberProfileModal) {
-      handleMembers();
-    }
-  }, [showMemberProfileModal]);
-
   return (
     <div className={`relative ${className}`}>
       <input

@@ -6,6 +6,7 @@ import HoverButton from '../components/button/HoverButton';
 import ListContainer from '../components/container/ListContainer';
 import ListInfoPanel from '../components/container/ListInfoPanel';
 import ListTitle from '../components/container/ListTitle';
+import ChannelPasswordModal from '../components/modal/ChannelPasswordModal';
 import ImageSrc from '../constants/ImageSrc';
 
 import type Channel from '../interfaces/Channel';
@@ -20,8 +21,16 @@ const AllChannels: React.FC<AllChannelsProps> = ({ socket }) => {
   const navigate = useNavigate();
 
   const [channels, setChannels] = useState<Channel[]>([]);
+  const [selectedChannel, setSelectedChannel] = useState<Channel | null>(null);
+  const [showPasswordModal, setShowPasswordModal] = useState<boolean>(false);
 
-  const handleChannelDoubleClick = ({ id }: Channel) => {
+  const handleChannelDoubleClick = (channel: Channel) => {
+    setSelectedChannel(channel);
+    const { id, isLocked } = channel;
+    if (isLocked) {
+      setShowPasswordModal(true);
+      return;
+    }
     navigate(`/channel/${id}`);
   };
 
@@ -68,6 +77,12 @@ const AllChannels: React.FC<AllChannelsProps> = ({ socket }) => {
           </li>
         );
       })}
+      {selectedChannel && showPasswordModal && (
+        <ChannelPasswordModal
+          channelId={selectedChannel.id}
+          setShowModal={setShowPasswordModal}
+        />
+      )}
     </ListContainer>
   );
 };

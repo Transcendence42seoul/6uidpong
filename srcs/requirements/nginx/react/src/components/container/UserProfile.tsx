@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
 
@@ -11,6 +11,7 @@ import ContentBox from './ContentBox';
 
 interface UserProfileProps {
   user: User;
+  friend?: boolean;
   className?: string;
   socket?: Socket;
   children?: React.ReactNode;
@@ -18,6 +19,7 @@ interface UserProfileProps {
 
 const UserProfile: React.FC<UserProfileProps> = ({
   user,
+  friend = false,
   className = '',
   socket = null,
   children = null,
@@ -60,12 +62,14 @@ const UserProfile: React.FC<UserProfileProps> = ({
             <p className="mt-1 text-sm">Wins: {user.winStat}</p>
             <p className="mt-1 text-sm">Losses: {user.loseStat}</p>
             <p className="mt-1 text-sm">Ladder Score: {user.ladderScore}</p>
-            <HoverButton
-              onClick={handleFriendRequestClick}
-              className="mt-4 border-2 px-2 py-1"
-            >
-              Friend Request
-            </HoverButton>
+            {!friend && (
+              <HoverButton
+                onClick={handleFriendRequestClick}
+                className="mt-4 border-2 px-2 py-1"
+              >
+                Friend Request
+              </HoverButton>
+            )}
             <div className="mt-4 flex">
               <button className="mr-2 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-400">
                 Game

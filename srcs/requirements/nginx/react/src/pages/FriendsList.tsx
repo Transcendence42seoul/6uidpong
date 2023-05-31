@@ -125,7 +125,7 @@ const FriendsList: React.FC<FriendsListProps> = ({ socket }) => {
       </ul>
       {selectedFriend && showUserProfileModal && (
         <ModalContainer setShowModal={setShowUserProfileModal} closeButton>
-          <UserProfile user={selectedFriend} socket={socket} />
+          <UserProfile user={selectedFriend} friend socket={socket} />
         </ModalContainer>
       )}
     </div>

@@ -22,6 +22,7 @@ import { Ban } from "../entity/channel/ban.entity";
 import { BanService } from "../service/channel/ban.service";
 import { UserResponse } from "../dto/channel/user-response";
 import { BanResponse } from "../dto/channel/ban-response";
+import { MuteService } from "../service/channel/mute.service";
 
 @WebSocketGateway(80, {
   namespace: "chat",
@@ -38,7 +39,8 @@ export class ChannelGateway {
 
   constructor(
     private readonly channelService: ChannelService,
-    private readonly banService: BanService
+    private readonly banService: BanService,
+    private readonly muteService: MuteService
   ) {}
 
   @SubscribeMessage("find-all-channels")
@@ -79,7 +81,15 @@ export class ChannelGateway {
     @MessageBody("to")
     to: { channelId: number; message: string }
   ): Promise<void> {
-    await this.channelService.send(jwt.it, to, this.server);
+    if (await this.muteService.has(to.channelId, jwt.id)) {
+      throw new WsException("can't send because muted user.");
+    }
+    await this.channelService.send(
+      jwt.it,
+      to.channelId,
+      to.message,
+      this.server
+    );
   }
 
   @SubscribeMessage("delete-channel")

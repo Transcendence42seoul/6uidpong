@@ -356,13 +356,10 @@ export class ChannelService {
 
   async send(
     userId: number,
-    to: { channelId: number; message: string },
+    channelId: number,
+    message: string,
     server: Namespace
   ): Promise<void> {
-    if (await this.muteService.has(to.channelId, userId)) {
-      throw new WsException("can't send because muted user.");
-    }
-    const { channelId, message } = to;
     const sockets = await server.in("c" + channelId).fetchSockets();
     const channelUsers: ChannelUser[] = await this.findUsers(channelId);
     const notJoined: ChannelUser[] = channelUsers.filter(

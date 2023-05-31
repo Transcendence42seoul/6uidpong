@@ -47,7 +47,7 @@ const Header: React.FC<HeaderProps> = ({ socket }) => {
       </HoverButton>
       {selectedUser && showUserProfileModal && (
         <ModalContainer setShowModal={setShowUserProfileModal} closeButton>
-          <UserProfile user={selectedUser} socket={socket} />
+          <UserProfile userId={selectedUser.id} socket={socket} />
         </ModalContainer>
       )}
     </div>

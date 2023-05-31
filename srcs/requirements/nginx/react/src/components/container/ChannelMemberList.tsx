@@ -6,6 +6,7 @@ import ChannelMemberProfile from './ChannelMemberProfile';
 import CircularImage from './CircularImage';
 import ModalContainer from './ModalContainer';
 
+import type Chat from '../../interfaces/Chat';
 import type User from '../../interfaces/User';
 
 import { isTest, mockUsers } from '../../mock'; // test
@@ -55,6 +56,18 @@ const ChannelMemberList: React.FC<ChannelMemberListProps> = ({
     });
     setSearchResults([...results]);
   };
+
+  useEffect(() => {
+    const chatHandler = (chat: Chat) => {
+      if (chat.isSystem) {
+        handleMembers();
+      }
+    };
+    socket.on('send-channel', chatHandler);
+    return () => {
+      socket.off('send-channel', chatHandler);
+    };
+  }, []);
 
   useEffect(() => {
     handleMembers();

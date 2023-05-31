@@ -43,28 +43,30 @@ const ChannelMemberList: React.FC<ChannelMemberListProps> = ({
     setMembers(isTest ? mockUsers : members); // test
   };
 
-  const handleSearchResults = async (results: User[]) => {
-    setSearchResults([...results]);
-  };
-
   const handleSearchChange = async (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    const keyword = event.target.value;
-    setSearch(keyword);
-    if (keyword) {
-      const results = members.filter((member) => {
-        return member.nickname.startsWith(keyword);
-      });
-      await handleSearchResults(results);
-    } else {
-      await handleSearchResults(members);
+    setSearch(event.target.value);
+  };
+
+  const handleSearchResults = () => {
+    if (!search) {
+      setSearchResults([...members]);
+      return;
     }
+    const results = members.filter((member) => {
+      return member.nickname.startsWith(search);
+    });
+    setSearchResults([...results]);
   };
 
   useEffect(() => {
     handleMembers();
   }, []);
+
+  useEffect(() => {
+    handleSearchResults();
+  }, [search]);
 
   useEffect(() => {
     handleMembers();

@@ -30,7 +30,7 @@ const ModalContainer: React.FC<ModalContainerProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex justify-center bg-gray-900 bg-opacity-60 pt-40">
-      <div className="relative flex space-x-8">
+      <div className="relative flex space-x-8 text-black">
         {closeButton && (
           <button
             className="absolute right-0 top-0 px-2 py-1 text-white"

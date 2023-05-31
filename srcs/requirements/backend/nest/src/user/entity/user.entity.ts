@@ -51,14 +51,14 @@ export class User {
   @OneToMany(() => DmChat, (chat) => chat.user)
   dmChats: DmChat[];
 
-  @OneToMany(() => ChannelUser, (channelUser) => channelUser.user)
-  channelUsers: ChannelUser[];
-
   @OneToMany(() => Block, (block) => block.blockedUser)
   blocks: Block[];
 
   @OneToMany(() => Ban, (ban) => ban.user)
   bans: Ban[];
+
+  @OneToMany(() => ChannelUser, (channelUser) => channelUser.user)
+  channelUsers: ChannelUser[];
 
   @OneToMany(() => ChannelChat, (chat) => chat.user)
   channelChats: ChannelChat[];

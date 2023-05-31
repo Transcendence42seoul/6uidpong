@@ -8,14 +8,13 @@ import { Channel } from "src/chat/entity/channel/channel.entity";
 import * as bcryptjs from "bcryptjs";
 import { DataSource, MoreThanOrEqual, Repository, InsertResult } from "typeorm";
 import { WsException } from "@nestjs/websockets";
-import { Namespace, Socket } from "socket.io";
+import { Socket } from "socket.io";
 import { ChatResponse } from "src/chat/dto/channel/chat-response";
 import { BanService } from "./ban.service";
-import { MuteService } from "./mute.service";
 import { Ban } from "src/chat/entity/channel/ban.entity";
-import { User } from "src/user/entity/user.entity";
-import { channel } from "diagnostics_channel";
 import { Mute } from "src/chat/entity/channel/mute.entity";
+import { UserService } from "src/user/service/user.service";
+import { User } from "src/user/entity/user.entity";
 
 @Injectable()
 export class ChannelService {
@@ -27,6 +26,7 @@ export class ChannelService {
     @InjectRepository(ChannelChat)
     private readonly chatRepository: Repository<ChannelChat>,
     private readonly banService: BanService,
+    private readonly userService: UserService,
     private readonly dataSource: DataSource
   ) {}
 
@@ -146,15 +146,16 @@ export class ChannelService {
       await this.sendSystemMsg(userId, channelId, systemMessage, client);
 
       await queryRunner.commitTransaction();
+
+      client.join("c" + channelId);
+      const chats: ChannelChat[] = await this.findChats(channelUser);
+      return chats.map((chat) => new ChatResponse(chat));
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;
     } finally {
       await queryRunner.release();
     }
-    client.join("c" + channelId);
-    const chats: ChannelChat[] = await this.findChats(channelUser);
-    return chats.map((chat) => new ChatResponse(chat));
   }
 
   async deleteChannel(
@@ -200,6 +201,7 @@ export class ChannelService {
     if (!inviter.isAdmin) {
       throw new WsException("permission denied");
     }
+    const invitee: User = await this.userService.findOne(userIds[0]);
     const queryRunner = this.dataSource.createQueryRunner();
 
     await queryRunner.connect();
@@ -209,12 +211,11 @@ export class ChannelService {
         ChannelUser,
         userIds.map((id) => ({ channelId, id }))
       );
-      const invitee: ChannelUser = await this.findUser(channelId, userIds[0]);
       const systemMessage: string = `was added by ${
         inviter.user.nickname
-      }. Also, ${invitee.user.nickname} and ${userIds.length - 1} others joined.
+      }. Also, ${invitee.nickname} and ${userIds.length - 1} others joined.
       `;
-      await this.sendSystemMsg(userIds[0], channelId, systemMessage, client);
+      await this.sendSystemMsg(invitee.id, channelId, systemMessage, client);
 
       await queryRunner.commitTransaction();
     } catch (error) {
@@ -249,7 +250,12 @@ export class ChannelService {
         channelId,
         userId: kickedId,
       };
+      const systemMessage: string = `${kicked.user.nickname} has been kicked by ${kicker.user.nickname}`;
       await queryRunner.manager.delete(ChannelUser, kickedPk);
+      await this.sendSystemMsg(kickedId, channelId, systemMessage, client);
+
+      await queryRunner.commitTransaction();
+
       if (kicked.user.status === "online") {
         const kickedSocket = await client
           .to(kicked.user.socketId)
@@ -257,10 +263,6 @@ export class ChannelService {
         kickedSocket[0].leave("c" + channelId);
         kickedSocket[0].emit("kicked-channel", { id: channelId });
       }
-      const systemMessage: string = `${kicked.user.nickname} has been kicked by ${kicker.user.nickname}`;
-      await this.sendSystemMsg(kickedId, channelId, systemMessage, client);
-
-      await queryRunner.commitTransaction();
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;
@@ -329,8 +331,12 @@ export class ChannelService {
     try {
       await queryRunner.manager.delete(ChannelUser, { channelId, bannedId });
       await queryRunner.manager.insert(Ban, { channelId, userId: bannedId });
+
       const systemMessage: string = `${banned.user.nickname} has been banned by ${banner.user.nickname}`;
       await this.sendSystemMsg(bannedId, channelId, systemMessage, client);
+
+      await queryRunner.commitTransaction();
+
       if (banned.user.status === "online") {
         const bannedSocket = await client
           .to(banned.user.socketId)
@@ -338,8 +344,6 @@ export class ChannelService {
         bannedSocket[0].leave("c" + channelId);
         bannedSocket[0].emit("banned-channel", { id: channelId });
       }
-
-      await queryRunner.commitTransaction();
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;
@@ -470,6 +474,7 @@ export class ChannelService {
         "newMsgCount",
         1
       );
+      
       await queryRunner.commitTransaction();
 
       const chat: ChannelChat = await this.findChat(newChat.identifiers[0].id);
@@ -550,6 +555,7 @@ export class ChannelService {
     try {
       const primaryKey = { channelId, userId };
       const systemMessage: string = `${channelUser.user.nickname} has left`;
+      
       await queryRunner.manager.delete(ChannelUser, primaryKey);
       await this.sendSystemMsg(userId, channelId, systemMessage, client);
 
@@ -563,8 +569,8 @@ export class ChannelService {
   }
 
   async updatePassword(userId: number, channelId: number, password: string) {
-    const channelUser: ChannelUser = await this.findUser(channelId, userId);
-    if (!channelUser.isOwner) {
+    const updater: ChannelUser = await this.findUser(channelId, userId);
+    if (!updater.isOwner) {
       throw new WsException("permission denied");
     }
     await this.channelRepository.update(channelId, {

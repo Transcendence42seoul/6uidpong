@@ -90,7 +90,7 @@ export class ChannelGateway {
     if (await this.muteService.has(to.channelId, jwt.id)) {
       throw new WsException("can't send because muted user.");
     }
-    await this.channelService.send(jwt.it, to.channelId, to.message, client);
+    await this.channelService.send(jwt.id, to.channelId, to.message, client);
   }
 
   @SubscribeMessage("delete-channel")

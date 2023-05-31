@@ -31,9 +31,7 @@ const UserListWithSearchBar: React.FC<UserListWithSearchBarProps> = ({
     setSearchResults([...results]);
   };
 
-  const handleSearchChange = async (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(event.target.value);
   };
 

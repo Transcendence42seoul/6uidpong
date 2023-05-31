@@ -38,7 +38,7 @@ const ChannelSettings: React.FC<ChannelSettingsProps> = ({ socket }) => {
     socket.emit('create-channel', channel, channelIdHandler);
   };
 
-  const handleEnablePasswordChange = async () => {
+  const handleEnablePasswordChange = () => {
     setIsPasswordEnabled(!isPasswordEnabled);
   };
 

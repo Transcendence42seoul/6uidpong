@@ -36,9 +36,7 @@ const UserSearchBar: React.FC<UserSearchBarProps> = ({
     setShowSearchResults(!!search);
   };
 
-  const handleSearchChange = async (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(event.target.value);
   };
 

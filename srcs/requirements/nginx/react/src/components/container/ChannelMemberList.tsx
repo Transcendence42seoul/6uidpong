@@ -66,7 +66,7 @@ const ChannelMemberList: React.FC<ChannelMemberListProps> = ({
 
   useEffect(() => {
     handleSearchResults();
-  }, [search]);
+  }, [members, search]);
 
   useEffect(() => {
     handleMembers();

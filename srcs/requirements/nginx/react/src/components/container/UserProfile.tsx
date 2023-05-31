@@ -1,16 +1,17 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
 
 import selectAuth from '../../features/auth/authSelector';
-import type User from '../../interfaces/User';
 import useCallApi from '../../utils/useCallApi';
 import HoverButton from '../button/HoverButton';
 import CircularImage from './CircularImage';
 import ContentBox from './ContentBox';
 
+import type User from '../../interfaces/User';
+
 interface UserProfileProps {
-  user: User;
+  userId: number;
   friend?: boolean;
   className?: string;
   socket?: Socket;
@@ -18,7 +19,7 @@ interface UserProfileProps {
 }
 
 const UserProfile: React.FC<UserProfileProps> = ({
-  user,
+  userId,
   friend = false,
   className = '',
   socket = null,
@@ -29,39 +30,55 @@ const UserProfile: React.FC<UserProfileProps> = ({
 
   const { tokenInfo } = selectAuth();
   const myId = tokenInfo?.id;
-  const { id: interlocutorId, nickname, image } = user;
+
+  const [user, setUser] = useState<User | null>(null);
 
   const handleBlockClick = () => {
-    socket?.emit('block', { interlocutorId });
+    socket?.emit('block', { interlocutorId: userId });
   };
 
   const handleDmClick = () => {
     const roomIdHandler = ({ roomId }: { roomId: number }) =>
       navigate(`/dm/${roomId}`, {
-        state: { interlocutorId },
+        state: { interlocutorId: userId },
       });
-    socket?.emit('join-dm', { interlocutorId }, roomIdHandler);
+    socket?.emit('join-dm', { interlocutorId: userId }, roomIdHandler);
   };
 
   const handleFriendRequestClick = () => {
     const config = {
       url: `/api/v1/users/${myId}/friend-requests`,
       method: 'post',
-      data: { toId: interlocutorId },
+      data: { toId: userId },
     };
     callApi(config);
   };
 
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const config = {
+        url: `/api/v1/users/${userId}`,
+      };
+      const data: User = await callApi(config);
+      setUser(data);
+    };
+    fetchUserData();
+  }, []);
+
   return (
     <div className={className}>
       <ContentBox className="p-4">
-        <h2 className="text-lg font-semibold">{nickname}</h2>
-        <CircularImage src={image} alt={nickname} className="m-2.5 h-32 w-32" />
+        <h2 className="text-lg font-semibold">{user?.nickname}</h2>
+        <CircularImage
+          src={user?.image}
+          alt="Profile"
+          className="m-2.5 h-32 w-32"
+        />
         {children ?? (
           <div>
-            <p className="mt-1 text-sm">Wins: {user.winStat}</p>
-            <p className="mt-1 text-sm">Losses: {user.loseStat}</p>
-            <p className="mt-1 text-sm">Ladder Score: {user.ladderScore}</p>
+            <p className="mt-1 text-sm">Wins: {user?.winStat}</p>
+            <p className="mt-1 text-sm">Losses: {user?.loseStat}</p>
+            <p className="mt-1 text-sm">Ladder Score: {user?.ladderScore}</p>
             {!friend && (
               <HoverButton
                 onClick={handleFriendRequestClick}

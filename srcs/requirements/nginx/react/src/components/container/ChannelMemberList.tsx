@@ -106,7 +106,7 @@ const ChannelMemberList: React.FC<ChannelMemberListProps> = ({
       </ul>
       {selectedMember && showMemberProfileModal && (
         <ModalContainer setShowModal={setShowMemberProfileModal} closeButton>
-          <ChannelMemberProfile member={selectedMember} socket={socket} />
+          <ChannelMemberProfile userId={selectedMember.id} socket={socket} />
         </ModalContainer>
       )}
     </div>

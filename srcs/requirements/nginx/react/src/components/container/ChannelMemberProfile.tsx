@@ -8,7 +8,7 @@ import UserProfile from './UserProfile';
 import type User from '../../interfaces/User';
 
 interface ChannelMemberProfileProps {
-  member: User;
+  userId: number;
   socket: Socket;
   className?: string;
 }
@@ -23,7 +23,7 @@ interface SendData {
 }
 
 const ChannelMemberProfile: React.FC<ChannelMemberProfileProps> = ({
-  member,
+  userId,
   socket,
   className = '',
 }) => {
@@ -33,7 +33,7 @@ const ChannelMemberProfile: React.FC<ChannelMemberProfileProps> = ({
   const sendData: SendData = {
     info: {
       channelId,
-      userId: member.id,
+      userId,
       limitedAt: null,
       value: null,
     },
@@ -65,7 +65,7 @@ const ChannelMemberProfile: React.FC<ChannelMemberProfileProps> = ({
   };
 
   return (
-    <UserProfile user={member} className={className}>
+    <UserProfile userId={userId} className={className}>
       <div className="m-4 flex w-full">
         <HoverButton
           onClick={handleMuteClick}

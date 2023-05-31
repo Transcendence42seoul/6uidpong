@@ -1,9 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Socket } from 'socket.io-client';
 
 import HoverButton from '../components/button/HoverButton';
 import CircularImage from '../components/container/CircularImage';
 import ListTitle from '../components/container/ListTitle';
+import ModalContainer from '../components/container/ModalContainer';
+import UserProfile from '../components/container/UserProfile';
 import selectAuth from '../features/auth/authSelector';
 import useCallApi from '../utils/useCallApi';
 
@@ -12,7 +15,11 @@ import type User from '../interfaces/User';
 
 import { isTest, mockUsers } from '../mock'; // test
 
-const FriendsList: React.FC = () => {
+interface FriendsListProps {
+  socket: Socket;
+}
+
+const FriendsList: React.FC<FriendsListProps> = ({ socket }) => {
   const callApi = useCallApi();
   const navigate = useNavigate();
 
@@ -21,11 +28,11 @@ const FriendsList: React.FC = () => {
 
   const menuRef = useRef<HTMLUListElement>(null);
   const [friends, setFriends] = useState<User[]>([]);
+  const [menuPosition, setMenuPosition] = useState<Position>({ x: 0, y: 0 });
+  const [selectedFriend, setSelectedFriend] = useState<User | null>(null);
   const [showMenu, setShowMenu] = useState<boolean>(false);
-  const [menuPosition, setMenuPosition] = useState<Position>({
-    x: 0,
-    y: 0,
-  });
+  const [showUserProfileModal, setShowUserProfileModal] =
+    useState<boolean>(false);
 
   const handleContextMenu = (event: React.MouseEvent) => {
     event.preventDefault();
@@ -47,8 +54,9 @@ const FriendsList: React.FC = () => {
     navigate('/friend-requests');
   };
 
-  const handleUserDoubleClick = (userId: number) => {
-    navigate(`/profile/${userId}`);
+  const handleUserDoubleClick = (user: User) => {
+    setSelectedFriend(user);
+    setShowUserProfileModal(true);
   };
 
   useEffect(() => {
@@ -83,7 +91,7 @@ const FriendsList: React.FC = () => {
               key={id}
               className="flex items-center border-2 border-white bg-black p-2"
               onContextMenu={handleContextMenu}
-              onDoubleClick={() => handleUserDoubleClick(id)}
+              onDoubleClick={() => handleUserDoubleClick(friend)}
             >
               {showMenu && (
                 <ul
@@ -115,6 +123,11 @@ const FriendsList: React.FC = () => {
           );
         })}
       </ul>
+      {selectedFriend && showUserProfileModal && (
+        <ModalContainer setShowModal={setShowUserProfileModal} closeButton>
+          <UserProfile user={selectedFriend} friend socket={socket} />
+        </ModalContainer>
+      )}
     </div>
   );
 };

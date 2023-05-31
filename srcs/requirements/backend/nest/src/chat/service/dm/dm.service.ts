@@ -293,6 +293,7 @@ export class DmService {
       return await this.chatRepository.findOne({
         relations: {
           user: true,
+          room: true,
         },
         where: {
           id: newChat.identifiers[0].id,

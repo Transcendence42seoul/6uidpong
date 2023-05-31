@@ -64,6 +64,7 @@ export const mockChats = [
     nickname: mockUsers[0].nickname,
     image: mockUsers[0].image,
     message: 'Hello, there..!',
+    isSystem: true,
     createdAt: '2023-05-18 00:25:57.304419',
   },
   {
@@ -73,6 +74,7 @@ export const mockChats = [
     nickname: mockUsers[0].nickname,
     image: mockUsers[0].image,
     message: 'Hello, there..!',
+    isSystem: false,
     createdAt: '2023-05-18 00:25:57.304419',
   },
   {
@@ -82,6 +84,7 @@ export const mockChats = [
     nickname: mockUsers[1].nickname,
     image: mockUsers[1].image,
     message: 'Hi~?',
+    isSystem: false,
     createdAt: '2023-05-18 00:27:37.593432',
   },
   {
@@ -91,6 +94,7 @@ export const mockChats = [
     nickname: mockUsers[1].nickname,
     image: mockUsers[1].image,
     message: 'How, are, you?!',
+    isSystem: false,
     createdAt: '2023-05-18 00:27:44.127905',
   },
 ];

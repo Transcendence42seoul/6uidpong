@@ -117,14 +117,19 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send, socket }) => {
     <div className="mx-auto max-w-[1024px] p-4 pt-2">
       <ChatContainer ref={chatContainer}>
         {chats.map((chat, index) => {
-          const { id, userId, nickname, image, message, createdAt } = chat;
+          const { id, userId, nickname, image, message, isSystem, createdAt } =
+            chat;
           const prevUserId = chats[index - 1]?.userId;
+          const prevIsSystem = chats[index - 1]?.isSystem;
           const isMyMsg = userId === myId;
-          const isConsecutiveMsg = userId === prevUserId;
-          const showUserInfo = !isMyMsg && !isConsecutiveMsg;
+          const isConsecutiveMsg = !prevIsSystem && userId === prevUserId;
+          const showUserInfo = !isSystem && !isMyMsg && !isConsecutiveMsg;
           let messageBoxClassName = '';
           let messageClassName = 'mt-1';
-          if (isMyMsg) {
+          if (isSystem) {
+            messageBoxClassName = 'flex-col items-center';
+            messageClassName = 'bg-gray-700 text-xs text-gray-300';
+          } else if (isMyMsg) {
             messageBoxClassName = 'flex-col items-end';
             messageClassName = 'bg-yellow-300';
           } else if (isConsecutiveMsg) {
@@ -154,7 +159,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send, socket }) => {
                     {isMyMsg ? (
                       <>
                         <span className="mr-2 pb-1 text-xs text-gray-500">
-                          {formatTime(createdAt)}
+                          {!isSystem && formatTime(createdAt)}
                         </span>
                         <Message className={messageClassName}>
                           {message}
@@ -166,7 +171,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send, socket }) => {
                           {message}
                         </Message>
                         <span className="ml-2 pb-1 text-xs text-gray-500">
-                          {formatTime(createdAt)}
+                          {!isSystem && formatTime(createdAt)}
                         </span>
                       </>
                     )}

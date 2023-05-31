@@ -8,11 +8,13 @@ import { FriendRequest } from "../entity/friend-request.entity";
 import { FriendRequestService } from "../service/friend-request.service";
 import { Friend } from "../entity/friend.entity";
 import { FriendService } from "../service/friend.service";
+import { ChatModule } from "src/chat/module/chat.module";
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User, Friend, FriendRequest]),
     forwardRef(() => AuthModule),
+    forwardRef(() => ChatModule),
   ],
   providers: [UserService, FriendService, FriendRequestService],
   exports: [UserService],

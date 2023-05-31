@@ -3,7 +3,6 @@ import { Cron } from "@nestjs/schedule";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Mute } from "src/chat/entity/channel/mute.entity";
 import { LessThanOrEqual, Repository } from "typeorm";
-import { ChannelService } from "./channel.service";
 
 @Injectable()
 export class MuteService {

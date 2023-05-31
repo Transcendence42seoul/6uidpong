@@ -14,6 +14,8 @@ import {
   Delete,
   DefaultValuePipe,
   BadRequestException,
+  Inject,
+  forwardRef
 } from "@nestjs/common";
 import { UserService } from "../service/user.service";
 import { JwtAccessGuard } from "src/auth/guard/jwt-access.guard";

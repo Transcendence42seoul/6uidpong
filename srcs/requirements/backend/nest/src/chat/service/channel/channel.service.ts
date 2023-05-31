@@ -27,7 +27,6 @@ export class ChannelService {
     @InjectRepository(ChannelChat)
     private readonly chatRepository: Repository<ChannelChat>,
     private readonly banService: BanService,
-    private readonly muteService: MuteService,
     private readonly dataSource: DataSource
   ) {}
 

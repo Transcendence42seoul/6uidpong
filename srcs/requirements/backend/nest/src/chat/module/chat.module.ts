@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { Module, forwardRef } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { UserModule } from "src/user/module/user.module";
 import { DmChat } from "../entity/dm/dm-chat.entity";
@@ -35,7 +35,7 @@ import { ConnectionGateway } from "../gateway/connection.gateway";
       Ban,
       Mute,
     ]),
-    UserModule,
+    forwardRef(() => UserModule),
   ],
   providers: [
     DmService,
@@ -50,5 +50,6 @@ import { ConnectionGateway } from "../gateway/connection.gateway";
     ChannelGateway,
     WsJwtAccessGuard,
   ],
+  exports: [BlockService],
 })
 export class ChatModule {}

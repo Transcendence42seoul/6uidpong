@@ -27,17 +27,6 @@ export class MuteService {
     return false;
   }
 
-  async upsert(
-    channelId: number,
-    userId: number,
-    limitedAt: Date
-  ): Promise<void> {
-    await this.muteRepository.upsert({ channelId, userId, limitedAt }, [
-      "channelId",
-      "userId",
-    ]);
-  }
-
   @Cron("0 * * * *")
   async deleteTimeoutUsers(): Promise<void> {
     await this.muteRepository.delete({

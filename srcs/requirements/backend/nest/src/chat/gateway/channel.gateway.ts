@@ -90,22 +90,17 @@ export class ChannelGateway {
     if (await this.muteService.has(to.channelId, jwt.id)) {
       throw new WsException("can't send because muted user.");
     }
-    await this.channelService.send(
-      jwt.it,
-      to.channelId,
-      to.message,
-      false,
-      client
-    );
+    await this.channelService.send(jwt.it, to.channelId, to.message, client);
   }
 
   @SubscribeMessage("delete-channel")
   async delete(
     @WsJwtPayload() jwt: JwtPayload,
+    @ConnectedSocket() client: Socket,
     @MessageBody("channelId")
     channelId: number
   ): Promise<void> {
-    await this.channelService.deleteChannel(channelId, jwt.id);
+    await this.channelService.deleteChannel(channelId, jwt.id, client);
   }
 
   @SubscribeMessage("leave-channel")
@@ -130,55 +125,97 @@ export class ChannelGateway {
   @SubscribeMessage("transfer-ownership")
   async transferOwnership(
     @WsJwtPayload() jwt: JwtPayload,
+    @ConnectedSocket() client: Socket,
     @MessageBody("info")
     info: { channelId: number; userId: number }
   ): Promise<void> {
-    await this.channelService.transferOwnership(jwt.id, info);
+    await this.channelService.transferOwnership(
+      jwt.id,
+      info.channelId,
+      info.userId,
+      client
+    );
   }
 
-  @SubscribeMessage("update-admin")
-  async updateAdmin(
+  @SubscribeMessage("add-admin")
+  async addAdmin(
     @WsJwtPayload() jwt: JwtPayload,
+    @ConnectedSocket() client: Socket,
     @MessageBody("info")
-    info: { channelId: number; userId: number; value: boolean }
+    info: { channelId: number; userId: number }
   ): Promise<void> {
-    await this.channelService.updateAdmin(jwt.id, info);
+    await this.channelService.addAdmin(
+      jwt.id,
+      info.channelId,
+      info.userId,
+      client
+    );
+  }
+
+  @SubscribeMessage("delete-admin")
+  async deleteAdmin(
+    @WsJwtPayload() jwt: JwtPayload,
+    @ConnectedSocket() client: Socket,
+    @MessageBody("info")
+    info: { channelId: number; userId: number }
+  ): Promise<void> {
+    await this.channelService.deleteAdmin(
+      jwt.id,
+      info.channelId,
+      info.userId,
+      client
+    );
   }
 
   @SubscribeMessage("invite")
   async invite(
     @WsJwtPayload() jwt: JwtPayload,
+    @ConnectedSocket() client: Socket,
     @MessageBody("info")
     info: { channelId: number; userIds: number[] }
   ): Promise<void> {
-    await this.channelService.invite(jwt.id, info);
+    await this.channelService.invite(
+      jwt.id,
+      info.channelId,
+      info.userIds,
+      client
+    );
   }
 
   @SubscribeMessage("kick")
   async kick(
     @WsJwtPayload() jwt: JwtPayload,
+    @ConnectedSocket() client: Socket,
     @MessageBody("info")
     info: { channelId: number; userId: number }
   ): Promise<void> {
-    await this.channelService.kick(jwt.id, info, this.server);
+    await this.channelService.kick(jwt.id, info.channelId, info.userId, client);
   }
 
   @SubscribeMessage("mute")
   async mute(
     @WsJwtPayload() jwt: JwtPayload,
+    @ConnectedSocket() client: Socket,
     @MessageBody("info")
-    info: { channelId: number; userId: number; limitedAt: Date }
+    info: { channelId: number; userId: number; time: number }
   ): Promise<void> {
-    await this.channelService.mute(jwt.id, info);
+    await this.channelService.mute(
+      jwt.id,
+      info.channelId,
+      info.userId,
+      info.time,
+      client
+    );
   }
 
   @SubscribeMessage("ban")
   async ban(
     @WsJwtPayload() jwt: JwtPayload,
+    @ConnectedSocket() client: Socket,
     @MessageBody("info")
     info: { channelId: number; userId: number }
   ): Promise<void> {
-    await this.channelService.ban(jwt.id, info);
+    await this.channelService.ban(jwt.id, info.channelId, info.userId, client);
   }
 
   @SubscribeMessage("unban")
@@ -187,7 +224,20 @@ export class ChannelGateway {
     @MessageBody("info")
     info: { channelId: number; userId: number }
   ): Promise<void> {
-    await this.channelService.unban(jwt.id, info);
+    await this.channelService.unban(jwt.id, info.channelId, info.userId);
+  }
+
+  @SubscribeMessage("update-password")
+  async updatePassword(
+    @WsJwtPayload() jwt: JwtPayload,
+    @MessageBody("info")
+    info: { channelId: number; password: string }
+  ): Promise<void> {
+    await this.channelService.updatePassword(
+      jwt.id,
+      info.channelId,
+      info.password
+    );
   }
 
   @SubscribeMessage("find-channel-users")
@@ -219,14 +269,5 @@ export class ChannelGateway {
   ): Promise<BanResponse[]> {
     const banUsers: Ban[] = await this.banService.findUsers(channelId);
     return banUsers.map((ban) => new BanResponse(ban));
-  }
-
-  @SubscribeMessage("update-password")
-  async updatePassword(
-    @WsJwtPayload() jwt: JwtPayload,
-    @MessageBody("info")
-    info: { channelId: number; password: string }
-  ): Promise<void> {
-    await this.channelService.updatePassword(jwt.id, info);
   }
 }

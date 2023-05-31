@@ -99,7 +99,7 @@ const App: React.FC = () => {
         <Route path="/dm" element={<DmRoomList socket={socket} />} />
         <Route path="/dm/:roomId" element={<DmRoom socket={socket} />} />
         <Route path="/friend-requests" element={<FriendRequests />} />
-        <Route path="/friends-list" element={<FriendsList />} />
+        <Route path="/friends-list" element={<FriendsList socket={socket} />} />
         <Route path="/my-page" element={<MyPage stats={stats} />} />
         <Route path="/profile-settings" element={<ProfileSettings />} />
       </Routes>

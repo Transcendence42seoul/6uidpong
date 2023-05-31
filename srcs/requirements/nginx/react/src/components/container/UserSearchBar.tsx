@@ -28,37 +28,32 @@ const UserSearchBar: React.FC<UserSearchBarProps> = ({
   const [searchResults, setSearchResults] = useState<User[]>([]);
   const [showSearchResults, setShowSearchResults] = useState<boolean>(false);
 
-  const handleSearchClick = () => {
-    setShowSearchResults(true);
-  };
-
   const handleUserClick = (user: User) => {
-    setSearch('');
-    setShowSearchResults(false);
     onUserClick(user);
   };
 
-  const handleSearchResults = async (users: User[]) => {
-    setSearchResults([...users.filter((user) => user.id !== myId)]);
-  };
-
-  const handleShowSearchResults = async (nickname: string) => {
-    setShowSearchResults(!!nickname);
+  const handleShowSearchResults = () => {
+    setShowSearchResults(!!search);
   };
 
   const handleSearchChange = async (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    const nickname = event.target.value;
-    setSearch(nickname);
-    const config = {
-      url: '/api/v1/users/search',
-      params: { nickname },
-    };
-    const data: User[] = isTest ? mockUsers : await callApi(config); // test
-    await handleSearchResults(data);
-    await handleShowSearchResults(nickname);
+    setSearch(event.target.value);
   };
+
+  useEffect(() => {
+    const fetchUsersData = async () => {
+      const config = {
+        url: '/api/v1/users/search',
+        params: { search },
+      };
+      const data: User[] = isTest ? mockUsers : await callApi(config); // test
+      setSearchResults([...data.filter((user) => user.id !== myId)]);
+    };
+    fetchUsersData();
+    handleShowSearchResults();
+  }, [search]);
 
   useEffect(() => {
     const handleOutsideClick = (event: MouseEvent) => {
@@ -82,7 +77,7 @@ const UserSearchBar: React.FC<UserSearchBarProps> = ({
         placeholder="Search users"
         value={search}
         onChange={handleSearchChange}
-        onClick={handleSearchClick}
+        onClick={handleShowSearchResults}
         className="w-full rounded border border-white p-2 shadow"
       />
       {showSearchResults && (

@@ -50,10 +50,6 @@ const ChannelMemberList: React.FC<ChannelMemberListProps> = ({
   };
 
   const handleSearchResults = () => {
-    if (!search) {
-      setSearchResults([...members]);
-      return;
-    }
     const results = members.filter((member) => {
       return member.nickname.startsWith(search);
     });

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import CircularImage from './CircularImage';
 
@@ -24,24 +24,22 @@ const UserListWithSearchBar: React.FC<UserListWithSearchBarProps> = ({
     onUserClick(user);
   };
 
-  const handleSearchResults = async (results: User[]) => {
+  const handleSearchResults = () => {
+    const results = users.filter((user) => {
+      return user.nickname.startsWith(search);
+    });
     setSearchResults([...results]);
   };
 
   const handleSearchChange = async (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    const keyword = event.target.value;
-    setSearch(keyword);
-    if (keyword) {
-      const results = users.filter((user) => {
-        return user.nickname.startsWith(keyword);
-      });
-      await handleSearchResults(results);
-    } else {
-      await handleSearchResults(users);
-    }
+    setSearch(event.target.value);
   };
+
+  useEffect(() => {
+    handleSearchResults();
+  }, [search, users]);
 
   return (
     <div className={`relative ${className}`}>

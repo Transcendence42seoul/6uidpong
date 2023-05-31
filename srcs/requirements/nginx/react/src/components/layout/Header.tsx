@@ -16,10 +16,9 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ socket }) => {
   const navigate = useNavigate();
 
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [showUserProfileModal, setShowUserProfileModal] =
     useState<boolean>(false);
-
-  let selectedUser: User | null = null;
 
   const handleHomeClick = () => {
     navigate('/');
@@ -30,7 +29,7 @@ const Header: React.FC<HeaderProps> = ({ socket }) => {
   };
 
   const onUserClick = (user: User) => {
-    selectedUser = user;
+    setSelectedUser(user);
     setShowUserProfileModal(true);
   };
 

@@ -29,11 +29,10 @@ const FriendsList: React.FC<FriendsListProps> = ({ socket }) => {
   const menuRef = useRef<HTMLUListElement>(null);
   const [friends, setFriends] = useState<User[]>([]);
   const [menuPosition, setMenuPosition] = useState<Position>({ x: 0, y: 0 });
+  const [selectedFriend, setSelectedFriend] = useState<User | null>(null);
   const [showMenu, setShowMenu] = useState<boolean>(false);
   const [showUserProfileModal, setShowUserProfileModal] =
     useState<boolean>(false);
-
-  let selectedFriend: User | null = null;
 
   const handleContextMenu = (event: React.MouseEvent) => {
     event.preventDefault();
@@ -56,7 +55,7 @@ const FriendsList: React.FC<FriendsListProps> = ({ socket }) => {
   };
 
   const handleUserDoubleClick = (user: User) => {
-    selectedFriend = user;
+    setSelectedFriend(user);
     setShowUserProfileModal(true);
   };
 

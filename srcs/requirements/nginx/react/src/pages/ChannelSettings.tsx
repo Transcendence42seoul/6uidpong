@@ -6,6 +6,8 @@ import HoverButton from '../components/button/HoverButton';
 import ChannelManagePanel from '../components/container/ChannelManagePanel';
 import ContentBox from '../components/container/ContentBox';
 
+import type Channel from '../interfaces/Channel';
+
 interface ChannelSettingsProps {
   socket: Socket;
 }
@@ -30,12 +32,12 @@ const ChannelSettings: React.FC<ChannelSettingsProps> = ({ socket }) => {
       password: isPasswordEnabled ? password : undefined,
       isPublic,
     };
-    const channelIdHandler = (id: number) => {
+    const channelHandler = ({ id }: Channel) => {
       navigate(`/channel/${id}`, {
         state: { password },
       });
     };
-    socket.emit('create-channel', channel, channelIdHandler);
+    socket.emit('create-channel', channel, channelHandler);
   };
 
   const handleEnablePasswordChange = () => {

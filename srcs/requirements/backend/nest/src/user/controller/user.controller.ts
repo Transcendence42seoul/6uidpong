@@ -31,6 +31,7 @@ import { FriendRequest } from "../entity/friend-request.entity";
 import { FriendRequestResponse } from "../dto/friend-request-response";
 import { PermissionGuard } from "src/auth/guard/permission.guard";
 import { Friend } from "../entity/friend.entity";
+import { BlockService } from "src/chat/service/dm/block.service";
 
 @Controller("api/v1/users")
 @UseGuards(JwtAccessGuard)
@@ -39,7 +40,8 @@ export class UserController {
     private readonly userService: UserService,
     private readonly authService: AuthService,
     private readonly friendService: FriendService,
-    private readonly friendRequestService: FriendRequestService
+    private readonly friendRequestService: FriendRequestService,
+    private readonly blockService: BlockService
   ) {}
 
   @Get()
@@ -166,6 +168,9 @@ export class UserController {
     try {
       await this.friendService.findOne(fromId, toId);
     } catch {
+      if (await this.blockService.has(fromId, toId)) {
+        throw new BadRequestException("blocked user");
+      }
       await this.friendRequestService.insert(fromId, toId);
       return;
     }

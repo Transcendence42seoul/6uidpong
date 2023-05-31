@@ -143,7 +143,7 @@ export class ChannelService {
         channelUser = await this.insertUser(channelId, userId);
       }
       const systemMessage: string = `${channelUser.user.nickname} has joined`;
-      await this.sendSystemMsg(userId, channelId, systemMessage, client);
+      await this.send(userId, channelId, systemMessage, true, client);
 
       await queryRunner.commitTransaction();
 
@@ -215,7 +215,7 @@ export class ChannelService {
         inviter.user.nickname
       }. Also, ${invitee.nickname} and ${userIds.length - 1} others joined.
       `;
-      await this.sendSystemMsg(invitee.id, channelId, systemMessage, client);
+      await this.send(invitee.id, channelId, systemMessage, true, client);
 
       await queryRunner.commitTransaction();
     } catch (error) {
@@ -252,7 +252,7 @@ export class ChannelService {
       };
       const systemMessage: string = `${kicked.user.nickname} has been kicked by ${kicker.user.nickname}`;
       await queryRunner.manager.delete(ChannelUser, kickedPk);
-      await this.sendSystemMsg(kickedId, channelId, systemMessage, client);
+      await this.send(kickedId, channelId, systemMessage, true, client);
 
       await queryRunner.commitTransaction();
 
@@ -298,7 +298,7 @@ export class ChannelService {
         ["channelId", "userId"]
       );
       const systemMessage: string = `${muted.user.nickname} has been muted for ${time} seconds by ${muter.user.nickname}`;
-      await this.sendSystemMsg(mutedId, channelId, systemMessage, client);
+      await this.send(mutedId, channelId, systemMessage, true, client);
 
       await queryRunner.commitTransaction();
     } catch (error) {
@@ -333,7 +333,7 @@ export class ChannelService {
       await queryRunner.manager.insert(Ban, { channelId, userId: bannedId });
 
       const systemMessage: string = `${banned.user.nickname} has been banned by ${banner.user.nickname}`;
-      await this.sendSystemMsg(bannedId, channelId, systemMessage, client);
+      await this.send(bannedId, channelId, systemMessage, true, client);
 
       await queryRunner.commitTransaction();
 
@@ -439,6 +439,7 @@ export class ChannelService {
     userId: number,
     channelId: number,
     message: string,
+    isSystem: boolean,
     client: Socket
   ): Promise<void> {
     const sockets = await client.in("c" + channelId).fetchSockets();
@@ -465,7 +466,7 @@ export class ChannelService {
             id: channelId,
           },
           message,
-          isSystem: false,
+          isSystem,
         }
       );
       await queryRunner.manager.increment(
@@ -479,59 +480,6 @@ export class ChannelService {
 
       const chat: ChannelChat = await this.findChat(newChat.identifiers[0].id);
       client.to(onlineSockets).emit("send-channel", new ChatResponse(chat));
-    } catch (error) {
-      await queryRunner.rollbackTransaction();
-      throw error;
-    } finally {
-      await queryRunner.release();
-    }
-  }
-
-  async sendSystemMsg(
-    userId: number,
-    channelId: number,
-    message: string,
-    client: Socket
-  ): Promise<void> {
-    const sockets = await client.in("c" + channelId).fetchSockets();
-    const channelUsers: ChannelUser[] = await this.findUsers(channelId);
-    const notJoined: ChannelUser[] = channelUsers.filter(
-      (channelUser) =>
-        !sockets.some((socket) => socket.id === channelUser.user.socketId)
-    );
-    const onlineSockets: string[] = channelUsers
-      .filter((channelUser) => channelUser.user.status === "online")
-      .map((onlineChannelUser) => onlineChannelUser.user.socketId);
-    const queryRunner = this.dataSource.createQueryRunner();
-
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-    try {
-      const newChat: InsertResult = await queryRunner.manager.insert(
-        ChannelChat,
-        {
-          user: {
-            id: userId,
-          },
-          channel: {
-            id: channelId,
-          },
-          message,
-          isSystem: true,
-        }
-      );
-      await queryRunner.manager.increment(
-        ChannelUser,
-        notJoined,
-        "newMsgCount",
-        1
-      );
-      await queryRunner.commitTransaction();
-
-      const chat: ChannelChat = await this.findChat(newChat.identifiers[0].id);
-      client
-        .to(onlineSockets)
-        .emit("send-channel-system", new ChatResponse(chat));
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;
@@ -557,7 +505,7 @@ export class ChannelService {
       const systemMessage: string = `${channelUser.user.nickname} has left`;
       
       await queryRunner.manager.delete(ChannelUser, primaryKey);
-      await this.sendSystemMsg(userId, channelId, systemMessage, client);
+      await this.send(userId, channelId, systemMessage, true, client);
 
       await queryRunner.commitTransaction();
     } catch (error) {
@@ -609,7 +557,7 @@ export class ChannelService {
       });
       const systemMessage: string = `The owner of the channel has been changed from ${oldOwner.user.nickname} to ${newOwner.user.nickname}.
       `;
-      await this.sendSystemMsg(newOwnerId, channelId, systemMessage, client);
+      await this.send(newOwnerId, channelId, systemMessage, true, client);
 
       await queryRunner.commitTransaction();
     } catch (error) {
@@ -646,7 +594,7 @@ export class ChannelService {
       );
       const systemMessage: string = `${newAdmin.user.nickname} has been granted the "admin" role.
       `;
-      await this.sendSystemMsg(newAdminId, channelId, systemMessage, client);
+      await this.send(newAdminId, channelId, systemMessage, true, client);
 
       await queryRunner.commitTransaction();
     } catch (error) {
@@ -683,7 +631,7 @@ export class ChannelService {
       );
       const systemMessage: string = `${target.user.nickname} has been revoked the "admin" role.
       `;
-      await this.sendSystemMsg(targetId, channelId, systemMessage, client);
+      await this.send(targetId, channelId, systemMessage, true, client);
 
       await queryRunner.commitTransaction();
     } catch (error) {

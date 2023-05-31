@@ -13,16 +13,16 @@ export class Channel {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ unique: true })
+  @Column({ nullable: false, unique: true })
   title: string;
 
-  @Column()
+  @Column({ nullable: false })
   password: string;
 
-  @Column({ name: "is_public", type: "boolean" })
+  @Column({ nullable: false, name: "is_public", type: "boolean" })
   isPublic: boolean;
 
-  @CreateDateColumn({ name: "created_at" })
+  @CreateDateColumn({ nullable: false, name: "created_at" })
   createdAt: Date;
 
   @OneToMany(() => ChannelUser, (channelUser) => channelUser.channel)

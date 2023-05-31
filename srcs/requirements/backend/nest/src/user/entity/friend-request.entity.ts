@@ -27,6 +27,6 @@ export class FriendRequest {
   @JoinColumn({ name: "to_id" })
   to: User;
 
-  @CreateDateColumn({ name: "created_at" })
+  @CreateDateColumn({ nullable: false, name: "created_at" })
   createdAt: Date;
 }

@@ -30,15 +30,25 @@ export class ChannelUser {
   @JoinColumn({ name: "user_id" })
   user: User;
 
-  @Column({ name: "new_msg_count", default: 0 })
+  @Column({ nullable: false, name: "new_msg_count", default: 0 })
   newMsgCount: number;
 
-  @Column({ name: "is_owner", type: "boolean", default: false })
+  @Column({
+    nullable: false,
+    name: "is_owner",
+    type: "boolean",
+    default: false,
+  })
   isOwner: boolean;
 
-  @Column({ name: "is_admin", type: "boolean", default: false })
+  @Column({
+    nullable: false,
+    name: "is_admin",
+    type: "boolean",
+    default: false,
+  })
   isAdmin: boolean;
 
-  @CreateDateColumn({ name: "created_at" })
+  @CreateDateColumn({ nullable: false, name: "created_at" })
   createdAt: Date;
 }

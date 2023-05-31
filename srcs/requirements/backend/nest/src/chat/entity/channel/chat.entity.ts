@@ -30,6 +30,9 @@ export class ChannelChat {
   @Column()
   message: string;
 
+  @Column({ name: "is_system", type: "boolean" })
+  isSystem: boolean;
+
   @CreateDateColumn({ name: "created_at" })
   createdAt: Date;
 }

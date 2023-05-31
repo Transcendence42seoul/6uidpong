@@ -72,12 +72,18 @@ export class ChannelGateway {
     @MessageBody("info")
     info: { channelId: number; password: string }
   ): Promise<ChatResponse[]> {
-    return await this.channelService.join(jwt.id, info, client);
+    return await this.channelService.join(
+      jwt.id,
+      info.channelId,
+      info.password,
+      client
+    );
   }
 
   @SubscribeMessage("send-channel")
   async send(
     @WsJwtPayload() jwt: JwtPayload,
+    @ConnectedSocket() client: Socket,
     @MessageBody("to")
     to: { channelId: number; message: string }
   ): Promise<void> {
@@ -88,7 +94,8 @@ export class ChannelGateway {
       jwt.it,
       to.channelId,
       to.message,
-      this.server
+      false,
+      client
     );
   }
 

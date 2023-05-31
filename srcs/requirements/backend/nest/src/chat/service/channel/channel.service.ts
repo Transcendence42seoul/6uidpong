@@ -125,20 +125,37 @@ export class ChannelService {
 
   async join(
     userId: number,
-    info: { channelId: number; password: string },
+    channelId: number,
+    password: string,
     client: Socket
   ): Promise<ChatResponse[]> {
-    const { channelId, password } = info;
-    let channelUser: ChannelUser;
+    const queryRunner = this.dataSource.createQueryRunner();
+
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
     try {
-      channelUser = await this.findUser(channelId, userId);
-    } catch {
-      await this.authenticate(channelId, userId, password);
-      channelUser = await this.insertUser(channelId, userId);
+      let channelUser: ChannelUser;
+      try {
+        channelUser = await this.findUser(channelId, userId);
+      } catch {
+        await this.authenticate(channelId, userId, password);
+        channelUser = await this.insertUser(channelId, userId);
+      }
+      const { user }: ChannelUser = channelUser;
+      const systemMessage: string = `${user.nickname} has joined`;
+      await this.send(userId, channelId, systemMessage, true, client);
+      await queryRunner.commitTransaction();
+
+      client.join("c" + channelId);
+      const chats: ChannelChat[] = await this.findChats(channelUser);
+
+      return chats.map((chat) => new ChatResponse(chat));
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
     }
-    client.join("c" + channelId);
-    const chats: ChannelChat[] = await this.findChats(channelUser);
-    return chats.map((chat) => new ChatResponse(chat));
   }
 
   async deleteChannel(channelId: number, userId: number): Promise<void> {
@@ -358,9 +375,10 @@ export class ChannelService {
     userId: number,
     channelId: number,
     message: string,
-    server: Namespace
+    isSystem: boolean,
+    client: Socket
   ): Promise<void> {
-    const sockets = await server.in("c" + channelId).fetchSockets();
+    const sockets = await client.in("c" + channelId).fetchSockets();
     const channelUsers: ChannelUser[] = await this.findUsers(channelId);
     const notJoined: ChannelUser[] = channelUsers.filter(
       (channelUser) =>
@@ -381,6 +399,7 @@ export class ChannelService {
             id: channelId,
           },
           message,
+          isSystem,
         }
       );
       await queryRunner.manager.increment(
@@ -395,7 +414,7 @@ export class ChannelService {
       const chat: ChannelChat = await this.chatRepository.findOneBy({
         id: newChat.identifiers[0].id,
       });
-      server.to(onlineSockets).emit("send-channel", new ChatResponse(chat));
+      client.to(onlineSockets).emit("send-channel", new ChatResponse(chat));
 
       await queryRunner.commitTransaction();
     } catch (error) {

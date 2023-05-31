@@ -18,7 +18,6 @@ interface SendData {
     channelId: number;
     userId: number;
     limitedAt: Date | null;
-    value: boolean | null;
   };
 }
 
@@ -35,14 +34,11 @@ const ChannelMemberProfile: React.FC<ChannelMemberProfileProps> = ({
       channelId,
       userId,
       limitedAt: null,
-      value: null,
     },
   };
 
   const handleAssignAdminClick = () => {
-    sendData.info.value = true;
-    socket.emit('update-admin', sendData);
-    sendData.info.value = null;
+    socket.emit('add-admin', sendData);
   };
 
   const handleBanClick = () => {

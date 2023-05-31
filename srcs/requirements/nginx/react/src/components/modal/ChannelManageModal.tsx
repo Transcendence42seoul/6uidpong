@@ -23,7 +23,6 @@ interface SendData {
     channelId: number;
     userId: number | null;
     limitedAt: Date | null;
-    value: boolean | null;
   };
 }
 
@@ -42,7 +41,6 @@ const ChannelManageModal: React.FC<ChannelManageModalProps> = ({
       channelId,
       userId: null,
       limitedAt: null,
-      value: null,
     },
   };
 
@@ -54,29 +52,15 @@ const ChannelManageModal: React.FC<ChannelManageModalProps> = ({
     setMembers([...memberList]);
   };
 
-  const updateAdmins = () => {
-    if (!selectedMember) return;
-    const { value: isAssign } = sendData.info;
-    if (isAssign) {
-      setAdmins((prevAdmins) => [...prevAdmins, selectedMember]);
-      return;
-    }
-    const adminList = members.filter((member) => {
-      return member.id !== selectedMember.id;
-    });
-    setAdmins([...adminList]);
-  };
-
   const handleAdmins = () => {
     const adminList = members.filter((member) => member.isAdmin);
     setAdmins([...adminList]);
   };
 
   const handleAssignAdminClick = () => {
-    sendData.info.value = true;
-    socket.emit('update-admin', sendData);
-    updateAdmins();
-    sendData.info.value = null;
+    if (!selectedMember) return;
+    socket.emit('add-admin', sendData);
+    setAdmins((prevAdmins) => [...prevAdmins, selectedMember]);
   };
 
   const handleBanClick = () => {
@@ -106,10 +90,11 @@ const ChannelManageModal: React.FC<ChannelManageModalProps> = ({
 
   const onDeleteAdminClick = ({ id }: User) => {
     sendData.info.userId = id;
-    sendData.info.value = false;
-    socket.emit('update-admin', sendData);
-    updateAdmins();
-    sendData.info.value = null;
+    socket.emit('delete-admin', sendData);
+    const adminList = members.filter((member) => {
+      return member.id !== id;
+    });
+    setAdmins([...adminList]);
   };
 
   const onDeleteBanClick = ({ id }: User) => {

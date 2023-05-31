@@ -31,7 +31,7 @@ const DmRoom: React.FC<DmRoomProps> = ({ socket }) => {
 
   const send = {
     name: 'send-dm',
-    data: { toId: interlocutorId },
+    data: { interlocutorId },
   };
 
   return <ChatRoom join={join} leave={leave} send={send} socket={socket} />;

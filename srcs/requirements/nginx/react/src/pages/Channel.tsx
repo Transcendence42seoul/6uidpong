@@ -34,7 +34,7 @@ const Channel: React.FC<ChannelProps> = ({ socket }) => {
 
   const send = {
     name: 'send-channel',
-    data: { toId: channelId },
+    data: { channelId },
   };
 
   const handleExitClick = () => {

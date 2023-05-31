@@ -104,6 +104,21 @@ const ChannelManageModal: React.FC<ChannelManageModalProps> = ({
     socket.emit('transfer-ownership', sendData);
   };
 
+  const onDeleteAdminClick = ({ id }: User) => {
+    sendData.info.userId = id;
+    sendData.info.value = false;
+    socket.emit('update-admin', sendData);
+    updateAdmins();
+    sendData.info.value = null;
+  };
+
+  const onDeleteBanClick = ({ id }: User) => {
+    sendData.info.userId = id;
+    socket.emit('unban', sendData);
+    const newBanList = banList.filter((user) => user.id !== id);
+    setBanList([...newBanList]);
+  };
+
   const onUserClick = (user: User) => {
     setSelectedMember(user);
   };
@@ -180,8 +195,16 @@ const ChannelManageModal: React.FC<ChannelManageModalProps> = ({
       )}
       <div className="space-y-4">
         <div className="flex space-x-4">
-          <UserList title="Ban" users={banList} />
-          <UserList title="Admin" users={admins} />
+          <UserList
+            title="Ban"
+            users={banList}
+            onDeleteClick={onDeleteBanClick}
+          />
+          <UserList
+            title="Admin"
+            users={admins}
+            onDeleteClick={onDeleteAdminClick}
+          />
         </div>
         <HoverButton onClick={handleCloseClick} className="w-full border p-2">
           Close

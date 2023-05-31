@@ -44,6 +44,12 @@ const ChannelInviteModal: React.FC<ChannelInviteModalProps> = ({
     setShowModal(false);
   };
 
+  const onDeleteClick = ({ id }: User) => {
+    setSelectedUsers(
+      (prevUsers) => new Set([...prevUsers].filter((user) => user.id !== id)),
+    );
+  };
+
   const onUserClick = (user: User) => {
     setSelectedUsers((prevUsers) => new Set(prevUsers).add(user));
   };
@@ -62,7 +68,11 @@ const ChannelInviteModal: React.FC<ChannelInviteModalProps> = ({
   return (
     <ModalContainer setShowModal={setShowModal}>
       <UserListWithSearchBar users={allUsers} onUserClick={onUserClick} />
-      <UserList title="Invite" users={selectedUsers}>
+      <UserList
+        title="Invite"
+        users={selectedUsers}
+        onDeleteClick={onDeleteClick}
+      >
         <div className="flex">
           <HoverButton
             onClick={handleConfirmClick}

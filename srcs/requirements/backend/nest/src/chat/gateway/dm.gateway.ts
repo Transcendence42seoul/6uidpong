@@ -8,7 +8,6 @@ import {
   WsException,
 } from "@nestjs/websockets";
 import { Namespace, Socket } from "socket.io";
-import { ChatResponse } from "../dto/dm/chat-response";
 import { RoomResponse } from "../dto/dm/room-response";
 import { WsJwtAccessGuard } from "../guard/ws-jwt-access.guard";
 import { DmService } from "../service/dm/dm.service";
@@ -60,7 +59,7 @@ export class DmGateway {
     if (await this.blockService.has(jwt.id, to.id)) {
       throw new WsException("can't send because blocked");
     }
-    await this.dmService.send(jwt.id, to, client);
+    await this.dmService.send(jwt.id, to.id, to.message, client, this.server);
   }
 
   @SubscribeMessage("leave-dm")

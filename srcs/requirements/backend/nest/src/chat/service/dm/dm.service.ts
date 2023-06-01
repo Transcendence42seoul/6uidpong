@@ -93,19 +93,20 @@ export class DmService {
   }
 
   async send(
-    userId: number,
-    to: { id: number; message: string },
-    client: Socket
+    senderId: number,
+    recipientId: number,
+    message: string,
+    client: Socket,
+    server: Namespace
   ): Promise<void> {
-    const { id: toId, message } = to;
-    const recipient: DmRoomUser = await this.findUser(toId, userId);
+    const recipient: DmRoomUser = await this.findUser(recipientId, senderId);
     const chat: DmChat = await this.insertChat(
-      userId,
+      senderId,
       message,
       recipient,
       client.rooms.has("d" + recipient.roomId)
     );
-    client
+    server
       .to([client.id, recipient.user.socketId])
       .emit("send-dm", new ChatResponse(chat));
   }

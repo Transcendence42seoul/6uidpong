@@ -57,7 +57,7 @@ export class DmGateway {
     @MessageBody("to") to: { id: number; message: string }
   ): Promise<void> {
     if (await this.blockService.has(jwt.id, to.id)) {
-      throw new WsException("can't send because blocked");
+      throw new WsException("can't send because blocked.");
     }
     await this.dmService.send(jwt.id, to.id, to.message, client, this.server);
   }

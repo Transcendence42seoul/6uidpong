@@ -68,7 +68,7 @@ export class AuthService {
     await transporter.sendMail(mailOptions, (error) => {
       if (error) {
         console.error(error);
-        throw new InternalServerErrorException("mail send failed");
+        throw new InternalServerErrorException("mail send failed.");
       }
     });
 
@@ -77,7 +77,7 @@ export class AuthService {
 
   async validate2FACode(userId: number, code: string): Promise<void> {
     if ((await this.cacheManager.get(userId.toString())) != code) {
-      throw new UnauthorizedException("invalid 2fa code");
+      throw new UnauthorizedException("invalid 2fa code.");
     }
     await this.cacheManager.del(userId.toString());
   }

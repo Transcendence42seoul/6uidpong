@@ -15,7 +15,7 @@ import {
   DefaultValuePipe,
   BadRequestException,
   Inject,
-  forwardRef
+  forwardRef,
 } from "@nestjs/common";
 import { UserService } from "../service/user.service";
 import { JwtAccessGuard } from "src/auth/guard/jwt-access.guard";
@@ -74,7 +74,7 @@ export class UserController {
       const user: User = await this.userService.findOne(id);
       return new UserResponse(user);
     } catch {
-      throw new NotFoundException("user not exists");
+      throw new NotFoundException("user not exists.");
     }
   }
 
@@ -171,12 +171,12 @@ export class UserController {
       await this.friendService.findOne(fromId, toId);
     } catch {
       if (await this.blockService.has(fromId, toId)) {
-        throw new BadRequestException("blocked user");
+        throw new BadRequestException("blocked user.");
       }
       await this.friendRequestService.insert(fromId, toId);
       return;
     }
-    throw new BadRequestException("already friends");
+    throw new BadRequestException("already friends.");
   }
 
   @Delete("/:id/friend-requests/:fromId")

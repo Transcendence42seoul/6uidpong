@@ -9,7 +9,6 @@ import {
 import { Namespace, Socket } from "socket.io";
 import { WsJwtAccessGuard } from "../guard/ws-jwt-access.guard";
 import { ConnectionService } from "../service/connection/connection.service";
-import { DisconnectionService } from "../service/connection/disconnection.service";
 import { WsJwtPayload } from "../utils/decorator/ws-jwt-payload.decorator";
 import { JwtPayload } from "jsonwebtoken";
 

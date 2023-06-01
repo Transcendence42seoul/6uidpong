@@ -132,12 +132,13 @@ export class ChannelService {
     client: Socket,
     server: Namespace
   ): Promise<JoinResponse> {
-    let channelUser: ChannelUser;
+    client.join("c" + channelId);
     const queryRunner = this.dataSource.createQueryRunner();
 
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
+      let channelUser: ChannelUser;
       try {
         channelUser = await this.findUser(channelId, userId);
         await queryRunner.manager.update(
@@ -162,10 +163,9 @@ export class ChannelService {
             userId,
           },
         });
+        const systemMessage: string = `${channelUser.user.nickname} has joined`;
+        await this.send(userId, channelId, systemMessage, true, server);
       }
-      client.join("c" + channelId);
-      const systemMessage: string = `${channelUser.user.nickname} has joined`;
-      await this.send(userId, channelId, systemMessage, true, server);
 
       await queryRunner.commitTransaction();
 

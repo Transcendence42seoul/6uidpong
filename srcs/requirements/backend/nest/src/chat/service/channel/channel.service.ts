@@ -132,10 +132,6 @@ export class ChannelService {
     client: Socket,
     server: Namespace
   ): Promise<JoinResponse> {
-    const channel: Channel = await this.findChannel(channelId);
-    if (!channel.isPublic) {
-      throw new WsException("You cannot join a private channel.");
-    }
     const queryRunner = this.dataSource.createQueryRunner();
 
     await queryRunner.connect();
@@ -153,7 +149,7 @@ export class ChannelService {
         );
         client.join("c" + channelId);
       } catch {
-        await this.authenticate(channelId, userId, password);
+        await this.verifyJoin(channelId, userId, password);
         await queryRunner.manager.insert(ChannelUser, {
           channelId,
           userId,
@@ -399,15 +395,18 @@ export class ChannelService {
     });
   }
 
-  async authenticate(
+  async verifyJoin(
     channelId: number,
     userId: number,
     password: string
   ): Promise<void> {
+    const channel: Channel = await this.findChannel(channelId);
+    if (!channel.isPublic) {
+      throw new WsException("You cannot join a private channel.");
+    }
     if (await this.banService.has(channelId, userId)) {
       throw new WsException("can't join because banned.");
     }
-    const channel: Channel = await this.findChannel(channelId);
     if (
       channel.password.length !== 0 &&
       (typeof password === "undefined" ||

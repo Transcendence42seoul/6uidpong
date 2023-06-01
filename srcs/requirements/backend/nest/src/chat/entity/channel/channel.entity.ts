@@ -22,7 +22,10 @@ export class Channel {
   @Column({ nullable: false, name: "is_public", type: "boolean" })
   isPublic: boolean;
 
-  @CreateDateColumn({ nullable: false, name: "created_at" })
+  @CreateDateColumn({
+    nullable: false,
+    name: "created_at",
+  })
   createdAt: Date;
 
   @OneToMany(() => ChannelUser, (channelUser) => channelUser.channel)

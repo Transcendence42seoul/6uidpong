@@ -35,6 +35,9 @@ export class ChannelChat {
   @Column({ nullable: false, name: "is_system", type: "boolean" })
   isSystem: boolean;
 
-  @CreateDateColumn({ nullable: false, name: "created_at" })
+  @CreateDateColumn({
+    nullable: false,
+    name: "created_at",
+  })
   createdAt: Date;
 }

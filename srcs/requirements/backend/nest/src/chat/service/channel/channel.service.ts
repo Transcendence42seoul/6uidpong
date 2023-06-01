@@ -140,16 +140,35 @@ export class ChannelService {
     try {
       try {
         channelUser = await this.findUser(channelId, userId);
+        await queryRunner.manager.update(
+          ChannelUser,
+          { channelId, userId },
+          {
+            newMsgCount: 0,
+          }
+        );
       } catch {
         await this.authenticate(channelId, userId, password);
-        channelUser = await this.insertUser(channelId, userId);
+        await queryRunner.manager.insert(ChannelUser, {
+          channelId,
+          userId,
+        });
+        channelUser = await queryRunner.manager.findOne(ChannelUser, {
+          relations: {
+            user: true,
+          },
+          where: {
+            channelId,
+            userId,
+          },
+        });
       }
+      client.join("c" + channelId);
       const systemMessage: string = `${channelUser.user.nickname} has joined`;
       await this.send(userId, channelId, systemMessage, true, server);
 
       await queryRunner.commitTransaction();
 
-      client.join("c" + channelId);
       return new JoinResponse(
         channelId,
         channelUser.newMsgCount,
@@ -186,14 +205,6 @@ export class ChannelService {
         userId,
       },
     });
-  }
-
-  async insertUser(channelId: number, userId: number): Promise<ChannelUser> {
-    await this.channelUserRepository.insert({
-      channelId,
-      userId,
-    });
-    return await this.channelUserRepository.findOneBy({ channelId, userId });
   }
 
   async invite(
@@ -449,10 +460,12 @@ export class ChannelService {
   ): Promise<void> {
     const sockets = await server.in("c" + channelId).fetchSockets();
     const channelUsers: ChannelUser[] = await this.findUsers(channelId);
-    const notJoined: ChannelUser[] = channelUsers.filter(
-      (channelUser) =>
-        !sockets.some((socket) => socket.id === channelUser.user.socketId)
-    );
+    const notJoined = channelUsers
+      .filter(
+        (channelUser) =>
+          !sockets.some((socket) => socket.id === channelUser.user.socketId)
+      )
+      .map((notJoinedUser) => ({ channelId, userId: notJoinedUser.user.id }));
     const onlineSockets: string[] = channelUsers
       .filter((channelUser) => channelUser.user.status === "online")
       .map((onlineChannelUser) => onlineChannelUser.user.socketId);
@@ -474,7 +487,7 @@ export class ChannelService {
           isSystem,
         }
       );
-      if (notJoined.length) {
+      if (notJoined.length > 0) {
         await queryRunner.manager.increment(
           ChannelUser,
           notJoined,

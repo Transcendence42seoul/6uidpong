@@ -32,6 +32,9 @@ export class DmChat {
   @Column({ nullable: false })
   message: string;
 
-  @CreateDateColumn({ nullable: false, name: "created_at" })
+  @CreateDateColumn({
+    nullable: false,
+    name: "created_at",
+  })
   createdAt: Date;
 }

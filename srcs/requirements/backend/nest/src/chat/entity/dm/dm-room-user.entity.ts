@@ -36,6 +36,9 @@ export class DmRoomUser {
   @Column({ nullable: false, name: "new_msg_count", default: 0 })
   newMsgCount: number;
 
-  @CreateDateColumn({ nullable: false, name: "created_at" })
+  @CreateDateColumn({
+    nullable: false,
+    name: "created_at",
+  })
   createdAt: Date;
 }

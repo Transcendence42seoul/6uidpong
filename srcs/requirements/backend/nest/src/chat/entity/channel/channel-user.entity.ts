@@ -49,6 +49,9 @@ export class ChannelUser {
   })
   isAdmin: boolean;
 
-  @CreateDateColumn({ nullable: false, name: "created_at" })
+  @CreateDateColumn({
+    nullable: false,
+    name: "created_at",
+  })
   createdAt: Date;
 }

@@ -15,7 +15,6 @@ import { ChannelService } from "../service/channel/channel.service";
 import { Channel } from "../entity/channel/channel.entity";
 import { ChannelUser } from "../entity/channel/channel-user.entity";
 import { ChannelResponse } from "../dto/channel/channel-response";
-import { ChatResponse } from "../dto/channel/chat-response";
 import { CreateRequest } from "../dto/channel/create-request";
 import { CreateResponse } from "../dto/channel/create-response";
 import { Ban } from "../entity/channel/ban.entity";

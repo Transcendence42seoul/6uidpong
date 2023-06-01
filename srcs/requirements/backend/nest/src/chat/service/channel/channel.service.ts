@@ -140,13 +140,15 @@ export class ChannelService {
       let channelUser: ChannelUser;
       try {
         channelUser = await this.findUser(channelId, userId);
-        await queryRunner.manager.update(
-          ChannelUser,
-          { channelId, userId },
-          {
-            newMsgCount: 0,
-          }
-        );
+        if (channelUser.newMsgCount > 0) {
+          await queryRunner.manager.update(
+            ChannelUser,
+            { channelId, userId },
+            {
+              newMsgCount: 0,
+            }
+          );
+        }
         client.join("c" + channelId);
       } catch {
         await this.verifyJoin(channelId, userId, password);

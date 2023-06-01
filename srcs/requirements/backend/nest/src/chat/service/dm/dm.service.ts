@@ -39,13 +39,15 @@ export class DmService {
         "users.nickname         AS interlocutor",
         'users.image            AS "interlocutorImage"',
       ])
-      .addSelect((subQuery) => {
-        return subQuery
-          .select("sub.new_msg_count")
-          .from(DmRoomUser, "sub")
-          .where("sub.user_id = :userId")
-          .andWhere("sub.room_id = dm_chats.room_id");
-      }, "newMsgCount")
+      .addSelect(
+        (subQuery) =>
+          subQuery
+            .select("sub.new_msg_count")
+            .from(DmRoomUser, "sub")
+            .where("sub.user_id = :userId")
+            .andWhere("sub.room_id = dm_chats.room_id"),
+        "newMsgCount"
+      )
       .innerJoin(
         (subQuery) =>
           subQuery

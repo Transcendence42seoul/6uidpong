@@ -1,20 +1,20 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Namespace, Socket } from 'socket.io';
-import { ChatResponse } from 'src/chat/dto/dm/chat-response';
-import { JoinResponse } from 'src/chat/dto/dm/join-response';
-import { User } from 'src/user/entity/user.entity';
+import { Injectable } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Namespace, Socket } from "socket.io";
+import { ChatResponse } from "src/chat/dto/dm/chat-response";
+import { JoinResponse } from "src/chat/dto/dm/join-response";
+import { User } from "src/user/entity/user.entity";
 import {
   Repository,
   MoreThanOrEqual,
   DataSource,
   InsertResult,
   EntityNotFoundError,
-} from 'typeorm';
-import { RoomResponse } from '../../dto/dm/room-response';
-import { DmChat } from '../../entity/dm/dm-chat.entity';
-import { DmRoomUser } from '../../entity/dm/dm-room-user.entity';
-import { DmRoom } from '../../entity/dm/dm-room.entity';
+} from "typeorm";
+import { RoomResponse } from "../../dto/dm/room-response";
+import { DmChat } from "../../entity/dm/dm-chat.entity";
+import { DmRoomUser } from "../../entity/dm/dm-room-user.entity";
+import { DmRoom } from "../../entity/dm/dm-room.entity";
 
 @Injectable()
 export class DmService {
@@ -30,45 +30,45 @@ export class DmService {
 
   async findRooms(userId: number): Promise<RoomResponse[]> {
     return await this.chatRepository
-      .createQueryBuilder('dm_chats')
+      .createQueryBuilder("dm_chats")
       .select([
         'dm_chats.room_id       AS "roomId"',
         'dm_chats.message       AS "lastMessage"',
         'dm_chats.created_at    AS "lastMessageTime"',
         'users.id               AS "interlocutorId"',
-        'users.nickname         AS interlocutor',
+        "users.nickname         AS interlocutor",
         'users.image            AS "interlocutorImage"',
       ])
       .addSelect((subQuery) => {
         return subQuery
-          .select('sub.new_msg_count')
-          .from(DmRoomUser, 'sub')
-          .where('sub.user_id = :userId')
-          .andWhere('sub.room_id = dm_chats.room_id');
-      }, 'newMsgCount')
+          .select("sub.new_msg_count")
+          .from(DmRoomUser, "sub")
+          .where("sub.user_id = :userId")
+          .andWhere("sub.room_id = dm_chats.room_id");
+      }, "newMsgCount")
       .innerJoin(
         (subQuery) =>
           subQuery
-            .select('sub_dm_chats.room_id', 'room_id')
-            .addSelect('MAX(sub_dm_chats.created_at)', 'max_created_at')
-            .from(DmChat, 'sub_dm_chats')
+            .select("sub_dm_chats.room_id", "room_id")
+            .addSelect("MAX(sub_dm_chats.created_at)", "max_created_at")
+            .from(DmChat, "sub_dm_chats")
             .innerJoin(
               DmRoomUser,
-              'room_users',
-              'room_users.user_id = :userId AND room_users.is_exit = false AND room_users.room_id = sub_dm_chats.room_id'
+              "room_users",
+              "room_users.user_id = :userId AND room_users.is_exit = false AND room_users.room_id = sub_dm_chats.room_id"
             )
-            .groupBy('sub_dm_chats.room_id'),
-        'last_chats',
-        'dm_chats.room_id = last_chats.room_id AND dm_chats.created_at = last_chats.max_created_at'
+            .groupBy("sub_dm_chats.room_id"),
+        "last_chats",
+        "dm_chats.room_id = last_chats.room_id AND dm_chats.created_at = last_chats.max_created_at"
       )
       .innerJoin(
         DmRoomUser,
-        'room_users',
-        'dm_chats.room_id = room_users.room_id AND room_users.user_id != :userId'
+        "room_users",
+        "dm_chats.room_id = room_users.room_id AND room_users.user_id != :userId"
       )
-      .innerJoin(User, 'users', 'room_users.user_id = users.id')
-      .orderBy('dm_chats.created_at', 'DESC')
-      .setParameter('userId', userId)
+      .innerJoin(User, "users", "room_users.user_id = users.id")
+      .orderBy("dm_chats.created_at", "DESC")
+      .setParameter("userId", userId)
       .getRawMany();
   }
 
@@ -87,7 +87,7 @@ export class DmService {
       }
       roomUser = await this.createRoom(userId, interlocutorId);
     }
-    client.join('d' + roomUser.roomId);
+    client.join("d" + roomUser.roomId);
     const chats: DmChat[] = await this.findChats(roomUser);
     return new JoinResponse(roomUser.roomId, roomUser.newMsgCount, chats);
   }
@@ -95,25 +95,19 @@ export class DmService {
   async send(
     userId: number,
     to: { id: number; message: string },
-    server: Namespace
-  ): Promise<ChatResponse> {
+    client: Socket
+  ): Promise<void> {
     const { id: toId, message } = to;
     const recipient: DmRoomUser = await this.findUser(toId, userId);
-    const sockets = await server.in('d' + recipient.roomId).fetchSockets();
-    const isJoined: boolean = sockets.some(
-      (socket) => socket.id === recipient.user.socketId
-    );
     const chat: DmChat = await this.insertChat(
       userId,
       message,
       recipient,
-      isJoined
+      client.rooms.has("d" + recipient.roomId)
     );
-    const chatResponse: ChatResponse = new ChatResponse(chat);
-    if (recipient.user.status === 'online') {
-      server.to(recipient.user.socketId).emit('send-dm', chatResponse);
-    }
-    return chatResponse;
+    client
+      .to([client.id, recipient.user.socketId])
+      .emit("send-dm", new ChatResponse(chat));
   }
 
   async deleteRoom(
@@ -134,25 +128,25 @@ export class DmService {
         newMsgCount: 0,
       });
     }
-    client.leave('d' + interRoomUser.roomId);
+    client.leave("d" + interRoomUser.roomId);
   }
 
   async findUser(userId: number, interlocutorId: number): Promise<DmRoomUser> {
     return await this.roomUserRepository
-      .createQueryBuilder('room_user')
+      .createQueryBuilder("room_user")
       .innerJoin(
         (subQuery) =>
           subQuery
-            .select('d.room_id')
-            .from(DmRoomUser, 'd')
-            .where('d.user_id IN (:userId, :interlocutorId)')
-            .groupBy('d.room_id')
-            .having('COUNT(DISTINCT d.user_id) = 2'),
-        'match_room_user',
-        'room_user.room_id = match_room_user.room_id'
+            .select("d.room_id")
+            .from(DmRoomUser, "d")
+            .where("d.user_id IN (:userId, :interlocutorId)")
+            .groupBy("d.room_id")
+            .having("COUNT(DISTINCT d.user_id) = 2"),
+        "match_room_user",
+        "room_user.room_id = match_room_user.room_id"
       )
-      .innerJoinAndSelect('room_user.user', 'user')
-      .where('room_user.user_id = :userId')
+      .innerJoinAndSelect("room_user.user", "user")
+      .where("room_user.user_id = :userId")
       .setParameters({ userId, interlocutorId })
       .getOneOrFail();
   }
@@ -238,7 +232,7 @@ export class DmService {
         createdAt: MoreThanOrEqual(roomUser.createdAt),
       },
       order: {
-        createdAt: 'ASC',
+        createdAt: "ASC",
       },
     });
   }
@@ -283,7 +277,7 @@ export class DmService {
             userId: recipient.userId,
             roomId: recipient.roomId,
           },
-          'newMsgCount',
+          "newMsgCount",
           1
         );
       }

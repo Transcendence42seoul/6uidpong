@@ -54,12 +54,13 @@ export class DmGateway {
   @SubscribeMessage("send-dm")
   async send(
     @WsJwtPayload() jwt: JwtPayload,
+    @ConnectedSocket() client: Socket,
     @MessageBody("to") to: { id: number; message: string }
-  ): Promise<ChatResponse> {
+  ): Promise<void> {
     if (await this.blockService.has(jwt.id, to.id)) {
       throw new WsException("can't send because blocked");
     }
-    return await this.dmService.send(jwt.id, to, this.server);
+    await this.dmService.send(jwt.id, to, client);
   }
 
   @SubscribeMessage("leave-dm")

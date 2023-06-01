@@ -25,13 +25,10 @@ export class ConnectionGateway implements OnGatewayDisconnect {
   @WebSocketServer()
   server: Namespace;
 
-  constructor(
-    private readonly connectionService: ConnectionService,
-    private readonly disconnectionService: DisconnectionService
-  ) {}
+  constructor(private readonly connectionService: ConnectionService) {}
 
   async handleDisconnect(@ConnectedSocket() client: Socket) {
-    await this.disconnectionService.update(client.id);
+    await this.connectionService.disconnect(client.id);
   }
 
   @SubscribeMessage("connection")
@@ -39,6 +36,6 @@ export class ConnectionGateway implements OnGatewayDisconnect {
     @WsJwtPayload() jwt: JwtPayload,
     @ConnectedSocket() client: Socket
   ): Promise<void> {
-    await this.connectionService.update(jwt.id, client.id);
+    await this.connectionService.connect(jwt.id, client.id, this.server);
   }
 }

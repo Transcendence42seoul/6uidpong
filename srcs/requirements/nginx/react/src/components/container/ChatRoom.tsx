@@ -65,11 +65,8 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send, socket }) => {
           message: inputMsg,
         },
       };
-      const chatHandler = (chat: Chat) => {
-        addChat(chat);
-        setInputMsg('');
-      };
-      socket.emit(send.name, sendData, chatHandler);
+      socket.emit(send.name, sendData);
+      setInputMsg('');
     },
     [inputMsg],
   );

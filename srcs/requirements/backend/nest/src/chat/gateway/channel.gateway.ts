@@ -23,6 +23,7 @@ import { BanService } from "../service/channel/ban.service";
 import { UserResponse } from "../dto/channel/user-response";
 import { BanResponse } from "../dto/channel/ban-response";
 import { MuteService } from "../service/channel/mute.service";
+import { JoinResponse } from "../dto/channel/join-response";
 
 @WebSocketGateway(80, {
   namespace: "chat",
@@ -71,7 +72,7 @@ export class ChannelGateway {
     @ConnectedSocket() client: Socket,
     @MessageBody("info")
     info: { channelId: number; password: string }
-  ): Promise<ChatResponse[]> {
+  ): Promise<JoinResponse> {
     return await this.channelService.join(
       jwt.id,
       info.channelId,
@@ -84,7 +85,6 @@ export class ChannelGateway {
   @SubscribeMessage("send-channel")
   async send(
     @WsJwtPayload() jwt: JwtPayload,
-    @ConnectedSocket() client: Socket,
     @MessageBody("to")
     to: { channelId: number; message: string }
   ): Promise<void> {

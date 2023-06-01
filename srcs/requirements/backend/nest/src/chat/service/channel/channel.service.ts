@@ -15,6 +15,7 @@ import { Ban } from "src/chat/entity/channel/ban.entity";
 import { Mute } from "src/chat/entity/channel/mute.entity";
 import { UserService } from "src/user/service/user.service";
 import { User } from "src/user/entity/user.entity";
+import { JoinResponse } from "src/chat/dto/channel/join-response";
 
 @Injectable()
 export class ChannelService {
@@ -130,7 +131,7 @@ export class ChannelService {
     password: string,
     client: Socket,
     server: Namespace
-  ): Promise<ChatResponse[]> {
+  ): Promise<JoinResponse> {
     let channelUser: ChannelUser;
     const queryRunner = this.dataSource.createQueryRunner();
 
@@ -149,8 +150,11 @@ export class ChannelService {
       await queryRunner.commitTransaction();
 
       client.join("c" + channelId);
-      const chats: ChannelChat[] = await this.findChats(channelUser);
-      return chats.map((chat) => new ChatResponse(chat));
+      return new JoinResponse(
+        channelId,
+        channelUser.newMsgCount,
+        await this.findChats(channelUser)
+      );
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;
@@ -470,12 +474,14 @@ export class ChannelService {
           isSystem,
         }
       );
-      await queryRunner.manager.increment(
-        ChannelUser,
-        notJoined,
-        "newMsgCount",
-        1
-      );
+      if (notJoined.length) {
+        await queryRunner.manager.increment(
+          ChannelUser,
+          notJoined,
+          "newMsgCount",
+          1
+        );
+      }
 
       await queryRunner.commitTransaction();
 

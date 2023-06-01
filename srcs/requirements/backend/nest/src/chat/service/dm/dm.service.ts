@@ -100,11 +100,15 @@ export class DmService {
     server: Namespace
   ): Promise<void> {
     const recipient: DmRoomUser = await this.findUser(recipientId, senderId);
+    const sockets = await server.in("d" + recipient.roomId).fetchSockets();
+    const isJoined: boolean = sockets.some(
+      (socket) => socket.id === recipient.user.socketId
+    );
     const chat: DmChat = await this.insertChat(
       senderId,
       message,
       recipient,
-      client.rooms.has("d" + recipient.roomId)
+      isJoined
     );
     server
       .to([client.id, recipient.user.socketId])

@@ -544,7 +544,10 @@ export class ChannelService {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      await queryRunner.manager.delete(ChannelUser, { channelId, bannedId });
+      await queryRunner.manager.delete(ChannelUser, {
+        channelId,
+        userId: bannedId,
+      });
       await queryRunner.manager.insert(Ban, { channelId, userId: bannedId });
 
       const systemMessage: string = `${banned.user.nickname} has been banned by ${banner.user.nickname}`;

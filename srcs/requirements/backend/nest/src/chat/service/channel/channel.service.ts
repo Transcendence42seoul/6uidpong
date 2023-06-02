@@ -400,7 +400,7 @@ export class ChannelService {
     try {
       await queryRunner.manager.insert(
         ChannelUser,
-        userIds.map((id) => ({ channelId, id }))
+        userIds.map((id) => ({ channelId, userId: id }))
       );
       const systemMessage: string = `was added by ${
         inviter.user.nickname

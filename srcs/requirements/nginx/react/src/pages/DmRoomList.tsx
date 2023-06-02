@@ -71,7 +71,7 @@ const DmRoomList: React.FC<DmRoomListProps> = ({ socket }) => {
   }, []);
 
   useEffect(() => {
-    const messageHandler = (chat: Chat) => {
+    const chatHandler = (chat: Chat) => {
       const roomToUpdate = rooms.find(
         (room) => room.interlocutorId === chat.userId,
       );
@@ -93,9 +93,9 @@ const DmRoomList: React.FC<DmRoomListProps> = ({ socket }) => {
       roomToUpdate.newMsgCount += 1;
       setRooms([...rooms]);
     };
-    socket.on('send-dm', messageHandler);
+    socket.on('send-dm', chatHandler);
     return () => {
-      socket.off('send-dm', messageHandler);
+      socket.off('send-dm', chatHandler);
     };
   }, [rooms]);
 

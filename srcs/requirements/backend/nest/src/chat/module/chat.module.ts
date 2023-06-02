@@ -27,7 +27,7 @@ import { DmRoomService } from "../service/dm/dm-room.service";
 import { DmChatService } from "../service/dm/dm-chat.service";
 import { DmUserService } from "../service/dm/dm-user.service";
 import { ChannelSystemService } from "../service/channel/channel-system.service";
-import { ChannelAuthService } from "../service/channel/channel-auth.service";
+import { ChannelVerifyService } from "../service/channel/channel-verify.service";
 
 @Module({
   imports: [
@@ -54,7 +54,7 @@ import { ChannelAuthService } from "../service/channel/channel-auth.service";
     ChannelChatService,
     ChannelUserService,
     ChannelSystemService,
-    ChannelAuthService,
+    ChannelVerifyService,
     BanService,
     MuteService,
     BlockService,

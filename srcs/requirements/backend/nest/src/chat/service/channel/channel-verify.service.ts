@@ -8,7 +8,7 @@ import { MuteService } from "./mute.service";
 import * as bcryptjs from "bcryptjs";
 
 @Injectable()
-export class ChannelAuthService {
+export class ChannelVerifyService {
   constructor(
     private readonly muteService: MuteService,
     private readonly banService: BanService,

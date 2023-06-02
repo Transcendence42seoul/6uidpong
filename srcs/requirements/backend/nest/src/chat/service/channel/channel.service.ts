@@ -23,7 +23,7 @@ import { UserResponse } from "src/chat/dto/channel/user-response";
 import { BanResponse } from "src/chat/dto/channel/ban-response";
 import { AllChannelResponse } from "src/chat/dto/channel/all-channel-response";
 import { ChannelSystemService } from "./channel-system.service";
-import { ChannelAuthService } from "./channel-auth.service";
+import { ChannelVerifyService } from "./channel-verify.service";
 
 @Injectable()
 export class ChannelService {
@@ -34,7 +34,7 @@ export class ChannelService {
     private readonly banService: BanService,
     private readonly userService: UserService,
     private readonly systemService: ChannelSystemService,
-    private readonly authService: ChannelAuthService,
+    private readonly verifyService: ChannelVerifyService,
     private readonly dataSource: DataSource
   ) {}
 
@@ -112,7 +112,7 @@ export class ChannelService {
         }
       );
       if (!channelUser) {
-        await this.authService.verifyJoin(channelId, userId, password);
+        await this.verifyService.verifyJoin(channelId, userId, password);
         await queryRunner.manager.insert(ChannelUser, {
           channelId,
           userId,
@@ -168,7 +168,7 @@ export class ChannelService {
     message: string,
     server: Namespace
   ): Promise<void> {
-    await this.authService.verifySend(channelId, senderId);
+    await this.verifyService.verifySend(channelId, senderId);
     const channelUsers: ChannelUser[] = await this.channelUserService.find(
       channelId
     );

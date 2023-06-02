@@ -39,7 +39,7 @@ export class DmService {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      let dmUser: DmUser = await this.dmUserService.findOne(
+      let dmUser: DmUser = await this.dmUserService.findOneNotFail(
         userId,
         interlocutorId
       );

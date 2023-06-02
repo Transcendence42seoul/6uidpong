@@ -7,5 +7,9 @@ export class ChannelResponse {
 
   readonly newMsgCount: number;
 
+  readonly isOwner: boolean;
+
+  readonly isAdmin: boolean;
+
   readonly memberCount: number;
 }

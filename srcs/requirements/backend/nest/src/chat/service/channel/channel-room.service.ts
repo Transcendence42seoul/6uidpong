@@ -41,6 +41,8 @@ export class ChannelRoomService {
         "channel.title                AS title",
         'channel.is_public            AS "isPublic"',
         'channel_users.new_msg_count  AS "newMsgCount"',
+        'channel_users.is_owner       AS "isOwner"',
+        'channel_users.is_admin       AS "isAdmin"',
         'member_count.count           AS "memberCount"',
       ])
       .innerJoin("channel.channelUsers", "channel_users")

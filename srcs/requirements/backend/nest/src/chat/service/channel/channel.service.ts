@@ -40,17 +40,13 @@ export class ChannelService {
         "channel.title                AS title",
         'count(*)                     AS "memberCount"',
         "CASE WHEN channel.password = '' THEN false \
-              ELSE true                             \
-              END                     AS \"isLocked\"",
+            ELSE true                             \
+            END                     AS \"isLocked\"",
       ])
-      .innerJoin(
-        "channel.channelUsers",
-        "channel_users",
-        "channel.is_public = true"
-      )
+      .innerJoin("channel.channelUsers", "channel_users")
+      .where("channel.is_public = true")
       .groupBy("channel.id")
       .addGroupBy("channel.title")
-      .addGroupBy("channel.is_public")
       .addGroupBy("channel.password")
       .orderBy("channel.title", "ASC")
       .getRawMany();
@@ -65,8 +61,8 @@ export class ChannelService {
   }
 
   async findMyChannels(userId: number): Promise<ChannelResponse[]> {
-    return await this.channelUserRepository
-      .createQueryBuilder("channel_users")
+    return await this.channelRepository
+      .createQueryBuilder("channel")
       .select([
         "channel.id                   AS id",
         "channel.title                AS title",
@@ -74,7 +70,7 @@ export class ChannelService {
         'channel_users.new_msg_count  AS "newMsgCount"',
         'member_count.count           AS "memberCount"',
       ])
-      .innerJoin("channel_users.channel", "channel")
+      .innerJoin("channel.channelUsers", "channel_users")
       .innerJoin(
         (subQuery) =>
           subQuery

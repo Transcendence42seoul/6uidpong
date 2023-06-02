@@ -80,7 +80,6 @@ export class ChannelGateway {
       jwt.id,
       to.channelId,
       to.message,
-      false,
       this.server
     );
   }

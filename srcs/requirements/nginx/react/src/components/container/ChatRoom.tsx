@@ -129,16 +129,16 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send, socket }) => {
           const isConsecutiveMsg = !prevIsSystem && userId === prevUserId;
           const showUserInfo = !isSystem && !isMyMsg && !isConsecutiveMsg;
           let messageBoxClassName = '';
-          let messageClassName = 'mt-1';
+          let messageClassName = 'mt-1 bg-white';
           if (isSystem) {
             messageBoxClassName = 'flex-col items-center';
-            messageClassName = 'bg-gray-700 text-xs text-gray-300';
+            messageClassName = 'bg-gray-700 py-2.5 text-xs text-gray-300';
           } else if (isMyMsg) {
             messageBoxClassName = 'flex-col items-end';
             messageClassName = 'bg-yellow-300';
           } else if (isConsecutiveMsg) {
             messageBoxClassName = 'ml-10 pl-2.5';
-            messageClassName = '';
+            messageClassName = 'bg-white';
           }
           return (
             <>

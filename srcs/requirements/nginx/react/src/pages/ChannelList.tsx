@@ -8,6 +8,7 @@ import ListInfoPanel from '../components/container/ListInfoPanel';
 import ListTitle from '../components/container/ListTitle';
 
 import type Channel from '../interfaces/Channel';
+import type Chat from '../interfaces/Chat';
 
 import { isTest, mockChannels } from '../mock'; // test
 
@@ -35,6 +36,21 @@ const ChannelList: React.FC<ChannelListProps> = ({ socket }) => {
     socket.emit('find-my-channels', channelsHandler);
     setChannels(isTest ? mockChannels : channels); // test
   }, []);
+
+  useEffect(() => {
+    const chatHandler = (chat: Chat) => {
+      const channelToUpdate = channels.find(
+        (channel) => channel.id === chat.channelId,
+      );
+      if (!channelToUpdate) return;
+      channelToUpdate.newMsgCount += 1;
+      setChannels([...channels]);
+    };
+    socket.on('send-channel', chatHandler);
+    return () => {
+      socket.off('send-channel', chatHandler);
+    };
+  }, [channels]);
 
   return (
     <ListContainer>

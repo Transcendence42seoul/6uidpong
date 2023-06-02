@@ -1,24 +1,22 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { Socket } from 'socket.io-client';
 
 import HoverButton from '../components/button/HoverButton';
 import ChannelMemberList from '../components/container/ChannelMemberList';
 import ChatRoom from '../components/container/ChatRoom';
 import ChannelInviteModal from '../components/modal/ChannelInviteModal';
+import selectSocket from '../features/socket/socketSelector';
 
-interface ChannelProps {
-  socket: Socket;
-}
-
-const Channel: React.FC<ChannelProps> = ({ socket }) => {
-  const navigate = useNavigate();
-
+const Channel: React.FC = () => {
   const { state } = useLocation();
   const password = state?.password;
 
+  const navigate = useNavigate();
+
   const { channelId: channelIdString } = useParams<{ channelId: string }>();
   const channelId = Number(channelIdString);
+
+  const { socket } = selectSocket();
 
   const [showInviteModal, setShowInviteModal] = useState<boolean>(false);
 
@@ -38,7 +36,7 @@ const Channel: React.FC<ChannelProps> = ({ socket }) => {
   };
 
   const handleExitClick = () => {
-    socket.emit('exit', { channelId });
+    socket?.emit('exit', { channelId });
   };
 
   const handleInviteClick = () => {
@@ -53,7 +51,7 @@ const Channel: React.FC<ChannelProps> = ({ socket }) => {
 
   return (
     <div className="flex space-x-1 px-4">
-      <ChannelMemberList socket={socket} />
+      <ChannelMemberList />
       <div className="w-full max-w-[1024px]">
         <div className="flex justify-between space-x-1.5 px-4">
           <HoverButton
@@ -77,10 +75,10 @@ const Channel: React.FC<ChannelProps> = ({ socket }) => {
             </HoverButton>
           </div>
         </div>
-        <ChatRoom join={join} leave={leave} send={send} socket={socket} />
+        <ChatRoom join={join} leave={leave} send={send} />
       </div>
       {showInviteModal && (
-        <ChannelInviteModal setShowModal={setShowInviteModal} socket={socket} />
+        <ChannelInviteModal setShowModal={setShowInviteModal} />
       )}
     </div>
   );

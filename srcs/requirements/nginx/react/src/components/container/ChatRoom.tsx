@@ -6,9 +6,9 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { Socket } from 'socket.io-client';
 
 import selectAuth from '../../features/auth/authSelector';
+import selectSocket from '../../features/socket/socketSelector';
 import formatTime from '../../utils/formatTime';
 import AlertWithCloseButton from '../alert/AlertWithCloseButton';
 import ChatContainer from './ChatContainer';
@@ -26,12 +26,13 @@ interface ChatRoomProps {
   join: SocketEvent;
   leave: SocketEvent;
   send: SocketEvent;
-  socket: Socket;
 }
 
-const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send, socket }) => {
+const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send }) => {
   const { tokenInfo } = selectAuth();
   const myId = tokenInfo?.id;
+
+  const { socket } = selectSocket();
 
   const chatContainer = useRef<HTMLDivElement>(null);
   const [chats, setChats] = useState<Chat[]>([]);
@@ -65,7 +66,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send, socket }) => {
           message: inputMsg,
         },
       };
-      socket.emit(send.name, sendData);
+      socket?.emit(send.name, sendData);
       setInputMsg('');
     },
     [inputMsg],
@@ -83,18 +84,18 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send, socket }) => {
       setNewMsgCount(newMsgCnt);
       setChats([...prevChats]);
     };
-    socket.emit(join.name, join.data, chatsHandler);
+    socket?.emit(join.name, join.data, chatsHandler);
     setChats(isTest ? mockChats : chats); // test
     return () => {
-      socket.emit(leave.name, leave.data);
+      socket?.emit(leave.name, leave.data);
     };
   }, []);
 
   useEffect(() => {
     const chatHandler = (chat: Chat) => addChat(chat);
-    socket.on(send.name, chatHandler);
+    socket?.on(send.name, chatHandler);
     return () => {
-      socket.off(send.name, chatHandler);
+      socket?.off(send.name, chatHandler);
     };
   }, []);
 

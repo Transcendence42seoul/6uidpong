@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Socket } from 'socket.io-client';
 
 import HoverButton from '../button/HoverButton';
 import ModalContainer from '../container/ModalContainer';
@@ -9,11 +8,7 @@ import UserSearchBar from '../container/UserSearchBar';
 
 import type User from '../../interfaces/User';
 
-interface HeaderProps {
-  socket: Socket;
-}
-
-const Header: React.FC<HeaderProps> = ({ socket }) => {
+const Header: React.FC = () => {
   const navigate = useNavigate();
 
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -47,7 +42,7 @@ const Header: React.FC<HeaderProps> = ({ socket }) => {
       </HoverButton>
       {selectedUser && showUserProfileModal && (
         <ModalContainer setShowModal={setShowUserProfileModal} closeButton>
-          <UserProfile userId={selectedUser.id} socket={socket} />
+          <UserProfile userId={selectedUser.id} />
         </ModalContainer>
       )}
     </div>

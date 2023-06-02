@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Socket } from 'socket.io-client';
 
 import HoverButton from '../components/button/HoverButton';
 import CircularImage from '../components/container/CircularImage';
@@ -15,11 +14,7 @@ import type User from '../interfaces/User';
 
 import { isTest, mockUsers } from '../mock'; // test
 
-interface FriendsListProps {
-  socket: Socket;
-}
-
-const FriendsList: React.FC<FriendsListProps> = ({ socket }) => {
+const FriendsList: React.FC = () => {
   const callApi = useCallApi();
   const navigate = useNavigate();
 
@@ -125,7 +120,7 @@ const FriendsList: React.FC<FriendsListProps> = ({ socket }) => {
       </ul>
       {selectedFriend && showUserProfileModal && (
         <ModalContainer setShowModal={setShowUserProfileModal} closeButton>
-          <UserProfile userId={selectedFriend.id} friend socket={socket} />
+          <UserProfile userId={selectedFriend.id} friend />
         </ModalContainer>
       )}
     </div>

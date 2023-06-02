@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Socket } from 'socket.io-client';
 
 import selectAuth from '../../features/auth/authSelector';
+import selectSocket from '../../features/socket/socketSelector';
 import useCallApi from '../../utils/useCallApi';
 import HoverButton from '../button/HoverButton';
 import CircularImage from './CircularImage';
@@ -14,7 +14,6 @@ interface UserProfileProps {
   userId: number;
   friend?: boolean;
   className?: string;
-  socket?: Socket;
   children?: React.ReactNode;
 }
 
@@ -22,7 +21,6 @@ const UserProfile: React.FC<UserProfileProps> = ({
   userId,
   friend = false,
   className = '',
-  socket = null,
   children = null,
 }) => {
   const callApi = useCallApi();
@@ -30,6 +28,8 @@ const UserProfile: React.FC<UserProfileProps> = ({
 
   const { tokenInfo } = selectAuth();
   const myId = tokenInfo?.id;
+
+  const { socket } = selectSocket();
 
   const [user, setUser] = useState<User | null>(null);
 

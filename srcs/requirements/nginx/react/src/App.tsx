@@ -7,6 +7,7 @@ import { io } from 'socket.io-client';
 import LoginAuth from './components/custom/LoginAuth';
 import dispatchAuth from './features/auth/authAction';
 import selectAuth from './features/auth/authSelector';
+import dispatchSocket from './features/socket/socketAction';
 import Layout from './Layout';
 import AllChannels from './pages/AllChannels';
 import BlockList from './pages/BlockList';
@@ -22,24 +23,30 @@ import Login from './pages/Login';
 import Main from './pages/Main';
 import MyPage from './pages/MyPage';
 import ProfileSettings from './pages/ProfileSettings';
-import UserProfile from './components/container/UserProfile';
 import redirect from './utils/redirect';
 
 import { isTest, mockAuthState } from './mock'; // test
 
 const App: React.FC = () => {
+  const dispatch = useDispatch();
+
   const stats = {
     recentHistory: ['Win', 'Loss', 'Win', 'Win', 'Loss'],
-  };
+  }; // test
 
-  const [loading, setLoading] = useState<boolean>(false);
   const { id, is2FA, accessToken, tokenInfo } = isTest
     ? mockAuthState
     : selectAuth(); // test
 
-  const dispatch = useDispatch();
+  const [loading, setLoading] = useState<boolean>(false);
+
   const handleLoading = async () => {
     setLoading(true);
+  };
+
+  const initSocket = async () => {
+    const socket = io('/chat', { auth: { token: accessToken } });
+    await dispatchSocket({ socket }, dispatch);
   };
 
   useEffect(() => {
@@ -76,27 +83,21 @@ const App: React.FC = () => {
     return <Login />;
   }
 
-  const socket = io('/chat', { auth: { token: accessToken } });
+  initSocket();
 
   return (
-    <Layout socket={socket}>
+    <Layout>
       <Routes>
         <Route path="/" element={<Main />} />
-        <Route path="/all-channels" element={<AllChannels socket={socket} />} />
-        <Route path="/block-list" element={<BlockList socket={socket} />} />
-        <Route path="/channel" element={<ChannelList socket={socket} />} />
-        <Route
-          path="/channel/:channelId"
-          element={<Channel socket={socket} />}
-        />
-        <Route
-          path="/channel-settings"
-          element={<ChannelSettings socket={socket} />}
-        />
-        <Route path="/dm" element={<DmRoomList socket={socket} />} />
-        <Route path="/dm/:roomId" element={<DmRoom socket={socket} />} />
+        <Route path="/all-channels" element={<AllChannels />} />
+        <Route path="/block-list" element={<BlockList />} />
+        <Route path="/channel" element={<ChannelList />} />
+        <Route path="/channel/:channelId" element={<Channel />} />
+        <Route path="/channel-settings" element={<ChannelSettings />} />
+        <Route path="/dm" element={<DmRoomList />} />
+        <Route path="/dm/:roomId" element={<DmRoom />} />
         <Route path="/friend-requests" element={<FriendRequests />} />
-        <Route path="/friends-list" element={<FriendsList socket={socket} />} />
+        <Route path="/friends-list" element={<FriendsList />} />
         <Route path="/my-page" element={<MyPage stats={stats} />} />
         <Route path="/profile-settings" element={<ProfileSettings />} />
       </Routes>

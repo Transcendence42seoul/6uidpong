@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Socket } from 'socket.io-client';
-
 import { useParams } from 'react-router-dom';
+
+import selectSocket from '../../features/socket/socketSelector';
 import ChannelMemberProfile from './ChannelMemberProfile';
 import CircularImage from './CircularImage';
 import ModalContainer from './ModalContainer';
@@ -12,16 +12,16 @@ import type User from '../../interfaces/User';
 import { isTest, mockUsers } from '../../mock'; // test
 
 interface ChannelMemberListProps {
-  socket: Socket;
   className?: string;
 }
 
 const ChannelMemberList: React.FC<ChannelMemberListProps> = ({
-  socket,
   className = '',
 }) => {
   const { channelId: channelIdString } = useParams<{ channelId: string }>();
   const channelId = Number(channelIdString);
+
+  const { socket } = selectSocket();
 
   const searchResultsRef = useRef<HTMLUListElement>(null);
   const [members, setMembers] = useState<User[]>([]);
@@ -40,7 +40,7 @@ const ChannelMemberList: React.FC<ChannelMemberListProps> = ({
     const membersHandler = (memberList: User[]) => {
       setMembers([...memberList]);
     };
-    socket.emit('find-channel-users', { channelId }, membersHandler);
+    socket?.emit('find-channel-users', { channelId }, membersHandler);
     setMembers(isTest ? mockUsers : members); // test
   };
 
@@ -63,9 +63,9 @@ const ChannelMemberList: React.FC<ChannelMemberListProps> = ({
         handleMembers();
       }
     };
-    socket.on('send-channel', chatHandler);
+    socket?.on('send-channel', chatHandler);
     return () => {
-      socket.off('send-channel', chatHandler);
+      socket?.off('send-channel', chatHandler);
     };
   }, []);
 
@@ -113,7 +113,7 @@ const ChannelMemberList: React.FC<ChannelMemberListProps> = ({
       </ul>
       {selectedMember && showMemberProfileModal && (
         <ModalContainer setShowModal={setShowMemberProfileModal} closeButton>
-          <ChannelMemberProfile userId={selectedMember.id} socket={socket} />
+          <ChannelMemberProfile userId={selectedMember.id} />
         </ModalContainer>
       )}
     </div>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Socket } from 'socket.io-client';
-
 import { useParams } from 'react-router-dom';
+
+import selectSocket from '../../features/socket/socketSelector';
 import useCallApi from '../../utils/useCallApi';
 import HoverButton from '../button/HoverButton';
 import ModalContainer from '../container/ModalContainer';
@@ -14,17 +14,17 @@ import { isTest, mockUsers } from '../../mock'; // test
 
 interface ChannelInviteModalProps {
   setShowModal: (showModal: boolean) => void;
-  socket: Socket;
 }
 
 const ChannelInviteModal: React.FC<ChannelInviteModalProps> = ({
   setShowModal,
-  socket,
 }) => {
   const callApi = useCallApi();
 
   const { channelId: channelIdString } = useParams<{ channelId: string }>();
   const channelId = Number(channelIdString);
+
+  const { socket } = selectSocket();
 
   const [allUsers, setAllUsers] = useState<User[]>([]);
   const [selectedUsers, setSelectedUsers] = useState<Set<User>>(new Set());
@@ -40,7 +40,7 @@ const ChannelInviteModal: React.FC<ChannelInviteModalProps> = ({
         userIds: [...selectedUsers].map((user) => user.id),
       },
     };
-    socket.emit('invite', inviteChannelData);
+    socket?.emit('invite', inviteChannelData);
     setShowModal(false);
   };
 

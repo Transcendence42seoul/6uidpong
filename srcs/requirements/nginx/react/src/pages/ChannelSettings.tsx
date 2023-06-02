@@ -1,21 +1,20 @@
 import React, { ChangeEvent, useCallback, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Socket } from 'socket.io-client';
 
 import HoverButton from '../components/button/HoverButton';
 import ChannelManagePanel from '../components/container/ChannelManagePanel';
 import ContentBox from '../components/container/ContentBox';
+import selectSocket from '../features/socket/socketSelector';
 
 import type Channel from '../interfaces/Channel';
 
-interface ChannelSettingsProps {
-  socket: Socket;
-}
-
-const ChannelSettings: React.FC<ChannelSettingsProps> = ({ socket }) => {
-  const navigate = useNavigate();
+const ChannelSettings: React.FC = () => {
   const { state } = useLocation();
   const channelId = state?.channelId;
+
+  const navigate = useNavigate();
+
+  const { socket } = selectSocket();
 
   const [isPasswordEnabled, setIsPasswordEnabled] = useState<boolean>(false);
   const [isPublic, setIsPublic] = useState<boolean>(true);
@@ -37,7 +36,7 @@ const ChannelSettings: React.FC<ChannelSettingsProps> = ({ socket }) => {
         state: { password },
       });
     };
-    socket.emit('create-channel', channel, channelHandler);
+    socket?.emit('create-channel', channel, channelHandler);
   };
 
   const handleEnablePasswordChange = () => {
@@ -140,9 +139,7 @@ const ChannelSettings: React.FC<ChannelSettingsProps> = ({ socket }) => {
           </HoverButton>
         </div>
       </ContentBox>
-      {channelId && (
-        <ChannelManagePanel channelId={channelId} socket={socket} />
-      )}
+      {channelId && <ChannelManagePanel channelId={channelId} />}
     </div>
   );
 };

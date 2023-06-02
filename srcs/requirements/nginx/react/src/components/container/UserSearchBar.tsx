@@ -18,10 +18,10 @@ const UserSearchBar: React.FC<UserSearchBarProps> = ({
   onUserClick,
   className = '',
 }) => {
+  const callApi = useCallApi();
+
   const { tokenInfo } = selectAuth();
   const myId = tokenInfo?.id;
-
-  const callApi = useCallApi();
 
   const searchResultsRef = useRef<HTMLUListElement>(null);
   const [search, setSearch] = useState<string>('');

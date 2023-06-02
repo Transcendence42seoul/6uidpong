@@ -1,15 +1,12 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { Socket } from 'socket.io-client';
 
+import selectSocket from '../../features/socket/socketSelector';
 import HoverButton from '../button/HoverButton';
 import UserProfile from './UserProfile';
 
-import type User from '../../interfaces/User';
-
 interface ChannelMemberProfileProps {
   userId: number;
-  socket: Socket;
   className?: string;
 }
 
@@ -23,11 +20,12 @@ interface SendData {
 
 const ChannelMemberProfile: React.FC<ChannelMemberProfileProps> = ({
   userId,
-  socket,
   className = '',
 }) => {
   const { channelId: channelIdString } = useParams<{ channelId: string }>();
   const channelId = Number(channelIdString);
+
+  const { socket } = selectSocket();
 
   const sendData: SendData = {
     info: {
@@ -38,26 +36,26 @@ const ChannelMemberProfile: React.FC<ChannelMemberProfileProps> = ({
   };
 
   const handleAssignAdminClick = () => {
-    socket.emit('add-admin', sendData);
+    socket?.emit('add-admin', sendData);
   };
 
   const handleBanClick = () => {
-    socket.emit('ban', sendData);
+    socket?.emit('ban', sendData);
   };
 
   const handleKickClick = () => {
-    socket.emit('kick', sendData);
+    socket?.emit('kick', sendData);
   };
 
   const handleMuteClick = () => {
     const currentTime = new Date();
     sendData.info.limitedAt = new Date(currentTime.getTime() + 30000); // 30초
-    socket.emit('mute', sendData);
+    socket?.emit('mute', sendData);
     sendData.info.limitedAt = null;
   };
 
   const handleTransferOwnerClick = () => {
-    socket.emit('transfer-ownership', sendData);
+    socket?.emit('transfer-ownership', sendData);
   };
 
   return (

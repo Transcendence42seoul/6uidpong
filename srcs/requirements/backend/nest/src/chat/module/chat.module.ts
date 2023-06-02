@@ -8,7 +8,6 @@ import { DmGateway } from "../gateway/dm.gateway";
 import { WsJwtAccessGuard } from "../guard/ws-jwt-access.guard";
 import { DmService } from "../service/dm/dm.service";
 import { ConnectionService } from "../service/connection/connection.service";
-import { DisconnectionService } from "../service/connection/disconnection.service";
 import { Block } from "../entity/dm/block.entity";
 import { BlockService } from "../service/dm/block.service";
 import { Channel } from "../entity/channel/channel.entity";
@@ -44,7 +43,6 @@ import { ConnectionGateway } from "../gateway/connection.gateway";
     MuteService,
     BlockService,
     ConnectionService,
-    DisconnectionService,
     ConnectionGateway,
     DmGateway,
     ChannelGateway,

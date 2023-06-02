@@ -673,6 +673,7 @@ export class ChannelService {
     return await this.chatRepository.findOne({
       relations: {
         user: true,
+        channel: true,
       },
       where: {
         id,

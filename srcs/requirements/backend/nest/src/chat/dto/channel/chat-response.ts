@@ -2,6 +2,7 @@ import { ChannelChat } from "src/chat/entity/channel/chat.entity";
 
 export class ChatResponse {
   constructor(entity: ChannelChat) {
+    this.channelId = entity.channel.id;
     this.userId = entity.user.id;
     this.nickname = entity.user.nickname;
     this.image = entity.user.image;
@@ -9,6 +10,8 @@ export class ChatResponse {
     this.isSystem = entity.isSystem;
     this.createdAt = entity.createdAt;
   }
+  readonly channelId: number;
+
   readonly userId: number;
 
   readonly nickname: string;

@@ -21,7 +21,7 @@ interface SendData {
   info: {
     channelId: number;
     userId: number | null;
-    limitedAt: number | null;
+    time: number | null;
   };
 }
 
@@ -40,7 +40,7 @@ const ChannelManageModal: React.FC<ChannelManageModalProps> = ({
     info: {
       channelId,
       userId: null,
-      limitedAt: null,
+      time: null,
     },
   };
 
@@ -78,9 +78,9 @@ const ChannelManageModal: React.FC<ChannelManageModalProps> = ({
   };
 
   const handleMuteClick = () => {
-    sendData.info.limitedAt = 30; // 30초
+    sendData.info.time = 30; // 30초
     socket?.emit('mute', sendData);
-    sendData.info.limitedAt = null;
+    sendData.info.time = null;
   };
 
   const handleTransferOwnerClick = () => {

@@ -57,7 +57,8 @@ const ChannelInviteModal: React.FC<ChannelInviteModalProps> = ({
   useEffect(() => {
     const fetchUsersData = async () => {
       const config = {
-        url: '/api/v1/users',
+        url: '/api/v1/users/search',
+        params: { nickname: '' },
       };
       const data: User[] = isTest ? mockUsers : await callApi(config); // test
       setAllUsers(data);

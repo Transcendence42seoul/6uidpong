@@ -19,11 +19,11 @@ import { ChannelUserService } from "./channel-user.service";
 import { MyChannelResponse } from "src/chat/dto/channel/my-channel-response";
 import { CreateRequest } from "src/chat/dto/channel/create-request";
 import { CreateResponse } from "src/chat/dto/channel/create-response";
-import { MuteService } from "./mute.service";
 import { UserResponse } from "src/chat/dto/channel/user-response";
 import { BanResponse } from "src/chat/dto/channel/ban-response";
 import { AllChannelResponse } from "src/chat/dto/channel/all-channel-response";
-import { SystemService } from "./system.service";
+import { ChannelSystemService } from "./channel-system.service";
+import { ChannelAuthService } from "./channel-auth.service";
 
 @Injectable()
 export class ChannelService {
@@ -32,9 +32,9 @@ export class ChannelService {
     private readonly channelUserService: ChannelUserService,
     private readonly chatService: ChannelChatService,
     private readonly banService: BanService,
-    private readonly muteService: MuteService,
     private readonly userService: UserService,
-    private readonly systemService: SystemService,
+    private readonly systemService: ChannelSystemService,
+    private readonly authService: ChannelAuthService,
     private readonly dataSource: DataSource
   ) {}
 
@@ -112,27 +112,7 @@ export class ChannelService {
         }
       );
       if (!channelUser) {
-        const channel: Channel = await queryRunner.manager.findOneByOrFail(
-          Channel,
-          { id: channelId }
-        );
-        if (!channel.isPublic) {
-          throw new WsException("You can't join a private channel.");
-        }
-        const ban: Ban = await queryRunner.manager.findOneBy(Ban, {
-          channelId,
-          userId,
-        });
-        if (ban) {
-          throw new WsException("can't join because banned.");
-        }
-        if (
-          channel.password?.length > 0 &&
-          (typeof password === "undefined" ||
-            !(await bcryptjs.compare(password, channel.password)))
-        ) {
-          throw new WsException("incorrect password.");
-        }
+        await this.authService.verifyJoin(channelId, userId, password);
         await queryRunner.manager.insert(ChannelUser, {
           channelId,
           userId,
@@ -188,7 +168,7 @@ export class ChannelService {
     message: string,
     server: Namespace
   ): Promise<void> {
-    await this.muteService.verifySend(channelId, senderId);
+    await this.authService.verifySend(channelId, senderId);
     const channelUsers: ChannelUser[] = await this.channelUserService.find(
       channelId
     );

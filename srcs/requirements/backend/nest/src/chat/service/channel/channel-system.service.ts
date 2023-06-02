@@ -6,7 +6,7 @@ import { ChannelChat } from "src/chat/entity/channel/chat.entity";
 import { EntityManager, InsertResult } from "typeorm";
 
 @Injectable()
-export class SystemService {
+export class ChannelSystemService {
   constructor() {}
 
   async send(

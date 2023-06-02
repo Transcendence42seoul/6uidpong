@@ -11,12 +11,13 @@ import { WsJwtAccessGuard } from "../guard/ws-jwt-access.guard";
 import { WsJwtPayload } from "../utils/decorator/ws-jwt-payload.decorator";
 import { JwtPayload } from "jsonwebtoken";
 import { ChannelService } from "../service/channel/channel.service";
-import { ChannelResponse } from "../dto/channel/channel-response";
+import { MyChannelResponse } from "../dto/channel/my-channel-response";
 import { CreateRequest } from "../dto/channel/create-request";
 import { CreateResponse } from "../dto/channel/create-response";
 import { UserResponse } from "../dto/channel/user-response";
 import { BanResponse } from "../dto/channel/ban-response";
 import { JoinResponse } from "../dto/channel/join-response";
+import { AllChannelResponse } from "../dto/channel/all-channel-response";
 
 @WebSocketGateway(80, {
   namespace: "chat",
@@ -34,14 +35,16 @@ export class ChannelGateway {
   constructor(private readonly channelService: ChannelService) {}
 
   @SubscribeMessage("find-all-channels")
-  async findAllChannels(): Promise<ChannelResponse[]> {
-    return await this.channelService.findAllChannels();
+  async findAllChannels(
+    @WsJwtPayload() jwt: JwtPayload
+  ): Promise<AllChannelResponse[]> {
+    return await this.channelService.findAllChannels(jwt.id);
   }
 
   @SubscribeMessage("find-my-channels")
   async findMyChannels(
     @WsJwtPayload() jwt: JwtPayload
-  ): Promise<ChannelResponse[]> {
+  ): Promise<MyChannelResponse[]> {
     return await this.channelService.findMyChannels(jwt.id);
   }
 

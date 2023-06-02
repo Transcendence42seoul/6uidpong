@@ -16,12 +16,13 @@ import { SendResponse } from "src/chat/dto/channel/send-response";
 import { ChannelChatService } from "./channel-chat.service";
 import { ChannelRoomService } from "./channel-room.service";
 import { ChannelUserService } from "./channel-user.service";
-import { ChannelResponse } from "src/chat/dto/channel/channel-response";
+import { MyChannelResponse } from "src/chat/dto/channel/my-channel-response";
 import { CreateRequest } from "src/chat/dto/channel/create-request";
 import { CreateResponse } from "src/chat/dto/channel/create-response";
 import { MuteService } from "./mute.service";
 import { UserResponse } from "src/chat/dto/channel/user-response";
 import { BanResponse } from "src/chat/dto/channel/ban-response";
+import { AllChannelResponse } from "src/chat/dto/channel/all-channel-response";
 
 @Injectable()
 export class ChannelService {
@@ -35,11 +36,11 @@ export class ChannelService {
     private readonly dataSource: DataSource
   ) {}
 
-  async findAllChannels(): Promise<ChannelResponse[]> {
-    return this.roomService.findAll();
+  async findAllChannels(userId: number): Promise<AllChannelResponse[]> {
+    return this.roomService.findAll(userId);
   }
 
-  async findMyChannels(userId: number): Promise<ChannelResponse[]> {
+  async findMyChannels(userId: number): Promise<MyChannelResponse[]> {
     return this.roomService.find(userId);
   }
 

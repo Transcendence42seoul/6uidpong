@@ -1,10 +1,11 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { ChannelResponse } from "src/chat/dto/channel/channel-response";
+import { MyChannelResponse } from "src/chat/dto/channel/my-channel-response";
 import { ChannelUser } from "src/chat/entity/channel/channel-user.entity";
 import { Channel } from "src/chat/entity/channel/channel.entity";
 import * as bcryptjs from "bcryptjs";
 import { Repository } from "typeorm";
+import { AllChannelResponse } from "src/chat/dto/channel/all-channel-response";
 
 @Injectable()
 export class ChannelRoomService {
@@ -13,27 +14,42 @@ export class ChannelRoomService {
     private readonly channelRepository: Repository<Channel>
   ) {}
 
-  async findAll(): Promise<ChannelResponse[]> {
+  async findAll(userId: number): Promise<AllChannelResponse[]> {
     return await this.channelRepository
       .createQueryBuilder("channel")
       .select([
         "channel.id                   AS id",
         "channel.title                AS title",
-        'count(*)                     AS "memberCount"',
+        'member_count.count           AS "memberCount"',
         "CASE WHEN channel.password = '' THEN false \
-            ELSE true                             \
-            END                     AS \"isLocked\"",
+              ELSE true                             \
+              END                     AS \"isLocked\"",
       ])
-      .innerJoin("channel.channelUsers", "channel_users")
+      .addSelect(
+        (subQuery) =>
+          subQuery
+            .select("CASE WHEN count(*) = 0 THEN false ELSE true END")
+            .from(ChannelUser, "sub")
+            .where("sub.channel_id = channel.id")
+            .andWhere("sub.user_id = :userId", { userId }),
+        "isJoined"
+      )
+      .innerJoin(
+        (subQuery) =>
+          subQuery
+            .select(["sub.channel_id", "count(*) AS count"])
+            .from(ChannelUser, "sub")
+            .groupBy("sub.channel_id"),
+        "member_count",
+        "channel.id = member_count.channel_id"
+      )
       .where("channel.is_public = true")
-      .groupBy("channel.id")
-      .addGroupBy("channel.title")
-      .addGroupBy("channel.password")
-      .orderBy("channel.title", "ASC")
+      .orderBy('"isJoined"', "ASC")
+      .addOrderBy("channel.title", "ASC")
       .getRawMany();
   }
 
-  async find(userId: number): Promise<ChannelResponse[]> {
+  async find(userId: number): Promise<MyChannelResponse[]> {
     return await this.channelRepository
       .createQueryBuilder("channel")
       .select([

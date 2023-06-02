@@ -1,6 +1,7 @@
 interface Chat {
   id: number;
   roomId: number;
+  channelId: number;
   userId: number;
   nickname: string;
   image: string;

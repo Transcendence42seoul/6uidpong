@@ -40,7 +40,9 @@ const ChannelInviteModal: React.FC<ChannelInviteModalProps> = ({
         userIds: [...selectedUsers].map((user) => user.id),
       },
     };
-    socket?.emit('invite', inviteChannelData);
+    if (selectedUsers.size > 0) {
+      socket?.emit('invite', inviteChannelData);
+    }
     setShowModal(false);
   };
 

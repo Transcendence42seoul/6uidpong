@@ -9,8 +9,8 @@ import {
 } from "typeorm";
 import { DmRoom } from "./dm-room.entity";
 
-@Entity("dm_room_users")
-export class DmRoomUser {
+@Entity("dm_users")
+export class DmUser {
   @PrimaryColumn({ name: "room_id" })
   roomId: number;
 
@@ -24,7 +24,7 @@ export class DmRoomUser {
   @JoinColumn({ name: "room_id" })
   room: DmRoom;
 
-  @ManyToOne(() => User, (user) => user.dmRoomUsers, {
+  @ManyToOne(() => User, (user) => user.dmUsers, {
     onUpdate: "CASCADE",
   })
   @JoinColumn({ name: "user_id" })

@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import { BlockService } from "src/chat/service/dm/block.service";
 import { Repository } from "typeorm";
 import { FriendRequest } from "../entity/friend-request.entity";
 
@@ -7,7 +8,8 @@ import { FriendRequest } from "../entity/friend-request.entity";
 export class FriendRequestService {
   constructor(
     @InjectRepository(FriendRequest)
-    private readonly friendRequestRepository: Repository<FriendRequest>
+    private readonly friendRequestRepository: Repository<FriendRequest>,
+    private readonly blockService: BlockService
   ) {}
 
   async find(userId: number): Promise<FriendRequest[]> {
@@ -25,6 +27,7 @@ export class FriendRequestService {
   }
 
   async insert(fromId: number, toId: number): Promise<FriendRequest> {
+    await this.blockService.verify(fromId, toId);
     await this.friendRequestRepository.insert({
       fromId,
       toId,

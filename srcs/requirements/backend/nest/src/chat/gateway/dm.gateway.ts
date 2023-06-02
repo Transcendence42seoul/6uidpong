@@ -5,7 +5,6 @@ import {
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
-  WsException,
 } from "@nestjs/websockets";
 import { Namespace, Socket } from "socket.io";
 import { RoomResponse } from "../dto/dm/room-response";
@@ -14,8 +13,6 @@ import { DmService } from "../service/dm/dm.service";
 import { WsJwtPayload } from "../utils/decorator/ws-jwt-payload.decorator";
 import { JwtPayload } from "jsonwebtoken";
 import { JoinResponse } from "../dto/dm/join-response";
-import { BlockService } from "../service/dm/block.service";
-import { Block } from "../entity/dm/block.entity";
 import { BlockResponse } from "../dto/dm/block-response";
 
 @WebSocketGateway(80, {
@@ -31,10 +28,7 @@ export class DmGateway {
   @WebSocketServer()
   server: Namespace;
 
-  constructor(
-    private readonly dmService: DmService,
-    private readonly blockService: BlockService
-  ) {}
+  constructor(private readonly dmService: DmService) {}
 
   @SubscribeMessage("find-rooms")
   async findRooms(@WsJwtPayload() jwt: JwtPayload): Promise<RoomResponse[]> {
@@ -56,9 +50,6 @@ export class DmGateway {
     @ConnectedSocket() client: Socket,
     @MessageBody("to") to: { id: number; message: string }
   ): Promise<void> {
-    if (await this.blockService.has(jwt.id, to.id)) {
-      throw new WsException("can't send because blocked.");
-    }
     await this.dmService.send(jwt.id, to.id, to.message, client, this.server);
   }
 
@@ -83,8 +74,7 @@ export class DmGateway {
   async findBlockUsers(
     @WsJwtPayload() jwt: JwtPayload
   ): Promise<BlockResponse[]> {
-    const blocks: Block[] = await this.blockService.find(jwt.id);
-    return blocks.map((block) => new BlockResponse(block));
+    return await this.dmService.findBlockUsers(jwt.id);
   }
 
   @SubscribeMessage("block")
@@ -92,7 +82,7 @@ export class DmGateway {
     @WsJwtPayload() jwt: JwtPayload,
     @MessageBody("interlocutorId") interlocutorId: number
   ): Promise<void> {
-    await this.blockService.block(jwt.id, interlocutorId);
+    await this.dmService.block(jwt.id, interlocutorId);
   }
 
   @SubscribeMessage("unblock")
@@ -100,6 +90,6 @@ export class DmGateway {
     @WsJwtPayload() jwt: JwtPayload,
     @MessageBody("interlocutorId") interlocutorId: number
   ): Promise<void> {
-    await this.blockService.delete(jwt.id, interlocutorId);
+    await this.dmService.unblock(jwt.id, interlocutorId);
   }
 }

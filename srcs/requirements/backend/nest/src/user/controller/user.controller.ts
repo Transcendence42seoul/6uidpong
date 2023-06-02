@@ -14,8 +14,6 @@ import {
   Delete,
   DefaultValuePipe,
   BadRequestException,
-  Inject,
-  forwardRef,
 } from "@nestjs/common";
 import { UserService } from "../service/user.service";
 import { JwtAccessGuard } from "src/auth/guard/jwt-access.guard";
@@ -33,7 +31,6 @@ import { FriendRequest } from "../entity/friend-request.entity";
 import { FriendRequestResponse } from "../dto/friend-request-response";
 import { PermissionGuard } from "src/auth/guard/permission.guard";
 import { Friend } from "../entity/friend.entity";
-import { BlockService } from "src/chat/service/dm/block.service";
 
 @Controller("api/v1/users")
 @UseGuards(JwtAccessGuard)
@@ -42,8 +39,7 @@ export class UserController {
     private readonly userService: UserService,
     private readonly authService: AuthService,
     private readonly friendService: FriendService,
-    private readonly friendRequestService: FriendRequestService,
-    private readonly blockService: BlockService
+    private readonly friendRequestService: FriendRequestService
   ) {}
 
   @Get()
@@ -123,7 +119,6 @@ export class UserController {
     @Param("id", ParseIntPipe) userId: number
   ): Promise<FriendResponse[]> {
     const friends: Friend[] = await this.friendService.find(userId);
-
     return friends.map((friend) => new FriendResponse(friend));
   }
 
@@ -154,7 +149,6 @@ export class UserController {
   ): Promise<FriendRequestResponse[]> {
     const friendRequests: FriendRequest[] =
       await this.friendRequestService.find(userId);
-
     return friendRequests.map(
       (friendRequest) => new FriendRequestResponse(friendRequest)
     );
@@ -169,14 +163,10 @@ export class UserController {
   ): Promise<void> {
     try {
       await this.friendService.findOne(fromId, toId);
+      throw new BadRequestException("already friends.");
     } catch {
-      if (await this.blockService.has(fromId, toId)) {
-        throw new BadRequestException("blocked user.");
-      }
       await this.friendRequestService.insert(fromId, toId);
-      return;
     }
-    throw new BadRequestException("already friends.");
   }
 
   @Delete("/:id/friend-requests/:fromId")

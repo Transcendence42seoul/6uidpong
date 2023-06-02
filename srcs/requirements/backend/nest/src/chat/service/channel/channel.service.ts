@@ -26,9 +26,9 @@ import { BanResponse } from "src/chat/dto/channel/ban-response";
 @Injectable()
 export class ChannelService {
   constructor(
-    private readonly chatService: ChannelChatService,
     private readonly roomService: ChannelRoomService,
     private readonly channelUserService: ChannelUserService,
+    private readonly chatService: ChannelChatService,
     private readonly banService: BanService,
     private readonly muteService: MuteService,
     private readonly userService: UserService,

@@ -3,7 +3,7 @@ import { ChannelUser } from "src/chat/entity/channel/channel-user.entity";
 import { ChannelChat } from "src/chat/entity/channel/chat.entity";
 import { Block } from "src/chat/entity/dm/block.entity";
 import { DmChat } from "src/chat/entity/dm/dm-chat.entity";
-import { DmRoomUser } from "src/chat/entity/dm/dm-room-user.entity";
+import { DmUser } from "src/chat/entity/dm/dm-room-user.entity";
 import { Column, Entity, Index, OneToMany, PrimaryColumn } from "typeorm";
 import { FriendRequest } from "./friend-request.entity";
 import { Friend } from "./friend.entity";
@@ -46,8 +46,8 @@ export class User {
   @Index()
   socketId: string;
 
-  @OneToMany(() => DmRoomUser, (dmRoomUser) => dmRoomUser.user)
-  dmRoomUsers: DmRoomUser[];
+  @OneToMany(() => DmUser, (dmUser) => dmUser.user)
+  dmUsers: DmUser[];
 
   @OneToMany(() => DmChat, (chat) => chat.user)
   dmChats: DmChat[];

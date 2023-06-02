@@ -16,6 +16,7 @@ import { Mute } from "src/chat/entity/channel/mute.entity";
 import { UserService } from "src/user/service/user.service";
 import { User } from "src/user/entity/user.entity";
 import { JoinResponse } from "src/chat/dto/channel/join-response";
+import { SendResponse } from "src/chat/dto/channel/send-response";
 
 @Injectable()
 export class ChannelService {
@@ -501,7 +502,11 @@ export class ChannelService {
       await queryRunner.commitTransaction();
 
       const chat: ChannelChat = await this.findChat(newChat.identifiers[0].id);
-      server.to(onlineSockets).emit("send-channel", new ChatResponse(chat));
+      const sendResponse: SendResponse = new SendResponse(
+        channelId,
+        new ChatResponse(chat)
+      );
+      server.to(onlineSockets).emit("send-channel", sendResponse);
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;
@@ -673,7 +678,6 @@ export class ChannelService {
     return await this.chatRepository.findOne({
       relations: {
         user: true,
-        channel: true,
       },
       where: {
         id,

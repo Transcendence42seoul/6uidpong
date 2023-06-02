@@ -6,7 +6,7 @@ import ChannelMemberProfile from './ChannelMemberProfile';
 import CircularImage from './CircularImage';
 import ModalContainer from './ModalContainer';
 
-import type Chat from '../../interfaces/Chat';
+import type SendResponse from '../../interfaces/SendResponse';
 import type User from '../../interfaces/User';
 
 import { isTest, mockUsers } from '../../mock'; // test
@@ -58,7 +58,7 @@ const ChannelMemberList: React.FC<ChannelMemberListProps> = ({
   };
 
   useEffect(() => {
-    const chatHandler = (chat: Chat) => {
+    const chatHandler = ({ chatResponse: chat }: SendResponse) => {
       if (chat.isSystem) {
         handleMembers();
       }

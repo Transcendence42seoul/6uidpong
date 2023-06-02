@@ -18,6 +18,7 @@ import MessageBox from './MessageBox';
 import MessageForm from './MessageForm';
 
 import type Chat from '../../interfaces/Chat';
+import type SendResponse from '../../interfaces/SendResponse';
 import type SocketEvent from '../../interfaces/SocketEvent';
 
 import { isTest, mockChats } from '../../mock'; // test
@@ -92,7 +93,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send }) => {
   }, []);
 
   useEffect(() => {
-    const chatHandler = (chat: Chat) => addChat(chat);
+    const chatHandler = ({ chatResponse: chat }: SendResponse) => addChat(chat);
     socket?.on(send.name, chatHandler);
     return () => {
       socket?.off(send.name, chatHandler);

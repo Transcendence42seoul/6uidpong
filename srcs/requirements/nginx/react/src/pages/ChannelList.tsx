@@ -8,7 +8,7 @@ import ListTitle from '../components/container/ListTitle';
 import selectSocket from '../features/socket/socketSelector';
 
 import type Channel from '../interfaces/Channel';
-import type Chat from '../interfaces/Chat';
+import type SendResponse from '../interfaces/SendResponse';
 
 import { isTest, mockChannels } from '../mock'; // test
 
@@ -36,17 +36,17 @@ const ChannelList: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const messageHandler = (chat: Chat) => {
+    const chatHandler = ({ channelId }: SendResponse) => {
       const channelToUpdate = channels.find(
-        (channel) => channel.id === chat.channelId,
+        (channel) => channel.id === channelId,
       );
       if (!channelToUpdate) return;
       channelToUpdate.newMsgCount += 1;
       setChannels([...channels]);
     };
-    socket?.on('send-channel', messageHandler);
+    socket?.on('send-channel', chatHandler);
     return () => {
-      socket?.off('send-channel', messageHandler);
+      socket?.off('send-channel', chatHandler);
     };
   }, [channels]);
 

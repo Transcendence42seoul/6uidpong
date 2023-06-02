@@ -8,8 +8,8 @@ import ListTitle from '../components/container/ListTitle';
 import selectSocket from '../features/socket/socketSelector';
 import formatTime from '../utils/formatTime';
 
-import type Chat from '../interfaces/Chat';
 import type Position from '../interfaces/Position';
+import type SendResponse from '../interfaces/SendResponse';
 
 import { isTest, mockRooms } from '../mock'; // test
 
@@ -69,13 +69,13 @@ const DmRoomList: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const chatHandler = (chat: Chat) => {
+    const chatHandler = ({ roomId, chatResponse: chat }: SendResponse) => {
       const roomToUpdate = rooms.find(
         (room) => room.interlocutorId === chat.userId,
       );
       if (!roomToUpdate) {
         const newRoom = {
-          roomId: chat.roomId,
+          roomId,
           lastMessage: chat.message,
           lastMessageTime: chat.createdAt,
           interlocutor: chat.nickname,

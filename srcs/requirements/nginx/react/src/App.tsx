@@ -46,6 +46,9 @@ const App: React.FC = () => {
 
   const initSocket = async () => {
     const socket = io('/chat', { auth: { token: accessToken } });
+    socket.on('connect', () => {
+      socket.emit('connection');
+    });
     await dispatchSocket({ socket }, dispatch);
   };
 

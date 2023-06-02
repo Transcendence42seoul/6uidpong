@@ -10,7 +10,7 @@ export class BanService {
     private readonly banRepository: Repository<Ban>
   ) {}
 
-  async findUsers(channelId: number): Promise<Ban[]> {
+  async find(channelId: number): Promise<Ban[]> {
     return await this.banRepository.find({
       relations: {
         user: true,
@@ -24,15 +24,6 @@ export class BanService {
         },
       },
     });
-  }
-
-  async has(channelId: number, userId: number): Promise<boolean> {
-    const primaryKey = { channelId, userId };
-    const ban: Ban = await this.banRepository.findOneBy(primaryKey);
-    if (ban) {
-      return true;
-    }
-    return false;
   }
 
   async delete(channelId: number, userId: number): Promise<void> {

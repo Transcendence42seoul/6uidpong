@@ -20,6 +20,9 @@ import { BanService } from "../service/channel/ban.service";
 import { MuteService } from "../service/channel/mute.service";
 import { ChannelGateway } from "../gateway/channel.gateway";
 import { ConnectionGateway } from "../gateway/connection.gateway";
+import { ChannelRoomService } from "../service/channel/channel-room.service";
+import { ChannelChatService } from "../service/channel/channel-chat.service";
+import { ChannelUserService } from "../service/channel/channel-user.service";
 
 @Module({
   imports: [
@@ -38,7 +41,10 @@ import { ConnectionGateway } from "../gateway/connection.gateway";
   ],
   providers: [
     DmService,
+    ChannelRoomService,
     ChannelService,
+    ChannelChatService,
+    ChannelUserService,
     BanService,
     MuteService,
     BlockService,

@@ -24,7 +24,7 @@ const ChannelPasswordModal: React.FC<ChannelPasswordModalProps> = ({
 
   const handleConfirmClick = () => {
     navigate(`/channel/${channelId}`, {
-      state: password,
+      state: { password },
     });
   };
 

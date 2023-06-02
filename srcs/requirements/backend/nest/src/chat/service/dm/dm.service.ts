@@ -3,6 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Namespace, Socket } from "socket.io";
 import { ChatResponse } from "src/chat/dto/dm/chat-response";
 import { JoinResponse } from "src/chat/dto/dm/join-response";
+import { SendResponse } from "src/chat/dto/dm/send-response";
 import { User } from "src/user/entity/user.entity";
 import {
   Repository,
@@ -114,7 +115,7 @@ export class DmService {
     );
     server
       .to([client.id, recipient.user.socketId])
-      .emit("send-dm", new ChatResponse(chat));
+      .emit("send-dm", new SendResponse(recipient.roomId, chat));
   }
 
   async deleteRoom(
@@ -294,7 +295,6 @@ export class DmService {
       return await this.chatRepository.findOne({
         relations: {
           user: true,
-          room: true,
         },
         where: {
           id: newChat.identifiers[0].id,

@@ -1,9 +1,10 @@
+import { ChannelChat } from "src/chat/entity/channel/chat.entity";
 import { ChatResponse } from "./chat-response";
 
 export class SendResponse {
-  constructor(channelId: number, chatResponse: ChatResponse) {
+  constructor(channelId: number, chat: ChannelChat) {
     this.channelId = channelId;
-    this.chatResponse = chatResponse;
+    this.chatResponse = new ChatResponse(chat);
   }
 
   readonly channelId: number;

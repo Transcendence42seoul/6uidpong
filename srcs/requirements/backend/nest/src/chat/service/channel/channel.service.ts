@@ -92,7 +92,7 @@ export class ChannelService {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      const newChannel: InsertResult = await queryRunner.manager.insert(
+      const { identifiers }: InsertResult = await queryRunner.manager.insert(
         Channel,
         {
           title: body.title,
@@ -104,7 +104,7 @@ export class ChannelService {
         }
       );
       await queryRunner.manager.insert(ChannelUser, {
-        channelId: newChannel.identifiers[0].id,
+        channelId: identifiers[0].id,
         userId,
         isOwner: true,
         isAdmin: true,
@@ -112,7 +112,7 @@ export class ChannelService {
 
       await queryRunner.commitTransaction();
       return await this.channelRepository.findOneBy({
-        id: newChannel.identifiers[0].id,
+        id: identifiers[0].id,
       });
     } catch (error) {
       await queryRunner.rollbackTransaction();
@@ -136,7 +136,15 @@ export class ChannelService {
     try {
       let channelUser: ChannelUser;
       try {
-        channelUser = await this.findUser(channelId, userId);
+        channelUser = await queryRunner.manager.findOneOrFail(ChannelUser, {
+          relations: {
+            user: true,
+          },
+          where: {
+            channelId,
+            userId,
+          },
+        });
         if (channelUser.newMsgCount > 0) {
           await queryRunner.manager.update(
             ChannelUser,
@@ -500,11 +508,9 @@ export class ChannelService {
       await queryRunner.commitTransaction();
 
       const chat: ChannelChat = await this.findChat(newChat.identifiers[0].id);
-      const sendResponse: SendResponse = new SendResponse(
-        channelId,
-        new ChatResponse(chat)
-      );
-      server.to(onlineSockets).emit("send-channel", sendResponse);
+      server
+        .to(onlineSockets)
+        .emit("send-channel", new SendResponse(channelId, chat));
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;

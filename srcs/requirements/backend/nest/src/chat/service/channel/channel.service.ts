@@ -402,9 +402,9 @@ export class ChannelService {
         ChannelUser,
         userIds.map((id) => ({ channelId, userId: id }))
       );
-      const systemMessage: string = `was added by ${
+      const systemMessage: string = `${invitee.nickname} was added by ${
         inviter.user.nickname
-      }. Also, ${invitee.nickname} and ${userIds.length - 1} others joined.
+      }. Also, ${userIds.length - 1} others joined.
       `;
       await this.sendMessage(
         invitee.id,

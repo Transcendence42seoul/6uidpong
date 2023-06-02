@@ -428,6 +428,8 @@ export class ChannelService {
         channelId,
       },
       order: {
+        isOwner: "DESC",
+        isAdmin: "DESC",
         createdAt: "ASC",
         user: {
           nickname: "ASC",

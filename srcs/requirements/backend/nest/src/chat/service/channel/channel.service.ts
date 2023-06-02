@@ -3,7 +3,7 @@ import { ChannelChat } from "src/chat/entity/channel/chat.entity";
 import { ChannelUser } from "src/chat/entity/channel/channel-user.entity";
 import { Channel } from "src/chat/entity/channel/channel.entity";
 import * as bcryptjs from "bcryptjs";
-import { DataSource, EntityManager, InsertResult } from "typeorm";
+import { DataSource, InsertResult } from "typeorm";
 import { WsException } from "@nestjs/websockets";
 import { Namespace, Socket } from "socket.io";
 import { BanService } from "./ban.service";
@@ -23,6 +23,7 @@ import { MuteService } from "./mute.service";
 import { UserResponse } from "src/chat/dto/channel/user-response";
 import { BanResponse } from "src/chat/dto/channel/ban-response";
 import { AllChannelResponse } from "src/chat/dto/channel/all-channel-response";
+import { SystemService } from "./system.service";
 
 @Injectable()
 export class ChannelService {
@@ -33,6 +34,7 @@ export class ChannelService {
     private readonly banService: BanService,
     private readonly muteService: MuteService,
     private readonly userService: UserService,
+    private readonly systemService: SystemService,
     private readonly dataSource: DataSource
   ) {}
 
@@ -115,7 +117,7 @@ export class ChannelService {
           { id: channelId }
         );
         if (!channel.isPublic) {
-          throw new WsException("You cannot join a private channel.");
+          throw new WsException("You can't join a private channel.");
         }
         const ban: Ban = await queryRunner.manager.findOneBy(Ban, {
           channelId,
@@ -125,11 +127,11 @@ export class ChannelService {
           throw new WsException("can't join because banned.");
         }
         if (
-          channel.password !== "" &&
+          channel.password?.length > 0 &&
           (typeof password === "undefined" ||
             !(await bcryptjs.compare(password, channel.password)))
         ) {
-          throw new WsException("invalid password.");
+          throw new WsException("incorrect password.");
         }
         await queryRunner.manager.insert(ChannelUser, {
           channelId,
@@ -146,7 +148,7 @@ export class ChannelService {
         });
         client.join("c" + channelId);
         const systemMessage: string = `${channelUser.user.nickname} has joined.`;
-        await this.sendSys(
+        await this.systemService.send(
           queryRunner.manager,
           userId,
           channelId,
@@ -186,7 +188,7 @@ export class ChannelService {
     message: string,
     server: Namespace
   ): Promise<void> {
-    await this.muteService.verify(channelId, senderId);
+    await this.muteService.verifySend(channelId, senderId);
     const channelUsers: ChannelUser[] = await this.channelUserService.find(
       channelId
     );
@@ -274,7 +276,7 @@ export class ChannelService {
     );
     if (channelUser.isOwner) {
       throw new WsException(
-        "The owner cannot exit the channel. Please transfer ownership to another user and try again."
+        "The owner can't exit the channel. Please transfer ownership to another user and try again."
       );
     }
     client.leave("c" + channelId);
@@ -287,7 +289,7 @@ export class ChannelService {
       const systemMessage: string = `${channelUser.user.nickname} has left`;
 
       await queryRunner.manager.delete(ChannelUser, primaryKey);
-      await this.sendSys(
+      await this.systemService.send(
         queryRunner.manager,
         userId,
         channelId,
@@ -338,7 +340,7 @@ export class ChannelService {
       });
       const systemMessage: string = `The owner of the channel has been changed from ${oldOwner.user.nickname} to ${newOwner.user.nickname}.
       `;
-      await this.sendSys(
+      await this.systemService.send(
         queryRunner.manager,
         newOwnerId,
         channelId,
@@ -387,7 +389,7 @@ export class ChannelService {
       );
       const systemMessage: string = `${newAdmin.user.nickname} has been granted the "admin" role.
       `;
-      await this.sendSys(
+      await this.systemService.send(
         queryRunner.manager,
         newAdminId,
         channelId,
@@ -436,7 +438,7 @@ export class ChannelService {
       );
       const systemMessage: string = `${target.user.nickname} has been revoked the "admin" role.
       `;
-      await this.sendSys(
+      await this.systemService.send(
         queryRunner.manager,
         targetId,
         channelId,
@@ -483,7 +485,7 @@ export class ChannelService {
         inviter.user.nickname
       }. Also, ${userIds.length - 1} others joined.
       `;
-      await this.sendSys(
+      await this.systemService.send(
         queryRunner.manager,
         invitee.id,
         channelId,
@@ -532,7 +534,7 @@ export class ChannelService {
       };
       const systemMessage: string = `${kicked.user.nickname} has been kicked by ${kicker.user.nickname}`;
       await queryRunner.manager.delete(ChannelUser, kickedPk);
-      await this.sendSys(
+      await this.systemService.send(
         queryRunner.manager,
         kickedId,
         channelId,
@@ -590,7 +592,7 @@ export class ChannelService {
         ["channelId", "userId"]
       );
       const systemMessage: string = `${muted.user.nickname} has been muted for ${time} seconds by ${muter.user.nickname}`;
-      await this.sendSys(
+      await this.systemService.send(
         queryRunner.manager,
         mutedId,
         channelId,
@@ -640,7 +642,7 @@ export class ChannelService {
       await queryRunner.manager.insert(Ban, { channelId, userId: bannedId });
 
       const systemMessage: string = `${banned.user.nickname} has been banned by ${banner.user.nickname}`;
-      await this.sendSys(
+      await this.systemService.send(
         queryRunner.manager,
         bannedId,
         channelId,
@@ -706,57 +708,5 @@ export class ChannelService {
   async findBanUsers(channelId: number): Promise<BanResponse[]> {
     const bans: Ban[] = await this.banService.find(channelId);
     return bans.map((ban) => new BanResponse(ban));
-  }
-
-  private async sendSys(
-    manager: EntityManager,
-    userId: number,
-    channelId: number,
-    message: string,
-    server: Namespace
-  ): Promise<void> {
-    const sockets = await server.in("c" + channelId).fetchSockets();
-    const channelUsers: ChannelUser[] = await manager.find(ChannelUser, {
-      relations: {
-        user: true,
-      },
-      where: {
-        channelId,
-      },
-    });
-    const notJoined = channelUsers
-      .filter(
-        (channelUser) =>
-          !sockets.some((socket) => socket.id === channelUser.user.socketId)
-      )
-      .map((notJoinedUser) => ({ channelId, userId: notJoinedUser.user.id }));
-    const onlineSockets: string[] = channelUsers
-      .filter((channelUser) => channelUser.user.status === "online")
-      .map((onlineChannelUser) => onlineChannelUser.user.socketId);
-    const { identifiers }: InsertResult = await manager.insert(ChannelChat, {
-      user: {
-        id: userId,
-      },
-      channel: {
-        id: channelId,
-      },
-      message,
-      isSystem: true,
-    });
-    if (notJoined.length > 0) {
-      await manager.increment(ChannelUser, notJoined, "newMsgCount", 1);
-    }
-
-    const chat: ChannelChat = await manager.findOne(ChannelChat, {
-      relations: {
-        user: true,
-      },
-      where: {
-        id: identifiers[0].id,
-      },
-    });
-    server
-      .to(onlineSockets)
-      .emit("send-channel", new SendResponse(channelId, chat));
   }
 }

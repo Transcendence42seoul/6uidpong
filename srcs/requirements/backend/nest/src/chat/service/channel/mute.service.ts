@@ -12,7 +12,7 @@ export class MuteService {
     private readonly muteRepository: Repository<Mute>
   ) {}
 
-  async verify(channelId: number, userId: number): Promise<void> {
+  async verifySend(channelId: number, userId: number): Promise<void> {
     const primaryKey = {
       channelId,
       userId,

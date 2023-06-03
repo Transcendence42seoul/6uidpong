@@ -1,15 +1,13 @@
 import { Injectable } from "@nestjs/common";
-import { SocketReadyState } from "net";
 import { Socket } from "socket.io";
-import { createBrotliCompress } from "zlib";
 import { customRoomDto } from "../dto/game.dto";
 import { GameRoomService } from "./game.room.service";
 
 @Injectable()
 export class GameMatchService {
   private queue: Socket[] = [];
-  private roomNumber = 1;
   private rooms: customRoomDto[] = [];
+  private roomNumber = 1;
 
   constructor(private GameRoomService: GameRoomService) {
     setInterval(this.handleLadderMatch.bind(this), 1000);
@@ -20,20 +18,20 @@ export class GameMatchService {
     roomInfo: { mode: boolean; password: string | null }
   ): void {
     const roomId = this.roomNumber++;
-    const customRoomInfo: customRoomDto = {
+    const room: customRoomDto = {
       roomId: roomId,
       user1: client,
       user2: undefined,
       mode: roomInfo.mode,
       password: roomInfo.password,
     };
-    this.rooms.push(customRoomInfo);
-    client.emit("custom-room-created", customRoomInfo);
+    this.rooms.push(room);
+    client.emit("custom-room-created", room);
   }
 
   getCustomGameList(client: Socket): void {
-    const rooms: customRoomDto[] = this.rooms;
-    client.emit("custom-room-lists", rooms);
+    const room: customRoomDto[] = this.rooms;
+    client.emit("custom-room-lists", room);
   }
 
   //destroy, exit logic

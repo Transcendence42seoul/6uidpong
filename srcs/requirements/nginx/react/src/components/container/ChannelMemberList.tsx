@@ -25,7 +25,7 @@ const ChannelMemberList: React.FC<ChannelMemberListProps> = ({
 
   const searchResultsRef = useRef<HTMLUListElement>(null);
   const [members, setMembers] = useState<User[]>([]);
-  const [search, setSearch] = useState<string>('');
+  const [searchTerm, setSearchTerm] = useState<string>('');
   const [searchResults, setSearchResults] = useState<User[]>(members);
   const [selectedMember, setSelectedMember] = useState<User | null>(null);
   const [showMemberProfileModal, setShowMemberProfileModal] =
@@ -44,15 +44,15 @@ const ChannelMemberList: React.FC<ChannelMemberListProps> = ({
     setMembers(isTest ? mockUsers : members); // test
   };
 
-  const handleSearchChange = async (
+  const handleSearchTermChange = async (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    setSearch(event.target.value);
+    setSearchTerm(event.target.value);
   };
 
   const handleSearchResults = () => {
     const results = members.filter((member) => {
-      return member.nickname.startsWith(search);
+      return member.nickname.startsWith(searchTerm);
     });
     setSearchResults([...results]);
   };
@@ -75,15 +75,15 @@ const ChannelMemberList: React.FC<ChannelMemberListProps> = ({
 
   useEffect(() => {
     handleSearchResults();
-  }, [members, search]);
+  }, [members, searchTerm]);
 
   return (
     <div className={`relative ${className}`}>
       <input
         type="text"
         placeholder="Search members"
-        value={search}
-        onChange={handleSearchChange}
+        value={searchTerm}
+        onChange={handleSearchTermChange}
         className="w-full rounded border border-white p-2 shadow"
       />
       <ul

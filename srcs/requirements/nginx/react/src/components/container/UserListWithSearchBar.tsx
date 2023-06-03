@@ -16,36 +16,38 @@ const UserListWithSearchBar: React.FC<UserListWithSearchBarProps> = ({
   className = '',
 }) => {
   const searchResultsRef = useRef<HTMLUListElement>(null);
-  const [search, setSearch] = useState<string>('');
+  const [searchTerm, setSearchTerm] = useState<string>('');
   const [searchResults, setSearchResults] = useState<User[]>(users);
 
   const handleUserClick = (user: User) => {
-    setSearch('');
+    setSearchTerm('');
     onUserClick(user);
   };
 
   const handleSearchResults = () => {
     const results = users.filter((user) => {
-      return user.nickname.startsWith(search);
+      return user.nickname.startsWith(searchTerm);
     });
     setSearchResults([...results]);
   };
 
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(event.target.value);
+  const handleSearchTermChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    setSearchTerm(event.target.value);
   };
 
   useEffect(() => {
     handleSearchResults();
-  }, [search, users]);
+  }, [searchTerm, users]);
 
   return (
     <div className={`relative ${className}`}>
       <input
         type="text"
         placeholder="Search users"
-        value={search}
-        onChange={handleSearchChange}
+        value={searchTerm}
+        onChange={handleSearchTermChange}
         className="w-full rounded border border-white p-2 shadow"
       />
       <ul

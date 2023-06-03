@@ -24,7 +24,7 @@ const UserSearchBar: React.FC<UserSearchBarProps> = ({
   const myId = tokenInfo?.id;
 
   const searchResultsRef = useRef<HTMLUListElement>(null);
-  const [search, setSearch] = useState<string>('');
+  const [searchTerm, setSearchTerm] = useState<string>('');
   const [searchResults, setSearchResults] = useState<User[]>([]);
   const [showSearchResults, setShowSearchResults] = useState<boolean>(false);
 
@@ -32,8 +32,10 @@ const UserSearchBar: React.FC<UserSearchBarProps> = ({
     onUserClick(user);
   };
 
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(event.target.value);
+  const handleSearchTermChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    setSearchTerm(event.target.value);
   };
 
   const handleSearchResults = (users: User[]) => {
@@ -42,23 +44,23 @@ const UserSearchBar: React.FC<UserSearchBarProps> = ({
   };
 
   const handleShowSearchResults = () => {
-    setShowSearchResults(!!search);
+    setShowSearchResults(!!searchTerm);
   };
 
   useEffect(() => {
     const fetchUsersData = async () => {
       const config = {
-        url: '/api/v1/users/search',
-        params: { nickname: search },
+        url: '/api/v1/users/searchTerm',
+        params: { nickname: searchTerm },
       };
       const data: User[] = isTest ? mockUsers : await callApi(config); // test
       handleSearchResults(data);
     };
-    if (search) {
+    if (searchTerm) {
       fetchUsersData();
     }
     handleShowSearchResults();
-  }, [search]);
+  }, [searchTerm]);
 
   useEffect(() => {
     const handleOutsideClick = (event: MouseEvent) => {
@@ -80,8 +82,8 @@ const UserSearchBar: React.FC<UserSearchBarProps> = ({
       <input
         type="text"
         placeholder="Search users"
-        value={search}
-        onChange={handleSearchChange}
+        value={searchTerm}
+        onChange={handleSearchTermChange}
         onClick={handleShowSearchResults}
         className="w-full rounded border border-white p-2 shadow"
       />

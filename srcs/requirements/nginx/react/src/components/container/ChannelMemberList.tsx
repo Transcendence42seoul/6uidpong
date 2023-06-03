@@ -45,7 +45,7 @@ const ChannelMemberList: React.FC<ChannelMemberListProps> = ({
     setMembers(isTest ? mockUsers : members); // test
   };
 
-  const handleSearchTermChange = async (
+  const handleSearchTermChange = (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     setSearchTerm(event.target.value);

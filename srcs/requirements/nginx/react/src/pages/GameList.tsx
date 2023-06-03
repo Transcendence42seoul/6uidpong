@@ -4,10 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import HoverButton from '../components/button/HoverButton';
 import ListContainer from '../components/container/ListContainer';
 import ListTitle from '../components/container/ListTitle';
+import PasswordModal from '../components/modal/PasswordModal';
 import ImageSrc from '../constants/ImageSrc';
 
 import { isTest, mockGames } from '../mock'; // test
-import PasswordModal from '../components/modal/PasswordModal';
 
 interface Game {
   id: number;
@@ -26,12 +26,14 @@ const GameList: React.FC = () => {
 
   const joinGame = () => {
     if (!selectedGame) return;
-    const { id, isLocked } = selectedGame;
+    const { id, title, isLocked } = selectedGame;
     if (!showPasswordModal && isLocked) {
       setShowPasswordModal(true);
       return;
     }
-    navigate(`/custom/${id}`);
+    navigate(`/custom/${id}`, {
+      state: { title },
+    });
   };
 
   const handleCreateClick = () => {};

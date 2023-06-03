@@ -35,10 +35,6 @@ const Channel: React.FC = () => {
     data: { channelId },
   };
 
-  const channelIdHandler = ({ id }: { id: number }) => {
-    navigate('/channel');
-  };
-
   const handleExitClick = () => {
     socket?.emit('exit', { channelId });
     navigate('/channel');
@@ -55,6 +51,9 @@ const Channel: React.FC = () => {
   };
 
   useEffect(() => {
+    const channelIdHandler = ({ id }: { id: number }) => {
+      navigate('/channel');
+    };
     socket?.on('banned-channel', channelIdHandler);
     socket?.on('kicked-channel', channelIdHandler);
     return () => {

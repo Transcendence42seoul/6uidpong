@@ -1,15 +1,17 @@
-import { UseGuards } from "@nestjs/common";
 import {
   ConnectedSocket,
-  OnGatewayConnection,
   OnGatewayDisconnect,
+  SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
 } from "@nestjs/websockets";
 import { Namespace, Socket } from "socket.io";
-import { WsJwtAccessGuard } from "src/chat/guard/ws-jwt-access.guard";
 import { UserService } from "src/user/service/user.service";
 import { User } from "src/user/entity/user.entity";
+import { UseGuards } from "@nestjs/common";
+import { WsJwtAccessGuard } from "src/chat/guard/ws-jwt-access.guard";
+import { WsJwtPayload } from "src/chat/utils/decorator/ws-jwt-payload.decorator";
+import { JwtPayload } from "jsonwebtoken";
 
 @WebSocketGateway(80, {
   namespace: "game",
@@ -19,23 +21,25 @@ import { User } from "src/user/entity/user.entity";
   },
 })
 @UseGuards(WsJwtAccessGuard)
-export class ConnectionGateway
-  implements OnGatewayConnection, OnGatewayDisconnect
-{
+export class GameConnectionGateway implements OnGatewayDisconnect {
   @WebSocketServer()
   server: Namespace;
 
   constructor(private readonly userService: UserService) {}
 
-  async handleConnection(@ConnectedSocket() client: Socket) {
-    const user: User = await this.userService.findOne(client.id);
-    await this.userService.updateStatus(user.id, "game");
+  @SubscribeMessage("connection")
+  async connectGame(
+    @WsJwtPayload() jwt: JwtPayload,
+    @ConnectedSocket() client: Socket
+  ) {
+    const user: User = await this.userService.findOne(jwt.id);
+    await this.userService.updateStatus(user.id, client.id, "game");
   }
 
   async handleDisconnect(@ConnectedSocket() client: Socket) {
-    const user: User = await this.userService.findOne(client.id);
+    const user: User = await this.userService.findBySocketId(client.id);
     if (user.status === "game") {
-      await this.userService.updateStatus(user.id, "online");
+      await this.userService.updateStatus(user.id, "", "online");
     }
   }
 }

@@ -100,9 +100,22 @@ export class UserService {
     });
   }
 
-  async updateStatus(id: number, status: string): Promise<void> {
+  async updateStatus(
+    id: number,
+    gameSocketId: string,
+    status: string
+  ): Promise<void> {
     await this.userRepository.update(id, {
       status,
+    });
+    await this.userRepository.update(id, {
+      gameSocketId: gameSocketId,
+    });
+  }
+
+  async findBySocketId(id: string): Promise<User> {
+    return await this.userRepository.findOneOrFail({
+      where: { gameSocketId: id },
     });
   }
 }

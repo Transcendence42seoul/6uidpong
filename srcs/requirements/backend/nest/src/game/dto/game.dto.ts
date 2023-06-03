@@ -44,6 +44,8 @@ export interface gameRoomInfo {
   user2: Socket;
   user1Id: number;
   user2Id: number;
+  player1Nickname: string;
+  player2Nickname: string;
   state: GameRoomState;
   broadcast: NodeJS.Timeout;
   createAt: Date;

@@ -13,7 +13,8 @@ export class GameMatchService {
   }
 
   handleLadderMatch() {
-    for (let i = 1; i <= this.queue.length; i += 2) {
+    const length = this.queue.length;
+    for (let i = 1; i < length; i += 2) {
       const player1 = this.queue[0];
       const player2 = this.queue[1];
       this.GameRoomService.createRoom(player1, player2, true);
@@ -26,7 +27,6 @@ export class GameMatchService {
     if (this.queue.find((queue) => queue === client) === undefined) {
       this.queue.push(client);
       console.log("user pushed into the queue");
-      console.log(this.queue);
     }
   }
 

@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { Socket } from "socket.io";
+import { UserService } from "src/user/service/user.service";
 import {
   Ball,
   GameRoomState,
@@ -20,7 +21,7 @@ const GameInfo = {
 
 @Injectable()
 export class GameRoomService {
-  constructor() {}
+  constructor(private userService: UserService) {}
 
   private roomInfos: gameRoomInfo[] = [];
   private roomNumber = 1;
@@ -63,18 +64,23 @@ export class GameRoomService {
   private async InitRoomState(
     user1: Socket,
     user2: Socket,
+    player1: number,
+    player2: number,
+    player1Nickname: string,
+    player2Nickname: string,
     mode: boolean
   ): Promise<gameRoomInfo> {
     const roomId = this.roomNumber++;
-
     const roomInfo: gameRoomInfo = {
       roomId: roomId,
       isLadder: mode,
       user1: user1,
       user2: user2,
       // id userrepo에서 가져오는걸로 수정 필요.
-      user1Id: user1.data.id,
-      user2Id: user2.data.id,
+      user1Id: player1,
+      user2Id: player2,
+      player1Nickname: player1Nickname,
+      player2Nickname: player2Nickname,
       state: {
         keyState1: 0,
         keyState2: 0,
@@ -88,6 +94,7 @@ export class GameRoomService {
       endAt: new Date(),
       broadcast: null,
     };
+    console.log(roomInfo);
     return roomInfo;
   }
 
@@ -191,7 +198,17 @@ export class GameRoomService {
   }
 
   async createRoom(user1: Socket, user2: Socket, mode: boolean) {
-    const roomInfo: gameRoomInfo = await this.InitRoomState(user1, user2, mode);
+    const player1 = await this.userService.findBySocketId(user1.id);
+    const player2 = await this.userService.findBySocketId(user2.id);
+    const roomInfo: gameRoomInfo = await this.InitRoomState(
+      user1,
+      user2,
+      player1.id,
+      player2.id,
+      player1.nickname,
+      player2.nickname,
+      mode
+    );
     const roomId = roomInfo.roomId;
 
     await user1.join(roomId.toString());

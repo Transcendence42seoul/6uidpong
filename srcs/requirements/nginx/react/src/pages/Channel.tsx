@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import HoverButton from '../components/button/HoverButton';
@@ -35,6 +35,10 @@ const Channel: React.FC = () => {
     data: { channelId },
   };
 
+  const channelIdHandler = ({ id }: { id: number }) => {
+    navigate('/channel');
+  };
+
   const handleExitClick = () => {
     socket?.emit('exit', { channelId });
   };
@@ -48,6 +52,15 @@ const Channel: React.FC = () => {
       state: { channelId },
     });
   };
+
+  useEffect(() => {
+    socket?.on('banned-channel', channelIdHandler);
+    socket?.on('kicked-channel', channelIdHandler);
+    return () => {
+      socket?.off('banned-channel', channelIdHandler);
+      socket?.off('kicked-channel', channelIdHandler);
+    };
+  }, []);
 
   return (
     <div className="flex space-x-1 px-4">

@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 import selectSocket from '../../features/socket/socketSelector';
+import startsWithIgnoreCase from '../../utils/startsWithIgnoreCase';
 import ChannelMemberProfile from './ChannelMemberProfile';
 import CircularImage from './CircularImage';
 import ModalContainer from './ModalContainer';
@@ -52,7 +53,7 @@ const ChannelMemberList: React.FC<ChannelMemberListProps> = ({
 
   const handleSearchResults = () => {
     const results = members.filter((member) => {
-      return member.nickname.startsWith(searchTerm);
+      return startsWithIgnoreCase(member.nickname, searchTerm);
     });
     setSearchResults([...results]);
   };

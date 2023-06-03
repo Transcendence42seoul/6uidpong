@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 
+import startsWithIgnoreCase from '../../utils/startsWithIgnoreCase';
 import CircularImage from './CircularImage';
 
 import type User from '../../interfaces/User';
@@ -26,7 +27,7 @@ const UserListWithSearchBar: React.FC<UserListWithSearchBarProps> = ({
 
   const handleSearchResults = () => {
     const results = users.filter((user) => {
-      return user.nickname.startsWith(searchTerm);
+      return startsWithIgnoreCase(user.nickname, searchTerm);
     });
     setSearchResults([...results]);
   };

@@ -61,3 +61,11 @@ export interface inviteRoomDto {
   uid1: number;
   uid2: number;
 }
+
+export interface customRoomDto {
+  roomId: number;
+  user1: Socket;
+  user2: Socket | undefined;
+  mode: boolean;
+  password: string | null;
+}

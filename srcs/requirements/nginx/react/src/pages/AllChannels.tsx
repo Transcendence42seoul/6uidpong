@@ -19,12 +19,13 @@ const AllChannels: React.FC = () => {
   const { socket } = selectSocket();
 
   const [channels, setChannels] = useState<Channel[]>([]);
-  const [selectedChannel, setSelectedChannel] = useState<Channel | null>(null);
+  const [selectedChannelId, setSelectedChannelId] = useState<number | null>(
+    null,
+  );
   const [showPasswordModal, setShowPasswordModal] = useState<boolean>(false);
 
-  const handleChannelDoubleClick = (channel: Channel) => {
-    setSelectedChannel(channel);
-    const { id, isLocked } = channel;
+  const handleChannelDoubleClick = ({ id, isLocked }: Channel) => {
+    setSelectedChannelId(id);
     if (isLocked) {
       setShowPasswordModal(true);
       return;
@@ -75,9 +76,9 @@ const AllChannels: React.FC = () => {
           </li>
         );
       })}
-      {selectedChannel && showPasswordModal && (
+      {selectedChannelId && showPasswordModal && (
         <ChannelPasswordModal
-          channelId={selectedChannel.id}
+          channelId={selectedChannelId}
           setShowModal={setShowPasswordModal}
         />
       )}

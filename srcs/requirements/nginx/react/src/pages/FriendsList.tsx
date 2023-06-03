@@ -24,7 +24,7 @@ const FriendsList: React.FC = () => {
   const menuRef = useRef<HTMLUListElement>(null);
   const [friends, setFriends] = useState<User[]>([]);
   const [menuPosition, setMenuPosition] = useState<Position>({ x: 0, y: 0 });
-  const [selectedFriend, setSelectedFriend] = useState<User | null>(null);
+  const [selectedFriendId, setSelectedFriendId] = useState<number | null>(null);
   const [showMenu, setShowMenu] = useState<boolean>(false);
   const [showUserProfileModal, setShowUserProfileModal] =
     useState<boolean>(false);
@@ -49,8 +49,8 @@ const FriendsList: React.FC = () => {
     navigate('/friend-requests');
   };
 
-  const handleUserDoubleClick = (user: User) => {
-    setSelectedFriend(user);
+  const handleUserDoubleClick = ({ id }: User) => {
+    setSelectedFriendId(id);
     setShowUserProfileModal(true);
   };
 
@@ -118,9 +118,9 @@ const FriendsList: React.FC = () => {
           );
         })}
       </ul>
-      {selectedFriend && showUserProfileModal && (
+      {selectedFriendId && showUserProfileModal && (
         <ModalContainer setShowModal={setShowUserProfileModal} closeButton>
-          <UserProfile userId={selectedFriend.id} friend />
+          <UserProfile userId={selectedFriendId} friend />
         </ModalContainer>
       )}
     </div>

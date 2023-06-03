@@ -28,12 +28,12 @@ const ChannelMemberList: React.FC<ChannelMemberListProps> = ({
   const [members, setMembers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [searchResults, setSearchResults] = useState<User[]>(members);
-  const [selectedMember, setSelectedMember] = useState<User | null>(null);
+  const [selectedMemberId, setSelectedMemberId] = useState<number | null>(null);
   const [showMemberProfileModal, setShowMemberProfileModal] =
     useState<boolean>(false);
 
-  const handleMemberClick = (member: User) => {
-    setSelectedMember(member);
+  const handleMemberClick = ({ id }: User) => {
+    setSelectedMemberId(id);
     setShowMemberProfileModal(true);
   };
 
@@ -112,9 +112,9 @@ const ChannelMemberList: React.FC<ChannelMemberListProps> = ({
           );
         })}
       </ul>
-      {selectedMember && showMemberProfileModal && (
+      {selectedMemberId && showMemberProfileModal && (
         <ModalContainer setShowModal={setShowMemberProfileModal} closeButton>
-          <ChannelMemberProfile userId={selectedMember.id} />
+          <ChannelMemberProfile userId={selectedMemberId} />
         </ModalContainer>
       )}
     </div>

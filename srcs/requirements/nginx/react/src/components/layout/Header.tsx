@@ -11,7 +11,7 @@ import type User from '../../interfaces/User';
 const Header: React.FC = () => {
   const navigate = useNavigate();
 
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
   const [showUserProfileModal, setShowUserProfileModal] =
     useState<boolean>(false);
 
@@ -23,8 +23,8 @@ const Header: React.FC = () => {
     navigate('/my-page');
   };
 
-  const onUserClick = (user: User) => {
-    setSelectedUser(user);
+  const onUserClick = ({ id }: User) => {
+    setSelectedUserId(id);
     setShowUserProfileModal(true);
   };
 
@@ -40,9 +40,9 @@ const Header: React.FC = () => {
       >
         My Page
       </HoverButton>
-      {selectedUser && showUserProfileModal && (
+      {selectedUserId && showUserProfileModal && (
         <ModalContainer setShowModal={setShowUserProfileModal} closeButton>
-          <UserProfile userId={selectedUser.id} />
+          <UserProfile userId={selectedUserId} />
         </ModalContainer>
       )}
     </div>

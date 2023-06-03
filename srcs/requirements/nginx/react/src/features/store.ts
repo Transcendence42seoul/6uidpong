@@ -1,9 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit';
+import { combineReducers } from 'redux';
 import { persistReducer, persistStore } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
-import { combineReducers } from 'redux';
 
 import authReducer, { AuthState } from './auth/authSlice';
+import gameSocketReducer, { GameSocketState } from './socket/gameSocketSlice';
 import socketReducer, { SocketState } from './socket/socketSlice';
 
 const persistConfig = {
@@ -13,6 +14,7 @@ const persistConfig = {
 
 const rootReducer = combineReducers({
   auth: authReducer,
+  gameSocket: gameSocketReducer,
   socket: socketReducer,
 });
 
@@ -26,6 +28,7 @@ export const persistor = persistStore(store);
 
 export interface RootState {
   auth: AuthState;
+  gameSocket: GameSocketState;
   socket: SocketState;
 }
 

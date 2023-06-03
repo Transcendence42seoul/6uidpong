@@ -1,10 +1,10 @@
-export const isTest = false;
+export const isTest = true;
 
 export const mockChannels = [
   {
     id: 1,
     title: '42seoul_other_pet',
-    isLocked: false,
+    isLocked: true,
     newMsgCount: 0,
     memberCount: 42,
   },
@@ -14,6 +14,19 @@ export const mockChannels = [
     isLocked: false,
     newMsgCount: 42,
     memberCount: 1234,
+  },
+];
+
+export const mockGames = [
+  {
+    id: 1,
+    title: '1:1투혼초보테란아재만',
+    isLocked: false,
+  },
+  {
+    id: 2,
+    title: '1:1투혼고수만',
+    isLocked: true,
   },
 ];
 

@@ -46,7 +46,7 @@ const AllChannels: React.FC = () => {
   }, []);
 
   return (
-    <ListContainer>
+    <ListContainer className="justify-center">
       <div className="flex items-end">
         <ListTitle className="mb-4 ml-4">All Channels</ListTitle>
         <HoverButton

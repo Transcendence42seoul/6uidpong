@@ -1,21 +1,18 @@
 import React, { ChangeEvent, useCallback, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 import HoverButton from '../button/HoverButton';
 import ModalContainer from '../container/ModalContainer';
 import ContentBox from '../container/ContentBox';
 
-interface ChannelPasswordModalProps {
-  channelId: number;
+interface PasswordModalProps {
+  onConfirmClick: () => void;
   setShowModal: (showModal: boolean) => void;
 }
 
-const ChannelPasswordModal: React.FC<ChannelPasswordModalProps> = ({
-  channelId,
+const PasswordModal: React.FC<PasswordModalProps> = ({
+  onConfirmClick,
   setShowModal,
 }) => {
-  const navigate = useNavigate();
-
   const [password, setPassword] = useState<string>('');
 
   const handleCancelClick = () => {
@@ -23,9 +20,7 @@ const ChannelPasswordModal: React.FC<ChannelPasswordModalProps> = ({
   };
 
   const handleConfirmClick = () => {
-    navigate(`/channel/${channelId}`, {
-      state: { password },
-    });
+    onConfirmClick();
   };
 
   const handleKeyDown = (event: KeyboardEvent) => {
@@ -79,4 +74,4 @@ const ChannelPasswordModal: React.FC<ChannelPasswordModalProps> = ({
   );
 };
 
-export default ChannelPasswordModal;
+export default PasswordModal;

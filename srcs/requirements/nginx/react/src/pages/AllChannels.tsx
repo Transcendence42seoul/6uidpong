@@ -5,7 +5,7 @@ import HoverButton from '../components/button/HoverButton';
 import ListContainer from '../components/container/ListContainer';
 import ListInfoPanel from '../components/container/ListInfoPanel';
 import ListTitle from '../components/container/ListTitle';
-import ChannelPasswordModal from '../components/modal/ChannelPasswordModal';
+import PasswordModal from '../components/modal/PasswordModal';
 import ImageSrc from '../constants/ImageSrc';
 import selectSocket from '../features/socket/socketSelector';
 
@@ -24,17 +24,25 @@ const AllChannels: React.FC = () => {
   );
   const [showPasswordModal, setShowPasswordModal] = useState<boolean>(false);
 
+  const joinChannel = (id = selectedChannelId) => {
+    navigate(`/channel/${id}`);
+  };
+
   const handleChannelDoubleClick = ({ id, isLocked }: Channel) => {
     setSelectedChannelId(id);
     if (isLocked) {
       setShowPasswordModal(true);
       return;
     }
-    navigate(`/channel/${id}`);
+    joinChannel(id);
   };
 
   const handleCreateChannelClick = () => {
     navigate('/channel-settings');
+  };
+
+  const onConfirmClick = () => {
+    joinChannel();
   };
 
   useEffect(() => {
@@ -77,8 +85,8 @@ const AllChannels: React.FC = () => {
         );
       })}
       {selectedChannelId && showPasswordModal && (
-        <ChannelPasswordModal
-          channelId={selectedChannelId}
+        <PasswordModal
+          onConfirmClick={onConfirmClick}
           setShowModal={setShowPasswordModal}
         />
       )}

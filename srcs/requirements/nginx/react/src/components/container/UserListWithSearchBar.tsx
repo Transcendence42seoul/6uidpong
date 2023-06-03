@@ -17,8 +17,8 @@ const UserListWithSearchBar: React.FC<UserListWithSearchBarProps> = ({
   className = '',
 }) => {
   const searchResultsRef = useRef<HTMLUListElement>(null);
-  const [searchTerm, setSearchTerm] = useState<string>('');
   const [searchResults, setSearchResults] = useState<User[]>(users);
+  const [searchTerm, setSearchTerm] = useState<string>('');
 
   const handleUserClick = (user: User) => {
     setSearchTerm('');

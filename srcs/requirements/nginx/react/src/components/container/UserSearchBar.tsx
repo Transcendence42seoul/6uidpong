@@ -24,8 +24,8 @@ const UserSearchBar: React.FC<UserSearchBarProps> = ({
   const myId = tokenInfo?.id;
 
   const searchResultsRef = useRef<HTMLUListElement>(null);
-  const [searchTerm, setSearchTerm] = useState<string>('');
   const [searchResults, setSearchResults] = useState<User[]>([]);
+  const [searchTerm, setSearchTerm] = useState<string>('');
   const [showSearchResults, setShowSearchResults] = useState<boolean>(false);
 
   const handleUserClick = (user: User) => {

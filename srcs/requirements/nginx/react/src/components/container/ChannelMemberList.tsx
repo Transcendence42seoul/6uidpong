@@ -26,8 +26,8 @@ const ChannelMemberList: React.FC<ChannelMemberListProps> = ({
 
   const searchResultsRef = useRef<HTMLUListElement>(null);
   const [members, setMembers] = useState<User[]>([]);
-  const [searchTerm, setSearchTerm] = useState<string>('');
   const [searchResults, setSearchResults] = useState<User[]>(members);
+  const [searchTerm, setSearchTerm] = useState<string>('');
   const [selectedMemberId, setSelectedMemberId] = useState<number | null>(null);
   const [showMemberProfileModal, setShowMemberProfileModal] =
     useState<boolean>(false);

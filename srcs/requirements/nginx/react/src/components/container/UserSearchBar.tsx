@@ -50,7 +50,7 @@ const UserSearchBar: React.FC<UserSearchBarProps> = ({
   useEffect(() => {
     const fetchUsersData = async () => {
       const config = {
-        url: '/api/v1/users/searchTerm',
+        url: '/api/v1/users/search',
         params: { nickname: searchTerm },
       };
       const data: User[] = isTest ? mockUsers : await callApi(config); // test

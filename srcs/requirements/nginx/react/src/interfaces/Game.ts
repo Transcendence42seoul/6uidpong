@@ -1,10 +1,12 @@
+import User from "./User";
+
 interface Game {
   roomId: number;
   title: string;
   isLocked: boolean;
   mode: boolean;
-  masterId: number;
-  participantId: number | null;
+  master: User;
+  participant: User | undefined;
 }
 
 export default Game;

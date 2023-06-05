@@ -18,7 +18,7 @@ import DmRoomList from './pages/DmRoomList';
 import FriendRequests from './pages/FriendRequests';
 import FriendsList from './pages/FriendsList';
 import GameList from './pages/GameList';
-import GameWaitingRoom from './pages/GameWaitingRoom';
+import GameRoom from './pages/GameRoom';
 import Loading from './pages/Loading';
 import Login from './pages/Login';
 import Main from './pages/Main';
@@ -102,10 +102,10 @@ const App: React.FC = () => {
         <Route path="/all-channels" element={<AllChannels />} />
         <Route path="/block-list" element={<BlockList />} />
         <Route path="/channel" element={<ChannelList />} />
-        <Route path="/channel/:channelId" element={<Channel />} />
         <Route path="/channel-settings" element={<ChannelSettings />} />
+        <Route path="/channel/:channelId" element={<Channel />} />
         <Route path="/custom" element={<GameList />} />
-        <Route path="/custom/:gameId" element={<GameWaitingRoom />} />
+        <Route path="/custom/:gameId" element={<GameRoom />} />
         <Route path="/dm" element={<DmRoomList />} />
         <Route path="/dm/:roomId" element={<DmRoom />} />
         <Route path="/friend-requests" element={<FriendRequests />} />

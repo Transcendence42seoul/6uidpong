@@ -7,7 +7,7 @@ import UserProfile from '../components/container/UserProfile';
 
 import { isTest, mockUsers } from '../mock'; // test
 
-const GameWaitingRoom: React.FC = () => {
+const GameRoom: React.FC = () => {
   const { state } = useLocation();
   const title = state?.title;
 
@@ -48,4 +48,4 @@ const GameWaitingRoom: React.FC = () => {
   );
 };
 
-export default GameWaitingRoom;
+export default GameRoom;

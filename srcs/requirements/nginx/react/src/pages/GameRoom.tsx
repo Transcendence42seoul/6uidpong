@@ -1,24 +1,16 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import HoverButton from '../components/button/HoverButton';
 import ContentBox from '../components/container/ContentBox';
 import UserProfile from '../components/container/UserProfile';
 
-import { isTest, mockUsers } from '../mock'; // test
-
 const GameRoom: React.FC = () => {
   const { state } = useLocation();
-  const title = state?.title;
+  const { game } = state;
+  const { title, masterId, participantId } = game;
 
   const navigate = useNavigate();
-
-  const [masterId, setMasterId] = useState<number | null>(
-    isTest ? mockUsers[0].id : null,
-  ); // test
-  const [participantId, setParticipantId] = useState<number | null>(
-    isTest ? mockUsers[2].id : null,
-  ); // test
 
   const handleStartClick = () => {};
 

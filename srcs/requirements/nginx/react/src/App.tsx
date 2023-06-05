@@ -105,6 +105,7 @@ const App: React.FC = () => {
         <Route path="/channel-settings" element={<ChannelSettings />} />
         <Route path="/channel/:channelId" element={<Channel />} />
         <Route path="/custom" element={<GameList />} />
+        <Route path="/custom-settings" element={<GameRoomSettings />} />
         <Route path="/custom/:gameId" element={<GameRoom />} />
         <Route path="/dm" element={<DmRoomList />} />
         <Route path="/dm/:roomId" element={<DmRoom />} />

@@ -39,7 +39,9 @@ const GameList: React.FC = () => {
     });
   };
 
-  const handleCreateClick = () => {};
+  const handleCreateClick = () => {
+    navigate('/custom-settings');
+  };
 
   const handleGameClick = (game: Game) => {
     setSelectedGame(game);

@@ -30,8 +30,9 @@ export class GameMatchService {
     const { id: masterId } = await this.userService.findBySocketId(client.id);
     const room: customRoomInfo = {
       roomId,
+      title: roomInfo.title,
       isLocked: !!roomInfo.password,
-      ...roomInfo,
+      mode: roomInfo.mode,
       masterId,
       participantId: undefined,
     };
@@ -92,7 +93,9 @@ export class GameMatchService {
     const roomIndex = this.rooms.findIndex(
       (room) => room.roomId === roomInfo.roomId
     );
-    const { id: participantId } = await this.userService.findBySocketId(client.id);
+    const { id: participantId } = await this.userService.findBySocketId(
+      client.id
+    );
     if (roomIndex !== -1) {
       const room = this.rooms[roomIndex];
       if (room.isLocked == true) {

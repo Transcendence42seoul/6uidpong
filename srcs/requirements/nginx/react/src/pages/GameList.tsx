@@ -6,6 +6,7 @@ import ListContainer from '../components/container/ListContainer';
 import ListTitle from '../components/container/ListTitle';
 import PasswordModal from '../components/modal/PasswordModal';
 import ImageSrc from '../constants/ImageSrc';
+import { selectGameSocket } from '../features/socket/socketSelector';
 
 import { isTest, mockGames } from '../mock'; // test
 
@@ -17,6 +18,8 @@ interface Game {
 
 const GameList: React.FC = () => {
   const navigate = useNavigate();
+
+  const { gameSocket } = selectGameSocket();
 
   const [games, setGames] = useState<Game[]>(isTest ? mockGames : []); // test
   const [searchResults, setSearchResults] = useState<Game[]>([]);
@@ -84,7 +87,14 @@ const GameList: React.FC = () => {
   };
 
   useEffect(() => {
-    setSearchResults(games);
+    const gameListHandler = (gameList: Game[]) => {
+      setGames([...gameList]);
+    };
+    gameSocket?.on('custom-room-lists', gameListHandler);
+    gameSocket?.emit('custom-game-list');
+    return () => {
+      gameSocket?.off('custom-room-lists', gameListHandler);
+    };
   }, []);
 
   return (

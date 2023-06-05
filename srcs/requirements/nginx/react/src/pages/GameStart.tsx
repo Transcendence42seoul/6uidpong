@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Socket } from 'socket.io-client';
+import { selectGameSocket } from '../features/socket/socketSelector';
 
 interface GameRoomState {
   user1Id: number;
@@ -35,11 +35,8 @@ const GameInfo = {
   ballr: 10,
 };
 
-interface GameStartProps {
-  socketGame: Socket;
-}
-
-const GameStart: React.FC<GameStartProps> = ({ socketGame }) => {
+const GameStart: React.FC = () => {
+  const { gameSocket } = selectGameSocket();
   const ref = useRef<HTMLCanvasElement>(null);
   const canvas = ref.current;
 

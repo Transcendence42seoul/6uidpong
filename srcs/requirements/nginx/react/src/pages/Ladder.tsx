@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { io, Socket } from 'socket.io-client';
 import LadderQueueModal from '../components/modal/LadderQueueModal';
 import ImageSrc from '../constants/ImageSrc';
+import { selectGameSocket } from '../features/socket/socketSelector';
 
 interface RoomInfo {
   user1Id: number;
@@ -17,11 +17,8 @@ interface RoomInfo {
   score2: number;
 }
 
-interface LadderProps {
-  socketGame: Socket;
-}
-
-const Ladder: React.FC<LadderProps> = ({ socketGame }) => {
+const Ladder: React.FC = () => {
+  const { gameSocket } = selectGameSocket();
   const [openModal, setOpenModal] = useState(false);
   const [time, setTime] = useState({ minutes: 0, seconds: 0 });
   const [username, setUsername] = useState({ user1: '', user2: '' });
@@ -46,8 +43,8 @@ const Ladder: React.FC<LadderProps> = ({ socketGame }) => {
       });
     }, 1000);
 
-    socketGame.emit('ladder-game-match');
-    socketGame.on('game-start', (roomInfo: RoomInfo) => {
+    gameSocket?.emit('ladder-game-match');
+    gameSocket?.on('game-start', (roomInfo: RoomInfo) => {
       if (roomInfo !== undefined) {
         setUsername({
           user1: roomInfo.user1Nickname,

@@ -7,7 +7,9 @@ import { io } from 'socket.io-client';
 import LoginAuth from './components/custom/LoginAuth';
 import dispatchAuth from './features/auth/authAction';
 import selectAuth from './features/auth/authSelector';
-import dispatchSocket from './features/socket/socketAction';
+import dispatchSocket, {
+  dispatchGameSocket,
+} from './features/socket/socketAction';
 import Layout from './Layout';
 import AllChannels from './pages/AllChannels';
 import BlockList from './pages/BlockList';
@@ -55,6 +57,12 @@ const App: React.FC = () => {
       socket.emit('connection');
     });
     await dispatchSocket({ socket }, dispatch);
+
+    const gameSocket = io('/game', { auth: { token: accessToken } });
+    gameSocket.on('connect', () => {
+      gameSocket.emit('connection');
+    });
+    await dispatchGameSocket({ gameSocket }, dispatch);
   };
 
   useEffect(() => {
@@ -93,11 +101,6 @@ const App: React.FC = () => {
 
   initSocket();
 
-  const socketGame = io('/game', { auth: { token: accessToken } });
-  socketGame.on('connect', () => {
-    socketGame.emit('connection');
-  });
-
   return (
     <Layout>
       <Routes>
@@ -116,10 +119,10 @@ const App: React.FC = () => {
         <Route path="/friends-list" element={<FriendsList />} />
         <Route path="/my-page" element={<MyPage stats={stats} />} />
         <Route path="/profile-settings" element={<ProfileSettings />} />
-        <Route path="/ladder" element={<Ladder socketGame={socketGame} />} />
+        <Route path="/ladder" element={<Ladder />} />
         <Route
           path="/game-start"
-          element={<GameStart socketGame={socketGame} />}
+          element={<GameStart />}
         />
       </Routes>
     </Layout>

@@ -25,6 +25,7 @@ const GameRoomSettings: React.FC = () => {
     const roomInfo = {
       title,
       password: isPasswordEnabled ? password : null,
+      mode,
     };
     gameSocket?.emit('custom-game-create', roomInfo);
   };

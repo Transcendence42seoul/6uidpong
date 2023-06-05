@@ -19,14 +19,20 @@ export const mockChannels = [
 
 export const mockGames = [
   {
-    id: 1,
+    roomId: 1,
     title: '1:1투혼초보테란아재만',
     isLocked: false,
+    mode: false,
+    p1Id: 110729,
+    p2Id: null,
   },
   {
-    id: 2,
+    roomId: 2,
     title: '1:1투혼고수만',
     isLocked: true,
+    mode: true,
+    p1Id: 110729,
+    p2Id: 110731,
   },
 ];
 

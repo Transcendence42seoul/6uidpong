@@ -5,12 +5,7 @@ import HoverButton from '../components/button/HoverButton';
 import ContentBox from '../components/container/ContentBox';
 import { selectGameSocket } from '../features/socket/socketSelector';
 
-interface Game {
-  roomId: number;
-  p1Id: number;
-  p2Id: number | null;
-  mode: boolean;
-}
+import type Game from '../interfaces/Game';
 
 const GameRoomSettings: React.FC = () => {
   const navigate = useNavigate();

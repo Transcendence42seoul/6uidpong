@@ -8,13 +8,9 @@ import PasswordModal from '../components/modal/PasswordModal';
 import ImageSrc from '../constants/ImageSrc';
 import { selectGameSocket } from '../features/socket/socketSelector';
 
-import { isTest, mockGames } from '../mock'; // test
+import type Game from '../interfaces/Game';
 
-interface Game {
-  id: number;
-  title: string;
-  isLocked: boolean;
-}
+import { isTest, mockGames } from '../mock'; // test
 
 const GameList: React.FC = () => {
   const navigate = useNavigate();
@@ -29,13 +25,13 @@ const GameList: React.FC = () => {
 
   const joinGame = () => {
     if (!selectedGame) return;
-    const { id, title, isLocked } = selectedGame;
+    const { roomId, isLocked } = selectedGame;
     if (!showPasswordModal && isLocked) {
       setShowPasswordModal(true);
       return;
     }
-    navigate(`/custom/${id}`, {
-      state: { title },
+    navigate(`/custom/${roomId}`, {
+      state: { game: selectedGame },
     });
   };
 
@@ -59,7 +55,7 @@ const GameList: React.FC = () => {
       if (showPasswordModal) return;
       const lastIndex = searchResults.length - 1;
       const currentIndex = searchResults.findIndex(
-        (game) => game.id === selectedGame.id,
+        (game) => game.roomId === selectedGame.roomId,
       );
       let nextIndex = currentIndex;
       if (key === 'ArrowUp') {
@@ -120,12 +116,12 @@ const GameList: React.FC = () => {
         </div>
       </div>
       {searchResults.map((game) => {
-        const { id, title, isLocked } = game;
+        const { roomId, title, isLocked } = game;
         return (
-          <li key={id}>
+          <li key={roomId}>
             <button
               className={`flex w-full items-center space-x-1 border p-1 text-lg text-gray-100 ${
-                id === selectedGame?.id ? 'bg-indigo-600' : ''
+                roomId === selectedGame?.roomId ? 'bg-indigo-600' : ''
               }`}
               onClick={() => handleGameClick(game)}
               onDoubleClick={handleGameDoubleClick}

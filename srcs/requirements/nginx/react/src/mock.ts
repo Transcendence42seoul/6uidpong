@@ -23,16 +23,16 @@ export const mockGames = [
     title: '1:1투혼초보테란아재만',
     isLocked: false,
     mode: false,
-    p1Id: 110729,
-    p2Id: null,
+    masterId: 110729,
+    participantId: null,
   },
   {
     roomId: 2,
     title: '1:1투혼고수만',
     isLocked: true,
     mode: true,
-    p1Id: 110729,
-    p2Id: 110731,
+    masterId: 110729,
+    participantId: 110731,
   },
 ];
 

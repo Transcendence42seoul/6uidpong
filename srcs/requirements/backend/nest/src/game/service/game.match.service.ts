@@ -95,15 +95,15 @@ export class GameMatchService {
     const participant = await this.userService.findBySocketId(client.id);
     if (roomIndex !== -1) {
       const room = this.rooms[roomIndex];
-      if (this.roomPassword[roomIndex].password === roomInfo.password) {
-        if (room.isLocked === false) {
-          room.participant = participant;
-          room.isLocked = true;
-          this.roomPassword[roomIndex].master.emit("user-join", room);
-          client.emit("user-join", room);
-        }
+      if (room.isLocked == true) {
+        client.emit("room-already-locked", roomInfo.roomId);
+      } else if (this.roomPassword[roomIndex].password === roomInfo.password) {
+        room.participant = participant;
+        room.isLocked = true;
+        this.roomPassword[roomIndex].master.emit("user-join", room);
+        client.emit("user-join", room);
       } else {
-        client.emit("wrong-password");
+        client.emit("wrong-password", roomInfo.roomId);
       }
     }
   }

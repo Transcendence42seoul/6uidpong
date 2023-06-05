@@ -57,12 +57,6 @@ export interface keyCode {
   keyCode: number;
 }
 
-export interface inviteRoomDto {
-  user1: Socket;
-  uid1: number;
-  uid2: number;
-}
-
 export interface customRoomInfo {
   roomId: number;
   title: string;

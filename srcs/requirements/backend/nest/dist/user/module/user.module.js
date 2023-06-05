@@ -17,6 +17,7 @@ const friend_request_entity_1 = require("../entity/friend-request.entity");
 const friend_request_service_1 = require("../service/friend-request.service");
 const friend_entity_1 = require("../entity/friend.entity");
 const friend_service_1 = require("../service/friend.service");
+const chat_module_1 = require("../../chat/module/chat.module");
 let UserModule = class UserModule {
 };
 UserModule = __decorate([
@@ -24,6 +25,7 @@ UserModule = __decorate([
         imports: [
             typeorm_1.TypeOrmModule.forFeature([user_entity_1.User, friend_entity_1.Friend, friend_request_entity_1.FriendRequest]),
             (0, common_1.forwardRef)(() => auth_module_1.AuthModule),
+            (0, common_1.forwardRef)(() => chat_module_1.ChatModule),
         ],
         providers: [user_service_1.UserService, friend_service_1.FriendService, friend_request_service_1.FriendRequestService],
         exports: [user_service_1.UserService],

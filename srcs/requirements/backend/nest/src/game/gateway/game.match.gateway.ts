@@ -7,7 +7,6 @@ import {
 } from "@nestjs/websockets";
 import { Namespace, Socket } from "socket.io";
 import { WsJwtAccessGuard } from "src/chat/guard/ws-jwt-access.guard";
-import { customRoomDto } from "../dto/game.dto";
 import { GameMatchService } from "../service/game.match.service";
 
 @WebSocketGateway(80, {
@@ -28,14 +27,25 @@ export class GameMatchGateway {
   createCustomGame(
     client: Socket,
     @MessageBody("roomInfo")
-    roomInfo: { mode: boolean; password: string | null }
+    roomInfo: {
+      title: string;
+      password: string | null;
+      mode: boolean;
+    }
   ): void {
     this.gameMatchService.createCustomGame(client, roomInfo);
   }
 
   @SubscribeMessage("join-custom-game")
-  joinCustomGame(client: Socket, @MessageBody("roomId") roomId: number): void {
-    this.gameMatchService.joinCustomGame(client, roomId);
+  joinCustomGame(
+    client: Socket,
+    @MessageBody("roomInfo")
+    roomInfo: {
+      roomId: number;
+      password: string | null;
+    }
+  ): void {
+    this.gameMatchService.joinCustomGame(client, roomInfo);
   }
 
   @SubscribeMessage("start-custom-game")

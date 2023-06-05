@@ -1,4 +1,5 @@
 import { Socket } from "socket.io";
+import { User } from "src/user/entity/user.entity";
 
 export interface Ball {
   x: number;
@@ -62,10 +63,17 @@ export interface inviteRoomDto {
   uid2: number;
 }
 
-export interface customRoomDto {
+export interface customRoomInfo {
   roomId: number;
-  user1: Socket;
-  user2: Socket | undefined;
+  title: string;
+  isLocked: boolean;
   mode: boolean;
+  master: User;
+  participant: User | undefined;
+}
+
+export interface customRoomPassword {
+  roomId: number;
+  master: Socket;
   password: string | null;
 }

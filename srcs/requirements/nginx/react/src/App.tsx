@@ -120,10 +120,7 @@ const App: React.FC = () => {
         <Route path="/my-page" element={<MyPage stats={stats} />} />
         <Route path="/profile-settings" element={<ProfileSettings />} />
         <Route path="/ladder" element={<Ladder />} />
-        <Route
-          path="/game-start"
-          element={<GameStart />}
-        />
+        <Route path="/game-start" element={<GameStart />} />
       </Routes>
     </Layout>
   );

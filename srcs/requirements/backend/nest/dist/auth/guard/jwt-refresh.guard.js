@@ -8,7 +8,6 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.JwtRefreshGuard = void 0;
 const common_1 = require("@nestjs/common");
@@ -20,7 +19,7 @@ let JwtRefreshGuard = class JwtRefreshGuard {
     async canActivate(context) {
         const request = context.switchToHttp().getRequest();
         const token = this.extractTokenFromCookies(request);
-        if (typeof token === undefined) {
+        if (typeof token === "undefined") {
             throw new common_1.UnauthorizedException();
         }
         try {
@@ -41,7 +40,7 @@ let JwtRefreshGuard = class JwtRefreshGuard {
 };
 JwtRefreshGuard = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [typeof (_a = typeof jwt_1.JwtService !== "undefined" && jwt_1.JwtService) === "function" ? _a : Object])
+    __metadata("design:paramtypes", [jwt_1.JwtService])
 ], JwtRefreshGuard);
 exports.JwtRefreshGuard = JwtRefreshGuard;
 //# sourceMappingURL=jwt-refresh.guard.js.map

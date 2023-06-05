@@ -1,9 +1,12 @@
-import { ChannelChat } from "src/chat/entity/channel/channel-chat.entity";
+import { Ban } from "src/chat/entity/channel/ban.entity";
 import { ChannelUser } from "src/chat/entity/channel/channel-user.entity";
+import { ChannelChat } from "src/chat/entity/channel/chat.entity";
+import { Block } from "src/chat/entity/dm/block.entity";
 import { DmChat } from "src/chat/entity/dm/dm-chat.entity";
-import { DmRoomUser } from "src/chat/entity/dm/dm-room-user.entity";
+import { DmUser } from "src/chat/entity/dm/dm-room-user.entity";
 import { FriendRequest } from "./friend-request.entity";
 import { Friend } from "./friend.entity";
+import { GameEntity } from "src/game/entity/game.entity";
 export declare class User {
     id: number;
     nickname: string;
@@ -15,10 +18,14 @@ export declare class User {
     loseStat: number;
     ladderScore: number;
     socketId: string;
-    dmRoomUsers: DmRoomUser[];
+    gameSocketId: string;
+    dmUsers: DmUser[];
     dmChats: DmChat[];
+    blocks: Block[];
+    bans: Ban[];
     channelUsers: ChannelUser[];
     channelChats: ChannelChat[];
     friends: Friend[];
     friendRequests: FriendRequest[];
+    gameRecords: GameEntity[];
 }

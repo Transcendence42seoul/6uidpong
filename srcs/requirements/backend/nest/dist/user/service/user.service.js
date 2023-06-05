@@ -11,7 +11,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var _a, _b;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserService = void 0;
 const common_1 = require("@nestjs/common");
@@ -32,7 +31,7 @@ let UserService = class UserService {
             },
         });
     }
-    async findOneOrFail(id) {
+    async findOne(id) {
         if (typeof id === "number") {
             return await this.userRepository.findOneOrFail({ where: { id } });
         }
@@ -42,7 +41,7 @@ let UserService = class UserService {
         return await this.userRepository.findBy(ids.map((id) => ({ id })));
     }
     async search(nickname) {
-        return this.userRepository
+        return await this.userRepository
             .createQueryBuilder()
             .select()
             .where("nickname ILIKE :includedNickname")
@@ -60,13 +59,14 @@ let UserService = class UserService {
         })
             .getMany();
     }
-    async save(profile) {
-        return await this.userRepository.save({
+    async insert(profile) {
+        await this.userRepository.insert({
             id: profile.id,
             nickname: `undefined-${profile.id}`,
             email: profile.email,
             image: profile.image.link,
         });
+        return await this.userRepository.findOneBy({ id: profile.id });
     }
     async updateNickname(id, nickname) {
         const queryRunner = this.dataSource.createQueryRunner();
@@ -100,11 +100,25 @@ let UserService = class UserService {
             is2FA,
         });
     }
+    async updateStatus(id, gameSocketId, status) {
+        await this.userRepository.update(id, {
+            status,
+        });
+        await this.userRepository.update(id, {
+            gameSocketId: gameSocketId,
+        });
+    }
+    async findBySocketId(id) {
+        return await this.userRepository.findOneOrFail({
+            where: { gameSocketId: id },
+        });
+    }
 };
 UserService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(user_entity_1.User)),
-    __metadata("design:paramtypes", [typeof (_a = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _a : Object, typeof (_b = typeof typeorm_2.DataSource !== "undefined" && typeorm_2.DataSource) === "function" ? _b : Object])
+    __metadata("design:paramtypes", [typeorm_2.Repository,
+        typeorm_2.DataSource])
 ], UserService);
 exports.UserService = UserService;
 //# sourceMappingURL=user.service.js.map

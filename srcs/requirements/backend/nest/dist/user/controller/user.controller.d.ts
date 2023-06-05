@@ -1,14 +1,14 @@
 import { UserService } from "../service/user.service";
 import { AuthService } from "src/auth/service/auth.service";
-import { ImageUpdateRequest } from "../dto/image-update-request.dto";
-import { NicknameUpdateRequest } from "../dto/nickname-update-request.dto";
-import { TwoFactorAuthUpdateRequest } from "../dto/two-factor-auth-update-request.dto";
-import { UserResponse } from "../dto/user-response.dto";
+import { ImageUpdateRequest } from "../dto/image-update-request";
+import { NicknameUpdateRequest } from "../dto/nickname-update-request";
+import { TwoFactorAuthUpdateRequest } from "../dto/two-factor-auth-update-request";
+import { UserResponse } from "../dto/user-response";
 import { Pagination } from "src/utils/pagination/pagination";
 import { FriendService } from "../service/friend.service";
 import { FriendRequestService } from "../service/friend-request.service";
-import { FriendResponse } from "../dto/friend-response.dto";
-import { FriendRequestResponse } from "../dto/friend-request-response.dto";
+import { FriendResponse } from "../dto/friend-response";
+import { FriendRequestResponse } from "../dto/friend-request-response";
 export declare class UserController {
     private readonly userService;
     private readonly authService;
@@ -23,9 +23,9 @@ export declare class UserController {
     send2FACode(id: number): Promise<void>;
     update2FA(id: number, body: TwoFactorAuthUpdateRequest): Promise<void>;
     findFriends(userId: number): Promise<FriendResponse[]>;
-    saveFriend(userId: number, friendId: number): Promise<void>;
+    createFriend(userId: number, friendId: number): Promise<void>;
     deleteFriend(userId: number, friendId: number): Promise<void>;
     findFriendRequests(userId: number): Promise<FriendRequestResponse[]>;
-    saveFriendRequest(fromId: number, toId: number): Promise<void>;
-    deleteFriendRequest(fromId: number, toId: number): Promise<void>;
+    createFriendRequest(fromId: number, toId: number): Promise<void>;
+    deleteFriendRequest(toId: number, fromId: number): Promise<void>;
 }

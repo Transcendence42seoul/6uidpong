@@ -1,9 +1,9 @@
 import { Response } from "express";
 import { AuthService } from "../service/auth.service";
 import { UserService } from "src/user/service/user.service";
-import { TwoFactorAuthRequest } from "../dto/two-factor-auth-request.dto";
-import { CallbackResponse } from "../dto/callback-response.dto";
-import { AccessTokenResponse } from "../dto/access-token-response.dto";
+import { TwoFactorAuthRequest } from "../dto/two-factor-auth-request";
+import { CallbackResponse } from "../dto/callback-response";
+import { AccessTokenResponse } from "../dto/access-token-response";
 export declare class AuthController {
     private readonly authService;
     private readonly userService;

@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 
 services:
   pgadmin:
@@ -12,7 +12,7 @@ services:
     networks:
       - transcendence
     ports:
-      - '5050:80'
+      - "5050:80"
     volumes:
       - pgadmin-data:/var/lib/pgadmin
 
@@ -27,7 +27,7 @@ services:
       - transcendence
     restart: always
     ports:
-      - '5432:5432'
+      - "5432:5432"
     volumes:
       - db-volume:/var/lib/postgresql/data
 
@@ -52,8 +52,8 @@ services:
     networks:
       - transcendence
     restart: always
-    # volumes:
-    #   - ./requirements/backend/nest:/app
+    volumes:
+      - ./requirements/backend/nest:/app
 
   nginx:
     build:
@@ -65,8 +65,8 @@ services:
     networks:
       - transcendence
     ports:
-      - '80:80'
-      - '443:443'
+      - "80:80"
+      - "443:443"
     restart: always
 
 networks:

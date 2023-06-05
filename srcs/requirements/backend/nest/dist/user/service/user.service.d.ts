@@ -6,11 +6,13 @@ export declare class UserService {
     private readonly dataSource;
     constructor(userRepository: Repository<User>, dataSource: DataSource);
     findAll(options: PaginationOptions): Promise<[User[], number]>;
-    findOneOrFail(id: number | string): Promise<User>;
+    findOne(id: number | string): Promise<User>;
     find(ids: number[]): Promise<User[]>;
     search(nickname: string): Promise<User[]>;
-    save(profile: any): Promise<User>;
+    insert(profile: any): Promise<User>;
     updateNickname(id: number, nickname: string): Promise<void>;
     updateImage(id: number, image: string): Promise<void>;
     updateIsTwoFactor(id: number, is2FA: boolean): Promise<void>;
+    updateStatus(id: number, gameSocketId: string, status: string): Promise<void>;
+    findBySocketId(id: string): Promise<User>;
 }

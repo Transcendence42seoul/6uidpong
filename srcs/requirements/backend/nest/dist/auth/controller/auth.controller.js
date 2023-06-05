@@ -11,19 +11,17 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var _a, _b, _c;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthController = void 0;
 const common_1 = require("@nestjs/common");
-const express_1 = require("express");
 const auth_service_1 = require("../service/auth.service");
 const user_service_1 = require("../../user/service/user.service");
 const jwt_refresh_guard_1 = require("../guard/jwt-refresh.guard");
 const ft_guard_1 = require("../guard/ft.guard");
-const two_factor_auth_request_dto_1 = require("../dto/two-factor-auth-request.dto");
+const two_factor_auth_request_1 = require("../dto/two-factor-auth-request");
 const typeorm_1 = require("typeorm");
-const callback_response_dto_1 = require("../dto/callback-response.dto");
-const access_token_response_dto_1 = require("../dto/access-token-response.dto");
+const callback_response_1 = require("../dto/callback-response");
+const access_token_response_1 = require("../dto/access-token-response");
 let AuthController = class AuthController {
     constructor(authService, userService) {
         this.authService = authService;
@@ -37,18 +35,18 @@ let AuthController = class AuthController {
     async callbackFortytwo(req, res) {
         let user;
         try {
-            user = await this.userService.findOneOrFail(req.user.id);
+            user = await this.userService.findOne(req.user.id);
             res.status(common_1.HttpStatus.OK);
             if (user.is2FA) {
                 this.authService.send2FACode(user.id, user.email);
-                return new callback_response_dto_1.CallbackResponse(true, user.id);
+                return new callback_response_1.CallbackResponse(true, user.id);
             }
         }
         catch (e) {
             if (!(e instanceof typeorm_1.EntityNotFoundError)) {
                 throw e;
             }
-            user = await this.userService.save(req.user);
+            user = await this.userService.insert(req.user);
         }
         res.cookie("refresh", await this.authService.genRefreshToken(user.id), {
             httpOnly: true,
@@ -57,7 +55,7 @@ let AuthController = class AuthController {
             sameSite: "strict",
             path: "/api/v1/auth/token/refresh",
         });
-        return new callback_response_dto_1.CallbackResponse(false, user.id, await this.authService.genAccessToken(user.id));
+        return new callback_response_1.CallbackResponse(false, user.id, await this.authService.genAccessToken(user.id));
     }
     async TwoFactorAuthentication(body, res) {
         await this.authService.validate2FACode(body.id, body.code);
@@ -68,17 +66,17 @@ let AuthController = class AuthController {
             sameSite: "strict",
             path: "/api/v1/auth/token/refresh",
         });
-        return new access_token_response_dto_1.AccessTokenResponse(await this.authService.genAccessToken(body.id));
+        return new access_token_response_1.AccessTokenResponse(await this.authService.genAccessToken(body.id));
     }
     async refreshToken(req) {
-        return new access_token_response_dto_1.AccessTokenResponse(await this.authService.genAccessToken(req.user.id));
+        return new access_token_response_1.AccessTokenResponse(await this.authService.genAccessToken(req.user.id));
     }
 };
 __decorate([
     (0, common_1.Get)("/social/redirect/forty-two"),
     __param(0, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [typeof (_a = typeof express_1.Response !== "undefined" && express_1.Response) === "function" ? _a : Object]),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "redirectFortytwo", null);
 __decorate([
@@ -87,7 +85,7 @@ __decorate([
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Res)({ passthrough: true })),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, typeof (_b = typeof express_1.Response !== "undefined" && express_1.Response) === "function" ? _b : Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "callbackFortytwo", null);
 __decorate([
@@ -95,7 +93,7 @@ __decorate([
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Res)({ passthrough: true })),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [two_factor_auth_request_dto_1.TwoFactorAuthRequest, typeof (_c = typeof express_1.Response !== "undefined" && express_1.Response) === "function" ? _c : Object]),
+    __metadata("design:paramtypes", [two_factor_auth_request_1.TwoFactorAuthRequest, Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "TwoFactorAuthentication", null);
 __decorate([

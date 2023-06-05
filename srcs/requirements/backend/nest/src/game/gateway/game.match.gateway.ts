@@ -23,7 +23,7 @@ export class GameMatchGateway {
 
   constructor(private readonly gameMatchService: GameMatchService) {}
 
-  @SubscribeMessage("custom-game-create")
+  @SubscribeMessage("create-custom-room")
   createCustomGame(
     client: Socket,
     @MessageBody("roomInfo")
@@ -36,7 +36,7 @@ export class GameMatchGateway {
     this.gameMatchService.createCustomGame(client, roomInfo);
   }
 
-  @SubscribeMessage("join-custom-game")
+  @SubscribeMessage("join-custom-room")
   joinCustomGame(
     client: Socket,
     @MessageBody("roomInfo")
@@ -48,7 +48,7 @@ export class GameMatchGateway {
     this.gameMatchService.joinCustomGame(client, roomInfo);
   }
 
-  @SubscribeMessage("start-custom-game")
+  @SubscribeMessage("start-custom-room")
   startCustomGame(client: Socket, @MessageBody("roomId") roomId: number): void {
     this.gameMatchService.customGameStart(client, roomId);
   }
@@ -58,7 +58,7 @@ export class GameMatchGateway {
     this.gameMatchService.exitCustomGame(client, roomId);
   }
 
-  @SubscribeMessage("custom-game-list")
+  @SubscribeMessage("custom-room-list")
   getCustomGameList(client: Socket): void {
     this.gameMatchService.getCustomGameList(client);
   }

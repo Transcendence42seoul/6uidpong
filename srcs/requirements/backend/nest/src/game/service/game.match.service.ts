@@ -47,7 +47,7 @@ export class GameMatchService {
 
   getCustomGameList(client: Socket): void {
     const room: customRoomInfo[] = this.rooms;
-    client.emit("custom-room-lists", room);
+    client.emit("custom-room-list", room);
   }
 
   //destroy, exit logic
@@ -131,9 +131,5 @@ export class GameMatchService {
     if (index !== -1) {
       this.queue.splice(index, 1);
     }
-    // const index2 = this.rooms.findIndex((queue) => queue.master === client);
-    // if (index2 !== -1) {
-    //   this.rooms.splice(index2, 1);
-    // }
   }
 }

@@ -44,6 +44,8 @@ export interface gameRoomInfo {
   user2: Socket;
   user1Id: number;
   user2Id: number;
+  player1Nickname: string;
+  player2Nickname: string;
   state: GameRoomState;
   broadcast: NodeJS.Timeout;
   createAt: Date;
@@ -58,4 +60,12 @@ export interface inviteRoomDto {
   user1: Socket;
   uid1: number;
   uid2: number;
+}
+
+export interface customRoomDto {
+  roomId: number;
+  user1: Socket;
+  user2: Socket | undefined;
+  mode: boolean;
+  password: string | null;
 }

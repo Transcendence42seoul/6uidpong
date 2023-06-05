@@ -5,6 +5,8 @@ import { typeORMConfig } from "./configs/typeorm.config";
 import { UserModule } from "./user/module/user.module";
 import { ChatModule } from "./chat/module/chat.module";
 import { ScheduleModule } from "@nestjs/schedule";
+import { GameModule } from "./game/module/game.match.module";
+import { GameRoomModule } from "./game/module/game.room.module";
 
 @Module({
   imports: [
@@ -13,6 +15,8 @@ import { ScheduleModule } from "@nestjs/schedule";
     AuthModule,
     UserModule,
     ChatModule,
+    GameModule,
+    GameRoomModule,
   ],
 })
 export class AppModule {}

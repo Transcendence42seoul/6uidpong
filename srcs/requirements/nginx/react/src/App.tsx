@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { Routes, Route } from 'react-router-dom';
 import { io } from 'socket.io-client';
-
 import LoginAuth from './components/custom/LoginAuth';
 import dispatchAuth from './features/auth/authAction';
 import selectAuth from './features/auth/authSelector';
@@ -26,8 +25,9 @@ import Main from './pages/Main';
 import MyPage from './pages/MyPage';
 import ProfileSettings from './pages/ProfileSettings';
 import redirect from './utils/redirect';
-
 import { isTest, mockAuthState } from './mock'; // test
+import Ladder from './pages/Ladder';
+import GameStart from './pages/GameStart';
 
 const App: React.FC = () => {
   const dispatch = useDispatch();
@@ -90,6 +90,11 @@ const App: React.FC = () => {
 
   initSocket();
 
+  const socketGame = io('/game', { auth: { token: accessToken } });
+  socketGame.on('connect', () => {
+    socketGame.emit('connection');
+  });
+
   return (
     <Layout>
       <Routes>
@@ -107,6 +112,11 @@ const App: React.FC = () => {
         <Route path="/friends-list" element={<FriendsList />} />
         <Route path="/my-page" element={<MyPage stats={stats} />} />
         <Route path="/profile-settings" element={<ProfileSettings />} />
+        <Route path="/ladder" element={<Ladder socketGame={socketGame} />} />
+        <Route
+          path="/game-start"
+          element={<GameStart socketGame={socketGame} />}
+        />
       </Routes>
     </Layout>
   );

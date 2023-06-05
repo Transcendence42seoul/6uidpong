@@ -46,8 +46,12 @@ export class User {
   @Index()
   socketId: string;
 
-  @OneToMany(() => DmUser, (dmUser) => dmUser.user)
-  dmUsers: DmUser[];
+  @Column({ name: "game_socket_id", default: "" })
+  gameSocketId: string;
+
+  @OneToMany(() => DmRoomUser, (dmRoomUser) => dmRoomUser.user)
+  dmRoomUsers: DmRoomUser[];
+
 
   @OneToMany(() => DmChat, (chat) => chat.user)
   dmChats: DmChat[];

@@ -1,22 +1,25 @@
+import { UseGuards } from "@nestjs/common";
 import {
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
 } from "@nestjs/websockets";
-import { Server } from "http";
-import { Socket } from "socket.io";
+import { Namespace, Socket } from "socket.io";
+import { WsJwtAccessGuard } from "src/chat/guard/ws-jwt-access.guard";
 import { keyCode } from "../dto/game.dto";
 import { GameRoomService } from "../service/game.room.service";
 
 @WebSocketGateway(80, {
+  namespace: "game",
   cors: {
     origin: [`https://${process.env.HOST_NAME}`],
     credentials: true,
   },
 })
+@UseGuards(WsJwtAccessGuard)
 export class GameRoomGateway {
   @WebSocketServer()
-  server: Server;
+  server: Namespace;
 
   constructor(private gameRoomService: GameRoomService) {}
 

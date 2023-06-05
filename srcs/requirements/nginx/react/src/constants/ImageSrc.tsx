@@ -11,6 +11,12 @@ class ImageSrc {
     'https://static.vecteezy.com/system/resources/previews/012/852/009/large_2x/pixel-art-lock-isolated-free-vector.jpg';
 
   static readonly MODAL_IMAGE = 'https://i.imgur.com/lfaWNsI.png';
+
+  static readonly MATCH_IMAGE =
+    'https://media.tenor.com/PeRI5dkeLFkAAAAj/tower-defense-simulator-roblox.gif';
+
+  static readonly MATCH_SUCCESS_IMAGE =
+    'https://media.tenor.com/7HTQnebtrOsAAAAj/dbz-pixel.gif';
 }
 
 export default ImageSrc;

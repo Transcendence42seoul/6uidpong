@@ -1,5 +1,6 @@
 import { UseGuards } from "@nestjs/common";
 import {
+  ConnectedSocket,
   MessageBody,
   SubscribeMessage,
   WebSocketGateway,
@@ -25,6 +26,7 @@ export class GameMatchGateway {
 
   @SubscribeMessage("create-custom-room")
   createCustomGame(
+    @ConnectedSocket()
     client: Socket,
     @MessageBody("roomInfo")
     roomInfo: {
@@ -33,11 +35,14 @@ export class GameMatchGateway {
       mode: boolean;
     }
   ): void {
+    console.log(client);
+    console.log(roomInfo);
     this.gameMatchService.createCustomGame(client, roomInfo);
   }
 
   @SubscribeMessage("join-custom-room")
   joinCustomGame(
+    @ConnectedSocket()
     client: Socket,
     @MessageBody("roomInfo")
     roomInfo: {
@@ -49,27 +54,33 @@ export class GameMatchGateway {
   }
 
   @SubscribeMessage("start-custom-room")
-  startCustomGame(client: Socket, @MessageBody("roomId") roomId: number): void {
+  startCustomGame(
+    @ConnectedSocket() client: Socket,
+    @MessageBody("roomId") roomId: number
+  ): void {
     this.gameMatchService.customGameStart(client, roomId);
   }
 
   @SubscribeMessage("exit-custom-room")
-  exitCustomGame(client: Socket, @MessageBody("roomId") roomId: number): void {
+  exitCustomGame(
+    @ConnectedSocket() client: Socket,
+    @MessageBody("roomId") roomId: number
+  ): void {
     this.gameMatchService.exitCustomGame(client, roomId);
   }
 
   @SubscribeMessage("custom-room-list")
-  getCustomGameList(client: Socket): void {
+  getCustomGameList(@ConnectedSocket() client: Socket): void {
     this.gameMatchService.getCustomGameList(client);
   }
 
   @SubscribeMessage("ladder-game-match")
-  handleConnectLadder(client: Socket): void {
+  handleConnectLadder(@ConnectedSocket() client: Socket): void {
     this.gameMatchService.handleLadderMatchStart(client);
   }
 
   @SubscribeMessage("ladder-game-match-cancel")
-  handleDisconnectLadder(client: Socket): void {
+  handleDisconnectLadder(@ConnectedSocket() client: Socket): void {
     this.gameMatchService.handleLadderMatchcancel(client);
   }
 }

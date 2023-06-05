@@ -3,12 +3,14 @@ import { useNavigate } from 'react-router-dom';
 
 import HoverButton from '../components/button/HoverButton';
 import ContentBox from '../components/container/ContentBox';
+import selectAuth from '../features/auth/authSelector';
 import { selectGameSocket } from '../features/socket/socketSelector';
-
-import type Game from '../interfaces/Game';
 
 const GameRoomSettings: React.FC = () => {
   const navigate = useNavigate();
+
+  const { tokenInfo } = selectAuth();
+  const myId = tokenInfo?.id;
 
   const { gameSocket } = selectGameSocket();
 
@@ -27,7 +29,7 @@ const GameRoomSettings: React.FC = () => {
       password: isPasswordEnabled ? password : null,
       mode,
     };
-    gameSocket?.emit('custom-game-create', roomInfo);
+    gameSocket?.emit('create-custom-game', roomInfo);
   };
 
   const handleEnablePasswordChange = () => {
@@ -53,14 +55,22 @@ const GameRoomSettings: React.FC = () => {
   };
 
   useEffect(() => {
-    const gameRoomHandler = (game: Game) => {
-      navigate(`/custom/${game.roomId}`, {
+    const roomIdHandler = (roomId: number) => {
+      const game = {
+        roomId,
+        title,
+        isLocked: isPasswordEnabled,
+        mode,
+        masterId: myId,
+        participantId: null,
+      };
+      navigate(`/custom/${roomId}`, {
         state: { game },
       });
     };
-    gameSocket?.on('custom-room-created', gameRoomHandler);
+    gameSocket?.on('custom-room-created', roomIdHandler);
     return () => {
-      gameSocket?.off('custom-room-created', gameRoomHandler);
+      gameSocket?.off('custom-room-created', roomIdHandler);
     };
   }, []);
 

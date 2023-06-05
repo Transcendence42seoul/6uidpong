@@ -28,7 +28,7 @@ export class GameMatchGateway {
   createCustomGame(
     @ConnectedSocket()
     client: Socket,
-    @MessageBody("roomInfo")
+    @MessageBody()
     roomInfo: {
       title: string;
       password: string | null;
@@ -44,7 +44,7 @@ export class GameMatchGateway {
   joinCustomGame(
     @ConnectedSocket()
     client: Socket,
-    @MessageBody("roomInfo")
+    @MessageBody()
     roomInfo: {
       roomId: number;
       password: string | null;
@@ -56,7 +56,7 @@ export class GameMatchGateway {
   @SubscribeMessage("start-custom-room")
   startCustomGame(
     @ConnectedSocket() client: Socket,
-    @MessageBody("roomId") roomId: number
+    @MessageBody() roomId: number
   ): void {
     this.gameMatchService.customGameStart(client, roomId);
   }
@@ -64,7 +64,7 @@ export class GameMatchGateway {
   @SubscribeMessage("exit-custom-room")
   exitCustomGame(
     @ConnectedSocket() client: Socket,
-    @MessageBody("roomId") roomId: number
+    @MessageBody() roomId: number
   ): void {
     this.gameMatchService.exitCustomGame(client, roomId);
   }

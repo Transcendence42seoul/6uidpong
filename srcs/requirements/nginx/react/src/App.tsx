@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { Routes, Route } from 'react-router-dom';
 import { io } from 'socket.io-client';
+
 import LoginAuth from './components/custom/LoginAuth';
 import dispatchAuth from './features/auth/authAction';
 import selectAuth from './features/auth/authSelector';
@@ -19,15 +20,17 @@ import FriendRequests from './pages/FriendRequests';
 import FriendsList from './pages/FriendsList';
 import GameList from './pages/GameList';
 import GameRoom from './pages/GameRoom';
+import GameRoomSettings from './pages/GameRoomSettings';
+import GameStart from './pages/GameStart';
+import Ladder from './pages/Ladder';
 import Loading from './pages/Loading';
 import Login from './pages/Login';
 import Main from './pages/Main';
 import MyPage from './pages/MyPage';
 import ProfileSettings from './pages/ProfileSettings';
 import redirect from './utils/redirect';
+
 import { isTest, mockAuthState } from './mock'; // test
-import Ladder from './pages/Ladder';
-import GameStart from './pages/GameStart';
 
 const App: React.FC = () => {
   const dispatch = useDispatch();

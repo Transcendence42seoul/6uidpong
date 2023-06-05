@@ -1,4 +1,4 @@
-export const isTest = true;
+export const isTest = false;
 
 export const mockChannels = [
   {

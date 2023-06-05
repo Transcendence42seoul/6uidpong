@@ -29,7 +29,7 @@ const GameRoomSettings: React.FC = () => {
       password: isPasswordEnabled ? password : null,
       mode,
     };
-    gameSocket?.emit('create-custom-game', roomInfo);
+    gameSocket?.emit('create-custom-room', roomInfo);
   };
 
   const handleEnablePasswordChange = () => {

@@ -88,10 +88,10 @@ const GameList: React.FC = () => {
     const gameListHandler = (gameList: Game[]) => {
       setGames([...gameList]);
     };
-    gameSocket?.on('custom-room-lists', gameListHandler);
-    gameSocket?.emit('custom-game-list');
+    gameSocket?.on('custom-room-list', gameListHandler);
+    gameSocket?.emit('custom-room-list');
     return () => {
-      gameSocket?.off('custom-room-lists', gameListHandler);
+      gameSocket?.off('custom-room-list', gameListHandler);
     };
   }, []);
 

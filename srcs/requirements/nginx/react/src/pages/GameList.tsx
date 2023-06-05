@@ -87,6 +87,7 @@ const GameList: React.FC = () => {
   useEffect(() => {
     const gameListHandler = (gameList: Game[]) => {
       setGames([...gameList]);
+      setSearchResults([...gameList]);
     };
     gameSocket?.on('custom-room-list', gameListHandler);
     gameSocket?.emit('custom-room-list');

@@ -62,8 +62,8 @@ export interface customRoomInfo {
   title: string;
   isLocked: boolean;
   mode: boolean;
-  master: User;
-  participant: User | undefined;
+  masterId: number;
+  participantId: number | undefined;
 }
 
 export interface customRoomPassword {

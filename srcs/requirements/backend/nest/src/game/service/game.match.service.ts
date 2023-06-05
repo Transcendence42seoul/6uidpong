@@ -27,17 +27,17 @@ export class GameMatchService {
     }
   ): Promise<void> {
     const roomId = this.roomNumber++;
-    const master = await this.userService.findBySocketId(client.id);
+    const { id: masterId } = await this.userService.findBySocketId(client.id);
     const room: customRoomInfo = {
-      roomId: roomId,
+      roomId,
       isLocked: !!roomInfo.password,
       ...roomInfo,
-      master: master,
-      participant: undefined,
+      masterId,
+      participantId: undefined,
     };
     this.rooms.push(room);
     const roomPassword: customRoomPassword = {
-      roomId: roomId,
+      roomId,
       master: client,
       password: roomInfo.password,
     };
@@ -60,7 +60,7 @@ export class GameMatchService {
         this.roomPassword[roomIndex].master.emit("room-destroyed");
         client.emit("room-destroyed");
       } else {
-        room.participant = undefined;
+        room.participantId = undefined;
         room.isLocked = false;
         this.roomPassword[roomIndex].master.emit("user-exit", room);
         client.emit("user-exit", room);
@@ -92,13 +92,13 @@ export class GameMatchService {
     const roomIndex = this.rooms.findIndex(
       (room) => room.roomId === roomInfo.roomId
     );
-    const participant = await this.userService.findBySocketId(client.id);
+    const { id: participantId } = await this.userService.findBySocketId(client.id);
     if (roomIndex !== -1) {
       const room = this.rooms[roomIndex];
       if (room.isLocked == true) {
         client.emit("room-already-locked", roomInfo.roomId);
       } else if (this.roomPassword[roomIndex].password === roomInfo.password) {
-        room.participant = participant;
+        room.participantId = participantId;
         room.isLocked = true;
         this.roomPassword[roomIndex].master.emit("user-join", room);
         client.emit("user-join", room);

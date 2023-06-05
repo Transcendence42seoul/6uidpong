@@ -16,7 +16,7 @@ const HoverButton: React.FC<HoverButtonProps> = ({
   return (
     <button
       onClick={onClick}
-      className={`cursor-pointer border-white bg-black text-white hover:bg-white hover:text-black ${className}`}
+      className={`border-white bg-black text-white hover:bg-white hover:text-black ${className}`}
       disabled={disabled}
     >
       {children}

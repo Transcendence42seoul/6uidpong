@@ -189,7 +189,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send }) => {
         })}
       </ChatContainer>
       <MessageForm onSubmit={handleInputMsgSubmit}>
-        <input type="text" onChange={handleInputMsgChange} value={inputMsg} />
+        <input type="text" value={inputMsg} onChange={handleInputMsgChange} />
         <button className="bg-black p-2 text-white">Send</button>
       </MessageForm>
       {showAlert && (

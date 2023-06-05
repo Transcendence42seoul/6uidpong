@@ -101,11 +101,11 @@ const GameList: React.FC = () => {
         <ListTitle className="mb-2.5 ml-2">Custom Games</ListTitle>
         <div className="flex">
           <input
-            className="w-full border bg-black p-2 text-white focus:outline-none"
             type="text"
             placeholder="Search games"
             value={searchTerm}
             onChange={handleSearchTermChange}
+            className="w-full border bg-black p-2 text-white focus:outline-none"
           />
           <HoverButton className="border p-2" onClick={handleSearchClick}>
             Search

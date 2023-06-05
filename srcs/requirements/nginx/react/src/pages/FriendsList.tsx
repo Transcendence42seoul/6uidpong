@@ -98,7 +98,7 @@ const FriendsList: React.FC = () => {
                   }}
                 >
                   <button
-                    className="cursor-pointer rounded border-4 border-red-400 bg-black p-1 text-white hover:text-red-400"
+                    className="rounded border-4 border-red-400 bg-black p-1 text-white hover:text-red-400"
                     onClick={() => handleDeleteClick(id)}
                   >
                     Delete

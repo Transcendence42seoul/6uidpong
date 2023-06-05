@@ -30,14 +30,11 @@ const Header: React.FC = () => {
 
   return (
     <div className="flex items-center justify-between p-4">
-      <HoverButton onClick={handleHomeClick} className="rounded border-2 p-2.5">
+      <HoverButton onClick={handleHomeClick} className="border-2 p-2.5">
         Home
       </HoverButton>
       <UserSearchBar onUserClick={onUserClick} className="w-[40%]" />
-      <HoverButton
-        onClick={handleMyPageClick}
-        className="rounded border-2 p-2.5"
-      >
+      <HoverButton onClick={handleMyPageClick} className="border-2 p-2.5">
         My Page
       </HoverButton>
       {selectedUserId && showUserProfileModal && (

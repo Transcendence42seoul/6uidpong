@@ -67,22 +67,19 @@ const Channel: React.FC = () => {
       <ChannelMemberList />
       <div className="w-full max-w-[1024px]">
         <div className="flex justify-between space-x-1.5 px-4">
-          <HoverButton
-            onClick={handleSettingsClick}
-            className="rounded border p-1.5"
-          >
+          <HoverButton onClick={handleSettingsClick} className="border p-1.5">
             Settings
           </HoverButton>
           <div className="space-x-1.5">
             <HoverButton
               onClick={handleInviteClick}
-              className="rounded border bg-blue-800 p-1.5 hover:text-blue-800"
+              className="border bg-blue-800 p-1.5 hover:text-blue-800"
             >
               Invite
             </HoverButton>
             <HoverButton
               onClick={handleExitClick}
-              className="rounded border bg-red-800 p-1.5 hover:text-red-800"
+              className="border bg-red-800 p-1.5 hover:text-red-800"
             >
               Exit
             </HoverButton>

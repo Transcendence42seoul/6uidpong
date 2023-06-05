@@ -23,6 +23,6 @@ export class Mute {
   @JoinColumn({ name: "user_id" })
   user: User;
 
-  @Column({ name: "limited_at" })
+  @Column({ nullable: false, name: "limited_at" })
   limitedAt: Date;
 }

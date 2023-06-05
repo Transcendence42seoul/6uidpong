@@ -15,6 +15,7 @@ export class DmChat {
   id: number;
 
   @ManyToOne(() => DmRoom, (room) => room.chats, {
+    nullable: false,
     onDelete: "CASCADE",
     onUpdate: "CASCADE",
   })
@@ -22,14 +23,18 @@ export class DmChat {
   room: DmRoom;
 
   @ManyToOne(() => User, (user) => user.dmChats, {
+    nullable: false,
     onUpdate: "CASCADE",
   })
   @JoinColumn({ name: "user_id" })
   user: User;
 
-  @Column()
+  @Column({ nullable: false })
   message: string;
 
-  @CreateDateColumn({ name: "created_at" })
+  @CreateDateColumn({
+    nullable: false,
+    name: "created_at",
+  })
   createdAt: Date;
 }

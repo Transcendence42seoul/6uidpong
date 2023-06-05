@@ -15,6 +15,7 @@ export class ChannelChat {
   id: number;
 
   @ManyToOne(() => Channel, (channel) => channel.chats, {
+    nullable: false,
     onDelete: "CASCADE",
     onUpdate: "CASCADE",
   })
@@ -22,14 +23,21 @@ export class ChannelChat {
   channel: Channel;
 
   @ManyToOne(() => User, (user) => user.channelChats, {
+    nullable: false,
     onUpdate: "CASCADE",
   })
   @JoinColumn({ name: "user_id" })
   user: User;
 
-  @Column()
+  @Column({ nullable: false })
   message: string;
 
-  @CreateDateColumn({ name: "created_at" })
+  @Column({ nullable: false, name: "is_system", type: "boolean" })
+  isSystem: boolean;
+
+  @CreateDateColumn({
+    nullable: false,
+    name: "created_at",
+  })
   createdAt: Date;
 }

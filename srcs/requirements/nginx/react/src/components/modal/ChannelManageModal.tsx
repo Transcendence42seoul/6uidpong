@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Socket } from 'socket.io-client';
 
+import selectSocket from '../../features/socket/socketSelector';
 import HoverButton from '../button/HoverButton';
 import CircularImage from '../container/CircularImage';
 import ContentBox from '../container/ContentBox';
@@ -15,37 +15,57 @@ import UserList from '../container/UserList';
 interface ChannelManageModalProps {
   channelId: number;
   setShowModal: (showModal: boolean) => void;
-  socket: Socket;
 }
 
 interface SendData {
   info: {
     channelId: number;
-    userId: number;
+    userId: number | null;
+    time: number;
   };
 }
 
 const ChannelManageModal: React.FC<ChannelManageModalProps> = ({
   channelId,
   setShowModal,
-  socket,
 }) => {
+  const { socket } = selectSocket();
+
   const [admins, setAdmins] = useState<User[]>([]);
   const [banList, setBanList] = useState<User[]>([]);
   const [members, setMembers] = useState<User[]>([]);
-  const [owner, setOwner] = useState<User | null>(null);
   const [selectedMember, setSelectedMember] = useState<User | null>(null);
-  const [sendData, setSendData] = useState<SendData | null>(null);
 
-  const removeUser = () => {
-    setMembers([...members.filter((user) => user.id !== selectedMember?.id)]);
+  const sendData: SendData = {
+    info: {
+      channelId,
+      userId: null,
+      time: 30,
+    },
   };
 
-  const handleAssignAdminClick = () => {};
+  const removeMember = () => {
+    if (!selectedMember) return;
+    const memberList = members.filter((member) => {
+      return member.id !== selectedMember.id;
+    });
+    setMembers([...memberList]);
+  };
+
+  const handleAdmins = () => {
+    const adminList = members.filter((member) => member.isAdmin);
+    setAdmins([...adminList]);
+  };
+
+  const handleAssignAdminClick = () => {
+    if (!selectedMember) return;
+    socket?.emit('add-admin', sendData);
+    setAdmins((prevAdmins) => [...prevAdmins, selectedMember]);
+  };
 
   const handleBanClick = () => {
-    socket.emit('ban', sendData);
-    removeUser();
+    socket?.emit('ban', sendData);
+    removeMember();
   };
 
   const handleCloseClick = () => {
@@ -53,15 +73,32 @@ const ChannelManageModal: React.FC<ChannelManageModalProps> = ({
   };
 
   const handleKickClick = () => {
-    socket.emit('kick', sendData);
-    removeUser();
+    socket?.emit('kick', sendData);
+    removeMember();
   };
 
-  const handleMuteClick = () => {};
+  const handleMuteClick = () => {
+    socket?.emit('mute', sendData);
+  };
 
   const handleTransferOwnerClick = () => {
-    socket.emit('transfer-ownership', sendData);
-    setOwner(selectedMember);
+    socket?.emit('transfer-ownership', sendData);
+  };
+
+  const onDeleteAdminClick = ({ id }: User) => {
+    sendData.info.userId = id;
+    socket?.emit('delete-admin', sendData);
+    const adminList = members.filter((member) => {
+      return member.id !== id;
+    });
+    setAdmins([...adminList]);
+  };
+
+  const onDeleteBanClick = ({ id }: User) => {
+    sendData.info.userId = id;
+    socket?.emit('unban', sendData);
+    const newBanList = banList.filter((user) => user.id !== id);
+    setBanList([...newBanList]);
   };
 
   const onUserClick = (user: User) => {
@@ -69,18 +106,10 @@ const ChannelManageModal: React.FC<ChannelManageModalProps> = ({
   };
 
   useEffect(() => {
-    const adminsHandler = (users: User[]) => {
-      setAdmins([...users]);
-    };
-    socket.emit('find-admins', { channelId }, adminsHandler);
-    setAdmins(isTest ? mockUsers : admins); // test
-  }, []);
-
-  useEffect(() => {
     const banListHandler = (users: User[]) => {
       setBanList([...users]);
     };
-    socket.emit('find-bans', { channelId }, banListHandler);
+    socket?.emit('find-bans', { channelId }, banListHandler);
     setBanList(isTest ? mockUsers : banList); // test
   }, []);
 
@@ -88,18 +117,17 @@ const ChannelManageModal: React.FC<ChannelManageModalProps> = ({
     const membersHandler = (users: User[]) => {
       setMembers([...users]);
     };
-    socket.emit('find-channel-users', { channelId }, membersHandler);
+    socket?.emit('find-channel-users', { channelId }, membersHandler);
     setMembers(isTest ? mockUsers : members); // test
   }, []);
 
   useEffect(() => {
+    handleAdmins();
+  }, [members]);
+
+  useEffect(() => {
     if (!selectedMember) return;
-    setSendData({
-      info: {
-        channelId,
-        userId: selectedMember.id,
-      },
-    });
+    sendData.info.userId = selectedMember.id;
   }, [selectedMember]);
 
   return (
@@ -149,8 +177,16 @@ const ChannelManageModal: React.FC<ChannelManageModalProps> = ({
       )}
       <div className="space-y-4">
         <div className="flex space-x-4">
-          <UserList title="Ban" users={banList} />
-          <UserList title="Admin" users={admins} />
+          <UserList
+            title="Ban"
+            users={banList}
+            onDeleteClick={onDeleteBanClick}
+          />
+          <UserList
+            title="Admin"
+            users={admins}
+            onDeleteClick={onDeleteAdminClick}
+          />
         </div>
         <HoverButton onClick={handleCloseClick} className="w-full border p-2">
           Close

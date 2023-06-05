@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Socket } from 'socket.io-client';
-
 import { useParams } from 'react-router-dom';
+
+import selectSocket from '../../features/socket/socketSelector';
 import useCallApi from '../../utils/useCallApi';
 import HoverButton from '../button/HoverButton';
 import ModalContainer from '../container/ModalContainer';
@@ -14,17 +14,17 @@ import { isTest, mockUsers } from '../../mock'; // test
 
 interface ChannelInviteModalProps {
   setShowModal: (showModal: boolean) => void;
-  socket: Socket;
 }
 
 const ChannelInviteModal: React.FC<ChannelInviteModalProps> = ({
   setShowModal,
-  socket,
 }) => {
   const callApi = useCallApi();
 
   const { channelId: channelIdString } = useParams<{ channelId: string }>();
   const channelId = Number(channelIdString);
+
+  const { socket } = selectSocket();
 
   const [allUsers, setAllUsers] = useState<User[]>([]);
   const [selectedUsers, setSelectedUsers] = useState<Set<User>>(new Set());
@@ -40,8 +40,16 @@ const ChannelInviteModal: React.FC<ChannelInviteModalProps> = ({
         userIds: [...selectedUsers].map((user) => user.id),
       },
     };
-    socket.emit('invite', inviteChannelData);
+    if (selectedUsers.size > 0) {
+      socket?.emit('invite', inviteChannelData);
+    }
     setShowModal(false);
+  };
+
+  const onDeleteClick = ({ id }: User) => {
+    setSelectedUsers(
+      (prevUsers) => new Set([...prevUsers].filter((user) => user.id !== id)),
+    );
   };
 
   const onUserClick = (user: User) => {
@@ -51,7 +59,8 @@ const ChannelInviteModal: React.FC<ChannelInviteModalProps> = ({
   useEffect(() => {
     const fetchUsersData = async () => {
       const config = {
-        url: '/api/v1/users',
+        url: '/api/v1/users/search',
+        params: { nickname: '' },
       };
       const data: User[] = isTest ? mockUsers : await callApi(config); // test
       setAllUsers(data);
@@ -62,7 +71,11 @@ const ChannelInviteModal: React.FC<ChannelInviteModalProps> = ({
   return (
     <ModalContainer setShowModal={setShowModal}>
       <UserListWithSearchBar users={allUsers} onUserClick={onUserClick} />
-      <UserList title="Invite" users={selectedUsers}>
+      <UserList
+        title="Invite"
+        users={selectedUsers}
+        onDeleteClick={onDeleteClick}
+      >
         <div className="flex">
           <HoverButton
             onClick={handleConfirmClick}

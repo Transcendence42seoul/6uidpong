@@ -1,37 +1,39 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Socket } from 'socket.io-client';
-
 import { useParams } from 'react-router-dom';
+
+import selectSocket from '../../features/socket/socketSelector';
+import startsWithIgnoreCase from '../../utils/startsWithIgnoreCase';
 import ChannelMemberProfile from './ChannelMemberProfile';
 import CircularImage from './CircularImage';
 import ModalContainer from './ModalContainer';
 
+import type SendResponse from '../../interfaces/SendResponse';
 import type User from '../../interfaces/User';
 
 import { isTest, mockUsers } from '../../mock'; // test
 
 interface ChannelMemberListProps {
-  socket: Socket;
   className?: string;
 }
 
 const ChannelMemberList: React.FC<ChannelMemberListProps> = ({
-  socket,
   className = '',
 }) => {
   const { channelId: channelIdString } = useParams<{ channelId: string }>();
   const channelId = Number(channelIdString);
 
+  const { socket } = selectSocket();
+
   const searchResultsRef = useRef<HTMLUListElement>(null);
   const [members, setMembers] = useState<User[]>([]);
-  const [search, setSearch] = useState<string>('');
   const [searchResults, setSearchResults] = useState<User[]>(members);
-  const [selectedMember, setSelectedMember] = useState<User | null>(null);
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [selectedMemberId, setSelectedMemberId] = useState<number | null>(null);
   const [showMemberProfileModal, setShowMemberProfileModal] =
     useState<boolean>(false);
 
-  const handleMemberClick = (member: User) => {
-    setSelectedMember(member);
+  const handleMemberClick = ({ id }: User) => {
+    setSelectedMemberId(id);
     setShowMemberProfileModal(true);
   };
 
@@ -39,44 +41,50 @@ const ChannelMemberList: React.FC<ChannelMemberListProps> = ({
     const membersHandler = (memberList: User[]) => {
       setMembers([...memberList]);
     };
-    socket.emit('find-channel-users', { channelId }, membersHandler);
+    socket?.emit('find-channel-users', { channelId }, membersHandler);
     setMembers(isTest ? mockUsers : members); // test
   };
 
-  const handleSearchResults = async (results: User[]) => {
+  const handleSearchTermChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const handleSearchResults = () => {
+    const results = members.filter((member) => {
+      return startsWithIgnoreCase(member.nickname, searchTerm);
+    });
     setSearchResults([...results]);
   };
 
-  const handleSearchChange = async (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const keyword = event.target.value;
-    setSearch(keyword);
-    if (keyword) {
-      const results = members.filter((member) => {
-        return member.nickname.startsWith(keyword);
-      });
-      await handleSearchResults(results);
-    } else {
-      await handleSearchResults(members);
-    }
-  };
+  useEffect(() => {
+    const chatHandler = ({ chatResponse: chat }: SendResponse) => {
+      if (chat.isSystem) {
+        handleMembers();
+      }
+    };
+    socket?.on('send-channel', chatHandler);
+    return () => {
+      socket?.off('send-channel', chatHandler);
+    };
+  }, []);
 
   useEffect(() => {
     handleMembers();
   }, []);
 
   useEffect(() => {
-    handleMembers();
-  }, [showMemberProfileModal]);
+    handleSearchResults();
+  }, [members, searchTerm]);
 
   return (
     <div className={`relative ${className}`}>
       <input
         type="text"
         placeholder="Search members"
-        value={search}
-        onChange={handleSearchChange}
+        value={searchTerm}
+        onChange={handleSearchTermChange}
         className="w-full rounded border border-white p-2 shadow"
       />
       <ul
@@ -104,9 +112,9 @@ const ChannelMemberList: React.FC<ChannelMemberListProps> = ({
           );
         })}
       </ul>
-      {selectedMember && showMemberProfileModal && (
+      {selectedMemberId && showMemberProfileModal && (
         <ModalContainer setShowModal={setShowMemberProfileModal} closeButton>
-          <ChannelMemberProfile member={selectedMember} socket={socket} />
+          <ChannelMemberProfile userId={selectedMemberId} />
         </ModalContainer>
       )}
     </div>

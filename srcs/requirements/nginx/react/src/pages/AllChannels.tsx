@@ -1,44 +1,60 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Socket } from 'socket.io-client';
 
 import HoverButton from '../components/button/HoverButton';
 import ListContainer from '../components/container/ListContainer';
 import ListInfoPanel from '../components/container/ListInfoPanel';
 import ListTitle from '../components/container/ListTitle';
+import PasswordModal from '../components/modal/PasswordModal';
 import ImageSrc from '../constants/ImageSrc';
+import selectSocket from '../features/socket/socketSelector';
 
 import type Channel from '../interfaces/Channel';
 
 import { isTest, mockChannels } from '../mock'; // test
 
-interface AllChannelsProps {
-  socket: Socket;
-}
-
-const AllChannels: React.FC<AllChannelsProps> = ({ socket }) => {
+const AllChannels: React.FC = () => {
   const navigate = useNavigate();
 
-  const [channels, setChannels] = useState<Channel[]>([]);
+  const { socket } = selectSocket();
 
-  const handleChannelDoubleClick = ({ id }: Channel) => {
+  const [channels, setChannels] = useState<Channel[]>([]);
+  const [selectedChannelId, setSelectedChannelId] = useState<number | null>(
+    null,
+  );
+  const [showPasswordModal, setShowPasswordModal] = useState<boolean>(false);
+
+  const joinChannel = (id = selectedChannelId) => {
     navigate(`/channel/${id}`);
+  };
+
+  const handleChannelDoubleClick = ({ id, isLocked }: Channel) => {
+    setSelectedChannelId(id);
+    if (isLocked) {
+      setShowPasswordModal(true);
+      return;
+    }
+    joinChannel(id);
   };
 
   const handleCreateChannelClick = () => {
     navigate('/channel-settings');
   };
 
+  const onConfirmClick = () => {
+    joinChannel();
+  };
+
   useEffect(() => {
     const channelsHandler = (channelList: Channel[]) => {
       setChannels([...channelList]);
     };
-    socket.emit('find-all-channels', channelsHandler);
+    socket?.emit('find-all-channels', channelsHandler);
     setChannels(isTest ? mockChannels : channels); // test
   }, []);
 
   return (
-    <ListContainer>
+    <ListContainer className="justify-center">
       <div className="flex items-end">
         <ListTitle className="mb-4 ml-4">All Channels</ListTitle>
         <HoverButton
@@ -68,6 +84,12 @@ const AllChannels: React.FC<AllChannelsProps> = ({ socket }) => {
           </li>
         );
       })}
+      {selectedChannelId && showPasswordModal && (
+        <PasswordModal
+          onConfirmClick={onConfirmClick}
+          setShowModal={setShowPasswordModal}
+        />
+      )}
     </ListContainer>
   );
 };

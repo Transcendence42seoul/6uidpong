@@ -5,23 +5,19 @@ import {
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
-  WsException,
 } from "@nestjs/websockets";
 import { Namespace, Socket } from "socket.io";
 import { WsJwtAccessGuard } from "../guard/ws-jwt-access.guard";
 import { WsJwtPayload } from "../utils/decorator/ws-jwt-payload.decorator";
 import { JwtPayload } from "jsonwebtoken";
 import { ChannelService } from "../service/channel/channel.service";
-import { Channel } from "../entity/channel/channel.entity";
-import { ChannelUser } from "../entity/channel/channel-user.entity";
-import { ChannelResponse } from "../dto/channel/channel-response";
-import { ChatResponse } from "../dto/channel/chat-response";
+import { MyChannelResponse } from "../dto/channel/my-channel-response";
 import { CreateRequest } from "../dto/channel/create-request";
 import { CreateResponse } from "../dto/channel/create-response";
-import { Ban } from "../entity/channel/ban.entity";
-import { BanService } from "../service/channel/ban.service";
 import { UserResponse } from "../dto/channel/user-response";
 import { BanResponse } from "../dto/channel/ban-response";
+import { JoinResponse } from "../dto/channel/join-response";
+import { AllChannelResponse } from "../dto/channel/all-channel-response";
 
 @WebSocketGateway(80, {
   namespace: "chat",
@@ -36,20 +32,19 @@ export class ChannelGateway {
   @WebSocketServer()
   server: Namespace;
 
-  constructor(
-    private readonly channelService: ChannelService,
-    private readonly banService: BanService
-  ) {}
+  constructor(private readonly channelService: ChannelService) {}
 
   @SubscribeMessage("find-all-channels")
-  async findAllChannels(): Promise<ChannelResponse[]> {
-    return await this.channelService.findAllChannels();
+  async findAllChannels(
+    @WsJwtPayload() jwt: JwtPayload
+  ): Promise<AllChannelResponse[]> {
+    return await this.channelService.findAllChannels(jwt.id);
   }
 
   @SubscribeMessage("find-my-channels")
   async findMyChannels(
     @WsJwtPayload() jwt: JwtPayload
-  ): Promise<ChannelResponse[]> {
+  ): Promise<MyChannelResponse[]> {
     return await this.channelService.findMyChannels(jwt.id);
   }
 
@@ -59,8 +54,7 @@ export class ChannelGateway {
     @MessageBody()
     body: CreateRequest
   ): Promise<CreateResponse> {
-    const newChannel: Channel = await this.channelService.create(jwt.id, body);
-    return new CreateResponse(newChannel);
+    return await this.channelService.createChannel(jwt.id, body);
   }
 
   @SubscribeMessage("join-channel")
@@ -69,8 +63,14 @@ export class ChannelGateway {
     @ConnectedSocket() client: Socket,
     @MessageBody("info")
     info: { channelId: number; password: string }
-  ): Promise<ChatResponse[]> {
-    return await this.channelService.join(jwt.id, info, client);
+  ): Promise<JoinResponse> {
+    return await this.channelService.join(
+      jwt.id,
+      info.channelId,
+      info.password,
+      client,
+      this.server
+    );
   }
 
   @SubscribeMessage("send-channel")
@@ -79,16 +79,21 @@ export class ChannelGateway {
     @MessageBody("to")
     to: { channelId: number; message: string }
   ): Promise<void> {
-    await this.channelService.send(jwt.it, to, this.server);
+    await this.channelService.send(
+      jwt.id,
+      to.channelId,
+      to.message,
+      this.server
+    );
   }
 
   @SubscribeMessage("delete-channel")
-  async delete(
+  async deleteChannel(
     @WsJwtPayload() jwt: JwtPayload,
     @MessageBody("channelId")
     channelId: number
   ): Promise<void> {
-    await this.channelService.deleteChannel(channelId, jwt.id);
+    await this.channelService.deleteChannel(channelId, jwt.id, this.server);
   }
 
   @SubscribeMessage("leave-channel")
@@ -107,7 +112,7 @@ export class ChannelGateway {
     @MessageBody("channelId")
     channelId: number
   ): Promise<void> {
-    await this.channelService.exit(channelId, jwt.id, client);
+    await this.channelService.exit(channelId, jwt.id, client, this.server);
   }
 
   @SubscribeMessage("transfer-ownership")
@@ -116,16 +121,40 @@ export class ChannelGateway {
     @MessageBody("info")
     info: { channelId: number; userId: number }
   ): Promise<void> {
-    await this.channelService.transferOwnership(jwt.id, info);
+    await this.channelService.transferOwnership(
+      jwt.id,
+      info.channelId,
+      info.userId,
+      this.server
+    );
   }
 
-  @SubscribeMessage("update-admin")
-  async updateAdmin(
+  @SubscribeMessage("add-admin")
+  async addAdmin(
     @WsJwtPayload() jwt: JwtPayload,
     @MessageBody("info")
-    info: { channelId: number; userId: number; value: boolean }
+    info: { channelId: number; userId: number }
   ): Promise<void> {
-    await this.channelService.updateAdmin(jwt.id, info);
+    await this.channelService.addAdmin(
+      jwt.id,
+      info.channelId,
+      info.userId,
+      this.server
+    );
+  }
+
+  @SubscribeMessage("delete-admin")
+  async deleteAdmin(
+    @WsJwtPayload() jwt: JwtPayload,
+    @MessageBody("info")
+    info: { channelId: number; userId: number }
+  ): Promise<void> {
+    await this.channelService.deleteAdmin(
+      jwt.id,
+      info.channelId,
+      info.userId,
+      this.server
+    );
   }
 
   @SubscribeMessage("invite")
@@ -134,7 +163,12 @@ export class ChannelGateway {
     @MessageBody("info")
     info: { channelId: number; userIds: number[] }
   ): Promise<void> {
-    await this.channelService.invite(jwt.id, info);
+    await this.channelService.invite(
+      jwt.id,
+      info.channelId,
+      info.userIds,
+      this.server
+    );
   }
 
   @SubscribeMessage("kick")
@@ -143,16 +177,27 @@ export class ChannelGateway {
     @MessageBody("info")
     info: { channelId: number; userId: number }
   ): Promise<void> {
-    await this.channelService.kick(jwt.id, info, this.server);
+    await this.channelService.kick(
+      jwt.id,
+      info.channelId,
+      info.userId,
+      this.server
+    );
   }
 
   @SubscribeMessage("mute")
   async mute(
     @WsJwtPayload() jwt: JwtPayload,
     @MessageBody("info")
-    info: { channelId: number; userId: number; limitedAt: Date }
+    info: { channelId: number; userId: number; time: number }
   ): Promise<void> {
-    await this.channelService.mute(jwt.id, info);
+    await this.channelService.mute(
+      jwt.id,
+      info.channelId,
+      info.userId,
+      info.time,
+      this.server
+    );
   }
 
   @SubscribeMessage("ban")
@@ -161,7 +206,12 @@ export class ChannelGateway {
     @MessageBody("info")
     info: { channelId: number; userId: number }
   ): Promise<void> {
-    await this.channelService.ban(jwt.id, info);
+    await this.channelService.ban(
+      jwt.id,
+      info.channelId,
+      info.userId,
+      this.server
+    );
   }
 
   @SubscribeMessage("unban")
@@ -170,38 +220,7 @@ export class ChannelGateway {
     @MessageBody("info")
     info: { channelId: number; userId: number }
   ): Promise<void> {
-    await this.channelService.unban(jwt.id, info);
-  }
-
-  @SubscribeMessage("find-channel-users")
-  async findUsers(
-    @MessageBody("channelId")
-    channelId: number
-  ): Promise<UserResponse[]> {
-    const channelUsers: ChannelUser[] = await this.channelService.findUsers(
-      channelId
-    );
-    return channelUsers.map((channelUser) => new UserResponse(channelUser));
-  }
-
-  @SubscribeMessage("find-admins")
-  async findAdmins(
-    @MessageBody("channelId")
-    channelId: number
-  ): Promise<UserResponse[]> {
-    const channelAdmins: ChannelUser[] = await this.channelService.findAdmins(
-      channelId
-    );
-    return channelAdmins.map((channelUser) => new UserResponse(channelUser));
-  }
-
-  @SubscribeMessage("find-bans")
-  async findBanUsers(
-    @MessageBody("channelId")
-    channelId: number
-  ): Promise<BanResponse[]> {
-    const banUsers: Ban[] = await this.banService.findUsers(channelId);
-    return banUsers.map((ban) => new BanResponse(ban));
+    await this.channelService.unban(jwt.id, info.channelId, info.userId);
   }
 
   @SubscribeMessage("update-password")
@@ -210,6 +229,34 @@ export class ChannelGateway {
     @MessageBody("info")
     info: { channelId: number; password: string }
   ): Promise<void> {
-    await this.channelService.updatePassword(jwt.id, info);
+    await this.channelService.updatePassword(
+      jwt.id,
+      info.channelId,
+      info.password
+    );
+  }
+
+  @SubscribeMessage("find-channel-users")
+  async findUsers(
+    @MessageBody("channelId")
+    channelId: number
+  ): Promise<UserResponse[]> {
+    return await this.channelService.findUsers(channelId);
+  }
+
+  @SubscribeMessage("find-admins")
+  async findAdmins(
+    @MessageBody("channelId")
+    channelId: number
+  ): Promise<UserResponse[]> {
+    return await this.channelService.findAdmins(channelId);
+  }
+
+  @SubscribeMessage("find-bans")
+  async findBanUsers(
+    @MessageBody("channelId")
+    channelId: number
+  ): Promise<BanResponse[]> {
+    return await this.channelService.findBanUsers(channelId);
   }
 }

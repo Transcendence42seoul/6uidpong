@@ -1,26 +1,26 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Socket } from 'socket.io-client';
 
+import selectSocket from '../../features/socket/socketSelector';
 import HoverButton from '../button/HoverButton';
 import ChannelManageModal from '../modal/ChannelManageModal';
 import ContentBox from './ContentBox';
 
 interface ChannelManagePanelProps {
   channelId: number;
-  socket: Socket;
 }
 
 const ChannelManagePanel: React.FC<ChannelManagePanelProps> = ({
   channelId,
-  socket,
 }) => {
   const navigate = useNavigate();
+
+  const { socket } = selectSocket();
 
   const [showManageModal, setShowManageModal] = useState<boolean>(false);
 
   const handleDeleteChannelClick = () => {
-    socket.emit('delete-channel', { channelId });
+    socket?.emit('delete-channel', { channelId });
     navigate('/channel');
   };
 
@@ -46,7 +46,6 @@ const ChannelManagePanel: React.FC<ChannelManagePanelProps> = ({
         <ChannelManageModal
           channelId={channelId}
           setShowModal={setShowManageModal}
-          socket={socket}
         />
       )}
     </ContentBox>

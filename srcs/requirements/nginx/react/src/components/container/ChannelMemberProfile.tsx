@@ -1,15 +1,12 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { Socket } from 'socket.io-client';
 
+import selectSocket from '../../features/socket/socketSelector';
 import HoverButton from '../button/HoverButton';
 import UserProfile from './UserProfile';
 
-import type User from '../../interfaces/User';
-
 interface ChannelMemberProfileProps {
-  member: User;
-  socket: Socket;
+  userId: number;
   className?: string;
 }
 
@@ -17,55 +14,49 @@ interface SendData {
   info: {
     channelId: number;
     userId: number;
-    limitedAt: Date | null;
-    value: boolean | null;
+    time: number;
   };
 }
 
 const ChannelMemberProfile: React.FC<ChannelMemberProfileProps> = ({
-  member,
-  socket,
+  userId,
   className = '',
 }) => {
   const { channelId: channelIdString } = useParams<{ channelId: string }>();
   const channelId = Number(channelIdString);
 
+  const { socket } = selectSocket();
+
   const sendData: SendData = {
     info: {
       channelId,
-      userId: member.id,
-      limitedAt: null,
-      value: null,
+      userId,
+      time: 30,
     },
   };
 
   const handleAssignAdminClick = () => {
-    sendData.info.value = true;
-    socket.emit('update-admin', sendData);
-    sendData.info.value = null;
+    socket?.emit('add-admin', sendData);
   };
 
   const handleBanClick = () => {
-    socket.emit('ban', sendData);
+    socket?.emit('ban', sendData);
   };
 
   const handleKickClick = () => {
-    socket.emit('kick', sendData);
+    socket?.emit('kick', sendData);
   };
 
   const handleMuteClick = () => {
-    const currentTime = new Date();
-    sendData.info.limitedAt = new Date(currentTime.getTime() + 30000); // 30초
-    socket.emit('mute', sendData);
-    sendData.info.limitedAt = null;
+    socket?.emit('mute', sendData);
   };
 
   const handleTransferOwnerClick = () => {
-    socket.emit('transfer-ownership', sendData);
+    socket?.emit('transfer-ownership', sendData);
   };
 
   return (
-    <UserProfile user={member} className={className}>
+    <UserProfile userId={userId} className={className}>
       <div className="m-4 flex w-full">
         <HoverButton
           onClick={handleMuteClick}

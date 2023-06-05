@@ -1,5 +1,6 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
+import startsWithIgnoreCase from '../../utils/startsWithIgnoreCase';
 import CircularImage from './CircularImage';
 
 import type User from '../../interfaces/User';
@@ -16,40 +17,38 @@ const UserListWithSearchBar: React.FC<UserListWithSearchBarProps> = ({
   className = '',
 }) => {
   const searchResultsRef = useRef<HTMLUListElement>(null);
-  const [search, setSearch] = useState<string>('');
   const [searchResults, setSearchResults] = useState<User[]>(users);
+  const [searchTerm, setSearchTerm] = useState<string>('');
 
   const handleUserClick = (user: User) => {
-    setSearch('');
+    setSearchTerm('');
     onUserClick(user);
   };
 
-  const handleSearchResults = async (results: User[]) => {
+  const handleSearchResults = () => {
+    const results = users.filter((user) => {
+      return startsWithIgnoreCase(user.nickname, searchTerm);
+    });
     setSearchResults([...results]);
   };
 
-  const handleSearchChange = async (
+  const handleSearchTermChange = (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    const keyword = event.target.value;
-    setSearch(keyword);
-    if (keyword) {
-      const results = users.filter((user) => {
-        return user.nickname.startsWith(keyword);
-      });
-      await handleSearchResults(results);
-    } else {
-      await handleSearchResults(users);
-    }
+    setSearchTerm(event.target.value);
   };
+
+  useEffect(() => {
+    handleSearchResults();
+  }, [searchTerm, users]);
 
   return (
     <div className={`relative ${className}`}>
       <input
         type="text"
         placeholder="Search users"
-        value={search}
-        onChange={handleSearchChange}
+        value={searchTerm}
+        onChange={handleSearchTermChange}
         className="w-full rounded border border-white p-2 shadow"
       />
       <ul

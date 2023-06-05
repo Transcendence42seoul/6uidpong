@@ -3,7 +3,6 @@ import { Cron } from "@nestjs/schedule";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Mute } from "src/chat/entity/channel/mute.entity";
 import { LessThanOrEqual, Repository } from "typeorm";
-import { ChannelService } from "./channel.service";
 
 @Injectable()
 export class MuteService {
@@ -12,30 +11,12 @@ export class MuteService {
     private readonly muteRepository: Repository<Mute>
   ) {}
 
-  async has(channelId: number, userId: number): Promise<boolean> {
-    const primaryKey = {
-      channelId,
-      userId,
-    };
-    try {
-      const mute: Mute = await this.muteRepository.findOneByOrFail(primaryKey);
-      if (mute.limitedAt > new Date()) {
-        return true;
-      }
-      await this.muteRepository.delete(primaryKey);
-    } catch {}
-    return false;
+  async findOne(channelId: number, userId: number): Promise<Mute> {
+    return await this.muteRepository.findOneByOrFail({ channelId, userId });
   }
 
-  async upsert(
-    channelId: number,
-    userId: number,
-    limitedAt: Date
-  ): Promise<void> {
-    await this.muteRepository.upsert({ channelId, userId, limitedAt }, [
-      "channelId",
-      "userId",
-    ]);
+  async delete(channelId: number, userId: number): Promise<void> {
+    await this.muteRepository.delete({ channelId, userId });
   }
 
   @Cron("0 * * * *")

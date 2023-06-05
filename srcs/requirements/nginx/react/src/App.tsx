@@ -6,6 +6,7 @@ import { io } from 'socket.io-client';
 import LoginAuth from './components/custom/LoginAuth';
 import dispatchAuth from './features/auth/authAction';
 import selectAuth from './features/auth/authSelector';
+import dispatchSocket from './features/socket/socketAction';
 import Layout from './Layout';
 import AllChannels from './pages/AllChannels';
 import BlockList from './pages/BlockList';
@@ -16,6 +17,8 @@ import DmRoom from './pages/DmRoom';
 import DmRoomList from './pages/DmRoomList';
 import FriendRequests from './pages/FriendRequests';
 import FriendsList from './pages/FriendsList';
+import GameList from './pages/GameList';
+import GameWaitingRoom from './pages/GameWaitingRoom';
 import Loading from './pages/Loading';
 import Login from './pages/Login';
 import Main from './pages/Main';
@@ -27,18 +30,28 @@ import Ladder from './pages/Ladder';
 import GameStart from './pages/GameStart';
 
 const App: React.FC = () => {
+  const dispatch = useDispatch();
+
   const stats = {
     recentHistory: ['Win', 'Loss', 'Win', 'Win', 'Loss'],
-  };
+  }; // test
 
-  const [loading, setLoading] = useState<boolean>(false);
   const { id, is2FA, accessToken, tokenInfo } = isTest
     ? mockAuthState
     : selectAuth(); // test
 
-  const dispatch = useDispatch();
+  const [loading, setLoading] = useState<boolean>(false);
+
   const handleLoading = async () => {
     setLoading(true);
+  };
+
+  const initSocket = async () => {
+    const socket = io('/chat', { auth: { token: accessToken } });
+    socket.on('connect', () => {
+      socket.emit('connection');
+    });
+    await dispatchSocket({ socket }, dispatch);
   };
 
   useEffect(() => {
@@ -75,10 +88,7 @@ const App: React.FC = () => {
     return <Login />;
   }
 
-  const socket = io('/chat', { auth: { token: accessToken } });
-  socket.on('connect', () => {
-    socket.emit('connection');
-  });
+  initSocket();
 
   const socketGame = io('/game', { auth: { token: accessToken } });
   socketGame.on('connect', () => {
@@ -86,22 +96,18 @@ const App: React.FC = () => {
   });
 
   return (
-    <Layout socket={socket}>
+    <Layout>
       <Routes>
         <Route path="/" element={<Main />} />
-        <Route path="/all-channels" element={<AllChannels socket={socket} />} />
-        <Route path="/block-list" element={<BlockList socket={socket} />} />
-        <Route path="/channel" element={<ChannelList socket={socket} />} />
-        <Route
-          path="/channel/:channelId"
-          element={<Channel socket={socket} />}
-        />
-        <Route
-          path="/channel-settings"
-          element={<ChannelSettings socket={socket} />}
-        />
-        <Route path="/dm" element={<DmRoomList socket={socket} />} />
-        <Route path="/dm/:roomId" element={<DmRoom socket={socket} />} />
+        <Route path="/all-channels" element={<AllChannels />} />
+        <Route path="/block-list" element={<BlockList />} />
+        <Route path="/channel" element={<ChannelList />} />
+        <Route path="/channel/:channelId" element={<Channel />} />
+        <Route path="/channel-settings" element={<ChannelSettings />} />
+        <Route path="/custom" element={<GameList />} />
+        <Route path="/custom/:gameId" element={<GameWaitingRoom />} />
+        <Route path="/dm" element={<DmRoomList />} />
+        <Route path="/dm/:roomId" element={<DmRoom />} />
         <Route path="/friend-requests" element={<FriendRequests />} />
         <Route path="/friends-list" element={<FriendsList />} />
         <Route path="/my-page" element={<MyPage stats={stats} />} />

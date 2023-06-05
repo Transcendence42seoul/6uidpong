@@ -1,14 +1,13 @@
-import { Module } from "@nestjs/common";
+import { Module, forwardRef } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { UserModule } from "src/user/module/user.module";
 import { DmChat } from "../entity/dm/dm-chat.entity";
 import { DmRoom } from "../entity/dm/dm-room.entity";
-import { DmRoomUser } from "../entity/dm/dm-room-user.entity";
+import { DmUser } from "../entity/dm/dm-room-user.entity";
 import { DmGateway } from "../gateway/dm.gateway";
 import { WsJwtAccessGuard } from "../guard/ws-jwt-access.guard";
 import { DmService } from "../service/dm/dm.service";
 import { ConnectionService } from "../service/connection/connection.service";
-import { DisconnectionService } from "../service/connection/disconnection.service";
 import { Block } from "../entity/dm/block.entity";
 import { BlockService } from "../service/dm/block.service";
 import { Channel } from "../entity/channel/channel.entity";
@@ -21,12 +20,20 @@ import { BanService } from "../service/channel/ban.service";
 import { MuteService } from "../service/channel/mute.service";
 import { ChannelGateway } from "../gateway/channel.gateway";
 import { ConnectionGateway } from "../gateway/connection.gateway";
+import { ChannelRoomService } from "../service/channel/channel-room.service";
+import { ChannelChatService } from "../service/channel/channel-chat.service";
+import { ChannelUserService } from "../service/channel/channel-user.service";
+import { DmRoomService } from "../service/dm/dm-room.service";
+import { DmChatService } from "../service/dm/dm-chat.service";
+import { DmUserService } from "../service/dm/dm-user.service";
+import { ChannelSystemService } from "../service/channel/channel-system.service";
+import { ChannelVerifyService } from "../service/channel/channel-verify.service";
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       DmRoom,
-      DmRoomUser,
+      DmUser,
       DmChat,
       Block,
       Channel,
@@ -35,20 +42,28 @@ import { ConnectionGateway } from "../gateway/connection.gateway";
       Ban,
       Mute,
     ]),
-    UserModule,
+    forwardRef(() => UserModule),
   ],
   providers: [
     DmService,
+    DmRoomService,
+    DmChatService,
+    DmUserService,
     ChannelService,
+    ChannelRoomService,
+    ChannelChatService,
+    ChannelUserService,
+    ChannelSystemService,
+    ChannelVerifyService,
     BanService,
     MuteService,
     BlockService,
     ConnectionService,
-    DisconnectionService,
     ConnectionGateway,
     DmGateway,
     ChannelGateway,
     WsJwtAccessGuard,
   ],
+  exports: [BlockService],
 })
 export class ChatModule {}

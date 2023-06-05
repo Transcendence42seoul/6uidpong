@@ -11,7 +11,7 @@ export class WsJwtAccessGuard implements CanActivate {
     const client: Socket = context.switchToWs().getClient<Socket>();
     const token: string | undefined = this.extractToken(client);
     if (typeof token === "undefined") {
-      throw new WsException("token not exists");
+      throw new WsException("token not exists.");
     }
     try {
       const payload: Object = await this.jwtService.verifyAsync(token, {
@@ -19,7 +19,7 @@ export class WsJwtAccessGuard implements CanActivate {
       });
       client.data["user"] = payload;
     } catch {
-      throw new WsException("invalid token");
+      throw new WsException("invalid token.");
     }
     return true;
   }

@@ -9,8 +9,8 @@ import {
 } from "typeorm";
 import { DmRoom } from "./dm-room.entity";
 
-@Entity("dm_room_users")
-export class DmRoomUser {
+@Entity("dm_users")
+export class DmUser {
   @PrimaryColumn({ name: "room_id" })
   roomId: number;
 
@@ -24,18 +24,21 @@ export class DmRoomUser {
   @JoinColumn({ name: "room_id" })
   room: DmRoom;
 
-  @ManyToOne(() => User, (user) => user.dmRoomUsers, {
+  @ManyToOne(() => User, (user) => user.dmUsers, {
     onUpdate: "CASCADE",
   })
   @JoinColumn({ name: "user_id" })
   user: User;
 
-  @Column({ name: "is_exit", type: "boolean", default: false })
+  @Column({ nullable: false, name: "is_exit", type: "boolean", default: false })
   isExit: boolean;
 
-  @Column({ name: "new_msg_count", default: 0 })
+  @Column({ nullable: false, name: "new_msg_count", default: 0 })
   newMsgCount: number;
 
-  @CreateDateColumn({ name: "created_at" })
+  @CreateDateColumn({
+    nullable: false,
+    name: "created_at",
+  })
   createdAt: Date;
 }

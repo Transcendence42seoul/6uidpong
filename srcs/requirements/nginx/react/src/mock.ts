@@ -1,10 +1,10 @@
-export const isTest = false;
+export const isTest = true;
 
 export const mockChannels = [
   {
     id: 1,
     title: '42seoul_other_pet',
-    isLocked: false,
+    isLocked: true,
     newMsgCount: 0,
     memberCount: 42,
   },
@@ -14,6 +14,19 @@ export const mockChannels = [
     isLocked: false,
     newMsgCount: 42,
     memberCount: 1234,
+  },
+];
+
+export const mockGames = [
+  {
+    id: 1,
+    title: '1:1투혼초보테란아재만',
+    isLocked: false,
+  },
+  {
+    id: 2,
+    title: '1:1투혼고수만',
+    isLocked: true,
   },
 ];
 
@@ -59,38 +72,38 @@ export const mockUsers = [
 export const mockChats = [
   {
     id: 1,
-    roomId: 1,
     userId: mockUsers[0].id,
     nickname: mockUsers[0].nickname,
     image: mockUsers[0].image,
     message: 'Hello, there..!',
+    isSystem: true,
     createdAt: '2023-05-18 00:25:57.304419',
   },
   {
     id: 2,
-    roomId: 1,
     userId: mockUsers[0].id,
     nickname: mockUsers[0].nickname,
     image: mockUsers[0].image,
     message: 'Hello, there..!',
+    isSystem: false,
     createdAt: '2023-05-18 00:25:57.304419',
   },
   {
     id: 3,
-    roomId: 1,
     userId: mockUsers[1].id,
     nickname: mockUsers[1].nickname,
     image: mockUsers[1].image,
     message: 'Hi~?',
+    isSystem: false,
     createdAt: '2023-05-18 00:27:37.593432',
   },
   {
     id: 4,
-    roomId: 1,
     userId: mockUsers[1].id,
     nickname: mockUsers[1].nickname,
     image: mockUsers[1].image,
     message: 'How, are, you?!',
+    isSystem: false,
     createdAt: '2023-05-18 00:27:44.127905',
   },
 ];

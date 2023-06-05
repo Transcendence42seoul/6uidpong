@@ -13,6 +13,9 @@ export class BlockService {
 
   async find(userId: number): Promise<Block[]> {
     return await this.blockRepository.find({
+      relations: {
+        blockedUser: true,
+      },
       where: {
         userId,
       },
@@ -24,13 +27,6 @@ export class BlockService {
     });
   }
 
-  async insert(userId: number, interlocutorId: number): Promise<void> {
-    await this.blockRepository.insert({
-      userId: userId,
-      blockedUserId: interlocutorId,
-    });
-  }
-
   async delete(userId: number, interlocutorId: number): Promise<void> {
     await this.blockRepository.delete({
       userId: userId,
@@ -38,7 +34,7 @@ export class BlockService {
     });
   }
 
-  async has(userId: number, interlocutorId: number): Promise<boolean> {
+  async verify(userId: number, interlocutorId: number): Promise<void> {
     if (
       await this.blockRepository.countBy([
         {
@@ -51,8 +47,7 @@ export class BlockService {
         },
       ])
     ) {
-      return true;
+      throw new WsException("can't send because blocked.");
     }
-    return false;
   }
 }

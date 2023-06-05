@@ -6,9 +6,9 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { Socket } from 'socket.io-client';
 
 import selectAuth from '../../features/auth/authSelector';
+import selectSocket from '../../features/socket/socketSelector';
 import formatTime from '../../utils/formatTime';
 import AlertWithCloseButton from '../alert/AlertWithCloseButton';
 import ChatContainer from './ChatContainer';
@@ -18,6 +18,7 @@ import MessageBox from './MessageBox';
 import MessageForm from './MessageForm';
 
 import type Chat from '../../interfaces/Chat';
+import type SendResponse from '../../interfaces/SendResponse';
 import type SocketEvent from '../../interfaces/SocketEvent';
 
 import { isTest, mockChats } from '../../mock'; // test
@@ -26,12 +27,13 @@ interface ChatRoomProps {
   join: SocketEvent;
   leave: SocketEvent;
   send: SocketEvent;
-  socket: Socket;
 }
 
-const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send, socket }) => {
+const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send }) => {
   const { tokenInfo } = selectAuth();
   const myId = tokenInfo?.id;
+
+  const { socket } = selectSocket();
 
   const chatContainer = useRef<HTMLDivElement>(null);
   const [chats, setChats] = useState<Chat[]>([]);
@@ -57,12 +59,16 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send, socket }) => {
     (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
       if (!inputMsg) return;
-      const sendData = { to: { id: send.data.toId, message: inputMsg } };
-      const chatHandler = (chat: Chat) => {
-        addChat(chat);
-        setInputMsg('');
+      const { channelId, interlocutorId } = send.data;
+      const sendData = {
+        to: {
+          channelId,
+          id: interlocutorId,
+          message: inputMsg,
+        },
       };
-      socket.emit(send.name, sendData, chatHandler);
+      socket?.emit(send.name, sendData);
+      setInputMsg('');
     },
     [inputMsg],
   );
@@ -79,18 +85,18 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send, socket }) => {
       setNewMsgCount(newMsgCnt);
       setChats([...prevChats]);
     };
-    socket.emit(join.name, join.data, chatsHandler);
+    socket?.emit(join.name, join.data, chatsHandler);
     setChats(isTest ? mockChats : chats); // test
     return () => {
-      socket.emit(leave.name, leave.data);
+      socket?.emit(leave.name, leave.data);
     };
   }, []);
 
   useEffect(() => {
-    const chatHandler = (chat: Chat) => addChat(chat);
-    socket.on(send.name, chatHandler);
+    const chatHandler = ({ chatResponse: chat }: SendResponse) => addChat(chat);
+    socket?.on(send.name, chatHandler);
     return () => {
-      socket.off(send.name, chatHandler);
+      socket?.off(send.name, chatHandler);
     };
   }, []);
 
@@ -117,19 +123,24 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send, socket }) => {
     <div className="mx-auto max-w-[1024px] p-4 pt-2">
       <ChatContainer ref={chatContainer}>
         {chats.map((chat, index) => {
-          const { id, userId, nickname, image, message, createdAt } = chat;
+          const { id, userId, nickname, image, message, isSystem, createdAt } =
+            chat;
           const prevUserId = chats[index - 1]?.userId;
+          const prevIsSystem = chats[index - 1]?.isSystem;
           const isMyMsg = userId === myId;
-          const isConsecutiveMsg = userId === prevUserId;
-          const showUserInfo = !isMyMsg && !isConsecutiveMsg;
+          const isConsecutiveMsg = !prevIsSystem && userId === prevUserId;
+          const showUserInfo = !isSystem && !isMyMsg && !isConsecutiveMsg;
           let messageBoxClassName = '';
-          let messageClassName = 'mt-1';
-          if (isMyMsg) {
+          let messageClassName = 'mt-1 bg-white';
+          if (isSystem) {
+            messageBoxClassName = 'flex-col items-center';
+            messageClassName = 'bg-gray-700 py-2.5 text-xs text-gray-300';
+          } else if (isMyMsg) {
             messageBoxClassName = 'flex-col items-end';
             messageClassName = 'bg-yellow-300';
           } else if (isConsecutiveMsg) {
             messageBoxClassName = 'ml-10 pl-2.5';
-            messageClassName = '';
+            messageClassName = 'bg-white';
           }
           return (
             <>
@@ -154,7 +165,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send, socket }) => {
                     {isMyMsg ? (
                       <>
                         <span className="mr-2 pb-1 text-xs text-gray-500">
-                          {formatTime(createdAt)}
+                          {!isSystem && formatTime(createdAt)}
                         </span>
                         <Message className={messageClassName}>
                           {message}
@@ -166,7 +177,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send, socket }) => {
                           {message}
                         </Message>
                         <span className="ml-2 pb-1 text-xs text-gray-500">
-                          {formatTime(createdAt)}
+                          {!isSystem && formatTime(createdAt)}
                         </span>
                       </>
                     )}

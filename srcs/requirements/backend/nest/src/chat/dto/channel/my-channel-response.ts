@@ -1,4 +1,4 @@
-export class ChannelResponse {
+export class MyChannelResponse {
   readonly id: number;
 
   readonly title: string;
@@ -6,6 +6,10 @@ export class ChannelResponse {
   readonly isPublic: boolean;
 
   readonly newMsgCount: number;
+
+  readonly isOwner: boolean;
+
+  readonly isAdmin: boolean;
 
   readonly memberCount: number;
 }

@@ -3,7 +3,7 @@ import { ChannelUser } from "src/chat/entity/channel/channel-user.entity";
 import { ChannelChat } from "src/chat/entity/channel/chat.entity";
 import { Block } from "src/chat/entity/dm/block.entity";
 import { DmChat } from "src/chat/entity/dm/dm-chat.entity";
-import { DmRoomUser } from "src/chat/entity/dm/dm-room-user.entity";
+import { DmUser } from "src/chat/entity/dm/dm-room-user.entity";
 import { Column, Entity, Index, OneToMany, PrimaryColumn } from "typeorm";
 import { FriendRequest } from "./friend-request.entity";
 import { Friend } from "./friend.entity";
@@ -14,34 +14,35 @@ export class User {
   @PrimaryColumn()
   id: number;
 
-  @Column({ unique: true })
+  @Column({ nullable: false, unique: true })
   @Index()
   nickname: string;
 
-  @Column()
+  @Column({ nullable: false })
   email: string;
 
-  @Column()
+  @Column({ nullable: false })
   image: string;
 
-  @Column({ name: "is_2fa", type: "boolean", default: false })
+  @Column({ nullable: false, name: "is_2fa", type: "boolean", default: false })
   is2FA: boolean;
 
   @Column({
+    nullable: false,
     default: "offline",
   })
   status: string;
 
-  @Column({ name: "win_stat", default: 0 })
+  @Column({ nullable: false, name: "win_stat", default: 0 })
   winStat: number;
 
-  @Column({ name: "lose_stat", default: 0 })
+  @Column({ nullable: false, name: "lose_stat", default: 0 })
   loseStat: number;
 
-  @Column({ name: "ladder_score", default: 1000 })
+  @Column({ nullable: false, name: "ladder_score", default: 1000 })
   ladderScore: number;
 
-  @Column({ name: "socket_id", default: "" })
+  @Column({ nullable: false, name: "socket_id", default: "" })
   @Index()
   socketId: string;
 
@@ -51,17 +52,18 @@ export class User {
   @OneToMany(() => DmRoomUser, (dmRoomUser) => dmRoomUser.user)
   dmRoomUsers: DmRoomUser[];
 
+
   @OneToMany(() => DmChat, (chat) => chat.user)
   dmChats: DmChat[];
-
-  @OneToMany(() => ChannelUser, (channelUser) => channelUser.user)
-  channelUsers: ChannelUser[];
 
   @OneToMany(() => Block, (block) => block.blockedUser)
   blocks: Block[];
 
   @OneToMany(() => Ban, (ban) => ban.user)
   bans: Ban[];
+
+  @OneToMany(() => ChannelUser, (channelUser) => channelUser.user)
+  channelUsers: ChannelUser[];
 
   @OneToMany(() => ChannelChat, (chat) => chat.user)
   channelChats: ChannelChat[];

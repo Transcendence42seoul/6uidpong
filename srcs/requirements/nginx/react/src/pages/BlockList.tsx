@@ -1,23 +1,21 @@
 import React, { useEffect, useState } from 'react';
-import { Socket } from 'socket.io-client';
 
 import HoverButton from '../components/button/HoverButton';
 import CircularImage from '../components/container/CircularImage';
 import ListTitle from '../components/container/ListTitle';
+import selectSocket from '../features/socket/socketSelector';
 
 import type User from '../interfaces/User';
 
 import { isTest, mockUsers } from '../mock'; // test
 
-interface BlockListProps {
-  socket: Socket;
-}
+const BlockList: React.FC = () => {
+  const { socket } = selectSocket();
 
-const BlockList: React.FC<BlockListProps> = ({ socket }) => {
   const [blockedUsers, setBlockedUsers] = useState<User[]>([]);
 
   const handleUnblockClick = (interlocutorId: number) => {
-    socket.emit('unblock', { interlocutorId });
+    socket?.emit('unblock', { interlocutorId });
     setBlockedUsers([
       ...blockedUsers.filter((user) => user.id !== interlocutorId),
     ]);
@@ -27,7 +25,7 @@ const BlockList: React.FC<BlockListProps> = ({ socket }) => {
     const blockListHandler = (blockList: User[]) => {
       setBlockedUsers([...blockList]);
     };
-    socket.emit('find-block-users', blockListHandler);
+    socket?.emit('find-block-users', blockListHandler);
     setBlockedUsers(isTest ? mockUsers : blockedUsers); // test
   }, []);
 

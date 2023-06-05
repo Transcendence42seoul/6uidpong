@@ -3,6 +3,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import useCallApi from '../../utils/useCallApi';
 import CircularImage from './CircularImage';
 
+import selectAuth from '../../features/auth/authSelector';
+
 import type User from '../../interfaces/User';
 
 import { isTest, mockUsers } from '../../mock'; // test
@@ -18,42 +20,47 @@ const UserSearchBar: React.FC<UserSearchBarProps> = ({
 }) => {
   const callApi = useCallApi();
 
+  const { tokenInfo } = selectAuth();
+  const myId = tokenInfo?.id;
+
   const searchResultsRef = useRef<HTMLUListElement>(null);
-  const [search, setSearch] = useState<string>('');
   const [searchResults, setSearchResults] = useState<User[]>([]);
+  const [searchTerm, setSearchTerm] = useState<string>('');
   const [showSearchResults, setShowSearchResults] = useState<boolean>(false);
 
-  const handleSearchClick = () => {
-    setShowSearchResults(true);
-  };
-
   const handleUserClick = (user: User) => {
-    setSearch('');
-    setShowSearchResults(false);
     onUserClick(user);
   };
 
-  const handleSearchResults = async (data: User[]) => {
-    setSearchResults([...data]);
-  };
-
-  const handleShowSearchResults = async (nickname: string) => {
-    setShowSearchResults(!!nickname);
-  };
-
-  const handleSearchChange = async (
+  const handleSearchTermChange = (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    const nickname = event.target.value;
-    setSearch(nickname);
-    const config = {
-      url: '/api/v1/users/search',
-      params: { nickname },
-    };
-    const data: User[] = isTest ? mockUsers : await callApi(config); // test
-    await handleSearchResults(data);
-    await handleShowSearchResults(nickname);
+    setSearchTerm(event.target.value);
   };
+
+  const handleSearchResults = (users: User[]) => {
+    const results = users.filter((user) => user.id !== myId);
+    setSearchResults([...results]);
+  };
+
+  const handleShowSearchResults = () => {
+    setShowSearchResults(!!searchTerm);
+  };
+
+  useEffect(() => {
+    const fetchUsersData = async () => {
+      const config = {
+        url: '/api/v1/users/searchTerm',
+        params: { nickname: searchTerm },
+      };
+      const data: User[] = isTest ? mockUsers : await callApi(config); // test
+      handleSearchResults(data);
+    };
+    if (searchTerm) {
+      fetchUsersData();
+    }
+    handleShowSearchResults();
+  }, [searchTerm]);
 
   useEffect(() => {
     const handleOutsideClick = (event: MouseEvent) => {
@@ -75,9 +82,9 @@ const UserSearchBar: React.FC<UserSearchBarProps> = ({
       <input
         type="text"
         placeholder="Search users"
-        value={search}
-        onChange={handleSearchChange}
-        onClick={handleSearchClick}
+        value={searchTerm}
+        onChange={handleSearchTermChange}
+        onClick={handleShowSearchResults}
         className="w-full rounded border border-white p-2 shadow"
       />
       {showSearchResults && (

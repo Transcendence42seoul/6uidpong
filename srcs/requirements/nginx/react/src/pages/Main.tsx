@@ -9,9 +9,9 @@ const Main: React.FC = () => {
   const navigate = useNavigate();
 
   const handleChannelClick = () => navigate('/channel');
+  const handleCustomClick = () => navigate('/custom');
   const handleDmClick = () => navigate('/dm');
   const handleLadderClick = () => navigate('/ladder');
-  const handleCustomClick = () => navigate('/custom');
 
   return (
     <div className="flex min-h-screen items-center justify-center text-white">
@@ -26,10 +26,10 @@ const Main: React.FC = () => {
             GAME
           </h2>
         </ContentBox>
-        <div className="absolute inset-0 hidden flex-col justify-center group-hover:flex">
+        <div className="absolute inset-0 hidden flex-col justify-center space-y-10 group-hover:flex">
           <HoverButton
             onClick={handleCustomClick}
-            className="mb-10 h-1/4 w-full text-lg"
+            className="h-1/4 w-full text-lg"
           >
             CUSTOM
           </HoverButton>
@@ -52,11 +52,8 @@ const Main: React.FC = () => {
             CHAT
           </h2>
         </ContentBox>
-        <div className="absolute inset-0 hidden flex-col justify-center group-hover:flex">
-          <HoverButton
-            onClick={handleDmClick}
-            className="mb-10 h-1/4 w-full text-lg"
-          >
+        <div className="absolute inset-0 hidden flex-col justify-center space-y-10 group-hover:flex">
+          <HoverButton onClick={handleDmClick} className="h-1/4 w-full text-lg">
             DM
           </HoverButton>
           <HoverButton

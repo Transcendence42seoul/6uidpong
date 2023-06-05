@@ -70,7 +70,7 @@ export class UserController {
       const user: User = await this.userService.findOne(id);
       return new UserResponse(user);
     } catch {
-      throw new NotFoundException("user not exists");
+      throw new NotFoundException("user not exists.");
     }
   }
 
@@ -119,7 +119,6 @@ export class UserController {
     @Param("id", ParseIntPipe) userId: number
   ): Promise<FriendResponse[]> {
     const friends: Friend[] = await this.friendService.find(userId);
-
     return friends.map((friend) => new FriendResponse(friend));
   }
 
@@ -150,7 +149,6 @@ export class UserController {
   ): Promise<FriendRequestResponse[]> {
     const friendRequests: FriendRequest[] =
       await this.friendRequestService.find(userId);
-
     return friendRequests.map(
       (friendRequest) => new FriendRequestResponse(friendRequest)
     );
@@ -165,11 +163,10 @@ export class UserController {
   ): Promise<void> {
     try {
       await this.friendService.findOne(fromId, toId);
+      throw new BadRequestException("already friends.");
     } catch {
       await this.friendRequestService.insert(fromId, toId);
-      return;
     }
-    throw new BadRequestException("already friends");
   }
 
   @Delete("/:id/friend-requests/:fromId")

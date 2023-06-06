@@ -23,16 +23,18 @@ const GameList: React.FC = () => {
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
   const [showPasswordModal, setShowPasswordModal] = useState<boolean>(false);
 
-  const joinGame = () => {
+  const joinGame = (password: string | null = null) => {
     if (!selectedGame) return;
     const { roomId, isLocked } = selectedGame;
     if (!showPasswordModal && isLocked) {
       setShowPasswordModal(true);
       return;
     }
-    navigate(`/custom/${roomId}`, {
-      state: { game: selectedGame },
-    });
+    const roomInfo = {
+      roomId,
+      password,
+    };
+    gameSocket?.emit('join-custom-room', roomInfo);
   };
 
   const handleCreateClick = () => {
@@ -80,8 +82,8 @@ const GameList: React.FC = () => {
     setSearchTerm(event.target.value);
   };
 
-  const onConfirmClick = () => {
-    joinGame();
+  const onConfirmClick = (password: string) => {
+    joinGame(password);
   };
 
   useEffect(() => {
@@ -93,6 +95,18 @@ const GameList: React.FC = () => {
     gameSocket?.emit('custom-room-list');
     return () => {
       gameSocket?.off('custom-room-list', gameListHandler);
+    };
+  }, []);
+
+  useEffect(() => {
+    const gameHandler = (game: Game) => {
+      navigate(`/custom/${game.roomId}`, {
+        state: { game },
+      });
+    };
+    gameSocket?.on('user-join', gameHandler);
+    return () => {
+      gameSocket?.off('user-join', gameHandler);
     };
   }, []);
 

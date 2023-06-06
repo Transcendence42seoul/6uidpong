@@ -49,10 +49,6 @@ const GameList: React.FC = () => {
     joinGame();
   };
 
-  const handleGameList = () => {
-    gameSocket?.emit('custom-room-list');
-  };
-
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (!selectedGame) return;
     const { key } = event;
@@ -95,25 +91,23 @@ const GameList: React.FC = () => {
       setGames([...gameList]);
       setSearchResults([...gameList]);
     };
+    gameSocket?.on('custom-room-list', gameListHandler);
+    gameSocket?.emit('custom-room-list');
+    return () => {
+      gameSocket?.off('custom-room-list', gameListHandler);
+    };
+  }, []);
+
+  useEffect(() => {
     const gameHandler = (game: Game) => {
       navigate(`/custom/${game.roomId}`, {
         state: { game },
       });
     };
-    gameSocket?.on('custom-room-created', handleGameList);
-    gameSocket?.on('custom-room-list', gameListHandler);
-    gameSocket?.on('room-destroyed', handleGameList);
     gameSocket?.on('user-join', gameHandler);
     return () => {
-      gameSocket?.off('custom-room-created', handleGameList);
-      gameSocket?.off('custom-room-list', gameListHandler);
-      gameSocket?.off('room-destroyed', handleGameList);
       gameSocket?.off('user-join', gameHandler);
     };
-  }, []);
-
-  useEffect(() => {
-    handleGameList();
   }, []);
 
   return (

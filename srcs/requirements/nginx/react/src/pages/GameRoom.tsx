@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import HoverButton from '../components/button/HoverButton';
 import ContentBox from '../components/container/ContentBox';
@@ -14,23 +14,36 @@ const GameRoom: React.FC = () => {
 
   const navigate = useNavigate();
 
+  const { gameId: roomIdString } = useParams<{ gameId: string }>();
+  const roomId = Number(roomIdString);
+
   const { gameSocket } = selectGameSocket();
 
   const [room, setRoom] = useState<Game>(game);
 
+  const exitGame = () => {
+    navigate('/custom');
+  };
+
   const handleStartClick = () => {};
 
   const handleExitClick = () => {
-    navigate('/custom');
+    gameSocket?.emit('exit-custom-room', roomId);
+    exitGame();
   };
 
   useEffect(() => {
     const roomHandler = (updatedRoom: Game) => {
       setRoom({ ...updatedRoom });
     };
+    gameSocket?.on('room-destroyed', exitGame);
+    gameSocket?.on('user-exit', roomHandler);
     gameSocket?.on('user-join', roomHandler);
     return () => {
+      gameSocket?.off('room-destroyed', exitGame);
+      gameSocket?.off('user-exit', roomHandler);
       gameSocket?.off('user-join', roomHandler);
+      gameSocket?.emit('exit-custom-room', roomId);
     };
   }, []);
 

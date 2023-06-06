@@ -40,6 +40,7 @@ export interface UserGameRoomState {
 
 export interface gameRoomInfo {
   roomId: number;
+  mode: boolean;
   isLadder: boolean;
   user1: Socket;
   user2: Socket;

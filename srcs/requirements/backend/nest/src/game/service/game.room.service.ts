@@ -68,12 +68,14 @@ export class GameRoomService {
     player2: number,
     player1Nickname: string,
     player2Nickname: string,
-    mode: boolean
+    mode: boolean,
+    isLadder: boolean
   ): Promise<gameRoomInfo> {
     const roomId = this.roomNumber++;
     const roomInfo: gameRoomInfo = {
       roomId: roomId,
-      isLadder: mode,
+      mode: mode,
+      isLadder: isLadder,
       user1: user1,
       user2: user2,
       // id userrepo에서 가져오는걸로 수정 필요.
@@ -99,7 +101,7 @@ export class GameRoomService {
   }
 
   broadcastState(roomInfo: gameRoomInfo) {
-    const { user1, user2, state } = roomInfo;
+    const { user1, user2, state, mode } = roomInfo;
 
     state.paddle1 += state.keyState1 * 4 * 3;
     state.paddle2 += state.keyState1 * 4 * 3;
@@ -109,23 +111,43 @@ export class GameRoomService {
     if (state.paddle2 > GameInfo.maxy) state.paddle2 = GameInfo.maxy;
     else if (state.paddle2 < -GameInfo.maxy) state.paddle2 = -GameInfo.maxy;
 
-    // wall
-    if (
-      state.ball.y >= GameInfo.height / 2 - GameInfo.ballrad &&
-      state.ball.dy > 0
-    ) {
-      state.ball.dy *= -1;
-      state.ball.y =
-        (GameInfo.height / 2 - GameInfo.ballrad) * 2 - state.ball.y;
-    } else if (
-      state.ball.y <= -(GameInfo.height / 2 - GameInfo.ballrad) &&
-      state.ball.dy < 0
-    ) {
-      state.ball.dy *= -1;
-      state.ball.y = -(
-        (GameInfo.height / 2 - GameInfo.ballrad) * 2 +
-        state.ball.y
-      );
+    // wall. mode true일때 벽 통과해서 반대편 벽에서 나오게끔 처리해줘야함.
+    if (mode === false) {
+      if (
+        state.ball.y >= GameInfo.height / 2 - GameInfo.ballrad &&
+        state.ball.dy > 0
+      ) {
+        state.ball.dy *= -1;
+        state.ball.y =
+          (GameInfo.height / 2 - GameInfo.ballrad) * 2 - state.ball.y;
+      } else if (
+        state.ball.y <= -(GameInfo.height / 2 - GameInfo.ballrad) &&
+        state.ball.dy < 0
+      ) {
+        state.ball.dy *= -1;
+        state.ball.y = -(
+          (GameInfo.height / 2 - GameInfo.ballrad) * 2 +
+          state.ball.y
+        );
+      }
+    } else {
+      if (
+        state.ball.y >= GameInfo.height / 2 - GameInfo.ballrad &&
+        state.ball.dy > 0
+      ) {
+        state.ball.dy *= -1;
+        state.ball.y =
+          (GameInfo.height / 2 - GameInfo.ballrad) * 2 - state.ball.y;
+      } else if (
+        state.ball.y <= -(GameInfo.height / 2 - GameInfo.ballrad) &&
+        state.ball.dy < 0
+      ) {
+        state.ball.dy *= -1;
+        state.ball.y = -(
+          (GameInfo.height / 2 - GameInfo.ballrad) * 2 +
+          state.ball.y
+        );
+      }
     }
 
     //  paddle
@@ -197,7 +219,12 @@ export class GameRoomService {
     this.roomInfos[roomId] = null;
   }
 
-  async createRoom(user1: Socket, user2: Socket, mode: boolean) {
+  async createRoom(
+    user1: Socket,
+    user2: Socket,
+    mode: boolean,
+    isLadder: boolean
+  ) {
     const player1 = await this.userService.findBySocketId(user1.id);
     const player2 = await this.userService.findBySocketId(user2.id);
     const roomInfo: gameRoomInfo = await this.InitRoomState(
@@ -207,7 +234,8 @@ export class GameRoomService {
       player2.id,
       player1.nickname,
       player2.nickname,
-      mode
+      mode,
+      isLadder
     );
     const roomId = roomInfo.roomId;
 

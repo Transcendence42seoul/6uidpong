@@ -78,6 +78,7 @@ export class GameMatchService {
       await this.GameRoomService.createRoom(
         this.roomPassword[roomIndex].master,
         client,
+        room.mode,
         false
       );
     }
@@ -116,7 +117,7 @@ export class GameMatchService {
     for (let i = 1; i < length; i += 2) {
       const player1 = this.queue[0];
       const player2 = this.queue[1];
-      this.GameRoomService.createRoom(player1, player2, true);
+      this.GameRoomService.createRoom(player1, player2, false, true);
       console.log("game room created");
       this.queue.splice(0, 2);
     }

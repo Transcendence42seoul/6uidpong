@@ -12,20 +12,6 @@ interface GameRoomState {
   score2: number;
 }
 
-interface CanvasState {
-  status: number;
-  gameRoomState: GameRoomState | undefined;
-}
-
-interface UserGameRoomState {
-  paddle1: number;
-  paddle2: number;
-  ballx: number;
-  bally: number;
-  score1: number;
-  score2: number;
-}
-
 const GameInfo = {
   width: 640,
   height: 660,
@@ -43,17 +29,17 @@ const GameStart: React.FC = () => {
   if (canvas) {
     canvas.width = GameInfo.width;
     canvas.height = GameInfo.height;
-    // const ctx = canvas.getContext('2d');
-    // if (ctx === null) return <></>;
-    // ctx.fillStyle = '#000000';
-    // ctx.fillRect(0, 0, GameInfo.width, GameInfo.height);
-    // ctx.fillStyle = '#FFFFFF';
-    // ctx.beginPath();
-    // ctx.strokeStyle = '#FFFFFF';
-    // ctx.setLineDash([20, 20]);
-    // ctx.moveTo(GameInfo.width / 2, 0);
-    // ctx.lineTo(GameInfo.width / 2, GameInfo.height);
-    // ctx.stroke();
+    const ctx = canvas.getContext('2d');
+    if (ctx === null) return <div />;
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(0, 0, GameInfo.width, GameInfo.height);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.beginPath();
+    ctx.strokeStyle = '#FFFFFF';
+    ctx.setLineDash([20, 20]);
+    ctx.moveTo(GameInfo.width / 2, 0);
+    ctx.lineTo(GameInfo.width / 2, GameInfo.height);
+    ctx.stroke();
   }
 
   return (

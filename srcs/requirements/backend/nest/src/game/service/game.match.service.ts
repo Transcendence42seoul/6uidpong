@@ -40,6 +40,7 @@ export class GameMatchService {
     const roomPassword: customRoomPassword = {
       roomId,
       master: client,
+      participant: null,
       password: roomInfo.password,
     };
     this.roomPassword.push(roomPassword);

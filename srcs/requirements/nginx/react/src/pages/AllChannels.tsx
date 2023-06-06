@@ -24,25 +24,23 @@ const AllChannels: React.FC = () => {
   );
   const [showPasswordModal, setShowPasswordModal] = useState<boolean>(false);
 
-  const joinChannel = (id = selectedChannelId) => {
-    navigate(`/channel/${id}`);
-  };
-
   const handleChannelDoubleClick = ({ id, isLocked }: Channel) => {
     setSelectedChannelId(id);
     if (isLocked) {
       setShowPasswordModal(true);
       return;
     }
-    joinChannel(id);
+    navigate(`/channel/${id}`);
   };
 
   const handleCreateChannelClick = () => {
     navigate('/channel-settings');
   };
 
-  const onConfirmClick = () => {
-    joinChannel();
+  const onConfirmClick = (password: string) => {
+    navigate(`/channel/${selectedChannelId}`, {
+      state: { password },
+    });
   };
 
   useEffect(() => {

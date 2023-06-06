@@ -5,7 +5,7 @@ import ModalContainer from '../container/ModalContainer';
 import ContentBox from '../container/ContentBox';
 
 interface PasswordModalProps {
-  onConfirmClick: () => void;
+  onConfirmClick: (password: string) => void;
   setShowModal: (showModal: boolean) => void;
 }
 
@@ -20,7 +20,7 @@ const PasswordModal: React.FC<PasswordModalProps> = ({
   };
 
   const handleConfirmClick = () => {
-    onConfirmClick();
+    onConfirmClick(password);
   };
 
   const handleKeyDown = (event: KeyboardEvent) => {

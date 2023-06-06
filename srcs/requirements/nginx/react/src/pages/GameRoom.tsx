@@ -28,7 +28,6 @@ const GameRoom: React.FC = () => {
   const handleStartClick = () => {};
 
   const handleExitClick = () => {
-    gameSocket?.emit('exit-custom-room', roomId);
     exitGame();
   };
 

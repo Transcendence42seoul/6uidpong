@@ -58,13 +58,11 @@ export class GameMatchService {
       const room = this.rooms[roomIndex];
       if (this.roomPassword[roomIndex].master === client) {
         this.rooms.splice(roomIndex, 1);
-        this.roomPassword[roomIndex].master.emit("room-destroyed");
         client.emit("room-destroyed");
       } else {
         room.participantId = undefined;
         room.isLocked = false;
         this.roomPassword[roomIndex].master.emit("user-exit", room);
-        client.emit("user-exit", room);
       }
     } else {
       console.log("Room not found");
@@ -98,13 +96,10 @@ export class GameMatchService {
     );
     if (roomIndex !== -1) {
       const room = this.rooms[roomIndex];
-      if (room.isLocked == true) {
-        client.emit("room-already-locked", roomInfo.roomId);
-      } else if (this.roomPassword[roomIndex].password === roomInfo.password) {
+      if (this.roomPassword[roomIndex].password === roomInfo.password) {
         room.participantId = participantId;
         room.isLocked = true;
         this.roomPassword[roomIndex].master.emit("user-join", room);
-        client.emit("user-join", room);
       } else {
         client.emit("wrong-password", roomInfo.roomId);
       }

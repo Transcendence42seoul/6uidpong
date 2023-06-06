@@ -105,6 +105,7 @@ export class GameMatchService {
         room.isLocked = true;
         roomPassword.participant = client;
         roomPassword.master.emit("user-join", room);
+        client.emit("user-join", room);
       } else {
         client.emit("wrong-password", roomInfo.roomId);
       }

@@ -40,6 +40,7 @@ export class GameMatchService {
     const roomPassword: customRoomPassword = {
       roomId,
       master: client,
+      participant: undefined,
       password: roomInfo.password,
     };
     this.roomPassword.push(roomPassword);
@@ -56,13 +57,15 @@ export class GameMatchService {
     const roomIndex = this.rooms.findIndex((room) => room.roomId === roomId);
     if (roomIndex !== -1) {
       const room = this.rooms[roomIndex];
-      if (this.roomPassword[roomIndex].master === client) {
+      const roomPassword = this.roomPassword[roomIndex];
+      if (roomPassword.master === client) {
         this.rooms.splice(roomIndex, 1);
-        client.emit("room-destroyed");
+        roomPassword.participant.emit("room-destroyed");
       } else {
         room.participantId = undefined;
         room.isLocked = false;
-        this.roomPassword[roomIndex].master.emit("user-exit", room);
+        roomPassword.participant = undefined;
+        roomPassword.master.emit("user-exit", room);
       }
     } else {
       console.log("Room not found");
@@ -72,9 +75,9 @@ export class GameMatchService {
   async customGameStart(client: Socket, roomId: number): Promise<void> {
     const roomIndex = this.rooms.findIndex((room) => room.roomId === roomId);
     if (roomIndex !== -1) {
-      const room = this.rooms[roomIndex];
+      const roomPassword = this.roomPassword[roomIndex];
       await this.GameRoomService.createRoom(
-        this.roomPassword[roomIndex].master,
+        roomPassword.master,
         client,
         false
       );
@@ -96,10 +99,12 @@ export class GameMatchService {
     );
     if (roomIndex !== -1) {
       const room = this.rooms[roomIndex];
-      if (this.roomPassword[roomIndex].password === roomInfo.password) {
+      const roomPassword = this.roomPassword[roomIndex];
+      if (roomPassword.password === roomInfo.password) {
         room.participantId = participantId;
         room.isLocked = true;
-        this.roomPassword[roomIndex].master.emit("user-join", room);
+        roomPassword.participant = client;
+        roomPassword.master.emit("user-join", room);
       } else {
         client.emit("wrong-password", roomInfo.roomId);
       }

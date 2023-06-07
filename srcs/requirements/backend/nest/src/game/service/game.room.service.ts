@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { Socket } from "socket.io";
 import { User } from "src/user/entity/user.entity";
 import { UserService } from "src/user/service/user.service";
+import { setTimeout } from "timers";
 import {
   Ball,
   GameRoomState,
@@ -11,11 +12,11 @@ import {
 } from "../dto/game.dto";
 
 const GameInfo = {
-  width: 640,
-  height: 660,
+  width: 1200,
+  height: 800,
   paddlex: 10,
   paddley: 80,
-  maxy: (660 - 80) / 2,
+  maxy: (800 - 80) / 2,
   ballrad: 10,
 };
 
@@ -26,12 +27,17 @@ export class GameRoomService {
   private roomInfos: gameRoomInfo[] = [];
   private roomNumber = 1;
 
+  private randomSpeed() {
+    const n = Math.random();
+    return (3 + n * 3) * ((Math.floor(n * 10) % 2) * 2 - 1);
+  }
+
   private InitBallState(): Ball {
     return {
       x: 0,
       y: 0,
-      dx: 3,
-      dy: 3,
+      dx: this.randomSpeed(),
+      dy: this.randomSpeed(),
     };
   }
 
@@ -111,11 +117,11 @@ export class GameRoomService {
     if (state.paddle2 > GameInfo.maxy) state.paddle2 = GameInfo.maxy;
     else if (state.paddle2 < -GameInfo.maxy) state.paddle2 = -GameInfo.maxy;
 
-    state.ball.x += state.ball.dx * 1;
-    state.ball.y += state.ball.dy * 1;
+    state.ball.x += state.ball.dx * 1.5;
+    state.ball.y += state.ball.dy * 1.5;
 
     // wall. mode true일때 벽 통과해서 반대편 벽에서 나오게끔 처리해줘야함.
-    if (mode === false) {
+    if (mode === true) {
       if (
         state.ball.y >= GameInfo.height / 2 - GameInfo.ballrad &&
         state.ball.dy > 0
@@ -138,18 +144,14 @@ export class GameRoomService {
         state.ball.y >= GameInfo.height / 2 - GameInfo.ballrad &&
         state.ball.dy > 0
       ) {
-        state.ball.dy *= -1;
         state.ball.y =
-          (GameInfo.height / 2 - GameInfo.ballrad) * 2 - state.ball.y;
+          -(GameInfo.height / 2 - GameInfo.ballrad) * 2 + state.ball.y;
       } else if (
         state.ball.y <= -(GameInfo.height / 2 - GameInfo.ballrad) &&
         state.ball.dy < 0
       ) {
-        state.ball.dy *= -1;
-        state.ball.y = -(
-          (GameInfo.height / 2 - GameInfo.ballrad) * 2 +
-          state.ball.y
-        );
+        state.ball.y =
+          (GameInfo.height / 2 - GameInfo.ballrad) * 2 - state.ball.y;
       }
     }
 
@@ -254,14 +256,16 @@ export class GameRoomService {
     const startState: StartGameRoomState = this.makeStartState(roomInfo);
     user1.emit("game-start", startState);
     user2.emit("game-start", startState);
-    this.broadcastState = this.broadcastState.bind(this);
-    this.roomInfos[roomId] = roomInfo;
-    const broadcast = setInterval(
-      this.broadcastState,
-      20,
-      this.roomInfos[roomId]
-    );
-    this.roomInfos[roomId].broadcast = broadcast;
+    setTimeout(() => {
+      this.broadcastState = this.broadcastState.bind(this);
+      this.roomInfos[roomId] = roomInfo;
+      const broadcast = setInterval(
+        this.broadcastState,
+        20,
+        this.roomInfos[roomId]
+      );
+      this.roomInfos[roomId].broadcast = broadcast;
+    }, 5000);
   }
 
   handleKeyState(

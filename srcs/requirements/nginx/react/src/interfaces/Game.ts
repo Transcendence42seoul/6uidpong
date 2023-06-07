@@ -12,8 +12,8 @@ export interface GameRoomState {
   user2: number;
   paddle1: number;
   paddle2: number;
-  ballX: number;
-  ballY: number;
+  ballx: number;
+  bally: number;
   score1: number;
   score2: number;
 }

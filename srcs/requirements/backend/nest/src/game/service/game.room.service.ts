@@ -28,8 +28,8 @@ export class GameRoomService {
 
   private InitBallState(): Ball {
     return {
-      x: GameInfo.width / 2,
-      y: GameInfo.height / 2,
+      x: 0,
+      y: 0,
       dx: 3,
       dy: 3,
     };
@@ -110,6 +110,9 @@ export class GameRoomService {
     else if (state.paddle1 < -GameInfo.maxy) state.paddle1 = -GameInfo.maxy;
     if (state.paddle2 > GameInfo.maxy) state.paddle2 = GameInfo.maxy;
     else if (state.paddle2 < -GameInfo.maxy) state.paddle2 = -GameInfo.maxy;
+
+    state.ball.x += state.ball.dx * 1;
+    state.ball.y += state.ball.dy * 1;
 
     // wall. mode true일때 벽 통과해서 반대편 벽에서 나오게끔 처리해줘야함.
     if (mode === false) {
@@ -196,6 +199,8 @@ export class GameRoomService {
     } else if (state.score2 >= 5) {
       this.endGame(user2, user1, roomInfo, userGameRoomState);
     }
+
+    console.log(userGameRoomState);
 
     user1.emit("game-state", userGameRoomState);
     user2.emit("game-state", userGameRoomState);

@@ -15,6 +15,24 @@ const GameStart: React.FC = () => {
   const { gameSocket } = selectGameSocket();
   const ref = useRef<HTMLCanvasElement>(null);
   const [gameRoomState, setGameRoomState] = useState<GameRoomState>();
+  const [upState, setUpState] = useState<boolean>(false);
+  const [downState, setDownState] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (upState) {
+      gameSocket?.emit('keydown', { roomId: gameRoomState?.roomId, code: -1 });
+    } else {
+      gameSocket?.emit('keyup', { roomId: gameRoomState?.roomId, code: -1 });
+    }
+  }, [upState]);
+
+  useEffect(() => {
+    if (downState) {
+      gameSocket?.emit('keydown', { roomId: gameRoomState?.roomId, code: 1 });
+    } else {
+      gameSocket?.emit('keyup', { roomId: gameRoomState?.roomId, code: 1 });
+    }
+  }, [downState]);
 
   useEffect(() => {
     const handleGameStateChange = (data: GameRoomState) => {
@@ -22,6 +40,24 @@ const GameStart: React.FC = () => {
     };
 
     gameSocket?.on('game-state', handleGameStateChange);
+
+    document.addEventListener('keydown', (key) => {
+      if (key.repeat) return;
+      if (key.keyCode === 38) {
+        setUpState(true);
+      } else if (key.keyCode === 40) {
+        setDownState(true);
+      }
+    });
+
+    document.addEventListener('keyup', (key) => {
+      if (key.repeat) return;
+      if (key.keyCode === 38) {
+        setUpState(false);
+      } else if (key.keyCode === 40) {
+        setDownState(false);
+      }
+    });
 
     const cvs = ref.current;
     if (cvs) {

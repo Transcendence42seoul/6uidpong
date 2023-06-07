@@ -1,5 +1,7 @@
 import { UseGuards } from "@nestjs/common";
 import {
+  ConnectedSocket,
+  MessageBody,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
@@ -24,12 +26,26 @@ export class GameRoomGateway {
   constructor(private gameRoomService: GameRoomService) {}
 
   @SubscribeMessage("keyup")
-  keyup(client: Socket, payload: keyCode): void {
-    this.gameRoomService.handleKeyState(client, payload, 1);
+  keyup(
+    @ConnectedSocket() client: Socket,
+    @MessageBody()
+    keyInfo: {
+      roomId: number;
+      code: number;
+    }
+  ): void {
+    this.gameRoomService.handleKeyState(client, keyInfo, -1);
   }
 
   @SubscribeMessage("keydown")
-  keydown(client: Socket, payload: keyCode): void {
-    this.gameRoomService.handleKeyState(client, payload, -1);
+  keydown(
+    @ConnectedSocket() client: Socket,
+    @MessageBody()
+    keyInfo: {
+      roomId: number;
+      code: number;
+    }
+  ): void {
+    this.gameRoomService.handleKeyState(client, keyInfo, 1);
   }
 }

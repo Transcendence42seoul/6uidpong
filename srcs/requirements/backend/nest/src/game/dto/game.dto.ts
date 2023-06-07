@@ -19,6 +19,7 @@ export interface GameRoomState {
 }
 
 export interface StartGameRoomState {
+  roomId: number;
   user1Id: number;
   user2Id: number;
   paddle1: number;
@@ -30,6 +31,7 @@ export interface StartGameRoomState {
 }
 
 export interface UserGameRoomState {
+  roomId: number;
   paddle1: number;
   paddle2: number;
   ballx: number;

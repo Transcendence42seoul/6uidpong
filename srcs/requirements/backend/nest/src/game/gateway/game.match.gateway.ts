@@ -35,8 +35,6 @@ export class GameMatchGateway {
       mode: boolean;
     }
   ): void {
-    console.log(client);
-    console.log(roomInfo);
     this.gameMatchService.createCustomGame(client, roomInfo);
   }
 

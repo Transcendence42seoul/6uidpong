@@ -8,6 +8,7 @@ export interface Game {
 }
 
 export interface GameRoomState {
+  roomId: number;
   user1: number;
   user2: number;
   paddle1: number;

@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { Socket } from "socket.io";
+import { User } from "src/user/entity/user.entity";
 import { UserService } from "src/user/service/user.service";
 import {
   Ball,
@@ -7,7 +8,6 @@ import {
   StartGameRoomState,
   UserGameRoomState,
   gameRoomInfo,
-  keyCode,
 } from "../dto/game.dto";
 
 const GameInfo = {
@@ -37,6 +37,7 @@ export class GameRoomService {
 
   makeStartState(roomInfo: gameRoomInfo) {
     const StartState: StartGameRoomState = {
+      roomId: roomInfo.roomId,
       user1Id: roomInfo.user1Id,
       user2Id: roomInfo.user2Id,
       paddle1: roomInfo.state.paddle1,
@@ -49,8 +50,9 @@ export class GameRoomService {
     return StartState;
   }
 
-  makeUserState(roomState: GameRoomState) {
+  makeUserState(roomState: GameRoomState, roomId: number) {
     const userState: UserGameRoomState = {
+      roomId: roomId,
       paddle1: roomState.paddle1,
       paddle2: roomState.paddle2,
       ballx: roomState.ball.x,
@@ -78,7 +80,6 @@ export class GameRoomService {
       isLadder: isLadder,
       user1: user1,
       user2: user2,
-      // id userrepo에서 가져오는걸로 수정 필요.
       user1Id: player1,
       user2Id: player2,
       player1Nickname: player1Nickname,
@@ -96,15 +97,14 @@ export class GameRoomService {
       endAt: new Date(),
       broadcast: null,
     };
-    console.log(roomInfo);
     return roomInfo;
   }
 
   broadcastState(roomInfo: gameRoomInfo) {
-    const { user1, user2, state, mode } = roomInfo;
+    const { roomId, user1, user2, state, mode } = roomInfo;
 
     state.paddle1 += state.keyState1 * 4 * 3;
-    state.paddle2 += state.keyState1 * 4 * 3;
+    state.paddle2 += state.keyState2 * 4 * 3;
 
     if (state.paddle1 > GameInfo.maxy) state.paddle1 = GameInfo.maxy;
     else if (state.paddle1 < -GameInfo.maxy) state.paddle1 = -GameInfo.maxy;
@@ -192,7 +192,10 @@ export class GameRoomService {
       state.ball = this.InitBallState();
     }
 
-    const userGameRoomState: UserGameRoomState = this.makeUserState(state);
+    const userGameRoomState: UserGameRoomState = this.makeUserState(
+      state,
+      roomId
+    );
 
     if (state.score1 >= 5) {
       this.endGame(user1, user2, roomInfo, userGameRoomState);
@@ -200,8 +203,7 @@ export class GameRoomService {
       this.endGame(user2, user1, roomInfo, userGameRoomState);
     }
 
-    console.log(userGameRoomState);
-
+    console.log(userGameRoomState.paddle1, userGameRoomState.paddle2);
     user1.emit("game-state", userGameRoomState);
     user2.emit("game-state", userGameRoomState);
   }
@@ -249,7 +251,7 @@ export class GameRoomService {
     user1.data = { ...user1.data, roomId: roomId };
     user2.data = { ...user2.data, roomId: roomId };
 
-    const startState = this.makeStartState(roomInfo);
+    const startState: StartGameRoomState = this.makeStartState(roomInfo);
     user1.emit("game-start", startState);
     user2.emit("game-start", startState);
     this.broadcastState = this.broadcastState.bind(this);
@@ -262,13 +264,21 @@ export class GameRoomService {
     this.roomInfos[roomId].broadcast = broadcast;
   }
 
-  handleKeyState(client: Socket, keyCode: keyCode, keyState: number) {
-    const roomId = client.data.roomId;
-    const roomInfo = this.roomInfos.find((room) => room.roomId === roomId);
-    if (roomInfo.user1 === client) {
-      roomInfo.state.keyState1 += keyCode.keyCode * keyState;
-    } else if (roomInfo.user2 === client) {
-      roomInfo.state.keyState2 += keyCode.keyCode * keyState;
+  handleKeyState(
+    client: Socket,
+    keyInfo: {
+      roomId: number;
+      code: number;
+    },
+    keyState: number
+  ) {
+    const roomInfo: gameRoomInfo = this.roomInfos[keyInfo.roomId];
+    if (roomInfo) {
+      if (roomInfo.user1 === client) {
+        roomInfo.state.keyState1 += keyInfo.code * keyState;
+      } else if (roomInfo.user2 === client) {
+        roomInfo.state.keyState2 += keyInfo.code * keyState;
+      }
     }
   }
 }

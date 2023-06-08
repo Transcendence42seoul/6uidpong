@@ -26,7 +26,11 @@ const GameRoom: React.FC = () => {
     navigate('/custom');
   };
 
-  const handleStartClick = () => {};
+  const handleStartClick = () => {
+    const roomInfo = { roomId, mode };
+    gameSocket?.emit('start-custom-room', roomInfo);
+    navigate('/game-start');
+  };
 
   const handleExitClick = () => {
     exitGame();

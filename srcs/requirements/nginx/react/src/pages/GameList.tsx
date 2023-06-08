@@ -30,10 +30,7 @@ const GameList: React.FC = () => {
       setShowPasswordModal(true);
       return;
     }
-    const roomInfo = {
-      roomId,
-      password,
-    };
+    const roomInfo = { roomId, password };
     gameSocket?.emit('join-custom-room', roomInfo);
   };
 

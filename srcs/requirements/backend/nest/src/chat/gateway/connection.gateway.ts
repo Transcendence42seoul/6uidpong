@@ -1,16 +1,12 @@
-import { UseGuards } from "@nestjs/common";
 import {
   ConnectedSocket,
+  OnGatewayConnection,
   OnGatewayDisconnect,
-  SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
 } from "@nestjs/websockets";
 import { Namespace, Socket } from "socket.io";
-import { WsJwtAccessGuard } from "../guard/ws-jwt-access.guard";
 import { ConnectionService } from "../service/connection/connection.service";
-import { WsJwtPayload } from "../utils/decorator/ws-jwt-payload.decorator";
-import { JwtPayload } from "jsonwebtoken";
 
 @WebSocketGateway(80, {
   namespace: "chat",
@@ -19,22 +15,23 @@ import { JwtPayload } from "jsonwebtoken";
     credentials: true,
   },
 })
-@UseGuards(WsJwtAccessGuard)
-export class ConnectionGateway implements OnGatewayDisconnect {
+export class ConnectionGateway
+  implements OnGatewayConnection, OnGatewayDisconnect
+{
   @WebSocketServer()
   server: Namespace;
 
   constructor(private readonly connectionService: ConnectionService) {}
 
-  async handleDisconnect(@ConnectedSocket() client: Socket) {
-    await this.connectionService.disconnect(client.id);
+  async handleConnection(@ConnectedSocket() client: Socket) {
+    try {
+      await this.connectionService.connect(client, this.server);
+    } catch {
+      client.disconnect();
+    }
   }
 
-  @SubscribeMessage("connection")
-  async connectClient(
-    @WsJwtPayload() jwt: JwtPayload,
-    @ConnectedSocket() client: Socket
-  ): Promise<void> {
-    await this.connectionService.connect(jwt.id, client.id, this.server);
+  async handleDisconnect(@ConnectedSocket() client: Socket) {
+    await this.connectionService.disconnect(client.id);
   }
 }

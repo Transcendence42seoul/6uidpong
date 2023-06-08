@@ -14,7 +14,7 @@ export class WsJwtAccessGuard implements CanActivate {
       throw new WsException("token not exists.");
     }
     try {
-      const payload: Object = await this.jwtService.verifyAsync(token, {
+      const payload = await this.jwtService.verifyAsync(token, {
         secret: process.env.JWT_ACCESS_SECRET_KEY,
       });
       client.data["user"] = payload;
@@ -25,9 +25,6 @@ export class WsJwtAccessGuard implements CanActivate {
   }
 
   private extractToken(client: Socket): string | undefined {
-    // const [type, token]: string[] =
-    //   client.handshake.headers.authorization?.split(" ") ?? [];
-    // return type === "Bearer" ? token : undefined;
     const { token } = client.handshake.auth;
     return token ? token : undefined;
   }

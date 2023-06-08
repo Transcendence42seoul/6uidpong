@@ -4,8 +4,7 @@ import HoverButton from '../components/button/HoverButton';
 
 const Login: React.FC = () => {
   const handleLoginClick = () => {
-    window.location.href =
-      'https://localhost/api/v1/auth/social/redirect/forty-two';
+    window.location.href = `https://${window.location.hostname}/api/v1/auth/social/redirect/forty-two`;
   };
 
   return (

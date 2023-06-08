@@ -19,6 +19,7 @@ const GameRoom: React.FC = () => {
 
   const { gameSocket } = selectGameSocket();
 
+  const [mode, setMode] = useState<boolean>(false);
   const [room, setRoom] = useState<Game>(game);
 
   const exitGame = () => {
@@ -29,6 +30,10 @@ const GameRoom: React.FC = () => {
 
   const handleExitClick = () => {
     exitGame();
+  };
+
+  const handleToggleChange = () => {
+    setMode(!mode);
   };
 
   useEffect(() => {
@@ -57,13 +62,43 @@ const GameRoom: React.FC = () => {
             <UserProfile userId={room.participantId}> </UserProfile>
           )}
         </div>
-        <div className="flex space-x-2">
-          <HoverButton className="border p-2" onClick={handleStartClick}>
-            Start
-          </HoverButton>
-          <HoverButton className="border p-2" onClick={handleExitClick}>
-            Exit
-          </HoverButton>
+        <div className="space-y-3">
+          <div className="flex items-center space-x-2.5">
+            <span>Normal</span>
+            <label
+              htmlFor="toggle"
+              className="flex cursor-pointer items-center"
+            >
+              <div className="relative">
+                <input
+                  type="checkbox"
+                  id="toggle"
+                  className="sr-only"
+                  checked={!mode}
+                  onChange={handleToggleChange}
+                />
+                <div
+                  className={`h-7 w-12 rounded-full transition ${
+                    mode ? 'bg-red-300' : 'bg-blue-300'
+                  }`}
+                />
+                <div
+                  className={`dot absolute left-1 top-1 h-5 w-5 rounded-full bg-white transition ${
+                    mode ? 'translate-x-full transform' : ''
+                  }`}
+                />
+              </div>
+            </label>
+            <span>Destroy</span>
+          </div>
+          <div className="space-x-2">
+            <HoverButton className="border p-2" onClick={handleStartClick}>
+              Start
+            </HoverButton>
+            <HoverButton className="border p-2" onClick={handleExitClick}>
+              Exit
+            </HoverButton>
+          </div>
         </div>
       </ContentBox>
     </div>

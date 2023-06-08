@@ -151,7 +151,7 @@ export class GameRoomService {
         state.ball.dy < 0
       ) {
         state.ball.y =
-          (GameInfo.height / 2 - GameInfo.ballrad) * 2 - state.ball.y;
+          (GameInfo.height / 2 - GameInfo.ballrad) * 2 + state.ball.y;
       }
     }
 
@@ -205,7 +205,6 @@ export class GameRoomService {
       this.endGame(user2, user1, roomInfo, userGameRoomState);
     }
 
-    console.log(userGameRoomState.paddle1, userGameRoomState.paddle2);
     user1.emit("game-state", userGameRoomState);
     user2.emit("game-state", userGameRoomState);
   }
@@ -236,6 +235,12 @@ export class GameRoomService {
   ) {
     const player1 = await this.userService.findBySocketId(user1.id);
     const player2 = await this.userService.findBySocketId(user2.id);
+    console.log("");
+    console.log("");
+    console.log("");
+    console.log("");
+    console.log("");
+    console.log(player1, player2);
     const roomInfo: gameRoomInfo = await this.InitRoomState(
       user1,
       user2,
@@ -265,7 +270,7 @@ export class GameRoomService {
         this.roomInfos[roomId]
       );
       this.roomInfos[roomId].broadcast = broadcast;
-    }, 5000);
+    }, 8000);
   }
 
   handleKeyState(

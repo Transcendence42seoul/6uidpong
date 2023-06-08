@@ -44,10 +44,15 @@ const GameRoom: React.FC = () => {
     const roomHandler = (updatedRoom: Game) => {
       setRoom({ ...updatedRoom });
     };
+    const startHandler = () => {
+      navigate('/game-start');
+    };
+    gameSocket?.on('game-start', startHandler);
     gameSocket?.on('room-destroyed', exitGame);
     gameSocket?.on('user-exit', roomHandler);
     gameSocket?.on('user-join', roomHandler);
     return () => {
+      gameSocket?.on('game-start', startHandler);
       gameSocket?.off('room-destroyed', exitGame);
       gameSocket?.off('user-exit', roomHandler);
       gameSocket?.off('user-join', roomHandler);

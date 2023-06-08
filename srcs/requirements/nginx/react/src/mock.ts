@@ -24,7 +24,7 @@ export const mockGames = [
     isLocked: false,
     mode: false,
     masterId: 110729,
-    participantId: null,
+    participantId: undefined,
   },
   {
     roomId: 2,

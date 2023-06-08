@@ -2,9 +2,9 @@ export interface Game {
   roomId: number;
   title: string;
   isLocked: boolean;
-  mode: boolean;
+  mode: boolean | undefined;
   masterId: number;
-  participantId: number | null;
+  participantId: number | undefined;
 }
 
 export interface GameRoomState {

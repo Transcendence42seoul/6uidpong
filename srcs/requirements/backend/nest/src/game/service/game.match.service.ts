@@ -119,7 +119,6 @@ export class GameMatchService {
       const player1 = this.queue[0];
       const player2 = this.queue[1];
       this.GameRoomService.createRoom(player1, player2, false, true);
-      console.log("game room created");
       this.queue.splice(0, 2);
     }
   }

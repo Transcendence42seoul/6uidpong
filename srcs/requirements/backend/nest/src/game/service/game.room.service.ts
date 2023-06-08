@@ -121,7 +121,7 @@ export class GameRoomService {
     state.ball.y += state.ball.dy * 1.5;
 
     // wall. mode true일때 벽 통과해서 반대편 벽에서 나오게끔 처리해줘야함.
-    if (mode === true) {
+    if (mode === false) {
       if (
         state.ball.y >= GameInfo.height / 2 - GameInfo.ballrad &&
         state.ball.dy > 0
@@ -205,7 +205,6 @@ export class GameRoomService {
       this.endGame(user2, user1, roomInfo, userGameRoomState);
     }
 
-    console.log(userGameRoomState.paddle1, userGameRoomState.paddle2);
     user1.emit("game-state", userGameRoomState);
     user2.emit("game-state", userGameRoomState);
   }
@@ -236,6 +235,12 @@ export class GameRoomService {
   ) {
     const player1 = await this.userService.findBySocketId(user1.id);
     const player2 = await this.userService.findBySocketId(user2.id);
+    console.log("");
+    console.log("");
+    console.log("");
+    console.log("");
+    console.log("");
+    console.log(player1, player2);
     const roomInfo: gameRoomInfo = await this.InitRoomState(
       user1,
       user2,

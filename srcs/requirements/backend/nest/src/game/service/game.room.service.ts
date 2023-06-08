@@ -255,16 +255,29 @@ export class GameRoomService {
     const startState: StartGameRoomState = this.makeStartState(roomInfo);
     user1.emit("game-start", startState);
     user2.emit("game-start", startState);
-    setTimeout(() => {
-      this.broadcastState = this.broadcastState.bind(this);
-      this.roomInfos[roomId] = roomInfo;
-      const broadcast = setInterval(
-        this.broadcastState,
-        20,
-        this.roomInfos[roomId]
-      );
-      this.roomInfos[roomId].broadcast = broadcast;
-    }, 8000);
+    if (roomInfo.isLadder === true) {
+      setTimeout(() => {
+        this.broadcastState = this.broadcastState.bind(this);
+        this.roomInfos[roomId] = roomInfo;
+        const broadcast = setInterval(
+          this.broadcastState,
+          20,
+          this.roomInfos[roomId]
+        );
+        this.roomInfos[roomId].broadcast = broadcast;
+      }, 8000);
+    } else {
+      setTimeout(() => {
+        this.broadcastState = this.broadcastState.bind(this);
+        this.roomInfos[roomId] = roomInfo;
+        const broadcast = setInterval(
+          this.broadcastState,
+          20,
+          this.roomInfos[roomId]
+        );
+        this.roomInfos[roomId].broadcast = broadcast;
+      }, 3000);
+    }
   }
 
   handleKeyState(

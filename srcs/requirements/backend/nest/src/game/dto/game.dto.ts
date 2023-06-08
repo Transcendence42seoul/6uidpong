@@ -68,7 +68,7 @@ export interface customRoomInfo {
   participantId: number | undefined;
 }
 
-export interface customRoomPassword {
+export interface roomSecretInfo {
   roomId: number;
   master: Socket;
   participant: Socket | undefined;

@@ -3,14 +3,14 @@ import { timeStamp } from "console";
 import { Namespace, Socket } from "socket.io";
 import { UserService } from "src/user/service/user.service";
 import { ServerType } from "typeorm";
-import { customRoomInfo, customRoomPassword } from "../dto/game.dto";
+import { customRoomInfo, roomSecretInfo } from "../dto/game.dto";
 import { GameRoomService } from "./game.room.service";
 
 @Injectable()
 export class GameMatchService {
   private queue: Socket[] = [];
   private rooms: customRoomInfo[] = [];
-  private roomPassword: customRoomPassword[] = [];
+  private roomPassword: roomSecretInfo[] = [];
   private roomNumber = 1;
 
   constructor(
@@ -37,7 +37,7 @@ export class GameMatchService {
       participantId: undefined,
     };
     this.rooms.push(room);
-    const roomPassword: customRoomPassword = {
+    const roomPassword: roomSecretInfo = {
       roomId,
       master: client,
       participant: null,
@@ -150,7 +150,7 @@ export class GameMatchService {
       participantId: undefined,
     };
     this.rooms.push(room);
-    const roomPassword: customRoomPassword = {
+    const roomPassword: roomSecretInfo = {
       roomId,
       master: client,
       participant: null,

@@ -64,7 +64,6 @@ export interface customRoomInfo {
   roomId: number;
   title: string;
   isLocked: boolean;
-  mode: boolean;
   masterId: number;
   participantId: number | undefined;
 }

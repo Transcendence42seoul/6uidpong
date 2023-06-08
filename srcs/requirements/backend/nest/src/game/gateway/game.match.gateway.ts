@@ -32,10 +32,17 @@ export class GameMatchGateway {
     roomInfo: {
       title: string;
       password: string | null;
-      mode: boolean;
     }
   ): void {
     this.gameMatchService.createCustomGame(client, roomInfo);
+  }
+
+  @SubscribeMessage("invite-game")
+  handleInviteGame(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() opponent: number
+  ): void {
+    this.gameMatchService.handleInviteGame(client, opponent);
   }
 
   @SubscribeMessage("join-custom-room")
@@ -54,9 +61,13 @@ export class GameMatchGateway {
   @SubscribeMessage("start-custom-room")
   startCustomGame(
     @ConnectedSocket() client: Socket,
-    @MessageBody() roomId: number
+    @MessageBody()
+    roomInfo: {
+      roomId: number;
+      mode: boolean;
+    }
   ): void {
-    this.gameMatchService.customGameStart(client, roomId);
+    this.gameMatchService.customGameStart(client, roomInfo);
   }
 
   @SubscribeMessage("exit-custom-room")

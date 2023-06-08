@@ -23,7 +23,6 @@ export class GameMatchService {
     roomInfo: {
       title: string;
       password: string | null;
-      mode: boolean;
     }
   ): Promise<void> {
     const roomId = this.roomNumber++;
@@ -32,7 +31,6 @@ export class GameMatchService {
       roomId,
       title: roomInfo.title,
       isLocked: !!roomInfo.password,
-      mode: roomInfo.mode,
       masterId,
       participantId: undefined,
     };
@@ -72,14 +70,22 @@ export class GameMatchService {
     }
   }
 
-  async customGameStart(client: Socket, roomId: number): Promise<void> {
-    const roomIndex = this.rooms.findIndex((room) => room.roomId === roomId);
+  async customGameStart(
+    client: Socket,
+    roomInfo: {
+      roomId: number;
+      mode: boolean;
+    }
+  ): Promise<void> {
+    const roomIndex = this.rooms.findIndex(
+      (room) => room.roomId === roomInfo.roomId
+    );
     if (roomIndex !== -1) {
       const room = this.rooms[roomIndex];
       await this.GameRoomService.createRoom(
         this.roomPassword[roomIndex].master,
         client,
-        room.mode,
+        roomInfo.mode,
         false
       );
     }
@@ -122,6 +128,8 @@ export class GameMatchService {
       this.queue.splice(0, 2);
     }
   }
+
+  handleInviteGame(client: Socket, opponent: number) {}
 
   handleLadderMatchStart(client: Socket): void {
     if (this.queue.find((queue) => queue === client) === undefined) {

@@ -1,6 +1,8 @@
 import { Injectable } from "@nestjs/common";
-import { Socket } from "socket.io";
+import { timeStamp } from "console";
+import { Namespace, Socket } from "socket.io";
 import { UserService } from "src/user/service/user.service";
+import { ServerType } from "typeorm";
 import { customRoomInfo, customRoomPassword } from "../dto/game.dto";
 import { GameRoomService } from "./game.room.service";
 
@@ -106,9 +108,12 @@ export class GameMatchService {
     );
     if (roomIndex !== -1) {
       const room = this.rooms[roomIndex];
-      if (room.isLocked == true) {
-        client.emit("room-already-locked", roomInfo.roomId);
-      } else if (this.roomPassword[roomIndex].password === roomInfo.password) {
+      if (room.participantId !== undefined) {
+        client.emit("room-full", roomInfo.roomId);
+      } else if (
+        room.isLocked === true &&
+        this.roomPassword[roomIndex].password === roomInfo.password
+      ) {
         room.participantId = participantId;
         room.isLocked = true;
         this.roomPassword[roomIndex].master.emit("user-join", room);
@@ -129,7 +134,42 @@ export class GameMatchService {
     }
   }
 
-  handleInviteGame(client: Socket, opponent: number) {}
+  async handleInviteGame(
+    client: Socket,
+    opponent: number,
+    server: Namespace
+  ): Promise<void> {
+    const user = await this.userService.findOne(opponent);
+    const master = await this.userService.findBySocketId(client.id);
+    const roomId = this.roomNumber++;
+    const room: customRoomInfo = {
+      roomId,
+      title: user.nickname + "'s game",
+      isLocked: true,
+      masterId: user.id,
+      participantId: undefined,
+    };
+    this.rooms.push(room);
+    const roomPassword: customRoomPassword = {
+      roomId,
+      master: client,
+      participant: null,
+      password: "Zxcasdqwe12#",
+    };
+    this.roomPassword.push(roomPassword);
+    server
+      .to(user.socketId)
+      .emit("invited-user", { nickname: master.nickname, roomId });
+    client.emit("invite-room-created", roomId);
+  }
+
+  async handleInviteFail(client: Socket, roomId: number, server: Namespace) {
+    const user = await this.userService.findOne(this.rooms[roomId].masterId);
+    const participant = await this.userService.findBySocketId(client.id);
+    this.rooms.splice(roomId, 1);
+    this.roomPassword.splice(roomId, 1);
+    server.to(user.socketId).emit("invite-dismissed", participant.nickname);
+  }
 
   handleLadderMatchStart(client: Socket): void {
     if (this.queue.find((queue) => queue === client) === undefined) {

@@ -42,7 +42,27 @@ export class GameMatchGateway {
     @ConnectedSocket() client: Socket,
     @MessageBody() opponent: number
   ): void {
-    this.gameMatchService.handleInviteGame(client, opponent);
+    this.gameMatchService.handleInviteGame(client, opponent, this.server);
+  }
+
+  @SubscribeMessage("invite-success")
+  handleInviteSuccess(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() roomId: number
+  ): void {
+    const roomInfo = {
+      roomId: roomId,
+      password: "Zxcasdqwe12#",
+    };
+    this.gameMatchService.joinCustomGame(client, roomInfo);
+  }
+
+  @SubscribeMessage("invite-failed")
+  handleInviteFail(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() roomId: number
+  ): void {
+    this.gameMatchService.handleInviteFail(client, roomId, this.server);
   }
 
   @SubscribeMessage("join-custom-room")

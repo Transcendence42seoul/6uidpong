@@ -82,13 +82,15 @@ export class GameMatchService {
       (room) => room.roomId === roomInfo.roomId
     );
     if (roomIndex !== -1) {
-      const roomSecret = this.roomSecrets[roomIndex];
-      await this.GameRoomService.createRoom(
-        roomSecret.master,
-        client,
-        roomInfo.mode,
-        false
-      );
+      if (this.rooms[roomIndex].participantId) {
+        const roomSecret = this.roomSecrets[roomIndex];
+        await this.GameRoomService.createRoom(
+          roomSecret.master,
+          client,
+          roomInfo.mode,
+          false
+        );
+      }
     }
   }
 

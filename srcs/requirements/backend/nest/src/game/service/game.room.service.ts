@@ -121,7 +121,7 @@ export class GameRoomService {
     state.ball.y += state.ball.dy * 1.5;
 
     // wall. mode true일때 벽 통과해서 반대편 벽에서 나오게끔 처리해줘야함.
-    if (mode === false) {
+    if (mode === true) {
       if (
         state.ball.y >= GameInfo.height / 2 - GameInfo.ballrad &&
         state.ball.dy > 0
@@ -151,7 +151,7 @@ export class GameRoomService {
         state.ball.dy < 0
       ) {
         state.ball.y =
-          (GameInfo.height / 2 - GameInfo.ballrad) * 2 - state.ball.y;
+          (GameInfo.height / 2 - GameInfo.ballrad) * 2 + state.ball.y;
       }
     }
 
@@ -270,7 +270,7 @@ export class GameRoomService {
         this.roomInfos[roomId]
       );
       this.roomInfos[roomId].broadcast = broadcast;
-    }, 5000);
+    }, 8000);
   }
 
   handleKeyState(

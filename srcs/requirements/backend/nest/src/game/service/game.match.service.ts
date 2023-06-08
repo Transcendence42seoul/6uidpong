@@ -10,7 +10,7 @@ import { GameRoomService } from "./game.room.service";
 export class GameMatchService {
   private queue: Socket[] = [];
   private rooms: customRoomInfo[] = [];
-  private roomPassword: roomSecretInfo[] = [];
+  private roomSecrets: roomSecretInfo[] = [];
   private roomNumber = 1;
 
   constructor(
@@ -37,13 +37,13 @@ export class GameMatchService {
       participantId: undefined,
     };
     this.rooms.push(room);
-    const roomPassword: roomSecretInfo = {
+    const roomSecret: roomSecretInfo = {
       roomId,
       master: client,
       participant: null,
       password: roomInfo.password,
     };
-    this.roomPassword.push(roomPassword);
+    this.roomSecrets.push(roomSecret);
     client.emit("custom-room-created", roomId);
   }
 
@@ -57,15 +57,14 @@ export class GameMatchService {
     const roomIndex = this.rooms.findIndex((room) => room.roomId === roomId);
     if (roomIndex !== -1) {
       const room = this.rooms[roomIndex];
-      if (this.roomPassword[roomIndex].master === client) {
+      const roomSecret = this.roomSecrets[roomIndex];
+      if (roomSecret.master === client) {
         this.rooms.splice(roomIndex, 1);
-        this.roomPassword[roomIndex].master.emit("room-destroyed");
         client.emit("room-destroyed");
       } else {
         room.participantId = undefined;
         room.isLocked = false;
-        this.roomPassword[roomIndex].master.emit("user-exit", room);
-        client.emit("user-exit", room);
+        roomSecret.master.emit("user-exit", room);
       }
     } else {
       console.log("Room not found");
@@ -83,9 +82,9 @@ export class GameMatchService {
       (room) => room.roomId === roomInfo.roomId
     );
     if (roomIndex !== -1) {
-      const room = this.rooms[roomIndex];
+      const roomSecret = this.roomSecrets[roomIndex];
       await this.GameRoomService.createRoom(
-        this.roomPassword[roomIndex].master,
+        roomSecret.master,
         client,
         roomInfo.mode,
         false
@@ -108,15 +107,16 @@ export class GameMatchService {
     );
     if (roomIndex !== -1) {
       const room = this.rooms[roomIndex];
+      const roomSecret = this.roomSecrets[roomIndex];
       if (room.participantId !== undefined) {
         client.emit("room-full", roomInfo.roomId);
       } else if (
         room.isLocked === true &&
-        this.roomPassword[roomIndex].password === roomInfo.password
+        roomSecret.password === roomInfo.password
       ) {
         room.participantId = participantId;
         room.isLocked = true;
-        this.roomPassword[roomIndex].master.emit("user-join", room);
+        roomSecret.master.emit("user-join", room);
         client.emit("user-join", room);
       } else {
         client.emit("wrong-password", roomInfo.roomId);
@@ -150,13 +150,13 @@ export class GameMatchService {
       participantId: undefined,
     };
     this.rooms.push(room);
-    const roomPassword: roomSecretInfo = {
+    const roomSecret: roomSecretInfo = {
       roomId,
       master: client,
       participant: null,
       password: "Zxcasdqwe12#",
     };
-    this.roomPassword.push(roomPassword);
+    this.roomSecrets.push(roomSecret);
     server
       .to(user.socketId)
       .emit("invited-user", { nickname: master.nickname, roomId });
@@ -167,7 +167,7 @@ export class GameMatchService {
     const user = await this.userService.findOne(this.rooms[roomId].masterId);
     const participant = await this.userService.findBySocketId(client.id);
     this.rooms.splice(roomId, 1);
-    this.roomPassword.splice(roomId, 1);
+    this.roomSecrets.splice(roomId, 1);
     server.to(user.socketId).emit("invite-dismissed", participant.nickname);
   }
 

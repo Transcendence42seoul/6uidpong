@@ -59,7 +59,7 @@ export class GameMatchService {
       if (roomSecret.master === client) {
         this.rooms.splice(roomIndex, 1);
         this.roomSecrets.splice(roomIndex, 1);
-        client.emit("room-destroyed");
+        roomSecret.participant.emit("room-destroyed");
       } else {
         room.participantId = undefined;
         roomSecret.master.emit("user-exit", room);

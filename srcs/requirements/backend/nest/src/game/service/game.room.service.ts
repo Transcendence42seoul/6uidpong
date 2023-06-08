@@ -235,12 +235,6 @@ export class GameRoomService {
   ) {
     const player1 = await this.userService.findBySocketId(user1.id);
     const player2 = await this.userService.findBySocketId(user2.id);
-    console.log("");
-    console.log("");
-    console.log("");
-    console.log("");
-    console.log("");
-    console.log(player1, player2);
     const roomInfo: gameRoomInfo = await this.InitRoomState(
       user1,
       user2,

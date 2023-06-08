@@ -1,8 +1,6 @@
 import { Injectable } from "@nestjs/common";
-import { timeStamp } from "console";
 import { Namespace, Socket } from "socket.io";
 import { UserService } from "src/user/service/user.service";
-import { ServerType } from "typeorm";
 import { customRoomInfo, roomSecretInfo } from "../dto/game.dto";
 import { GameRoomService } from "./game.room.service";
 
@@ -60,10 +58,10 @@ export class GameMatchService {
       const roomSecret = this.roomSecrets[roomIndex];
       if (roomSecret.master === client) {
         this.rooms.splice(roomIndex, 1);
+        this.roomSecrets.splice(roomIndex, 1);
         client.emit("room-destroyed");
       } else {
         room.participantId = undefined;
-        room.isLocked = false;
         roomSecret.master.emit("user-exit", room);
       }
     } else {
@@ -90,6 +88,8 @@ export class GameMatchService {
           roomInfo.mode,
           false
         );
+        this.rooms.splice(roomIndex, 1);
+        this.roomSecrets.splice(roomIndex, 1);
       }
     }
   }
@@ -112,12 +112,9 @@ export class GameMatchService {
       const roomSecret = this.roomSecrets[roomIndex];
       if (room.participantId !== undefined) {
         client.emit("room-full", roomInfo.roomId);
-      } else if (
-        room.isLocked === true &&
-        roomSecret.password === roomInfo.password
-      ) {
+      } else if (roomSecret.password === roomInfo.password) {
         room.participantId = participantId;
-        room.isLocked = true;
+        roomSecret.participant = client;
         roomSecret.master.emit("user-join", room);
         client.emit("user-join", room);
       } else {

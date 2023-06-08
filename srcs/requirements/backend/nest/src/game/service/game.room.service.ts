@@ -209,7 +209,7 @@ export class GameRoomService {
     user2.emit("game-state", userGameRoomState);
   }
 
-  private async endGame(
+  private endGame(
     winner: Socket,
     loser: Socket,
     roomInfo: gameRoomInfo,

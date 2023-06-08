@@ -15,7 +15,6 @@ const GameRoomSettings: React.FC = () => {
   const { gameSocket } = selectGameSocket();
 
   const [isPasswordEnabled, setIsPasswordEnabled] = useState<boolean>(false);
-  const [mode, setMode] = useState<boolean>(false);
   const [password, setPassword] = useState<string>('');
   const [title, setTitle] = useState<string>('');
 
@@ -27,7 +26,6 @@ const GameRoomSettings: React.FC = () => {
     const roomInfo = {
       title,
       password: isPasswordEnabled ? password : null,
-      mode,
     };
     gameSocket?.emit('create-custom-room', roomInfo);
   };
@@ -50,19 +48,13 @@ const GameRoomSettings: React.FC = () => {
     [],
   );
 
-  const handleToggleChange = () => {
-    setMode(!mode);
-  };
-
   useEffect(() => {
     const roomIdHandler = (roomId: number) => {
       const game = {
         roomId,
         title,
         isLocked: isPasswordEnabled,
-        mode,
         masterId: myId,
-        participantId: null,
       };
       navigate(`/custom/${roomId}`, {
         state: { game },
@@ -114,31 +106,6 @@ const GameRoomSettings: React.FC = () => {
             />
             Enable
           </label>
-        </div>
-        <div className="flex items-center space-x-2.5">
-          <span>Normal</span>
-          <label htmlFor="toggle" className="flex cursor-pointer items-center">
-            <div className="relative">
-              <input
-                type="checkbox"
-                id="toggle"
-                className="sr-only"
-                checked={!mode}
-                onChange={handleToggleChange}
-              />
-              <div
-                className={`h-7 w-12 rounded-full transition ${
-                  mode ? 'bg-red-300' : 'bg-blue-300'
-                }`}
-              />
-              <div
-                className={`dot absolute left-1 top-1 h-5 w-5 rounded-full bg-white transition ${
-                  mode ? 'translate-x-full transform' : ''
-                }`}
-              />
-            </div>
-          </label>
-          <span>Destroy</span>
         </div>
         <div className="flex space-x-4">
           <HoverButton

@@ -1,7 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Namespace, Socket } from "socket.io";
-import { User } from "src/user/entity/user.entity";
 import { UserService } from "src/user/service/user.service";
 import { Repository } from "typeorm";
 import {
@@ -80,7 +79,6 @@ export class GameMatchService {
   }
 
   async customGameStart(
-    client: Socket,
     roomInfo: {
       roomId: number;
       mode: boolean;
@@ -89,19 +87,16 @@ export class GameMatchService {
     const roomIndex = this.rooms.findIndex(
       (room) => room.roomId === roomInfo.roomId
     );
-    if (roomIndex !== -1) {
-      if (this.rooms[roomIndex].participantId) {
-        const roomSecret = this.roomSecrets[roomIndex];
-        await this.GameRoomService.createRoom(
-          roomSecret.master,
-          client,
-          roomInfo.mode,
-          false
-        );
-        this.rooms.splice(roomIndex, 1);
-        this.roomSecrets.splice(roomIndex, 1);
-      }
-    }
+    const roomSecret = this.roomSecrets[roomIndex];
+    if (!roomSecret?.participant) return;
+    await this.GameRoomService.createRoom(
+      roomSecret.master,
+      roomSecret.participant,
+      roomInfo.mode,
+      false
+    );
+    this.rooms.splice(roomIndex, 1);
+    this.roomSecrets.splice(roomIndex, 1);
   }
 
   async joinCustomGame(

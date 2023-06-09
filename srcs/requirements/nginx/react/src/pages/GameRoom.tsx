@@ -19,18 +19,22 @@ const GameRoom: React.FC = () => {
 
   const { gameSocket } = selectGameSocket();
 
-  const [gameStart, setGameStart] = useState<boolean>(false);
+  const [gameStart, setGameStart] = useState<boolean>(true);
   const [mode, setMode] = useState<boolean>(false);
   const [room, setRoom] = useState<Game>(game);
 
   const exitGame = () => {
-    navigate('/custom');
+    setGameStart(false);
+  };
+
+  const startGame = () => {
+    navigate('/game-start');
   };
 
   const handleStartClick = () => {
     const roomInfo = { roomId, mode };
     gameSocket?.emit('start-custom-room', roomInfo);
-    navigate('/game-start');
+    startGame();
   };
 
   const handleExitClick = () => {
@@ -45,24 +49,24 @@ const GameRoom: React.FC = () => {
     const roomHandler = (updatedRoom: Game) => {
       setRoom({ ...updatedRoom });
     };
-    const startHandler = () => {
-      setGameStart(true);
-      navigate('/game-start');
-    };
-    gameSocket?.on('game-start', startHandler);
+    gameSocket?.on('game-start', startGame);
     gameSocket?.on('room-destroyed', exitGame);
     gameSocket?.on('user-exit', roomHandler);
     gameSocket?.on('user-join', roomHandler);
     return () => {
-      gameSocket?.off('game-start', startHandler);
+      gameSocket?.off('game-start', startGame);
       gameSocket?.off('room-destroyed', exitGame);
       gameSocket?.off('user-exit', roomHandler);
       gameSocket?.off('user-join', roomHandler);
-      if (!gameStart) {
-        gameSocket?.emit('exit-custom-room', roomId);
-      }
     };
   }, []);
+
+  useEffect(() => {
+    if (!gameStart) {
+      gameSocket?.emit('exit-custom-room', roomId);
+      navigate('/custom');
+    }
+  }, [gameStart]);
 
   return (
     <div className="flex h-screen flex-col items-center justify-center">

@@ -83,14 +83,13 @@ export class GameMatchGateway {
 
   @SubscribeMessage("start-custom-room")
   startCustomGame(
-    @ConnectedSocket() client: Socket,
     @MessageBody()
     roomInfo: {
       roomId: number;
       mode: boolean;
     }
   ): void {
-    this.gameMatchService.customGameStart(client, roomInfo);
+    this.gameMatchService.customGameStart(roomInfo);
   }
 
   @SubscribeMessage("exit-custom-room")

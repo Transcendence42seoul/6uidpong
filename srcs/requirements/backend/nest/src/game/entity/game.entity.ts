@@ -10,37 +10,34 @@ import {
 } from "typeorm";
 
 @Entity("games")
-export class GameEntity {
+export class GameResult {
   @PrimaryColumn()
   id: number;
 
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  endAt: Date;
-
-  @Column()
+  @Column({ name: "is_ladder" })
   isLadder: boolean;
 
-  @Column()
-  isSpeed: boolean;
+  @ManyToOne(() => User, (user) => user.gameRecords, {
+    onUpdate: "CASCADE",
+  })
+  @JoinColumn({ name: "winner_id" })
+  winner: User;
 
   @ManyToOne(() => User, (user) => user.gameRecords, {
-    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
   })
-  @JoinColumn({ name: "user1_id" })
-  user1: User;
+  @JoinColumn({ name: "loser_id" })
+  loser: User;
 
-  @ManyToOne(() => User, (user) => user.gameRecords, {
-    onDelete: "CASCADE",
-  })
-  @JoinColumn({ name: "user2_id" })
-  user2: User;
+  @Column({ name: "winner_score", default: 0 })
+  winnerScore: number;
 
-  @Column({ name: "user1_score", default: 0 })
-  user1Score: number;
+  @Column({ name: "loser_score", default: 0 })
+  loserScore: number;
 
-  @Column({ name: "user2_score", default: 0 })
-  user2Score: number;
+  @Column({ name: "created_at" })
+  createdAt: Date;
+
+  @Column({ name: "end_at" })
+  endAt: Date;
 }

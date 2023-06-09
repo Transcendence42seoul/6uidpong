@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { selectGameSocket } from '../features/socket/socketSelector';
 import { GameRoomState } from '../interfaces/Game';
 

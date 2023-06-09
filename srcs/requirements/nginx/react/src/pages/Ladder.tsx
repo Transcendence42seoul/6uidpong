@@ -50,7 +50,6 @@ const Ladder: React.FC = () => {
           user1: roomInfo.user1Nickname,
           user2: roomInfo.user2Nickname,
         });
-        console.log(roomInfo);
         setOpenModal(true);
       }
       handleCloseModal();

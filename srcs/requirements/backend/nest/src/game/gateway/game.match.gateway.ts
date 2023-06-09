@@ -6,8 +6,11 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from "@nestjs/websockets";
+import { JwtPayload } from "jsonwebtoken";
 import { Namespace, Socket } from "socket.io";
 import { WsJwtAccessGuard } from "src/chat/guard/ws-jwt-access.guard";
+import { WsJwtPayload } from "src/chat/utils/decorator/ws-jwt-payload.decorator";
+import { GameResultResponse } from "../dto/game.dto";
 import { GameMatchService } from "../service/game.match.service";
 
 @WebSocketGateway(80, {
@@ -111,5 +114,13 @@ export class GameMatchGateway {
   @SubscribeMessage("ladder-game-match-cancel")
   handleDisconnectLadder(@ConnectedSocket() client: Socket): void {
     this.gameMatchService.handleLadderMatchcancel(client);
+  }
+
+  @SubscribeMessage("find-matches")
+  async handleFindMatches(
+    @WsJwtPayload() jwt: JwtPayload,
+    @ConnectedSocket() client: Socket
+  ): Promise<GameResultResponse[]> {
+    return await this.gameMatchService.handleFindMatches(jwt.id, client);
   }
 }

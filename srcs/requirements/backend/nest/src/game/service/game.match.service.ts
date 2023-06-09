@@ -1,7 +1,15 @@
 import { Injectable } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
 import { Namespace, Socket } from "socket.io";
+import { User } from "src/user/entity/user.entity";
 import { UserService } from "src/user/service/user.service";
-import { customRoomInfo, roomSecretInfo } from "../dto/game.dto";
+import { Repository } from "typeorm";
+import {
+  customRoomInfo,
+  GameResultResponse,
+  roomSecretInfo,
+} from "../dto/game.dto";
+import { GameResult } from "../entity/game.entity";
 import { GameRoomService } from "./game.room.service";
 
 @Injectable()
@@ -13,7 +21,9 @@ export class GameMatchService {
 
   constructor(
     private GameRoomService: GameRoomService,
-    private userService: UserService
+    private userService: UserService,
+    @InjectRepository(GameResult)
+    private gameResultRepository: Repository<GameResult>
   ) {
     setInterval(this.handleLadderMatch.bind(this), 1000);
   }
@@ -123,13 +133,30 @@ export class GameMatchService {
     }
   }
 
+  isDisconnectedSocket(player1: Socket, player2: Socket): boolean {
+    if (player1.disconnected && player2.disconnected) {
+      this.queue.splice(0, 2);
+      return true;
+    } else if (player2.disconnected) {
+      this.queue.splice(1, 1);
+      return true;
+    } else if (player1.disconnected) {
+      this.queue.splice(0, 1);
+      return true;
+    }
+    return false;
+  }
+
   handleLadderMatch() {
     const length = this.queue.length;
-    for (let i = 1; i < length; i += 2) {
+    let i = 1;
+    while (i < length) {
       const player1 = this.queue[0];
       const player2 = this.queue[1];
+      if (this.isDisconnectedSocket(player1, player2)) continue;
       this.GameRoomService.createRoom(player1, player2, false, true);
       this.queue.splice(0, 2);
+      i += 2;
     }
   }
 
@@ -179,8 +206,36 @@ export class GameMatchService {
 
   handleLadderMatchcancel(client: Socket): void {
     const index = this.queue.findIndex((queue) => queue === client);
-    if (index !== -1) {
+    if (index !== -1 || this.queue[index].disconnected) {
       this.queue.splice(index, 1);
     }
+  }
+
+  async handleFindMatches(
+    userId: number,
+    client: Socket
+  ): Promise<GameResultResponse[]> {
+    const matches: GameResult[] = await this.gameResultRepository.find({
+      relations: {
+        winner: true,
+        loser: true,
+      },
+      where: [
+        {
+          winner: {
+            id: userId,
+          },
+        },
+        {
+          loser: {
+            id: userId,
+          },
+        },
+      ],
+      order: {
+        createdAt: "DESC",
+      },
+    });
+    return matches.map((match) => new GameResultResponse(match));
   }
 }

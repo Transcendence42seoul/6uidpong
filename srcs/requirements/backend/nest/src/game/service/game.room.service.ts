@@ -3,6 +3,8 @@ import { Socket } from "socket.io";
 import { User } from "src/user/entity/user.entity";
 import { UserService } from "src/user/service/user.service";
 import { setTimeout } from "timers";
+import { InjectRepository } from "@nestjs/typeorm";
+import { DataSource, Repository } from "typeorm";
 import {
   Ball,
   GameRoomState,
@@ -10,6 +12,7 @@ import {
   UserGameRoomState,
   gameRoomInfo,
 } from "../dto/game.dto";
+import { GameResult } from "../entity/game.entity";
 
 const GameInfo = {
   width: 1200,
@@ -22,7 +25,10 @@ const GameInfo = {
 
 @Injectable()
 export class GameRoomService {
-  constructor(private userService: UserService) {}
+  constructor(
+    private userService: UserService,
+    private dataSource: DataSource
+  ) {}
 
   private roomInfos: gameRoomInfo[] = [];
   private roomNumber = 1;
@@ -120,7 +126,7 @@ export class GameRoomService {
     state.ball.x += state.ball.dx * 1.5;
     state.ball.y += state.ball.dy * 1.5;
 
-    if (mode === true) {
+    if (mode === false) {
       if (
         state.ball.y >= GameInfo.height / 2 - GameInfo.ballrad &&
         state.ball.dy > 0
@@ -198,20 +204,113 @@ export class GameRoomService {
       roomId
     );
 
+    if (user1.disconnected) {
+      this.endGame(user2, user1, roomInfo, userGameRoomState, 5, 0);
+    } else if (user2.disconnected) {
+      this.endGame(user1, user2, roomInfo, userGameRoomState, 5, 0);
+    }
+
     if (state.score1 >= 5) {
-      this.endGame(user1, user2, roomInfo, userGameRoomState);
+      this.endGame(
+        user1,
+        user2,
+        roomInfo,
+        userGameRoomState,
+        userGameRoomState.score1,
+        userGameRoomState.score2
+      );
     } else if (state.score2 >= 5) {
-      this.endGame(user2, user1, roomInfo, userGameRoomState);
+      this.endGame(
+        user2,
+        user1,
+        roomInfo,
+        userGameRoomState,
+        userGameRoomState.score2,
+        userGameRoomState.score1
+      );
     }
     user1.emit("game-state", userGameRoomState);
     user2.emit("game-state", userGameRoomState);
   }
 
-  private endGame(
+  calculateLadderScore(): number {
+    const min = 13;
+    const max = 21;
+
+    const randomValue = Math.floor(Math.random() * (max - min) + min);
+    return randomValue;
+  }
+
+  async gameResult(
     winner: Socket,
     loser: Socket,
     roomInfo: gameRoomInfo,
-    userGameRoomState: UserGameRoomState
+    winnerScore: number,
+    loserScore: number
+  ) {
+    const { isLadder, user1Id, user2Id, createAt, endAt } = roomInfo;
+    const win: User = await this.userService.findBySocketId(winner.id);
+    const lose: User = await this.userService.findBySocketId(loser.id);
+
+    const queryRunner = this.dataSource.createQueryRunner();
+
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      await queryRunner.manager.insert(GameResult, {
+        isLadder,
+        winner: {
+          id: win.id,
+        },
+        loser: {
+          id: lose.id,
+        },
+        winnerScore,
+        loserScore,
+        createdAt: createAt,
+        endAt,
+      });
+      await queryRunner.manager.update(
+        User,
+        {
+          id: win.id,
+        },
+        {
+          winStat: win.winStat + 1,
+          ladderScore: isLadder
+            ? win.ladderScore + this.calculateLadderScore()
+            : win.ladderScore,
+          status: "online",
+        }
+      );
+      await queryRunner.manager.update(
+        User,
+        {
+          id: lose.id,
+        },
+        {
+          loseStat: lose.loseStat + 1,
+          ladderScore: isLadder
+            ? lose.ladderScore - this.calculateLadderScore()
+            : lose.ladderScore,
+          status: "online",
+        }
+      );
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  private async endGame(
+    winner: Socket,
+    loser: Socket,
+    roomInfo: gameRoomInfo,
+    userGameRoomState: UserGameRoomState,
+    winScore: number,
+    loseScore: number
   ) {
     const { roomId, user1, user2, broadcast } = roomInfo;
 
@@ -223,6 +322,7 @@ export class GameRoomService {
     user2.data.roomId = null;
     clearInterval(broadcast);
     this.roomInfos[roomId] = null;
+    await this.gameResult(winner, loser, roomInfo, winScore, loseScore);
   }
 
   async createRoom(

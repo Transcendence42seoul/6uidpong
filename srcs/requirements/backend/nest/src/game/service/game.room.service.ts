@@ -3,8 +3,7 @@ import { Socket } from "socket.io";
 import { User } from "src/user/entity/user.entity";
 import { UserService } from "src/user/service/user.service";
 import { setTimeout } from "timers";
-import { InjectRepository } from "@nestjs/typeorm";
-import { DataSource, Repository } from "typeorm";
+import { DataSource } from "typeorm";
 import {
   Ball,
   GameRoomState,
@@ -248,7 +247,7 @@ export class GameRoomService {
     winnerScore: number,
     loserScore: number
   ) {
-    const { isLadder, user1Id, user2Id, createAt, endAt } = roomInfo;
+    const { isLadder, createAt, endAt } = roomInfo;
     const win: User = await this.userService.findBySocketId(winner.id);
     const lose: User = await this.userService.findBySocketId(loser.id);
 

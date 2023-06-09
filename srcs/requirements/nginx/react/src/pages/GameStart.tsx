@@ -1,6 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
+
+import GameResultModal from '../components/modal/GameResultModal';
 import { selectGameSocket } from '../features/socket/socketSelector';
-import { GameRoomState } from '../interfaces/Game';
+
+import type { GameRoomState } from '../interfaces/Game';
 
 const GameInfo = {
   width: 1200,
@@ -13,10 +16,24 @@ const GameInfo = {
 
 const GameStart: React.FC = () => {
   const { gameSocket } = selectGameSocket();
+
   const ref = useRef<HTMLCanvasElement>(null);
   const [gameRoomState, setGameRoomState] = useState<GameRoomState>();
   const [upState, setUpState] = useState<boolean>(false);
   const [downState, setDownState] = useState<boolean>(false);
+  const [gameResult, setGameResult] = useState<GameRoomState | null>(null);
+  const [showResultModal, setShowResultModal] = useState<boolean>(false);
+
+  useEffect(() => {
+    const gameStateHandler = (gameState: GameRoomState) => {
+      setGameResult(gameState);
+      setShowResultModal(true);
+    };
+    gameSocket?.on('game-end', gameStateHandler);
+    return () => {
+      gameSocket?.off('game-end', gameStateHandler);
+    };
+  }, []);
 
   useEffect(() => {
     if (upState) {
@@ -124,6 +141,12 @@ const GameStart: React.FC = () => {
   return (
     <div className="flex items-center justify-center">
       <canvas ref={ref} width={GameInfo.width} height={GameInfo.height} />
+      {gameResult && showResultModal && (
+        <GameResultModal
+          gameResult={gameResult}
+          setShowModal={setShowResultModal}
+        />
+      )}
     </div>
   );
 };

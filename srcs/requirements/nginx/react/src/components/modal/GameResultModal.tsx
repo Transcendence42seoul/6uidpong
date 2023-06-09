@@ -1,27 +1,22 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 import ContentBox from '../container/ContentBox';
 import ModalContainer from '../container/ModalContainer';
 import UserProfile from '../container/UserProfile';
 
-import { isTest, mockUsers } from '../../mock'; // test
+import type { GameRoomState } from '../../interfaces/Game';
 
 interface GameResultModalProps {
+  gameResult: GameRoomState;
   setShowModal: (showModal: boolean) => void;
 }
 
-const GameResultModal: React.FC<GameResultModalProps> = ({ setShowModal }) => {
-  const [p1Id, setP1Id] = useState<number | null>(
-    isTest ? mockUsers[0].id : null,
-  ); // test
-  const [p2Id, setP2Id] = useState<number | null>(
-    isTest ? mockUsers[2].id : null,
-  ); // test
-
-  const p1Score = 4;
-  const p2Score = 2;
-  const p1Win = p1Score > p2Score;
-  const p2Win = p2Score > p1Score;
+const GameResultModal: React.FC<GameResultModalProps> = ({
+  gameResult,
+  setShowModal,
+}) => {
+  const { user1Id, user2Id, score1, score2 } = gameResult;
+  const p1Win = score1 > score2;
 
   return (
     <ModalContainer setShowModal={setShowModal}>
@@ -29,8 +24,8 @@ const GameResultModal: React.FC<GameResultModalProps> = ({ setShowModal }) => {
         <ContentBox className="rounded-none border-2 p-8 shadow-md">
           <div className="flex justify-between space-x-8">
             <div className="flex flex-col items-center space-y-2">
-              {p1Id && <UserProfile userId={p1Id}> </UserProfile>}
-              <p className="text-lg">Score: {p1Score}</p>
+              <UserProfile userId={user1Id}> </UserProfile>
+              <p className="text-lg">Score: {score1}</p>
               <p
                 className={`text-2xl font-semibold ${
                   p1Win ? 'text-green-500' : 'text-red-500'
@@ -41,14 +36,14 @@ const GameResultModal: React.FC<GameResultModalProps> = ({ setShowModal }) => {
             </div>
             <div className="border-r border-white" />
             <div className="flex flex-col items-center space-y-2">
-              {p2Id && <UserProfile userId={p2Id}> </UserProfile>}
-              <p className="text-lg">Score: {p2Score}</p>
+              <UserProfile userId={user2Id}> </UserProfile>
+              <p className="text-lg">Score: {score2}</p>
               <p
                 className={`text-2xl font-semibold ${
-                  p2Win ? 'text-green-500' : 'text-red-500'
+                  p1Win ? 'text-red-500' : 'text-green-500'
                 }`}
               >
-                {p2Win ? 'WIN' : 'LOSE'}
+                {p1Win ? 'LOSE' : 'WIN'}
               </p>
             </div>
           </div>

@@ -9,8 +9,8 @@ export interface Game {
 
 export interface GameRoomState {
   roomId: number;
-  user1: number;
-  user2: number;
+  user1Id: number;
+  user2Id: number;
   paddle1: number;
   paddle2: number;
   ballx: number;

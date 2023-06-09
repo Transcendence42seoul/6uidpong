@@ -4,13 +4,7 @@ import { User } from "src/user/entity/user.entity";
 import { UserService } from "src/user/service/user.service";
 import { setTimeout } from "timers";
 import { DataSource } from "typeorm";
-import {
-  Ball,
-  GameRoomState,
-  StartGameRoomState,
-  UserGameRoomState,
-  gameRoomInfo,
-} from "../dto/game.dto";
+import { Ball, GameRoomState, GameState, gameRoomInfo } from "../dto/game.dto";
 import { GameResult } from "../entity/game.entity";
 
 const GameInfo = {
@@ -47,7 +41,7 @@ export class GameRoomService {
   }
 
   makeStartState(roomInfo: gameRoomInfo) {
-    const StartState: StartGameRoomState = {
+    const StartState: GameState = {
       roomId: roomInfo.roomId,
       user1Id: roomInfo.user1Id,
       user2Id: roomInfo.user2Id,
@@ -61,9 +55,16 @@ export class GameRoomService {
     return StartState;
   }
 
-  makeUserState(roomState: GameRoomState, roomId: number) {
-    const userState: UserGameRoomState = {
+  makeUserState(
+    user1Id: number,
+    user2Id: number,
+    roomState: GameRoomState,
+    roomId: number
+  ) {
+    const userState: GameState = {
       roomId: roomId,
+      user1Id: user1Id,
+      user2Id: user2Id,
       paddle1: roomState.paddle1,
       paddle2: roomState.paddle2,
       ballx: roomState.ball.x,
@@ -112,7 +113,7 @@ export class GameRoomService {
   }
 
   broadcastState(roomInfo: gameRoomInfo) {
-    const { roomId, user1, user2, state, mode } = roomInfo;
+    const { roomId, user1, user2, user1Id, user2Id, state, mode } = roomInfo;
 
     state.paddle1 += state.keyState1 * 4 * 3;
     state.paddle2 += state.keyState2 * 4 * 3;
@@ -198,7 +199,9 @@ export class GameRoomService {
       state.ball = this.InitBallState();
     }
 
-    const userGameRoomState: UserGameRoomState = this.makeUserState(
+    const userGameRoomState: GameState = this.makeUserState(
+      user1Id,
+      user2Id,
       state,
       roomId
     );
@@ -307,7 +310,7 @@ export class GameRoomService {
     winner: Socket,
     loser: Socket,
     roomInfo: gameRoomInfo,
-    userGameRoomState: UserGameRoomState,
+    userGameRoomState: GameState,
     winScore: number,
     loseScore: number
   ) {
@@ -352,11 +355,12 @@ export class GameRoomService {
     user1.data = { ...user1.data, roomId: roomId };
     user2.data = { ...user2.data, roomId: roomId };
 
-    const startState: StartGameRoomState = this.makeStartState(roomInfo);
+    const startState: GameState = this.makeStartState(roomInfo);
     user1.emit("game-start", startState);
     user2.emit("game-start", startState);
+
     if (roomInfo.isLadder === true) {
-      setTimeout(() => {
+      const timeout = setTimeout(() => {
         this.broadcastState = this.broadcastState.bind(this);
         this.roomInfos[roomId] = roomInfo;
         const broadcast = setInterval(
@@ -366,8 +370,16 @@ export class GameRoomService {
         );
         this.roomInfos[roomId].broadcast = broadcast;
       }, 8000);
+
+      if (user1.disconnected) {
+        clearTimeout(timeout);
+        this.endGame(user2, user1, roomInfo, startState, 5, 0);
+      } else if (user2.disconnected) {
+        clearTimeout(timeout);
+        this.endGame(user1, user2, roomInfo, startState, 5, 0);
+      }
     } else {
-      setTimeout(() => {
+      const timeout = setTimeout(() => {
         this.broadcastState = this.broadcastState.bind(this);
         this.roomInfos[roomId] = roomInfo;
         const broadcast = setInterval(
@@ -377,6 +389,14 @@ export class GameRoomService {
         );
         this.roomInfos[roomId].broadcast = broadcast;
       }, 3000);
+
+      if (user1.disconnected) {
+        clearTimeout(timeout);
+        this.endGame(user2, user1, roomInfo, startState, 5, 0);
+      } else if (user2.disconnected) {
+        clearTimeout(timeout);
+        this.endGame(user1, user2, roomInfo, startState, 5, 0);
+      }
     }
   }
 

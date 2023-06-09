@@ -41,20 +41,10 @@ export interface GameRoomState {
   score2: number;
 }
 
-export interface StartGameRoomState {
+export interface GameState {
   roomId: number;
   user1Id: number;
   user2Id: number;
-  paddle1: number;
-  paddle2: number;
-  ballx: number;
-  bally: number;
-  score1: number;
-  score2: number;
-}
-
-export interface UserGameRoomState {
-  roomId: number;
   paddle1: number;
   paddle2: number;
   ballx: number;

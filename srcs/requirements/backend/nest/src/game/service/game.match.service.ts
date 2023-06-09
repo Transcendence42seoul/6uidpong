@@ -78,12 +78,10 @@ export class GameMatchService {
     }
   }
 
-  async customGameStart(
-    roomInfo: {
-      roomId: number;
-      mode: boolean;
-    }
-  ): Promise<void> {
+  async customGameStart(roomInfo: {
+    roomId: number;
+    mode: boolean;
+  }): Promise<void> {
     const roomIndex = this.rooms.findIndex(
       (room) => room.roomId === roomInfo.roomId
     );

@@ -111,9 +111,12 @@ let UserService = class UserService {
         });
     }
     async findBySocketId(id) {
-        return await this.userRepository.findOneOrFail({
-            where: { gameSocketId: id },
-        });
+        if (id !== null) {
+            return await this.userRepository.findOneOrFail({
+                where: { gameSocketId: id },
+            });
+        }
+        return null;
     }
 };
 UserService = __decorate([

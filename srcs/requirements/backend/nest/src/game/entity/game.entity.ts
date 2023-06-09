@@ -1,17 +1,15 @@
 import { User } from "src/user/entity/user.entity";
 import {
   Column,
-  CreateDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
-  PrimaryColumn,
-  UpdateDateColumn,
+  PrimaryGeneratedColumn,
 } from "typeorm";
 
 @Entity("games")
 export class GameResult {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ name: "is_ladder" })

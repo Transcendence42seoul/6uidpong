@@ -53,7 +53,7 @@ export class ConnectionService {
             id: user.id,
           },
           {
-            status: "online",
+            status: "offline",
           }
         );
       }

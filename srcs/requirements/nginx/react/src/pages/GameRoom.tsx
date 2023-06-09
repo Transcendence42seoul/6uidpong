@@ -6,7 +6,7 @@ import ContentBox from '../components/container/ContentBox';
 import UserProfile from '../components/container/UserProfile';
 import { selectGameSocket } from '../features/socket/socketSelector';
 
-import { Game } from '../interfaces/Game';
+import type Game from '../interfaces/Game';
 
 const GameRoom: React.FC = () => {
   const { state } = useLocation();

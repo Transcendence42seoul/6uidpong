@@ -8,7 +8,7 @@ import PasswordModal from '../components/modal/PasswordModal';
 import ImageSrc from '../constants/ImageSrc';
 import { selectGameSocket } from '../features/socket/socketSelector';
 
-import { Game } from '../interfaces/Game';
+import type Game from '../interfaces/Game';
 
 import { isTest, mockGames } from '../mock'; // test
 

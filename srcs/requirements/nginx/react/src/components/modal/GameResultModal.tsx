@@ -4,10 +4,10 @@ import ContentBox from '../container/ContentBox';
 import ModalContainer from '../container/ModalContainer';
 import UserProfile from '../container/UserProfile';
 
-import type { GameRoomState } from '../../interfaces/Game';
+import type GameState from '../../interfaces/GameState';
 
 interface GameResultModalProps {
-  gameResult: GameRoomState;
+  gameResult: GameState;
   setShowModal: (showModal: boolean) => void;
 }
 

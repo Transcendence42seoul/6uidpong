@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import GameResultModal from '../components/modal/GameResultModal';
 import { selectGameSocket } from '../features/socket/socketSelector';
 
-import type { GameRoomState } from '../interfaces/Game';
+import type GameState from '../interfaces/GameState';
 
 const GameInfo = {
   width: 1200,
@@ -18,42 +18,42 @@ const GameStart: React.FC = () => {
   const { gameSocket } = selectGameSocket();
 
   const ref = useRef<HTMLCanvasElement>(null);
-  const [gameRoomState, setGameRoomState] = useState<GameRoomState>();
+  const [gameState, setGameState] = useState<GameState | null>(null);
   const [upState, setUpState] = useState<boolean>(false);
   const [downState, setDownState] = useState<boolean>(false);
-  const [gameResult, setGameResult] = useState<GameRoomState | null>(null);
+  const [gameResult, setGameResult] = useState<GameState | null>(null);
   const [showResultModal, setShowResultModal] = useState<boolean>(false);
 
   useEffect(() => {
-    const gameStateHandler = (gameState: GameRoomState) => {
-      setGameResult(gameState);
+    const resultHandler = (result: GameState) => {
+      setGameResult(result);
       setShowResultModal(true);
     };
-    gameSocket?.on('game-end', gameStateHandler);
+    gameSocket?.on('game-end', resultHandler);
     return () => {
-      gameSocket?.off('game-end', gameStateHandler);
+      gameSocket?.off('game-end', resultHandler);
     };
   }, []);
 
   useEffect(() => {
     if (upState) {
-      gameSocket?.emit('keydown', { roomId: gameRoomState?.roomId, code: -1 });
+      gameSocket?.emit('keydown', { roomId: gameState?.roomId, code: -1 });
     } else {
-      gameSocket?.emit('keyup', { roomId: gameRoomState?.roomId, code: -1 });
+      gameSocket?.emit('keyup', { roomId: gameState?.roomId, code: -1 });
     }
   }, [upState]);
 
   useEffect(() => {
     if (downState) {
-      gameSocket?.emit('keydown', { roomId: gameRoomState?.roomId, code: 1 });
+      gameSocket?.emit('keydown', { roomId: gameState?.roomId, code: 1 });
     } else {
-      gameSocket?.emit('keyup', { roomId: gameRoomState?.roomId, code: 1 });
+      gameSocket?.emit('keyup', { roomId: gameState?.roomId, code: 1 });
     }
   }, [downState]);
 
   useEffect(() => {
-    const handleGameStateChange = (data: GameRoomState) => {
-      setGameRoomState(data);
+    const handleGameStateChange = (state: GameState) => {
+      setGameState(state);
     };
 
     gameSocket?.on('game-state', handleGameStateChange);
@@ -98,34 +98,34 @@ const GameStart: React.FC = () => {
       ctx.lineTo(GameInfo.width / 2, GameInfo.height);
       ctx.stroke();
 
-      if (gameRoomState !== undefined) {
+      if (gameState) {
         ctx.font = '50px Arial, sans-serif';
         ctx.fillText(
-          gameRoomState.score1.toString(),
+          gameState.score1.toString(),
           GameInfo.width / 4,
           GameInfo.height / 4,
         );
         ctx.fillText(
-          gameRoomState.score2.toString(),
+          gameState.score2.toString(),
           (GameInfo.width / 4) * 3,
           GameInfo.height / 4,
         );
         ctx.fillRect(
           0,
-          (GameInfo.height - GameInfo.paddleY) / 2 + gameRoomState.paddle1,
+          (GameInfo.height - GameInfo.paddleY) / 2 + gameState.paddle1,
           GameInfo.paddleX,
           GameInfo.paddleY,
         );
         ctx.fillRect(
           GameInfo.width - GameInfo.paddleX,
-          (GameInfo.height - GameInfo.paddleY) / 2 + gameRoomState.paddle2,
+          (GameInfo.height - GameInfo.paddleY) / 2 + gameState.paddle2,
           GameInfo.paddleX,
           GameInfo.paddleY,
         );
         ctx.beginPath();
         ctx.arc(
-          gameRoomState.ballx + GameInfo.width / 2,
-          gameRoomState.bally + GameInfo.height / 2,
+          gameState.ballx + GameInfo.width / 2,
+          gameState.bally + GameInfo.height / 2,
           GameInfo.ballr,
           0,
           Math.PI * 2,
@@ -136,7 +136,7 @@ const GameStart: React.FC = () => {
 
       ctx.stroke();
     }
-  }, [gameSocket, gameRoomState]);
+  }, [gameSocket, gameState]);
 
   return (
     <div className="flex items-center justify-center">

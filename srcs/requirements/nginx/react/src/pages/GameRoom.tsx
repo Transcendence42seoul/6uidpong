@@ -19,6 +19,7 @@ const GameRoom: React.FC = () => {
 
   const { gameSocket } = selectGameSocket();
 
+  const [gameStart, setGameStart] = useState<boolean>(false);
   const [mode, setMode] = useState<boolean>(false);
   const [room, setRoom] = useState<Game>(game);
 
@@ -45,6 +46,7 @@ const GameRoom: React.FC = () => {
       setRoom({ ...updatedRoom });
     };
     const startHandler = () => {
+      setGameStart(true);
       navigate('/game-start');
     };
     gameSocket?.on('game-start', startHandler);
@@ -52,11 +54,13 @@ const GameRoom: React.FC = () => {
     gameSocket?.on('user-exit', roomHandler);
     gameSocket?.on('user-join', roomHandler);
     return () => {
-      gameSocket?.on('game-start', startHandler);
+      gameSocket?.off('game-start', startHandler);
       gameSocket?.off('room-destroyed', exitGame);
       gameSocket?.off('user-exit', roomHandler);
       gameSocket?.off('user-join', roomHandler);
-      gameSocket?.emit('exit-custom-room', roomId);
+      if (!gameStart) {
+        gameSocket?.emit('exit-custom-room', roomId);
+      }
     };
   }, []);
 

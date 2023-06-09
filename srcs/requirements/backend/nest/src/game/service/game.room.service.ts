@@ -333,6 +333,9 @@ export class GameRoomService {
   ) {
     const player1 = await this.userService.findBySocketId(user1.id);
     const player2 = await this.userService.findBySocketId(user2.id);
+    await this.userService.updateGameSocket(player1.id, "online");
+    await this.userService.updateGameSocket(player2.id, "online");
+
     const roomInfo: gameRoomInfo = await this.InitRoomState(
       user1,
       user2,

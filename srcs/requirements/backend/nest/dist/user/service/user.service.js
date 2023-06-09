@@ -105,6 +105,11 @@ let UserService = class UserService {
             gameSocketId: gameSocketId,
         });
     }
+    async updateStatus(id) {
+        await this.userRepository.update(id, {
+            status: "game",
+        });
+    }
     async findBySocketId(id) {
         return await this.userRepository.findOneOrFail({
             where: { gameSocketId: id },

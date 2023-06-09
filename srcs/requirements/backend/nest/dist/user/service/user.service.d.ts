@@ -14,5 +14,6 @@ export declare class UserService {
     updateImage(id: number, image: string): Promise<void>;
     updateIsTwoFactor(id: number, is2FA: boolean): Promise<void>;
     updateGameSocket(id: number, gameSocketId: string): Promise<void>;
+    updateStatus(id: number): Promise<void>;
     findBySocketId(id: string): Promise<User>;
 }

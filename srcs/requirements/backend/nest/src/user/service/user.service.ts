@@ -106,6 +106,12 @@ export class UserService {
     });
   }
 
+  async updateStatus(id: number): Promise<void> {
+    await this.userRepository.update(id, {
+      status: "game",
+    });
+  }
+
   async findBySocketId(id: string): Promise<User> {
     return await this.userRepository.findOneOrFail({
       where: { gameSocketId: id },

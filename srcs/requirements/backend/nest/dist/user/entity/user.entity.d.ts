@@ -6,7 +6,7 @@ import { DmChat } from "src/chat/entity/dm/dm-chat.entity";
 import { DmUser } from "src/chat/entity/dm/dm-room-user.entity";
 import { FriendRequest } from "./friend-request.entity";
 import { Friend } from "./friend.entity";
-import { GameEntity } from "src/game/entity/game.entity";
+import { GameResult } from "src/game/entity/game.entity";
 export declare class User {
     id: number;
     nickname: string;
@@ -27,5 +27,5 @@ export declare class User {
     channelChats: ChannelChat[];
     friends: Friend[];
     friendRequests: FriendRequest[];
-    gameRecords: GameEntity[];
+    gameRecords: GameResult[];
 }

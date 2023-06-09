@@ -13,6 +13,6 @@ export declare class UserService {
     updateNickname(id: number, nickname: string): Promise<void>;
     updateImage(id: number, image: string): Promise<void>;
     updateIsTwoFactor(id: number, is2FA: boolean): Promise<void>;
-    updateStatus(id: number, gameSocketId: string, status: string): Promise<void>;
+    updateGameSocket(id: number, gameSocketId: string): Promise<void>;
     findBySocketId(id: string): Promise<User>;
 }

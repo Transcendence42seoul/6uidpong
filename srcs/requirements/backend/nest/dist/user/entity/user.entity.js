@@ -104,8 +104,8 @@ __decorate([
     __metadata("design:type", Array)
 ], User.prototype, "friendRequests", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => game_entity_1.GameEntity, (gameRecord) => {
-        gameRecord.user1, gameRecord.user2;
+    (0, typeorm_1.OneToMany)(() => game_entity_1.GameResult, (gameRecord) => {
+        gameRecord.winner, gameRecord.loser;
     }),
     __metadata("design:type", Array)
 ], User.prototype, "gameRecords", void 0);

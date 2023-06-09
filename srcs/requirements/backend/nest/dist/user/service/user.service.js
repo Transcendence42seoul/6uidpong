@@ -100,10 +100,7 @@ let UserService = class UserService {
             is2FA,
         });
     }
-    async updateStatus(id, gameSocketId, status) {
-        await this.userRepository.update(id, {
-            status,
-        });
+    async updateGameSocket(id, gameSocketId) {
         await this.userRepository.update(id, {
             gameSocketId: gameSocketId,
         });

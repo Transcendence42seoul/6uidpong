@@ -50,6 +50,7 @@ const Ladder: React.FC = () => {
           user1: roomInfo.user1Nickname,
           user2: roomInfo.user2Nickname,
         });
+        console.log(roomInfo);
         setOpenModal(true);
       }
       handleCloseModal();
@@ -66,21 +67,15 @@ const Ladder: React.FC = () => {
   return (
     <div className="flex h-screen items-center justify-center">
       <LadderQueueModal isOpen={openModal} onClose={handleCloseModal}>
-        <div style={{ pointerEvents: 'auto' }}>
-          {openModal && (
+        {openModal && (
+          <div>
+            <img src={ImageSrc.MATCH_IMAGE} alt="MATCHING" className="h-full" />
             <div>
-              <img
-                src={ImageSrc.MATCH_IMAGE}
-                alt="MATCHING"
-                className="h-full"
-              />
-              <div>
-                <p>{user1}</p>
-                <p>{user2}</p>
-              </div>
+              <p>{user1}</p>
+              <p>{user2}</p>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </LadderQueueModal>
       <div className="flex h-1/2 w-1/2 flex-col items-center justify-center border-4 border-white bg-black p-4 text-center text-white">
         <div className="mb-10 flex h-[60%] items-center justify-center">

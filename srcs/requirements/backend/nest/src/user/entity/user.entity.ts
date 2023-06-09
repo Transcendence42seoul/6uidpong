@@ -7,7 +7,7 @@ import { DmUser } from "src/chat/entity/dm/dm-room-user.entity";
 import { Column, Entity, Index, OneToMany, PrimaryColumn } from "typeorm";
 import { FriendRequest } from "./friend-request.entity";
 import { Friend } from "./friend.entity";
-import { GameEntity } from "src/game/entity/game.entity";
+import { GameResult } from "src/game/entity/game.entity";
 
 @Entity("users")
 export class User {
@@ -74,10 +74,10 @@ export class User {
   friendRequests: FriendRequest[];
 
   @OneToMany(
-    () => GameEntity,
+    () => GameResult,
     (gameRecord) => {
-      gameRecord.user1, gameRecord.user2;
+      gameRecord.winner, gameRecord.loser;
     }
   )
-  gameRecords: GameEntity[];
+  gameRecords: GameResult[];
 }

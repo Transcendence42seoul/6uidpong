@@ -100,14 +100,7 @@ export class UserService {
     });
   }
 
-  async updateStatus(
-    id: number,
-    gameSocketId: string,
-    status: string
-  ): Promise<void> {
-    await this.userRepository.update(id, {
-      status,
-    });
+  async updateGameSocket(id: number, gameSocketId: string): Promise<void> {
     await this.userRepository.update(id, {
       gameSocketId: gameSocketId,
     });

@@ -54,7 +54,7 @@ export class ConnectionService {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      const findOptions: Object = { socketId: socketId };
+      const findOptions = { socketId: socketId };
       await queryRunner.manager.update(User, findOptions, {
         status: "offline",
       });

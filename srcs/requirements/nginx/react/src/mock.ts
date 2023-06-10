@@ -120,6 +120,31 @@ export const mockFriendRequests = [
   { from: mockUsers[2] },
 ];
 
+export const mockGameHistory = [
+  {
+    isLadder: false,
+    winnerNickname: mockUsers[0].nickname,
+    loserNickname: mockUsers[2].nickname,
+    winnerImage: mockUsers[0].image,
+    loserImage: mockUsers[2].image,
+    winnerScore: 5,
+    loserScore: 2,
+    createdAt: '2023-05-18 00:25:57.304419',
+    endAt: '2023-05-18 00:27:44.127905',
+  },
+  {
+    isLadder: false,
+    winnerNickname: mockUsers[2].nickname,
+    loserNickname: mockUsers[0].nickname,
+    winnerImage: mockUsers[2].image,
+    loserImage: mockUsers[0].image,
+    winnerScore: 5,
+    loserScore: 2,
+    createdAt: '2023-05-18 00:25:57.304419',
+    endAt: '2023-05-18 00:27:44.127905',
+  },
+];
+
 export const mockLocationState = {
   interlocutorId: mockUsers[1].id,
 };

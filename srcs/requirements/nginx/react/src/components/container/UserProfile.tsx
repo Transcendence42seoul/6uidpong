@@ -87,10 +87,12 @@ const UserProfile: React.FC<UserProfileProps> = ({
       const data: User = await callApi(config);
       setUser(data);
     };
-    if (userId) {
-      fetchUserData();
+    if (!userId) {
+      setUser(null);
+      return;
     }
-  }, []);
+    fetchUserData();
+  }, [userId]);
 
   return (
     <div className={className}>

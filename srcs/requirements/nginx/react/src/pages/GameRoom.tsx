@@ -75,12 +75,7 @@ const GameRoom: React.FC = () => {
         <div className="flex items-center justify-between">
           <UserProfile userId={room.masterId}> </UserProfile>
           <span className="text-lg">vs</span>
-          {room.participantId && (
-            <UserProfile userId={room.participantId}> </UserProfile>
-          )}
-          {!room.participantId && (
-            <UserProfile userId={room.participantId}> </UserProfile>
-          )}
+          <UserProfile userId={room.participantId}> </UserProfile>
         </div>
         <div className="space-y-3">
           <div className="flex items-center space-x-2.5">

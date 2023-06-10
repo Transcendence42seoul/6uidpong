@@ -32,7 +32,7 @@ const GameStart: React.FC = () => {
     gameSocket?.on('game-end', resultHandler);
     return () => {
       gameSocket?.off('game-end', resultHandler);
-      gameSocket?.emit('leave-game', gameState?.roomId);
+      gameSocket?.emit('leave-game', gameState);
     };
   }, []);
 

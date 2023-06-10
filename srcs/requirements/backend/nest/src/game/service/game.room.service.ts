@@ -209,17 +209,15 @@ export class GameRoomService {
     if (user1.disconnected === undefined || user1.disconnected) {
       userGameRoomState.score1 = 0;
       userGameRoomState.score2 = 5;
-      this.endGame(user2, user1, roomInfo, userGameRoomState, 5, 0);
+      this.endGame(roomInfo, userGameRoomState, 5, 0);
     } else if (user2.disconnected === undefined || user2.disconnected) {
       userGameRoomState.score1 = 5;
       userGameRoomState.score2 = 0;
-      this.endGame(user1, user2, roomInfo, userGameRoomState, 5, 0);
+      this.endGame(roomInfo, userGameRoomState, 5, 0);
     }
 
     if (state.score1 >= 5) {
       this.endGame(
-        user1,
-        user2,
         roomInfo,
         userGameRoomState,
         userGameRoomState.score1,
@@ -227,8 +225,6 @@ export class GameRoomService {
       );
     } else if (state.score2 >= 5) {
       this.endGame(
-        user2,
-        user1,
         roomInfo,
         userGameRoomState,
         userGameRoomState.score2,
@@ -310,8 +306,6 @@ export class GameRoomService {
   }
 
   private async endGame(
-    winner: Socket,
-    loser: Socket,
     roomInfo: gameRoomInfo,
     userGameRoomState: GameState,
     winScore: number,
@@ -391,7 +385,7 @@ export class GameRoomService {
           clearTimeout(timerId);
           startState.score1 = 0;
           startState.score2 = 5;
-          this.endGame(user2, user1, roomInfo, startState, 5, 0);
+          this.endGame(roomInfo, startState, 5, 0);
           clearInterval(intervalId);
         }
       } else if (user2.disconnected === undefined || user2.disconnected) {
@@ -399,7 +393,7 @@ export class GameRoomService {
           clearTimeout(timerId);
           startState.score1 = 5;
           startState.score2 = 0;
-          this.endGame(user1, user2, roomInfo, startState, 5, 0);
+          this.endGame(roomInfo, startState, 5, 0);
           clearInterval(intervalId);
         }
       }
@@ -433,6 +427,20 @@ export class GameRoomService {
       } else if (roomInfo.user2 === client) {
         roomInfo.state.keyState2 += keyInfo.code * keyState;
       }
+    }
+  }
+
+  async handleGameLeave(client: Socket, gameState: GameState) {
+    const user = await this.userService.findBySocketId(client.id);
+    const roomInfo = this.roomInfos[gameState.roomId];
+    if (user.id === gameState.user1Id) {
+      gameState.score1 = 0;
+      gameState.score2 = 5;
+      this.endGame(roomInfo, gameState, 5, 0);
+    } else if (user.id === gameState.user2Id) {
+      gameState.score2 = 0;
+      gameState.score1 = 5;
+      this.endGame(roomInfo, gameState, 5, 0);
     }
   }
 }

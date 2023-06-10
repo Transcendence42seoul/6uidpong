@@ -13,7 +13,7 @@ import ContentBox from './ContentBox';
 import type User from '../../interfaces/User';
 
 interface UserProfileProps {
-  userId: number;
+  userId: number | undefined;
   friend?: boolean;
   className?: string;
   children?: React.ReactNode;
@@ -87,17 +87,27 @@ const UserProfile: React.FC<UserProfileProps> = ({
       const data: User = await callApi(config);
       setUser(data);
     };
-    fetchUserData();
+    if (userId) {
+      fetchUserData();
+    }
   }, []);
 
   return (
     <div className={className}>
       <ContentBox className="p-4">
-        <h2 className="text-lg font-semibold">{user?.nickname}</h2>
+        <h2
+          className={`text-lg font-semibold ${
+            user ? '' : 'text-white text-opacity-0'
+          }`}
+        >
+          {user?.nickname ?? 'Waiting...'}
+        </h2>
         <CircularImage
           src={user?.image}
           alt="Profile"
-          className="m-2.5 h-32 w-32"
+          className={`m-2.5 h-32 w-32 border ${
+            user ? '' : 'bg-white bg-opacity-0 text-white text-opacity-0'
+          }`}
         />
         {children ?? (
           <div>

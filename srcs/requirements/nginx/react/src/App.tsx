@@ -37,10 +37,6 @@ import { isTest, mockAuthState } from './mock'; // test
 const App: React.FC = () => {
   const dispatch = useDispatch();
 
-  const stats = {
-    recentHistory: ['Win', 'Loss', 'Win', 'Win', 'Loss'],
-  }; // test
-
   const { id, is2FA, accessToken, tokenInfo } = isTest
     ? mockAuthState
     : selectAuth(); // test
@@ -117,7 +113,7 @@ const App: React.FC = () => {
         <Route path="/dm/:roomId" element={<DmRoom />} />
         <Route path="/friend-requests" element={<FriendRequests />} />
         <Route path="/friends-list" element={<FriendsList />} />
-        <Route path="/my-page" element={<MyPage stats={stats} />} />
+        <Route path="/my-page" element={<MyPage />} />
         <Route path="/profile-settings" element={<ProfileSettings />} />
         <Route path="/ladder" element={<Ladder />} />
         <Route path="/game-start" element={<GameStart />} />

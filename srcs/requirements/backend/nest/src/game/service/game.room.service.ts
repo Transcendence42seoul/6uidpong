@@ -206,9 +206,13 @@ export class GameRoomService {
       roomId
     );
 
-    if (user1.disconnected) {
+    if (user1.disconnected === undefined || user1.disconnected) {
+      userGameRoomState.score1 = 0;
+      userGameRoomState.score2 = 5;
       this.endGame(user2, user1, roomInfo, userGameRoomState, 5, 0);
-    } else if (user2.disconnected) {
+    } else if (user2.disconnected === undefined || user2.disconnected) {
+      userGameRoomState.score1 = 5;
+      userGameRoomState.score2 = 0;
       this.endGame(user1, user2, roomInfo, userGameRoomState, 5, 0);
     }
 
@@ -244,18 +248,17 @@ export class GameRoomService {
   }
 
   async gameResult(
-    winner: Socket,
-    loser: Socket,
+    winUserId: number,
+    loseUserId: number,
     roomInfo: gameRoomInfo,
     winnerScore: number,
     loserScore: number
   ) {
     const { isLadder, createAt, endAt } = roomInfo;
-    const win: User = await this.userService.findBySocketId(winner.id);
-    const lose: User = await this.userService.findBySocketId(loser.id);
+    const win = await this.userService.findOne(winUserId);
+    const lose = await this.userService.findOne(loseUserId);
 
     const queryRunner = this.dataSource.createQueryRunner();
-
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
@@ -282,7 +285,7 @@ export class GameRoomService {
           ladderScore: isLadder
             ? win.ladderScore + this.calculateLadderScore()
             : win.ladderScore,
-          status: "online",
+          status: win.socketId && win.gameSocketId ? "online" : "offline",
         }
       );
       await queryRunner.manager.update(
@@ -295,7 +298,7 @@ export class GameRoomService {
           ladderScore: isLadder
             ? lose.ladderScore - this.calculateLadderScore()
             : lose.ladderScore,
-          status: "online",
+          status: lose.socketId && lose.gameSocketId ? "online" : "offline",
         }
       );
       await queryRunner.commitTransaction();
@@ -323,8 +326,29 @@ export class GameRoomService {
     user2.leave(roomId.toString());
     user2.data.roomId = null;
     clearInterval(broadcast);
+
     this.roomInfos[roomId] = null;
-    await this.gameResult(winner, loser, roomInfo, winScore, loseScore);
+    if (userGameRoomState.score1 === winScore) {
+      const winUserId = userGameRoomState.user1Id;
+      const loseUserId = userGameRoomState.user2Id;
+      await this.gameResult(
+        winUserId,
+        loseUserId,
+        roomInfo,
+        winScore,
+        loseScore
+      );
+    } else if (userGameRoomState.score2 === winScore) {
+      const winUserId = userGameRoomState.user2Id;
+      const loseUserId = userGameRoomState.user1Id;
+      await this.gameResult(
+        winUserId,
+        loseUserId,
+        roomInfo,
+        winScore,
+        loseScore
+      );
+    }
   }
 
   async createRoom(
@@ -359,45 +383,39 @@ export class GameRoomService {
     user1.emit("game-start", startState);
     user2.emit("game-start", startState);
 
-    if (roomInfo.isLadder === true) {
-      const timeout = setTimeout(() => {
-        this.broadcastState = this.broadcastState.bind(this);
-        this.roomInfos[roomId] = roomInfo;
-        const broadcast = setInterval(
-          this.broadcastState,
-          20,
-          this.roomInfos[roomId]
-        );
-        this.roomInfos[roomId].broadcast = broadcast;
-      }, 8000);
+    let timerId: NodeJS.Timeout | null;
 
-      if (user1.disconnected) {
-        clearTimeout(timeout);
-        this.endGame(user2, user1, roomInfo, startState, 5, 0);
-      } else if (user2.disconnected) {
-        clearTimeout(timeout);
-        this.endGame(user1, user2, roomInfo, startState, 5, 0);
+    let intervalId = setInterval(() => {
+      if (user1.disconnected === undefined || user1.disconnected) {
+        if (timerId) {
+          clearTimeout(timerId);
+          startState.score1 = 0;
+          startState.score2 = 5;
+          this.endGame(user2, user1, roomInfo, startState, 5, 0);
+          clearInterval(intervalId);
+        }
+      } else if (user2.disconnected === undefined || user2.disconnected) {
+        if (timerId) {
+          clearTimeout(timerId);
+          startState.score1 = 5;
+          startState.score2 = 0;
+          this.endGame(user1, user2, roomInfo, startState, 5, 0);
+          clearInterval(intervalId);
+        }
       }
-    } else {
-      const timeout = setTimeout(() => {
-        this.broadcastState = this.broadcastState.bind(this);
-        this.roomInfos[roomId] = roomInfo;
-        const broadcast = setInterval(
-          this.broadcastState,
-          20,
-          this.roomInfos[roomId]
-        );
-        this.roomInfos[roomId].broadcast = broadcast;
-      }, 3000);
+    }, 50);
 
-      if (user1.disconnected) {
-        clearTimeout(timeout);
-        this.endGame(user2, user1, roomInfo, startState, 5, 0);
-      } else if (user2.disconnected) {
-        clearTimeout(timeout);
-        this.endGame(user1, user2, roomInfo, startState, 5, 0);
-      }
-    }
+    timerId = setTimeout(() => {
+      clearInterval(intervalId);
+      this.broadcastState = this.broadcastState.bind(this);
+      this.roomInfos[roomId] = roomInfo;
+      const broadcast = setInterval(
+        this.broadcastState,
+        20,
+        this.roomInfos[roomId]
+      );
+      this.roomInfos[roomId].broadcast = broadcast;
+    }, 3000);
   }
 
   handleKeyState(

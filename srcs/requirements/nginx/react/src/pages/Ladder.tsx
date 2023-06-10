@@ -26,10 +26,8 @@ const Ladder: React.FC = () => {
   const { user1, user2 } = username;
   const navigate = useNavigate();
   const handleCloseModal = () => {
-    setTimeout(() => {
-      setOpenModal(false);
-      navigate('/game-start');
-    }, 5000);
+    setOpenModal(false);
+    navigate('/game-start');
   };
 
   useEffect(() => {

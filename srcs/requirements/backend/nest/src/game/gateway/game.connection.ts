@@ -7,12 +7,8 @@ import {
   WebSocketServer,
 } from "@nestjs/websockets";
 import { Namespace, Socket } from "socket.io";
-import { UserService } from "src/user/service/user.service";
-import { User } from "src/user/entity/user.entity";
 import { UseGuards } from "@nestjs/common";
 import { WsJwtAccessGuard } from "src/chat/guard/ws-jwt-access.guard";
-import { WsJwtPayload } from "src/chat/utils/decorator/ws-jwt-payload.decorator";
-import { JwtPayload } from "jsonwebtoken";
 import { ConnectionService } from "../service/connection.service";
 
 @WebSocketGateway(80, {

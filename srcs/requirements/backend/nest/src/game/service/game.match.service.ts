@@ -158,14 +158,14 @@ export class GameMatchService {
     opponent: number,
     server: Namespace
   ): Promise<void> {
-    const user = await this.userService.findOne(opponent);
+    const participant = await this.userService.findOne(opponent);
     const master = await this.userService.findBySocketId(client.id);
     const roomId = this.roomNumber++;
     const room: customRoomInfo = {
       roomId,
-      title: user.nickname + "'s game",
+      title: `${master.nickname}'s game`,
       isLocked: true,
-      masterId: user.id,
+      masterId: master.id,
       participantId: undefined,
     };
     this.rooms.push(room);
@@ -177,7 +177,7 @@ export class GameMatchService {
     };
     this.roomSecrets.push(roomSecret);
     server
-      .to(user.socketId)
+      .to(participant.socketId)
       .emit("invited-user", { 
         master: master.nickname,
         masterId: master.id,

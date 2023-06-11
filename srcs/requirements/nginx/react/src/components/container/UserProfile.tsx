@@ -34,6 +34,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
   const { gameSocket } = selectGameSocket();
   const { socket } = selectSocket();
 
+  const [myNickname, setMyNickname] = useState<string>('');
   const [user, setUser] = useState<User | null>(null);
 
   const handleBlockClick = () => {
@@ -65,7 +66,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
     const gameIdHandler = (gameId: number) => {
       const game = {
         roomId: gameId,
-        title: `${user?.nickname}'s game`,
+        title: `${myNickname}'s game`,
         isLocked: true,
         masterId: myId,
       };
@@ -77,6 +78,17 @@ const UserProfile: React.FC<UserProfileProps> = ({
     return () => {
       gameSocket?.off('invite-room-created', gameIdHandler);
     };
+  }, []);
+
+  useEffect(() => {
+    const fetchMyData = async () => {
+      const config = {
+        url: `/api/v1/users/${myId}`,
+      };
+      const { nickname }: User = await callApi(config);
+      setMyNickname(nickname);
+    };
+    fetchMyData();
   }, []);
 
   useEffect(() => {

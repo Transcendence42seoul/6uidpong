@@ -45,14 +45,14 @@ const GameResultModal: React.FC<GameResultModalProps> = ({
   };
 
   useEffect(() => {
-    const fetchUserData = async () => {
+    const fetchMyData = async () => {
       const config = {
         url: `/api/v1/users/${myId}`,
       };
       const { nickname }: User = await callApi(config);
       setMyNickname(nickname);
     };
-    fetchUserData();
+    fetchMyData();
   }, []);
 
   useEffect(() => {

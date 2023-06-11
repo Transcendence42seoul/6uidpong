@@ -8,7 +8,7 @@ export class GameResultResponse {
     this.loserNickname = entity.loser.nickname;
     this.winnerImage = entity.winner.image;
     this.loserImage = entity.loser.image;
-    this.winnerScore - entity.winnerScore;
+    this.winnerScore = entity.winnerScore;
     this.loserScore = entity.loserScore;
     this.createdAt = entity.createdAt;
     this.endAt = entity.endAt;

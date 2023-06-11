@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Namespace, Socket } from "socket.io";
+import { User } from "src/user/entity/user.entity";
 import { UserService } from "src/user/service/user.service";
 import { Repository } from "typeorm";
 import {
@@ -158,7 +159,9 @@ export class GameMatchService {
     opponent: number,
     server: Namespace
   ): Promise<void> {
-    const participant = await this.userService.findOne(opponent);
+    const participant: User | undefined = await this.userService.findOne(
+      opponent
+    );
     const master = await this.userService.findBySocketId(client.id);
     const roomId = this.roomNumber++;
     const room: customRoomInfo = {
@@ -176,13 +179,12 @@ export class GameMatchService {
       password: "Zxcasdqwe12#",
     };
     this.roomSecrets.push(roomSecret);
-    server
-      .to(participant.socketId)
-      .emit("invited-user", { 
-        master: master.nickname,
-        masterId: master.id,
-        roomId,
-      });
+    server.to(participant.gameSocketId).emit("invited-user", {
+      master: master.nickname,
+      masterId: master.id,
+      roomId,
+    });
+    console.log(participant.gameSocketId);
     client.emit("invite-room-created", roomId);
   }
 

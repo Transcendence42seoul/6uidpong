@@ -15,12 +15,20 @@ const Notification: React.FC<NotificationProps> = ({ info, setInfo }) => {
 
   const { gameSocket } = selectGameSocket();
 
-  const { nickname, roomId } = info;
+  const { master, masterId, roomId } = info;
 
   const handleAcceptClick = () => {
+    const game = {
+      roomId,
+      title: `${master}'s game`,
+      isLocked: true,
+      masterId,
+    };
     gameSocket?.emit('invite-success', roomId);
     setInfo(null);
-    navigate(`/custom/${roomId}`);
+    navigate(`/custom/${roomId}`, {
+      state: { game },
+    });
   };
 
   const handleRejectClick = () => {
@@ -32,7 +40,7 @@ const Notification: React.FC<NotificationProps> = ({ info, setInfo }) => {
     <div className="fixed bottom-0 right-0 m-6">
       <div className="rounded-xl bg-white p-3 shadow-lg">
         <div className="ml-2 flex space-x-2">
-          <span className="font-semibold">{`${nickname} invites you to a game.`}</span>
+          <span className="font-semibold">{`${master} invites you to a game.`}</span>
           <svg
             width="24"
             height="24"

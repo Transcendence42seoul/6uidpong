@@ -178,7 +178,11 @@ export class GameMatchService {
     this.roomSecrets.push(roomSecret);
     server
       .to(user.socketId)
-      .emit("invited-user", { nickname: master.nickname, roomId });
+      .emit("invited-user", { 
+        master: master.nickname,
+        masterId: master.id,
+        roomId,
+      });
     client.emit("invite-room-created", roomId);
   }
 

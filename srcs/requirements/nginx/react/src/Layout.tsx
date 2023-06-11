@@ -24,7 +24,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     return () => {
       gameSocket?.off('invited-user', infoHandler);
     };
-  }, []);
+  }, [gameSocket, notificationInfo]);
 
   return (
     <>

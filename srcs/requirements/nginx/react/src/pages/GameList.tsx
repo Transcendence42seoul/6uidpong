@@ -97,7 +97,9 @@ const GameList: React.FC = () => {
 
   useEffect(() => {
     const gameHandler = (game: Game) => {
-      navigate(`/custom/${game.roomId}`);
+      navigate(`/custom/${game.roomId}`, {
+        state: { game },
+      });
     };
     gameSocket?.on('user-join', gameHandler);
     return () => {

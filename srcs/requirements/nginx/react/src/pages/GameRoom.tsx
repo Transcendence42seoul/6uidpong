@@ -10,6 +10,7 @@ import type Game from '../interfaces/Game';
 
 const GameRoom: React.FC = () => {
   const { state } = useLocation();
+  const { game } = state;
 
   const navigate = useNavigate();
 
@@ -20,7 +21,7 @@ const GameRoom: React.FC = () => {
 
   const [gameStart, setGameStart] = useState<boolean>(true);
   const [mode, setMode] = useState<boolean>(false);
-  const [room, setRoom] = useState<Game | undefined>(state?.game);
+  const [room, setRoom] = useState<Game>(game);
 
   const exitGame = () => {
     setGameStart(false);

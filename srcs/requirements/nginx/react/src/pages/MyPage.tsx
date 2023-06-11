@@ -31,7 +31,6 @@ const MyPage: React.FC = () => {
 
   const { tokenInfo } = selectAuth();
   const myId = tokenInfo?.id;
-  const myNickname = isTest ? mockUsers[0].nickname : tokenInfo?.nickname; // test
 
   const { gameSocket } = selectGameSocket();
 
@@ -135,7 +134,7 @@ const MyPage: React.FC = () => {
               winnerNickname,
               winnerScore,
             } = game;
-            const myWin = myNickname === winnerNickname;
+            const myWin = user?.nickname === winnerNickname;
             return (
               <div
                 key={createdAt}

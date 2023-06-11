@@ -1,14 +1,16 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import selectAuth from '../../features/auth/authSelector';
 import { selectGameSocket } from '../../features/socket/socketSelector';
+import useCallApi from '../../utils/useCallApi';
 import HoverButton from '../button/HoverButton';
 import ContentBox from '../container/ContentBox';
 import ModalContainer from '../container/ModalContainer';
 import UserProfile from '../container/UserProfile';
 
 import type GameState from '../../interfaces/GameState';
+import type User from '../../interfaces/User';
 
 interface GameResultModalProps {
   gameResult: GameState;
@@ -19,11 +21,11 @@ const GameResultModal: React.FC<GameResultModalProps> = ({
   gameResult,
   setShowModal,
 }) => {
+  const callApi = useCallApi();
   const navigate = useNavigate();
 
   const { tokenInfo } = selectAuth();
   const myId = tokenInfo?.id;
-  const myNickname = tokenInfo?.nickname;
 
   const { gameSocket } = selectGameSocket();
 
@@ -32,6 +34,8 @@ const GameResultModal: React.FC<GameResultModalProps> = ({
 
   const p1Win = score1 > score2;
 
+  const [myNickname, setMyNickname] = useState<string>('');
+
   const handleHomeClick = () => {
     navigate('/');
   };
@@ -39,6 +43,17 @@ const GameResultModal: React.FC<GameResultModalProps> = ({
   const handleRematchClick = () => {
     gameSocket?.emit('invite-game', opponentId);
   };
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const config = {
+        url: `/api/v1/users/${myId}`,
+      };
+      const { nickname }: User = await callApi(config);
+      setMyNickname(nickname);
+    };
+    fetchUserData();
+  }, []);
 
   useEffect(() => {
     const gameIdHandler = (gameId: number) => {

@@ -55,7 +55,7 @@ export class GameMatchGateway {
   ): void {
     const roomInfo = {
       roomId: roomId,
-      password: "Zxcasdqwe12#",
+      password: null,
     };
     this.gameMatchService.joinCustomGame(client, roomInfo);
   }

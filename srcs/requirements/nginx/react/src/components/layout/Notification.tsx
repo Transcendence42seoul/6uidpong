@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { selectGameSocket } from '../../features/socket/socketSelector';
 
+import type Game from '../../interfaces/Game';
 import type NotificationInfo from '../../interfaces/NotificationInfo';
 
 interface NotificationProps {
@@ -15,26 +16,26 @@ const Notification: React.FC<NotificationProps> = ({ info, setInfo }) => {
 
   const { gameSocket } = selectGameSocket();
 
-  const { master, masterId, roomId } = info;
+  const { master, roomId } = info;
 
   const handleAcceptClick = () => {
-    const game = {
-      roomId,
-      title: `${master}'s game`,
-      isLocked: true,
-      masterId,
-    };
     gameSocket?.emit('invite-success', roomId);
     setInfo(null);
-    navigate(`/custom/${roomId}`, {
-      state: { game },
-    });
   };
 
   const handleRejectClick = () => {
     gameSocket?.emit('invite-failed', roomId);
     setInfo(null);
   };
+
+  useEffect(() => {
+    const gameHandler = (game: Game) => {
+      navigate(`/custom/${roomId}`, {
+        state: { game },
+      });
+    };
+    gameSocket?.on('user-join', gameHandler);
+  }, [gameSocket]);
 
   return (
     <div className="fixed bottom-0 right-0 m-6">

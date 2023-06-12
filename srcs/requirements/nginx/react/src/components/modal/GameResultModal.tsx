@@ -1,16 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import selectAuth from '../../features/auth/authSelector';
 import { selectGameSocket } from '../../features/socket/socketSelector';
-import useCallApi from '../../utils/useCallApi';
 import HoverButton from '../button/HoverButton';
 import ContentBox from '../container/ContentBox';
 import ModalContainer from '../container/ModalContainer';
 import UserProfile from '../container/UserProfile';
 
+import type Game from '../../interfaces/Game';
 import type GameState from '../../interfaces/GameState';
-import type User from '../../interfaces/User';
 
 interface GameResultModalProps {
   gameResult: GameState;
@@ -21,7 +20,6 @@ const GameResultModal: React.FC<GameResultModalProps> = ({
   gameResult,
   setShowModal,
 }) => {
-  const callApi = useCallApi();
   const navigate = useNavigate();
 
   const { tokenInfo } = selectAuth();
@@ -34,8 +32,6 @@ const GameResultModal: React.FC<GameResultModalProps> = ({
 
   const p1Win = score1 > score2;
 
-  const [myNickname, setMyNickname] = useState<string>('');
-
   const handleHomeClick = () => {
     navigate('/');
   };
@@ -45,31 +41,14 @@ const GameResultModal: React.FC<GameResultModalProps> = ({
   };
 
   useEffect(() => {
-    const fetchMyData = async () => {
-      const config = {
-        url: `/api/v1/users/${myId}`,
-      };
-      const { nickname }: User = await callApi(config);
-      setMyNickname(nickname);
-    };
-    fetchMyData();
-  }, []);
-
-  useEffect(() => {
-    const gameIdHandler = (gameId: number) => {
-      const game = {
-        roomId: gameId,
-        title: `${myNickname}'s game`,
-        isLocked: true,
-        masterId: myId,
-      };
-      navigate(`/custom/${gameId}`, {
+    const gameHandler = (game: Game) => {
+      navigate(`/custom/${game.roomId}`, {
         state: { game },
       });
     };
-    gameSocket?.on('invite-room-created', gameIdHandler);
+    gameSocket?.on('invite-room-created', gameHandler);
     return () => {
-      gameSocket?.off('invite-room-created', gameIdHandler);
+      gameSocket?.off('invite-room-created', gameHandler);
     };
   }, []);
 

@@ -77,6 +77,7 @@ export interface customRoomInfo {
   roomId: number;
   title: string;
   isLocked: boolean;
+  isPrivate: boolean;
   masterId: number;
   participantId: number | undefined;
 }

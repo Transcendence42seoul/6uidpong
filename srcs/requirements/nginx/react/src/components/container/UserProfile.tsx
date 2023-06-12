@@ -10,6 +10,7 @@ import HoverButton from '../button/HoverButton';
 import CircularImage from './CircularImage';
 import ContentBox from './ContentBox';
 
+import type Game from '../../interfaces/Game';
 import type User from '../../interfaces/User';
 
 interface UserProfileProps {
@@ -34,7 +35,6 @@ const UserProfile: React.FC<UserProfileProps> = ({
 
   const [isBlocked, setIsBlocked] = useState<boolean>(false);
   const [isFriend, setIsFriend] = useState<boolean>(false);
-  const [myNickname, setMyNickname] = useState<string>('');
   const [user, setUser] = useState<User | null>(null);
 
   const handleBlockClick = () => {
@@ -69,7 +69,6 @@ const UserProfile: React.FC<UserProfileProps> = ({
       };
       callApi(config);
     }
-    setIsFriend(!isFriend);
   };
 
   const handleGameClick = () => {
@@ -77,32 +76,15 @@ const UserProfile: React.FC<UserProfileProps> = ({
   };
 
   useEffect(() => {
-    const gameIdHandler = (gameId: number) => {
-      const game = {
-        roomId: gameId,
-        title: `${myNickname}'s game`,
-        isLocked: true,
-        masterId: myId,
-      };
-      navigate(`/custom/${gameId}`, {
+    const gameHandler = (game: Game) => {
+      navigate(`/custom/${game.roomId}`, {
         state: { game },
       });
     };
-    gameSocket?.on('invite-room-created', gameIdHandler);
+    gameSocket?.on('invite-room-created', gameHandler);
     return () => {
-      gameSocket?.off('invite-room-created', gameIdHandler);
+      gameSocket?.off('invite-room-created', gameHandler);
     };
-  }, []);
-
-  useEffect(() => {
-    const fetchMyData = async () => {
-      const config = {
-        url: `/api/v1/users/${myId}`,
-      };
-      const { nickname }: User = await callApi(config);
-      setMyNickname(nickname);
-    };
-    fetchMyData();
   }, []);
 
   useEffect(() => {

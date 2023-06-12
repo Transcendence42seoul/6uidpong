@@ -22,7 +22,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   useEffect(() => {
     gameSocket?.on('invited-user', infoHandler);
-  }, [gameSocket, notificationInfo]);
+  }, [gameSocket]);
 
   return (
     <>

@@ -11,7 +11,7 @@ export class CreateRequest {
   @IsNotEmpty()
   @IsString()
   @Length(4, 30)
-  @Matches(/^[a-zA-Z0-9]+$/)
+  @Matches(/^[a-zA-Z0-9!@#$%^&*()]+$/)
   readonly title: string;
 
   readonly password: string | undefined;

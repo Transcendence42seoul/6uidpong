@@ -52,7 +52,7 @@ export class GameMatchService {
       password: roomInfo.password,
     };
     this.roomSecrets.push(roomSecret);
-    client.emit("custom-room-created", roomId);
+    client.emit("custom-room-created", roomInfo);
   }
 
   getCustomGameList(client: Socket): void {
@@ -184,22 +184,22 @@ export class GameMatchService {
       masterId: master.id,
       roomId,
     });
-    console.log(participant.gameSocketId);
-    client.emit("invite-room-created", roomId);
+    client.emit("invite-room-created", room);
   }
 
   async handleInviteFail(client: Socket, roomId: number, server: Namespace) {
-    const user = await this.userService.findOne(this.rooms[roomId].masterId);
+    const roomIndex = this.rooms.findIndex((room) => room.roomId === roomId);
+    const user = await this.userService.findOne(this.rooms[roomIndex].masterId);
     const participant = await this.userService.findBySocketId(client.id);
     this.rooms.splice(roomId, 1);
     this.roomSecrets.splice(roomId, 1);
     server.to(user.socketId).emit("invite-dismissed", participant.nickname);
+    client.emit("room-destroyed");
   }
 
   handleLadderMatchStart(client: Socket): void {
     if (this.queue.find((queue) => queue === client) === undefined) {
       this.queue.push(client);
-      console.log("user pushed into the queue");
     }
   }
 

@@ -188,7 +188,6 @@ export class GameMatchService {
       opponent
     );
     if (await this.handleInviteCheck(master, participant, server)) {
-      client.emit("invite-failed");
       return;
     }
     const roomId = this.roomNumber++;

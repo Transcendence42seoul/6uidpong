@@ -221,7 +221,7 @@ export class GameMatchService {
     const participant = await this.userService.findBySocketId(client.id);
     this.rooms.splice(roomId, 1);
     this.roomSecrets.splice(roomId, 1);
-    server.to(user.socketId).emit("invite-dismissed", participant.nickname);
+    server.to(user.socketId).emit("invite-dismissed", this.rooms[roomIndex]);
   }
 
   handleLadderMatchStart(client: Socket): void {

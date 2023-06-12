@@ -51,6 +51,7 @@ const GameRoom: React.FC = () => {
     };
     gameSocket?.on('game-start', startGame);
     gameSocket?.on('room-destroyed', exitGame);
+    gameSocket?.on('invite-dismissed', exitGame);
     gameSocket?.on('user-exit', roomHandler);
     gameSocket?.on('user-join', roomHandler);
     return () => {

@@ -114,7 +114,7 @@ export class UserService {
 
   async findBySocketId(id: string | null): Promise<User | null> {
     if (id !== null) {
-      return await this.userRepository.findOneOrFail({
+      return await this.userRepository.findOne({
         where: { gameSocketId: id },
       });
     }

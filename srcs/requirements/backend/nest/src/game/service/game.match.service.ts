@@ -154,15 +154,28 @@ export class GameMatchService {
     }
   }
 
+  async handleInviteCheck(master: User, participant: User): Promise<boolean> {
+    if (participant.status === "game") return;
+    for (let i = 0; i < this.rooms.length; i++) {
+      if (
+        this.rooms[i].masterId === master.id ||
+        this.rooms[i].participantId === participant.id
+      )
+        return true;
+    }
+    return false;
+  }
+
   async handleInviteGame(
     client: Socket,
     opponent: number,
     server: Namespace
   ): Promise<void> {
+    const master = await this.userService.findBySocketId(client.id);
     const participant: User | undefined = await this.userService.findOne(
       opponent
     );
-    const master = await this.userService.findBySocketId(client.id);
+    if (await this.handleInviteCheck(master, participant)) return;
     const roomId = this.roomNumber++;
     const room: customRoomInfo = {
       roomId,

@@ -14,14 +14,12 @@ import type User from '../../interfaces/User';
 
 interface UserProfileProps {
   userId: number | undefined;
-  friend?: boolean;
   className?: string;
   children?: React.ReactNode;
 }
 
 const UserProfile: React.FC<UserProfileProps> = ({
   userId,
-  friend = false,
   className = '',
   children = null,
 }) => {
@@ -34,11 +32,17 @@ const UserProfile: React.FC<UserProfileProps> = ({
   const { gameSocket } = selectGameSocket();
   const { socket } = selectSocket();
 
+  const [isBlocked, setIsBlocked] = useState<boolean>(false);
+  const [isFriend, setIsFriend] = useState<boolean>(false);
   const [myNickname, setMyNickname] = useState<string>('');
   const [user, setUser] = useState<User | null>(null);
 
   const handleBlockClick = () => {
-    socket?.emit('block', { interlocutorId: userId });
+    if (isBlocked) {
+      socket?.emit('unblock', { interlocutorId: userId });
+    } else {
+      socket?.emit('block', { interlocutorId: userId });
+    }
   };
 
   const handleDmClick = () => {
@@ -49,13 +53,21 @@ const UserProfile: React.FC<UserProfileProps> = ({
     socket?.emit('join-dm', { interlocutorId: userId }, roomIdHandler);
   };
 
-  const handleFriendRequestClick = () => {
-    const config = {
-      url: `/api/v1/users/${myId}/friend-requests`,
-      method: 'post',
-      data: { toId: userId },
-    };
-    callApi(config);
+  const handleFriendClick = () => {
+    if (isFriend) {
+      const config = {
+        url: `/api/v1/users/${myId}/friends/${userId}`,
+        method: 'delete',
+      };
+      callApi(config);
+    } else {
+      const config = {
+        url: `/api/v1/users/${myId}/friend-requests`,
+        method: 'post',
+        data: { toId: userId },
+      };
+      callApi(config);
+    }
   };
 
   const handleGameClick = () => {
@@ -90,6 +102,12 @@ const UserProfile: React.FC<UserProfileProps> = ({
     };
     fetchMyData();
   }, []);
+
+  useEffect(() => {
+    if (!user) return;
+    setIsBlocked(user.isBlocked);
+    setIsFriend(user.isFriend);
+  }, [user]);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -128,14 +146,12 @@ const UserProfile: React.FC<UserProfileProps> = ({
             <p className="mt-1 text-sm">Wins: {user?.winStat}</p>
             <p className="mt-1 text-sm">Losses: {user?.loseStat}</p>
             <p className="mt-1 text-sm">Ladder Score: {user?.ladderScore}</p>
-            {!friend && (
-              <HoverButton
-                onClick={handleFriendRequestClick}
-                className="mt-4 border-2 px-2 py-1"
-              >
-                Friend Request
-              </HoverButton>
-            )}
+            <HoverButton
+              onClick={handleFriendClick}
+              className="mt-4 border-2 px-2 py-1"
+            >
+              {isFriend ? 'Delete Friend' : 'Friend Request'}
+            </HoverButton>
             <div className="mt-4 flex">
               <button
                 className="mr-2 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-400"
@@ -153,7 +169,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
                 className="rounded bg-red-500 px-4 py-2 text-white hover:bg-red-400"
                 onClick={handleBlockClick}
               >
-                Block
+                {isBlocked ? 'Unblock' : 'Block'}
               </button>
             </div>
           </div>

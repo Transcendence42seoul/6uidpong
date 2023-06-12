@@ -65,7 +65,6 @@ export class ConnectionService {
       await queryRunner.commitTransaction();
     } catch (error) {
       await queryRunner.rollbackTransaction();
-      throw error;
     } finally {
       await queryRunner.release();
     }

@@ -1,7 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { WsException } from "@nestjs/websockets";
-import { JsonWebTokenError } from "jsonwebtoken";
 import { Namespace, Socket } from "socket.io";
 import { User } from "src/user/entity/user.entity";
 import { UserService } from "src/user/service/user.service";
@@ -32,6 +31,9 @@ export class ConnectionService {
 
   async disconnect(socketId: string): Promise<void> {
     const user: User = await this.userService.findBySocketId(socketId);
+    if (typeof user === null) {
+      return;
+    }
     const queryRunner = this.dataSource.createQueryRunner();
 
     await queryRunner.connect();
@@ -60,7 +62,6 @@ export class ConnectionService {
       await queryRunner.commitTransaction();
     } catch (error) {
       await queryRunner.rollbackTransaction();
-      throw error;
     } finally {
       await queryRunner.release();
     }

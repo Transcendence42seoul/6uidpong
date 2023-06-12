@@ -41,10 +41,10 @@ const Notification: React.FC<NotificationProps> = ({ info, setInfo }) => {
     <div className="fixed bottom-0 right-0 m-6">
       <div className="rounded-xl bg-white p-3 shadow-lg">
         <div className="ml-2 flex space-x-2">
-          <span className="font-semibold">{`${master} invites you to a game.`}</span>
+          <span className="text-sm">{`${master} invites you to a game.`}</span>
           <svg
-            width="24"
-            height="24"
+            width="20"
+            height="20"
             viewBox="0 0 1792 1792"
             fill="#44C997"
             xmlns="http://www.w3.org/2000/svg"
@@ -54,8 +54,8 @@ const Notification: React.FC<NotificationProps> = ({ info, setInfo }) => {
             <path d="M1671 566q0 40-28 68l-724 724-136 136q-28 28-68 28t-68-28l-136-136-362-362q-28-28-28-68t28-68l136-136q28-28 68-28t68 28l294 295 656-657q28-28 68-28t68 28l136 136q28 28 28 68z" />
           </svg>
           <svg
-            width="24"
-            height="24"
+            width="20"
+            height="20"
             viewBox="0 0 1792 1792"
             fill="#FF4136"
             xmlns="http://www.w3.org/2000/svg"

@@ -84,7 +84,7 @@ const ChannelMemberProfile: React.FC<ChannelMemberProfileProps> = ({
         </div>
       )}
       {isOwner && (
-        <div className="w-full flex-col space-y-4">
+        <div className="flex w-full flex-col space-y-4">
           <HoverButton onClick={handleAssignAdminClick} className="border p-2">
             Assign Admin
           </HoverButton>

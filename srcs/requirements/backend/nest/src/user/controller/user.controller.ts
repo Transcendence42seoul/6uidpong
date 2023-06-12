@@ -77,7 +77,12 @@ export class UserController {
     try {
       const user: User = await this.userService.findOne(id);
       const block: Block = await this.blockService.findOne(req.user.id, id);
-      return new UserProfileResponse(user, block ? true : false);
+      const friend: Friend = await this.friendService.findOne(req.user.id, id);
+      return new UserProfileResponse(
+        user,
+        block ? true : false,
+        friend ? true : false
+      );
     } catch {
       throw new NotFoundException("user not exists.");
     }

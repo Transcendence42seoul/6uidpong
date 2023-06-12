@@ -7,8 +7,6 @@ import selectSocket from '../features/socket/socketSelector';
 
 import type User from '../interfaces/User';
 
-import { isTest, mockUsers } from '../mock'; // test
-
 const BlockList: React.FC = () => {
   const { socket } = selectSocket();
 
@@ -26,7 +24,6 @@ const BlockList: React.FC = () => {
       setBlockedUsers([...blockList]);
     };
     socket?.emit('find-block-users', blockListHandler);
-    setBlockedUsers(isTest ? mockUsers : blockedUsers); // test
   }, []);
 
   return (

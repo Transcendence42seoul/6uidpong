@@ -79,7 +79,7 @@ const ChannelMemberList: React.FC<ChannelMemberListProps> = ({
   }, [members, searchTerm]);
 
   return (
-    <div className={`relative text-gray-100 ${className}`}>
+    <div className={`relative text-gray-50 ${className}`}>
       <input
         type="text"
         placeholder="Search members"

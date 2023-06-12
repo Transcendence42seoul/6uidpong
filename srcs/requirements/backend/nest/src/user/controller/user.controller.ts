@@ -170,12 +170,11 @@ export class UserController {
     @Param("id", ParseIntPipe) fromId: number,
     @Body("toId", ParseIntPipe) toId: number
   ): Promise<void> {
-    try {
-      await this.friendService.findOne(fromId, toId);
+    const friend: Friend = await this.friendService.findOne(fromId, toId);
+    if (friend) {
       throw new BadRequestException("already friends.");
-    } catch {
-      await this.friendRequestService.insert(fromId, toId);
     }
+    await this.friendRequestService.insert(fromId, toId);
   }
 
   @Delete("/:id/friend-requests/:fromId")

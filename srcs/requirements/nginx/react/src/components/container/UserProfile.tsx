@@ -69,7 +69,6 @@ const UserProfile: React.FC<UserProfileProps> = ({
       };
       callApi(config);
     }
-    setIsFriend(!isFriend);
   };
 
   const handleGameClick = () => {

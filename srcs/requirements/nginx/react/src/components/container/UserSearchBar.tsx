@@ -28,6 +28,15 @@ const UserSearchBar: React.FC<UserSearchBarProps> = ({
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [showSearchResults, setShowSearchResults] = useState<boolean>(false);
 
+  const handleOutsideClick = (event: MouseEvent) => {
+    if (
+      showSearchResults &&
+      !searchResultsRef.current?.contains(event.target as Node)
+    ) {
+      setShowSearchResults(false);
+    }
+  };
+
   const handleUserClick = (user: User) => {
     onUserClick(user);
   };
@@ -48,6 +57,12 @@ const UserSearchBar: React.FC<UserSearchBarProps> = ({
   };
 
   useEffect(() => {
+    return () => {
+      document.removeEventListener('click', handleOutsideClick);
+    };
+  }, []);
+
+  useEffect(() => {
     const fetchUsersData = async () => {
       const config = {
         url: '/api/v1/users/search',
@@ -63,18 +78,7 @@ const UserSearchBar: React.FC<UserSearchBarProps> = ({
   }, [searchTerm]);
 
   useEffect(() => {
-    const handleOutsideClick = (event: MouseEvent) => {
-      if (
-        showSearchResults &&
-        !searchResultsRef.current?.contains(event.target as Node)
-      ) {
-        setShowSearchResults(false);
-      }
-    };
     document.addEventListener('click', handleOutsideClick);
-    return () => {
-      document.removeEventListener('click', handleOutsideClick);
-    };
   }, [showSearchResults]);
 
   return (

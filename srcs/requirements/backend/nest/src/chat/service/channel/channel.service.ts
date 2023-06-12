@@ -586,6 +586,7 @@ export class ChannelService {
       );
 
       await queryRunner.commitTransaction();
+      server.to(muted.user.socketId).emit("muted");
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;

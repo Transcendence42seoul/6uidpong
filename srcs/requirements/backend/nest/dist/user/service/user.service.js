@@ -17,6 +17,8 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const user_entity_1 = require("../entity/user.entity");
+const fs_1 = require("fs");
+const path = require("path");
 let UserService = class UserService {
     constructor(userRepository, dataSource) {
         this.userRepository = userRepository;
@@ -90,9 +92,22 @@ let UserService = class UserService {
             await queryRunner.release();
         }
     }
-    async updateImage(id, image) {
+    async updateImage(id, file) {
+        const uploadPath = `uploads/${id}`;
+        if (!fs_1.default.existsSync(uploadPath)) {
+            fs_1.default.mkdirSync(uploadPath);
+        }
+        else {
+            const files = fs_1.default.readdirSync(uploadPath);
+            files.forEach((file) => {
+                const filePath = path.join(uploadPath, file);
+                fs_1.default.unlinkSync(filePath);
+            });
+        }
+        fs_1.default.writeFileSync(uploadPath, file.path);
+        fs_1.default.unlinkSync(file.path);
         await this.userRepository.update(id, {
-            image,
+            image: `https://${process.env.HOST_NAME}/api/v1/users/${id}/image`,
         });
     }
     async updateIsTwoFactor(id, is2FA) {
@@ -117,6 +132,23 @@ let UserService = class UserService {
             });
         }
         return null;
+    }
+    async streamImage(res, id) {
+        const imagePath = `uploads/${id}`;
+        if (!fs_1.default.existsSync(imagePath)) {
+            throw new common_1.NotFoundException();
+        }
+        const files = fs_1.default.readdirSync(imagePath);
+        if (files.length === 0) {
+            throw new common_1.NotFoundException();
+        }
+        const fileName = files[0];
+        const filePath = path.join(imagePath, fileName);
+        const fileStream = fs_1.default.createReadStream(filePath);
+        res.set({
+            "Content-Type": "image/jpeg",
+        });
+        fileStream.pipe(res);
     }
 };
 UserService = __decorate([

@@ -222,7 +222,6 @@ export class GameMatchService {
     this.rooms.splice(roomId, 1);
     this.roomSecrets.splice(roomId, 1);
     server.to(user.socketId).emit("invite-dismissed", participant.nickname);
-    client.emit("room-destroyed");
   }
 
   handleLadderMatchStart(client: Socket): void {

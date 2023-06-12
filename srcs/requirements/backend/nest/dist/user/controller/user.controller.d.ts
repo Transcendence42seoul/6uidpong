@@ -1,3 +1,4 @@
+/// <reference types="multer" />
 import { UserService } from "../service/user.service";
 import { AuthService } from "src/auth/service/auth.service";
 import { NicknameUpdateRequest } from "../dto/nickname-update-request";

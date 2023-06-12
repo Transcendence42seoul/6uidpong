@@ -1,3 +1,4 @@
+/// <reference types="multer" />
 import { PaginationOptions } from "src/utils/pagination/pagination.option";
 import { DataSource, Repository } from "typeorm";
 import { User } from "../entity/user.entity";

@@ -123,7 +123,7 @@ export class UserController {
     @UploadedFile(
       new ParseFilePipe({
         validators: [
-          new MaxFileSizeValidator({ maxSize: 200 }),
+          new MaxFileSizeValidator({ maxSize: 200 * 1024 }),
           new FileTypeValidator({ fileType: "image/jpeg" }),
         ],
       })

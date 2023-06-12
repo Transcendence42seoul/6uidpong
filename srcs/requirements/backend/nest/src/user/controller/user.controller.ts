@@ -15,12 +15,17 @@ import {
   DefaultValuePipe,
   BadRequestException,
   Req,
+  UseInterceptors,
+  UploadedFile,
+  ParseFilePipe,
+  MaxFileSizeValidator,
+  FileTypeValidator,
+  Res,
 } from "@nestjs/common";
 import { UserService } from "../service/user.service";
 import { JwtAccessGuard } from "src/auth/guard/jwt-access.guard";
 import { AuthService } from "src/auth/service/auth.service";
 import { User } from "../entity/user.entity";
-import { ImageUpdateRequest } from "../dto/image-update-request";
 import { NicknameUpdateRequest } from "../dto/nickname-update-request";
 import { TwoFactorAuthUpdateRequest } from "../dto/two-factor-auth-update-request";
 import { UserResponse } from "../dto/user-response";
@@ -35,6 +40,8 @@ import { Friend } from "../entity/friend.entity";
 import { BlockService } from "src/chat/service/dm/block.service";
 import { Block } from "src/chat/entity/dm/block.entity";
 import { UserProfileResponse } from "../dto/user-profile-response";
+import { FileInterceptor } from "@nestjs/platform-express";
+import { Response } from "express";
 
 @Controller("api/v1/users")
 @UseGuards(JwtAccessGuard)
@@ -88,6 +95,15 @@ export class UserController {
     }
   }
 
+  @Get("/:id/image")
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async streamImage(
+    @Res() res: Response,
+    @Param("id", ParseIntPipe) id: number
+  ): Promise<void> {
+    await this.userService.streamImage(res, id);
+  }
+
   @Put("/:id/nickname")
   @UseGuards(PermissionGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -100,12 +116,21 @@ export class UserController {
 
   @Put("/:id/image")
   @UseGuards(PermissionGuard)
+  @UseInterceptors(FileInterceptor("file", { dest: "uploads" }))
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateImage(
     @Param("id", ParseIntPipe) id: number,
-    @Body() body: ImageUpdateRequest
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 200 }),
+          new FileTypeValidator({ fileType: "image/jpeg" }),
+        ],
+      })
+    )
+    file: Express.Multer.File
   ): Promise<void> {
-    await this.userService.updateImage(id, body.image);
+    await this.userService.updateImage(id, file);
   }
 
   @Put("/:id/email/code")

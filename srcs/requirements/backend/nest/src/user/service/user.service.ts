@@ -1,8 +1,15 @@
-import { ConflictException, Injectable } from "@nestjs/common";
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { PaginationOptions } from "src/utils/pagination/pagination.option";
 import { DataSource, Repository } from "typeorm";
 import { User } from "../entity/user.entity";
+import fs from "fs";
+import * as path from "path";
+import { Response } from "express";
 
 @Injectable()
 export class UserService {
@@ -88,9 +95,21 @@ export class UserService {
     }
   }
 
-  async updateImage(id: number, image: string): Promise<void> {
+  async updateImage(id: number, file: Express.Multer.File): Promise<void> {
+    const uploadPath: string = `uploads/${id}`;
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath);
+    } else {
+      const files: string[] = fs.readdirSync(uploadPath);
+      files.forEach((file) => {
+        const filePath = path.join(uploadPath, file);
+        fs.unlinkSync(filePath);
+      });
+    }
+    fs.writeFileSync(uploadPath, file.path);
+    fs.unlinkSync(file.path);
     await this.userRepository.update(id, {
-      image,
+      image: `https://${process.env.HOST_NAME}/api/v1/users/${id}/image`,
     });
   }
 
@@ -119,5 +138,27 @@ export class UserService {
       });
     }
     return null;
+  }
+
+  async streamImage(res: Response, id: number): Promise<void> {
+    const imagePath: string = `uploads/${id}`;
+    if (!fs.existsSync(imagePath)) {
+      throw new NotFoundException();
+    }
+
+    const files: string[] = fs.readdirSync(imagePath);
+    if (files.length === 0) {
+      throw new NotFoundException();
+    }
+
+    const fileName: string = files[0];
+    const filePath = path.join(imagePath, fileName);
+    const fileStream = fs.createReadStream(filePath);
+
+    res.set({
+      "Content-Type": "image/jpeg",
+    });
+
+    fileStream.pipe(res);
   }
 }

@@ -41,6 +41,7 @@ export class GameMatchService {
       roomId,
       title: roomInfo.title,
       isLocked: !!roomInfo.password,
+      isPrivate: false,
       masterId,
       participantId: undefined,
     };
@@ -52,7 +53,7 @@ export class GameMatchService {
       password: roomInfo.password,
     };
     this.roomSecrets.push(roomSecret);
-    client.emit("custom-room-created", roomInfo);
+    client.emit("custom-room-created", room);
   }
 
   getCustomGameList(client: Socket): void {
@@ -154,8 +155,8 @@ export class GameMatchService {
     }
   }
 
-  async handleInviteCheck(master: User, participant: User): Promise<boolean> {
-    if (participant.status === "game") return;
+  handleInviteCheck(master: User, participant: User): boolean {
+    if (participant.status === "game") return true;
     for (let i = 0; i < this.rooms.length; i++) {
       if (
         this.rooms[i].masterId === master.id ||
@@ -175,12 +176,16 @@ export class GameMatchService {
     const participant: User | undefined = await this.userService.findOne(
       opponent
     );
-    if (await this.handleInviteCheck(master, participant)) return;
+    if (this.handleInviteCheck(master, participant)) {
+      client.emit("invite-failed");
+      return;
+    }
     const roomId = this.roomNumber++;
     const room: customRoomInfo = {
       roomId,
       title: `${master.nickname}'s game`,
-      isLocked: true,
+      isLocked: false,
+      isPrivate: true,
       masterId: master.id,
       participantId: undefined,
     };
@@ -189,7 +194,7 @@ export class GameMatchService {
       roomId,
       master: client,
       participant: null,
-      password: "Zxcasdqwe12#",
+      password: null,
     };
     this.roomSecrets.push(roomSecret);
     server.to(participant.gameSocketId).emit("invited-user", {

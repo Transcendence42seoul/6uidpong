@@ -10,14 +10,12 @@ import { selectGameSocket } from '../features/socket/socketSelector';
 
 import type Game from '../interfaces/Game';
 
-import { isTest, mockGames } from '../mock'; // test
-
 const GameList: React.FC = () => {
   const navigate = useNavigate();
 
   const { gameSocket } = selectGameSocket();
 
-  const [games, setGames] = useState<Game[]>(isTest ? mockGames : []); // test
+  const [games, setGames] = useState<Game[]>([]); // test
   const [isWrongPassword, setIsWrongPassword] = useState<boolean>(false);
   const [searchResults, setSearchResults] = useState<Game[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -135,22 +133,24 @@ const GameList: React.FC = () => {
         </div>
       </div>
       {searchResults.map((game) => {
-        const { roomId, title, isLocked } = game;
+        const { roomId, title, isLocked, isPrivate } = game;
         return (
           <li key={roomId}>
-            <button
-              className={`flex w-full items-center space-x-1 border p-1 text-lg text-gray-100 ${
-                roomId === selectedGame?.roomId ? 'bg-indigo-600' : ''
-              }`}
-              onClick={() => handleGameClick(game)}
-              onDoubleClick={handleGameDoubleClick}
-              onKeyDown={handleArrowKeydown}
-            >
-              <span>{title}</span>
-              {isLocked && (
-                <img src={ImageSrc.LOCK} alt="LOCK" className="h-5 w-5" />
-              )}
-            </button>
+            {!isPrivate && (
+              <button
+                className={`flex w-full items-center space-x-1 border p-1 text-lg text-gray-100 ${
+                  roomId === selectedGame?.roomId ? 'bg-indigo-600' : ''
+                }`}
+                onClick={() => handleGameClick(game)}
+                onDoubleClick={handleGameDoubleClick}
+                onKeyDown={handleArrowKeydown}
+              >
+                <span>{title}</span>
+                {isLocked && (
+                  <img src={ImageSrc.LOCK} alt="LOCK" className="h-5 w-5" />
+                )}
+              </button>
+            )}
           </li>
         );
       })}

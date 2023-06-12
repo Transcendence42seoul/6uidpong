@@ -15,20 +15,21 @@ const ProfilePicture: React.FC = () => {
     }
   };
 
-  const handleUpload = () => {
-    if (selectedFile) {
-      const formData = new FormData();
-      formData.append('file', selectedFile);
-      axios
-        .put(`api/v1/users/${myId}/image`, formData, {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        })
-        .then((response: AxiosResponse<void>) => {
-          alert('전송에 성공했습니다.');
-        })
-        .catch((error: AxiosError) => {
-          alert('전송에 실패했습니다.');
-        });
+  const handleUpload = async () => {
+    if (!selectedFile) return;
+
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+    try {
+      await axios.put(`api/v1/users/${myId}/image`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      alert('전송에 성공했습니다.');
+    } catch (e) {
+      alert('전송에 실패했습니다.');
     }
   };
 

@@ -120,7 +120,7 @@ const FriendsList: React.FC = () => {
       </ul>
       {selectedFriendId && showUserProfileModal && (
         <ModalContainer setShowModal={setShowUserProfileModal} closeButton>
-          <UserProfile userId={selectedFriendId} friend />
+          <UserProfile userId={selectedFriendId} />
         </ModalContainer>
       )}
     </div>

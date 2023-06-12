@@ -104,9 +104,9 @@ const DmRoomList: React.FC = () => {
         setShowMenu(false);
       }
     };
-    document.addEventListener('mousedown', handleOutsideClick);
+    document.addEventListener('click', handleOutsideClick);
     return () => {
-      document.removeEventListener('mousedown', handleOutsideClick);
+      document.removeEventListener('click', handleOutsideClick);
     };
   }, [showMenu]);
 

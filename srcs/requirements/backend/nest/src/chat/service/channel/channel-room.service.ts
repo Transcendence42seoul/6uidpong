@@ -85,6 +85,10 @@ export class ChannelRoomService {
     });
   }
 
+  async findOneByTitle(title: string): Promise<Channel> {
+    return await this.channelRepository.findOneBy({ title });
+  }
+
   async delete(channelId: number): Promise<void> {
     await this.channelRepository.delete(channelId);
   }

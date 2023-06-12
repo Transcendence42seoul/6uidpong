@@ -48,6 +48,14 @@ export class ChannelGateway {
     return await this.channelService.findMyChannels(jwt.id);
   }
 
+  @SubscribeMessage("channel-title-duplicated")
+  async isDuplicated(
+    @MessageBody("title")
+    title: string
+  ): Promise<boolean> {
+    return await this.channelService.isDuplicated(title);
+  }
+
   @SubscribeMessage("create-channel")
   async create(
     @WsJwtPayload() jwt: JwtPayload,

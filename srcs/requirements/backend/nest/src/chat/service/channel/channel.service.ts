@@ -46,6 +46,14 @@ export class ChannelService {
     return this.roomService.find(userId);
   }
 
+  async isDuplicated(title: string): Promise<boolean> {
+    const room: Channel = await this.roomService.findOneByTitle(title);
+    if (room) {
+      return true;
+    }
+    return false;
+  }
+
   async createChannel(
     userId: number,
     body: CreateRequest

@@ -10,7 +10,6 @@ import UserListWithSeacrhBar from '../container/UserListWithSearchBar';
 
 import type User from '../../interfaces/User';
 
-
 interface ChannelManageModalProps {
   channelId: number;
   setShowModal: (showModal: boolean) => void;

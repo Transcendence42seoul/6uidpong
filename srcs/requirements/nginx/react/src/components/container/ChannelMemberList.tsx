@@ -7,8 +7,8 @@ import ChannelMemberProfile from './ChannelMemberProfile';
 import CircularImage from './CircularImage';
 import ModalContainer from './ModalContainer';
 
+import type Member from '../../interfaces/Member';
 import type SendResponse from '../../interfaces/SendResponse';
-import type User from '../../interfaces/User';
 
 interface ChannelMemberListProps {
   className?: string;
@@ -23,20 +23,20 @@ const ChannelMemberList: React.FC<ChannelMemberListProps> = ({
   const { socket } = selectSocket();
 
   const searchResultsRef = useRef<HTMLUListElement>(null);
-  const [members, setMembers] = useState<User[]>([]);
-  const [searchResults, setSearchResults] = useState<User[]>(members);
+  const [members, setMembers] = useState<Member[]>([]);
+  const [searchResults, setSearchResults] = useState<Member[]>(members);
   const [searchTerm, setSearchTerm] = useState<string>('');
-  const [selectedMemberId, setSelectedMemberId] = useState<number | null>(null);
+  const [selectedMember, setSelectedMember] = useState<Member | null>(null);
   const [showMemberProfileModal, setShowMemberProfileModal] =
     useState<boolean>(false);
 
-  const handleMemberClick = ({ id }: User) => {
-    setSelectedMemberId(id);
+  const handleMemberClick = (member: Member) => {
+    setSelectedMember(member);
     setShowMemberProfileModal(true);
   };
 
   const handleMembers = () => {
-    const membersHandler = (memberList: User[]) => {
+    const membersHandler = (memberList: Member[]) => {
       setMembers([...memberList]);
     };
     socket?.emit('find-channel-users', { channelId }, membersHandler);
@@ -109,9 +109,9 @@ const ChannelMemberList: React.FC<ChannelMemberListProps> = ({
           );
         })}
       </ul>
-      {selectedMemberId && showMemberProfileModal && (
+      {selectedMember && showMemberProfileModal && (
         <ModalContainer setShowModal={setShowMemberProfileModal} closeButton>
-          <ChannelMemberProfile userId={selectedMemberId} />
+          <ChannelMemberProfile member={selectedMember} />
         </ModalContainer>
       )}
     </div>

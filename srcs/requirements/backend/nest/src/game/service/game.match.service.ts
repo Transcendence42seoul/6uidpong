@@ -70,7 +70,8 @@ export class GameMatchService {
       if (roomSecret.master === client) {
         this.rooms.splice(roomIndex, 1);
         this.roomSecrets.splice(roomIndex, 1);
-        roomSecret.participant.emit("room-destroyed");
+        if (roomSecret.participant)
+          roomSecret.participant.emit("room-destroyed");
       } else {
         room.participantId = undefined;
         roomSecret.master.emit("user-exit", room);
@@ -218,10 +219,9 @@ export class GameMatchService {
   async handleInviteFail(client: Socket, roomId: number, server: Namespace) {
     const roomIndex = this.rooms.findIndex((room) => room.roomId === roomId);
     const user = await this.userService.findOne(this.rooms[roomIndex].masterId);
-    const participant = await this.userService.findBySocketId(client.id);
     this.rooms.splice(roomId, 1);
     this.roomSecrets.splice(roomId, 1);
-    server.to(user.socketId).emit("invite-dismissed", this.rooms[roomIndex]);
+    server.to(user.gameSocketId).emit("invite-dismissed");
   }
 
   handleLadderMatchStart(client: Socket): void {

@@ -152,7 +152,7 @@ __decorate([
     __param(0, (0, common_1.Param)("id", common_1.ParseIntPipe)),
     __param(1, (0, common_1.UploadedFile)(new common_1.ParseFilePipe({
         validators: [
-            new common_1.MaxFileSizeValidator({ maxSize: 200 }),
+            new common_1.MaxFileSizeValidator({ maxSize: 200 * 1024 }),
             new common_1.FileTypeValidator({ fileType: "image/jpeg" }),
         ],
     }))),

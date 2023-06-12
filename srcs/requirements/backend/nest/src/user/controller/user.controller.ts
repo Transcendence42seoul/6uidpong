@@ -41,7 +41,7 @@ import { BlockService } from "src/chat/service/dm/block.service";
 import { Block } from "src/chat/entity/dm/block.entity";
 import { UserProfileResponse } from "../dto/user-profile-response";
 import { FileInterceptor } from "@nestjs/platform-express";
-import { Response } from "express";
+import { Express, Response } from "express";
 
 @Controller("api/v1/users")
 @UseGuards(JwtAccessGuard)
@@ -116,7 +116,7 @@ export class UserController {
 
   @Put("/:id/image")
   @UseGuards(PermissionGuard)
-  @UseInterceptors(FileInterceptor("file", { dest: "uploads" }))
+  @UseInterceptors(FileInterceptor("file"))
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateImage(
     @Param("id", ParseIntPipe) id: number,

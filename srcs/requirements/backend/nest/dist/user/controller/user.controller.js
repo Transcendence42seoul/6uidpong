@@ -147,7 +147,7 @@ __decorate([
 __decorate([
     (0, common_1.Put)("/:id/image"),
     (0, common_1.UseGuards)(permission_guard_1.PermissionGuard),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)("file", { dest: "uploads" })),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)("file")),
     (0, common_1.HttpCode)(common_1.HttpStatus.NO_CONTENT),
     __param(0, (0, common_1.Param)("id", common_1.ParseIntPipe)),
     __param(1, (0, common_1.UploadedFile)(new common_1.ParseFilePipe({

@@ -16,14 +16,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [notificationInfo, setNotificationInfo] =
     useState<NotificationInfo | null>(null);
 
+  const infoHandler = (info: NotificationInfo) => {
+    setNotificationInfo({ ...info });
+  };
+
   useEffect(() => {
-    const infoHandler = (info: NotificationInfo) => {
-      setNotificationInfo({ ...info });
-    };
     gameSocket?.on('invited-user', infoHandler);
-    return () => {
-      gameSocket?.off('invited-user', infoHandler);
-    };
   }, [gameSocket, notificationInfo]);
 
   return (

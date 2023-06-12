@@ -40,6 +40,29 @@ const DmRoomList: React.FC = () => {
     setRooms((prevRooms) => [...prevRooms, room]);
   };
 
+  const chatHandler = ({ roomId, chatResponse: chat }: SendResponse) => {
+    const roomToUpdate = rooms.find(
+      (room) => room.interlocutorId === chat.userId,
+    );
+    if (!roomToUpdate) {
+      const newRoom = {
+        roomId,
+        lastMessage: chat.message,
+        lastMessageTime: chat.createdAt,
+        interlocutor: chat.nickname,
+        interlocutorId: chat.userId,
+        interlocutorImage: chat.image,
+        newMsgCount: 1,
+      };
+      addRoom(newRoom);
+      return;
+    }
+    roomToUpdate.lastMessage = chat.message;
+    roomToUpdate.lastMessageTime = chat.createdAt;
+    roomToUpdate.newMsgCount += 1;
+    setRooms([...rooms]);
+  };
+
   const handleContextMenu = (event: React.MouseEvent) => {
     event.preventDefault();
     setMenuPosition({ x: event.clientX, y: event.clientY });
@@ -66,35 +89,13 @@ const DmRoomList: React.FC = () => {
     };
     socket?.emit('find-rooms', roomsHandler);
     setRooms(isTest ? mockRooms : rooms); // test
-  }, []);
-
-  useEffect(() => {
-    const chatHandler = ({ roomId, chatResponse: chat }: SendResponse) => {
-      const roomToUpdate = rooms.find(
-        (room) => room.interlocutorId === chat.userId,
-      );
-      if (!roomToUpdate) {
-        const newRoom = {
-          roomId,
-          lastMessage: chat.message,
-          lastMessageTime: chat.createdAt,
-          interlocutor: chat.nickname,
-          interlocutorId: chat.userId,
-          interlocutorImage: chat.image,
-          newMsgCount: 1,
-        };
-        addRoom(newRoom);
-        return;
-      }
-      roomToUpdate.lastMessage = chat.message;
-      roomToUpdate.lastMessageTime = chat.createdAt;
-      roomToUpdate.newMsgCount += 1;
-      setRooms([...rooms]);
-    };
-    socket?.on('send-dm', chatHandler);
     return () => {
       socket?.off('send-dm', chatHandler);
     };
+  }, []);
+
+  useEffect(() => {
+    socket?.on('send-dm', chatHandler);
   }, [rooms]);
 
   useEffect(() => {

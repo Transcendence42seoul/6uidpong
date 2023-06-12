@@ -19,6 +19,15 @@ const ChannelList: React.FC = () => {
 
   const [channels, setChannels] = useState<Channel[]>([]);
 
+  const chatHandler = ({ channelId }: SendResponse) => {
+    const channelToUpdate = channels.find(
+      (channel) => channel.id === channelId,
+    );
+    if (!channelToUpdate) return;
+    channelToUpdate.newMsgCount += 1;
+    setChannels([...channels]);
+  };
+
   const handleAllChannelsClick = () => {
     navigate('/all-channels');
   };
@@ -33,21 +42,13 @@ const ChannelList: React.FC = () => {
     };
     socket?.emit('find-my-channels', channelsHandler);
     setChannels(isTest ? mockChannels : channels); // test
-  }, []);
-
-  useEffect(() => {
-    const chatHandler = ({ channelId }: SendResponse) => {
-      const channelToUpdate = channels.find(
-        (channel) => channel.id === channelId,
-      );
-      if (!channelToUpdate) return;
-      channelToUpdate.newMsgCount += 1;
-      setChannels([...channels]);
-    };
-    socket?.on('send-channel', chatHandler);
     return () => {
       socket?.off('send-channel', chatHandler);
     };
+  }, []);
+
+  useEffect(() => {
+    socket?.on('send-channel', chatHandler);
   }, [channels]);
 
   return (

@@ -71,6 +71,7 @@ const ChannelSettings: React.FC = () => {
             id="title"
             value={title}
             onChange={handleTitleChange}
+            disabled={!!channelId}
             className="focus:shadow-outline mt-2 w-full rounded border px-3 py-2 leading-tight text-gray-700 focus:outline-none"
           />
         </label>

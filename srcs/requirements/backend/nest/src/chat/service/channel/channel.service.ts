@@ -112,7 +112,12 @@ export class ChannelService {
         }
       );
       if (!channelUser) {
-        await this.verifyService.verifyJoin(channelId, userId, password);
+        await this.verifyService.verifyJoin(
+          channelId,
+          userId,
+          password,
+          client
+        );
         await queryRunner.manager.insert(ChannelUser, {
           channelId,
           userId,

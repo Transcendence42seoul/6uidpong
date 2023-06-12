@@ -43,6 +43,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
     } else {
       socket?.emit('block', { interlocutorId: userId });
     }
+    setIsBlocked(!isBlocked);
   };
 
   const handleDmClick = () => {
@@ -68,6 +69,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
       };
       callApi(config);
     }
+    setIsFriend(!isFriend);
   };
 
   const handleGameClick = () => {

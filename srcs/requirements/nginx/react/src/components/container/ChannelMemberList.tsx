@@ -10,8 +10,6 @@ import ModalContainer from './ModalContainer';
 import type SendResponse from '../../interfaces/SendResponse';
 import type User from '../../interfaces/User';
 
-import { isTest, mockUsers } from '../../mock'; // test
-
 interface ChannelMemberListProps {
   className?: string;
 }
@@ -42,7 +40,6 @@ const ChannelMemberList: React.FC<ChannelMemberListProps> = ({
       setMembers([...memberList]);
     };
     socket?.emit('find-channel-users', { channelId }, membersHandler);
-    setMembers(isTest ? mockUsers : members); // test
   };
 
   const handleSearchTermChange = (

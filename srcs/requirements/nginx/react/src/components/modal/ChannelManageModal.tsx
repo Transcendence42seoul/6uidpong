@@ -5,12 +5,11 @@ import HoverButton from '../button/HoverButton';
 import CircularImage from '../container/CircularImage';
 import ContentBox from '../container/ContentBox';
 import ModalContainer from '../container/ModalContainer';
+import UserList from '../container/UserList';
 import UserListWithSeacrhBar from '../container/UserListWithSearchBar';
 
 import type User from '../../interfaces/User';
 
-import { isTest, mockUsers } from '../../mock'; // test
-import UserList from '../container/UserList';
 
 interface ChannelManageModalProps {
   channelId: number;
@@ -110,7 +109,6 @@ const ChannelManageModal: React.FC<ChannelManageModalProps> = ({
       setBanList([...users]);
     };
     socket?.emit('find-bans', { channelId }, banListHandler);
-    setBanList(isTest ? mockUsers : banList); // test
   }, []);
 
   useEffect(() => {
@@ -118,7 +116,6 @@ const ChannelManageModal: React.FC<ChannelManageModalProps> = ({
       setMembers([...users]);
     };
     socket?.emit('find-channel-users', { channelId }, membersHandler);
-    setMembers(isTest ? mockUsers : members); // test
   }, []);
 
   useEffect(() => {

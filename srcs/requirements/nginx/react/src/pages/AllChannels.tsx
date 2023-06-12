@@ -84,6 +84,7 @@ const AllChannels: React.FC = () => {
       })}
       {selectedChannelId && showPasswordModal && (
         <PasswordModal
+          isWrongPassword={false}
           onConfirmClick={onConfirmClick}
           setShowModal={setShowPasswordModal}
         />

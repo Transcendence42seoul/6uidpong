@@ -11,7 +11,7 @@ const ModalContainer: React.FC<ModalContainerProps> = ({
   children,
   closeButton = false,
 }) => {
-  const handleClickClose = () => {
+  const handleCloseClick = () => {
     setShowModal(false);
   };
 
@@ -34,7 +34,7 @@ const ModalContainer: React.FC<ModalContainerProps> = ({
         {closeButton && (
           <button
             className="absolute right-0 top-0 px-2 py-1 text-white"
-            onClick={handleClickClose}
+            onClick={handleCloseClick}
           >
             x
           </button>

@@ -18,6 +18,7 @@ const GameList: React.FC = () => {
   const { gameSocket } = selectGameSocket();
 
   const [games, setGames] = useState<Game[]>(isTest ? mockGames : []); // test
+  const [isWrongPassword, setIsWrongPassword] = useState<boolean>(false);
   const [searchResults, setSearchResults] = useState<Game[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
@@ -27,6 +28,7 @@ const GameList: React.FC = () => {
     if (!selectedGame) return;
     const { roomId, isLocked } = selectedGame;
     if (!showPasswordModal && isLocked) {
+      setIsWrongPassword(false);
       setShowPasswordModal(true);
       return;
     }
@@ -101,9 +103,14 @@ const GameList: React.FC = () => {
         state: { game },
       });
     };
+    const modalHandler = () => {
+      setIsWrongPassword(true);
+    };
     gameSocket?.on('user-join', gameHandler);
+    gameSocket?.on('wrong-password', modalHandler);
     return () => {
       gameSocket?.off('user-join', gameHandler);
+      gameSocket?.off('wrong-password', modalHandler);
     };
   }, []);
 
@@ -149,6 +156,7 @@ const GameList: React.FC = () => {
       })}
       {selectedGame && showPasswordModal && (
         <PasswordModal
+          isWrongPassword={isWrongPassword}
           onConfirmClick={onConfirmClick}
           setShowModal={setShowPasswordModal}
         />

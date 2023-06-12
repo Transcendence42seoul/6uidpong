@@ -5,11 +5,13 @@ import ModalContainer from '../container/ModalContainer';
 import ContentBox from '../container/ContentBox';
 
 interface PasswordModalProps {
+  isWrongPassword: boolean;
   onConfirmClick: (password: string) => void;
   setShowModal: (showModal: boolean) => void;
 }
 
 const PasswordModal: React.FC<PasswordModalProps> = ({
+  isWrongPassword,
   onConfirmClick,
   setShowModal,
 }) => {
@@ -21,6 +23,7 @@ const PasswordModal: React.FC<PasswordModalProps> = ({
 
   const handleConfirmClick = () => {
     onConfirmClick(password);
+    setPassword('');
   };
 
   const handleKeyDown = (event: KeyboardEvent) => {
@@ -47,15 +50,22 @@ const PasswordModal: React.FC<PasswordModalProps> = ({
     <ModalContainer setShowModal={setShowModal}>
       <div>
         <ContentBox className="space-y-4 p-4">
-          <label htmlFor="password">
+          <label htmlFor="password" className="space-y-1.5">
             Password
             <input
               type="password"
               id="password"
               value={password}
               onChange={handlePasswordChange}
-              className="focus:shadow-outline mt-2 w-full rounded border px-3 py-2 leading-tight text-gray-700 focus:outline-none"
+              className={`focus:shadow-outline mt-2 w-full rounded px-3 py-2 leading-tight text-gray-700 focus:outline-none ${
+                isWrongPassword ? 'border-2 border-red-500' : 'border'
+              }`}
             />
+            {isWrongPassword && (
+              <p className="pl-2.5 text-left text-xs text-red-500">
+                Wrong password.
+              </p>
+            )}
           </label>
           <div className="flex">
             <HoverButton

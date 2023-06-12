@@ -48,7 +48,7 @@ const GameList: React.FC = () => {
     joinGame();
   };
 
-  const handleKeyDown = (event: React.KeyboardEvent) => {
+  const handleArrowKeydown = (event: React.KeyboardEvent) => {
     if (!selectedGame) return;
     const { key } = event;
     if (key === 'ArrowUp' || key === 'ArrowDown') {
@@ -144,7 +144,7 @@ const GameList: React.FC = () => {
               }`}
               onClick={() => handleGameClick(game)}
               onDoubleClick={handleGameDoubleClick}
-              onKeyDown={handleKeyDown}
+              onKeyDown={handleArrowKeydown}
             >
               <span>{title}</span>
               {isLocked && (

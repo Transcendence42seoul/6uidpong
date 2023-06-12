@@ -26,7 +26,7 @@ const PasswordModal: React.FC<PasswordModalProps> = ({
     setPassword('');
   };
 
-  const handleKeyDown = (event: KeyboardEvent) => {
+  const handleEnterKeydown = (event: KeyboardEvent) => {
     if (event.key === 'Enter') {
       handleConfirmClick();
     }
@@ -40,9 +40,9 @@ const PasswordModal: React.FC<PasswordModalProps> = ({
   );
 
   useEffect(() => {
-    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('keydown', handleEnterKeydown);
     return () => {
-      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('keydown', handleEnterKeydown);
     };
   }, []);
 

@@ -27,12 +27,15 @@ const friend_request_service_1 = require("../service/friend-request.service");
 const friend_response_1 = require("../dto/friend-response");
 const friend_request_response_1 = require("../dto/friend-request-response");
 const permission_guard_1 = require("../../auth/guard/permission.guard");
+const block_service_1 = require("../../chat/service/dm/block.service");
+const user_profile_response_1 = require("../dto/user-profile-response");
 let UserController = class UserController {
-    constructor(userService, authService, friendService, friendRequestService) {
+    constructor(userService, authService, friendService, friendRequestService, blockService) {
         this.userService = userService;
         this.authService = authService;
         this.friendService = friendService;
         this.friendRequestService = friendRequestService;
+        this.blockService = blockService;
     }
     async findAllUser(page, size) {
         const [users, total] = await this.userService.findAll({
@@ -46,10 +49,11 @@ let UserController = class UserController {
         const entities = await this.userService.search(nickname);
         return entities.map((entity) => new user_response_1.UserResponse(entity));
     }
-    async findUser(id) {
+    async findUser(req, id) {
         try {
             const user = await this.userService.findOne(id);
-            return new user_response_1.UserResponse(user);
+            const block = await this.blockService.findOne(req.user.id, id);
+            return new user_profile_response_1.UserProfileResponse(user, block ? true : false);
         }
         catch (_a) {
             throw new common_1.NotFoundException("user not exists.");
@@ -113,9 +117,10 @@ __decorate([
 ], UserController.prototype, "searchUser", null);
 __decorate([
     (0, common_1.Get)("/:id"),
-    __param(0, (0, common_1.Param)("id", common_1.ParseIntPipe)),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)("id", common_1.ParseIntPipe)),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [Object, Number]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "findUser", null);
 __decorate([
@@ -219,7 +224,8 @@ UserController = __decorate([
     __metadata("design:paramtypes", [user_service_1.UserService,
         auth_service_1.AuthService,
         friend_service_1.FriendService,
-        friend_request_service_1.FriendRequestService])
+        friend_request_service_1.FriendRequestService,
+        block_service_1.BlockService])
 ], UserController);
 exports.UserController = UserController;
 //# sourceMappingURL=user.controller.js.map

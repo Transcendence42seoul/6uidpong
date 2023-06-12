@@ -77,6 +77,12 @@ const DmRoomList: React.FC = () => {
     setShowMenu(false);
   };
 
+  const handleOutsideClick = (event: MouseEvent) => {
+    if (showMenu && !menuRef.current?.contains(event.target as Node)) {
+      setShowMenu(false);
+    }
+  };
+
   const handleRoomDoubleClick = ({ roomId, interlocutorId }: Room) => {
     navigate(`/dm/${roomId}`, {
       state: { interlocutorId },
@@ -91,6 +97,7 @@ const DmRoomList: React.FC = () => {
     setRooms(isTest ? mockRooms : rooms); // test
     return () => {
       socket?.off('send-dm', chatHandler);
+      document.removeEventListener('click', handleOutsideClick);
     };
   }, []);
 
@@ -99,15 +106,7 @@ const DmRoomList: React.FC = () => {
   }, [rooms]);
 
   useEffect(() => {
-    const handleOutsideClick = (event: MouseEvent) => {
-      if (showMenu && !menuRef.current?.contains(event.target as Node)) {
-        setShowMenu(false);
-      }
-    };
-    document.addEventListener('mousedown', handleOutsideClick);
-    return () => {
-      document.removeEventListener('mousedown', handleOutsideClick);
-    };
+    document.addEventListener('click', handleOutsideClick);
   }, [showMenu]);
 
   return (

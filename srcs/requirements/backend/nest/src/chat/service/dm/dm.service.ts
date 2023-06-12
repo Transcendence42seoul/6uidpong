@@ -85,7 +85,16 @@ export class DmService {
         dmUser.roomId,
         dmUser.createdAt
       );
-      return new JoinResponse(dmUser.roomId, dmUser.newMsgCount, chats);
+      const block: Block = await this.blockService.findOne(
+        interlocutorId,
+        userId
+      );
+      return new JoinResponse(
+        dmUser.roomId,
+        dmUser.newMsgCount,
+        block ? true : false,
+        chats
+      );
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;

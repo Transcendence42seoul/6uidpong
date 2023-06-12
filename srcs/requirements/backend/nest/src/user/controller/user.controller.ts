@@ -76,8 +76,8 @@ export class UserController {
   ): Promise<UserResponse> {
     try {
       const user: User = await this.userService.findOne(id);
-      const block: Block = await this.blockService.findOne(id, req.user.id);
-      return new UserProfileResponse(user, block ? false : true);
+      const block: Block = await this.blockService.findOne(req.user.id, id);
+      return new UserProfileResponse(user, block ? true : false);
     } catch {
       throw new NotFoundException("user not exists.");
     }

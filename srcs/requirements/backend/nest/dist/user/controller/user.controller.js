@@ -53,7 +53,8 @@ let UserController = class UserController {
         try {
             const user = await this.userService.findOne(id);
             const block = await this.blockService.findOne(req.user.id, id);
-            return new user_profile_response_1.UserProfileResponse(user, block ? true : false);
+            const friend = await this.friendService.findOne(req.user.id, id);
+            return new user_profile_response_1.UserProfileResponse(user, block ? true : false, friend ? true : false);
         }
         catch (_a) {
             throw new common_1.NotFoundException("user not exists.");
@@ -88,13 +89,11 @@ let UserController = class UserController {
         return friendRequests.map((friendRequest) => new friend_request_response_1.FriendRequestResponse(friendRequest));
     }
     async createFriendRequest(fromId, toId) {
-        try {
-            await this.friendService.findOne(fromId, toId);
+        const friend = await this.friendService.findOne(fromId, toId);
+        if (friend) {
             throw new common_1.BadRequestException("already friends.");
         }
-        catch (_a) {
-            await this.friendRequestService.insert(fromId, toId);
-        }
+        await this.friendRequestService.insert(fromId, toId);
     }
     async deleteFriendRequest(toId, fromId) {
         await this.friendRequestService.delete(fromId, toId);

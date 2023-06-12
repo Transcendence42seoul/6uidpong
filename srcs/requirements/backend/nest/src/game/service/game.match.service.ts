@@ -159,10 +159,11 @@ export class GameMatchService {
     opponent: number,
     server: Namespace
   ): Promise<void> {
+    const master = await this.userService.findBySocketId(client.id);
     const participant: User | undefined = await this.userService.findOne(
       opponent
     );
-    const master = await this.userService.findBySocketId(client.id);
+    if (participant.status === "game") return;
     const roomId = this.roomNumber++;
     const room: customRoomInfo = {
       roomId,

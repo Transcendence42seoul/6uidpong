@@ -155,14 +155,25 @@ export class GameMatchService {
     }
   }
 
-  handleInviteCheck(master: User, participant: User): boolean {
-    if (participant.status === "game") return true;
+  async handleInviteCheck(
+    master: User,
+    participant: User,
+    server: Namespace
+  ): Promise<boolean> {
+    if (participant.status === "game") {
+      server.to(master.gameSocketId).emit("participant-already-ingame");
+      return true;
+    } else if (participant.status === "offline") {
+      server.to(master.gameSocketId).emit("participant-offline");
+    }
     for (let i = 0; i < this.rooms.length; i++) {
       if (
         this.rooms[i].masterId === master.id ||
         this.rooms[i].participantId === participant.id
-      )
+      ) {
+        server.to(master.gameSocketId).emit("participant-already-ingame");
         return true;
+      }
     }
     return false;
   }
@@ -176,7 +187,7 @@ export class GameMatchService {
     const participant: User | undefined = await this.userService.findOne(
       opponent
     );
-    if (this.handleInviteCheck(master, participant)) {
+    if (await this.handleInviteCheck(master, participant, server)) {
       client.emit("invite-failed");
       return;
     }

@@ -11,13 +11,13 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
+var _a, _b;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserController = void 0;
 const common_1 = require("@nestjs/common");
 const user_service_1 = require("../service/user.service");
 const jwt_access_guard_1 = require("../../auth/guard/jwt-access.guard");
 const auth_service_1 = require("../../auth/service/auth.service");
-const image_update_request_1 = require("../dto/image-update-request");
 const nickname_update_request_1 = require("../dto/nickname-update-request");
 const two_factor_auth_update_request_1 = require("../dto/two-factor-auth-update-request");
 const user_response_1 = require("../dto/user-response");
@@ -29,6 +29,7 @@ const friend_request_response_1 = require("../dto/friend-request-response");
 const permission_guard_1 = require("../../auth/guard/permission.guard");
 const block_service_1 = require("../../chat/service/dm/block.service");
 const user_profile_response_1 = require("../dto/user-profile-response");
+const platform_express_1 = require("@nestjs/platform-express");
 let UserController = class UserController {
     constructor(userService, authService, friendService, friendRequestService, blockService) {
         this.userService = userService;
@@ -60,11 +61,14 @@ let UserController = class UserController {
             throw new common_1.NotFoundException("user not exists.");
         }
     }
+    async streamImage(res, id) {
+        await this.userService.streamImage(res, id);
+    }
     async updateNickname(id, body) {
         await this.userService.updateNickname(id, body.nickname);
     }
-    async updateImage(id, body) {
-        await this.userService.updateImage(id, body.image);
+    async updateImage(id, file) {
+        await this.userService.updateImage(id, file);
     }
     async send2FACode(id) {
         const { email } = await this.userService.findOne(id);
@@ -123,6 +127,15 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "findUser", null);
 __decorate([
+    (0, common_1.Get)("/:id/image"),
+    (0, common_1.HttpCode)(common_1.HttpStatus.NO_CONTENT),
+    __param(0, (0, common_1.Res)()),
+    __param(1, (0, common_1.Param)("id", common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Number]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "streamImage", null);
+__decorate([
     (0, common_1.Put)("/:id/nickname"),
     (0, common_1.UseGuards)(permission_guard_1.PermissionGuard),
     (0, common_1.HttpCode)(common_1.HttpStatus.NO_CONTENT),
@@ -135,11 +148,17 @@ __decorate([
 __decorate([
     (0, common_1.Put)("/:id/image"),
     (0, common_1.UseGuards)(permission_guard_1.PermissionGuard),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)("file", { dest: "uploads" })),
     (0, common_1.HttpCode)(common_1.HttpStatus.NO_CONTENT),
     __param(0, (0, common_1.Param)("id", common_1.ParseIntPipe)),
-    __param(1, (0, common_1.Body)()),
+    __param(1, (0, common_1.UploadedFile)(new common_1.ParseFilePipe({
+        validators: [
+            new common_1.MaxFileSizeValidator({ maxSize: 200 }),
+            new common_1.FileTypeValidator({ fileType: "image/jpeg" }),
+        ],
+    }))),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, image_update_request_1.ImageUpdateRequest]),
+    __metadata("design:paramtypes", [Number, typeof (_b = typeof Express !== "undefined" && (_a = Express.Multer) !== void 0 && _a.File) === "function" ? _b : Object]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "updateImage", null);
 __decorate([

@@ -586,7 +586,10 @@ export class ChannelService {
       );
 
       await queryRunner.commitTransaction();
-      server.to(muted.user.socketId).emit("muted");
+      const sockets = await server.in("c" + channelId).fetchSockets();
+      if (sockets.some((socket) => socket.id === muted.user.socketId)) {
+        server.to(muted.user.socketId).emit("muted");
+      }
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;

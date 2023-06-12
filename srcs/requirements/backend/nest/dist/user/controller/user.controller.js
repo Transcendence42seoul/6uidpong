@@ -52,8 +52,8 @@ let UserController = class UserController {
     async findUser(req, id) {
         try {
             const user = await this.userService.findOne(id);
-            const block = await this.blockService.findOne(id, req.user.id);
-            return new user_profile_response_1.UserProfileResponse(user, block ? false : true);
+            const block = await this.blockService.findOne(req.user.id, id);
+            return new user_profile_response_1.UserProfileResponse(user, block ? true : false);
         }
         catch (_a) {
             throw new common_1.NotFoundException("user not exists.");

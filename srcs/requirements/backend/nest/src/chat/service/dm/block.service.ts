@@ -27,6 +27,13 @@ export class BlockService {
     });
   }
 
+  async findOne(userId: number, blockedUserId: number): Promise<Block> {
+    return await this.blockRepository.findOneBy({
+      userId,
+      blockedUserId,
+    });
+  }
+
   async delete(userId: number, interlocutorId: number): Promise<void> {
     await this.blockRepository.delete({
       userId: userId,

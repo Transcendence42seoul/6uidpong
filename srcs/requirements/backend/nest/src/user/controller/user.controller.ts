@@ -14,6 +14,7 @@ import {
   Delete,
   DefaultValuePipe,
   BadRequestException,
+  Req,
 } from "@nestjs/common";
 import { UserService } from "../service/user.service";
 import { JwtAccessGuard } from "src/auth/guard/jwt-access.guard";
@@ -31,6 +32,9 @@ import { FriendRequest } from "../entity/friend-request.entity";
 import { FriendRequestResponse } from "../dto/friend-request-response";
 import { PermissionGuard } from "src/auth/guard/permission.guard";
 import { Friend } from "../entity/friend.entity";
+import { BlockService } from "src/chat/service/dm/block.service";
+import { Block } from "src/chat/entity/dm/block.entity";
+import { UserProfileResponse } from "../dto/user-profile-response";
 
 @Controller("api/v1/users")
 @UseGuards(JwtAccessGuard)
@@ -39,7 +43,8 @@ export class UserController {
     private readonly userService: UserService,
     private readonly authService: AuthService,
     private readonly friendService: FriendService,
-    private readonly friendRequestService: FriendRequestService
+    private readonly friendRequestService: FriendRequestService,
+    private readonly blockService: BlockService
   ) {}
 
   @Get()
@@ -65,10 +70,19 @@ export class UserController {
   }
 
   @Get("/:id")
-  async findUser(@Param("id", ParseIntPipe) id: number): Promise<UserResponse> {
+  async findUser(
+    @Req() req: any,
+    @Param("id", ParseIntPipe) id: number
+  ): Promise<UserResponse> {
     try {
       const user: User = await this.userService.findOne(id);
-      return new UserResponse(user);
+      const block: Block = await this.blockService.findOne(req.user.id, id);
+      const friend: Friend = await this.friendService.findOne(req.user.id, id);
+      return new UserProfileResponse(
+        user,
+        block ? true : false,
+        friend ? true : false
+      );
     } catch {
       throw new NotFoundException("user not exists.");
     }
@@ -161,12 +175,11 @@ export class UserController {
     @Param("id", ParseIntPipe) fromId: number,
     @Body("toId", ParseIntPipe) toId: number
   ): Promise<void> {
-    try {
-      await this.friendService.findOne(fromId, toId);
+    const friend: Friend = await this.friendService.findOne(fromId, toId);
+    if (friend) {
       throw new BadRequestException("already friends.");
-    } catch {
-      await this.friendRequestService.insert(fromId, toId);
     }
+    await this.friendRequestService.insert(fromId, toId);
   }
 
   @Delete("/:id/friend-requests/:fromId")

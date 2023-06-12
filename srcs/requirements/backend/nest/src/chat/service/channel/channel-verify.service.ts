@@ -6,6 +6,7 @@ import { BanService } from "./ban.service";
 import { ChannelRoomService } from "./channel-room.service";
 import { MuteService } from "./mute.service";
 import * as bcryptjs from "bcryptjs";
+import { Socket } from "socket.io";
 
 @Injectable()
 export class ChannelVerifyService {
@@ -18,13 +19,15 @@ export class ChannelVerifyService {
   async verifyJoin(
     channelId: number,
     userId: number,
-    password: string
+    password: string,
+    client: Socket
   ): Promise<void> {
     const channel: Channel = await this.roomService.findOne(channelId);
     if (!channel.isPublic) {
       throw new WsException("You can't join a private channel.");
     }
     if (await this.banService.includes(channelId, [userId])) {
+      client.emit("join-banned");
       throw new WsException("can't join because banned.");
     }
     if (
@@ -32,6 +35,7 @@ export class ChannelVerifyService {
       (typeof password === "undefined" ||
         !(await bcryptjs.compare(password, channel.password)))
     ) {
+      client.emit("incorrect-password");
       throw new WsException("incorrect password.");
     }
   }

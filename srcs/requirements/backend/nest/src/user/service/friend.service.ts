@@ -29,7 +29,7 @@ export class FriendService {
   }
 
   async findOne(userId: number, friendId: number): Promise<Friend> {
-    return await this.friendRepository.findOneOrFail({
+    return await this.friendRepository.findOne({
       where: {
         userId,
         friendId,

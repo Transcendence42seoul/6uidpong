@@ -20,13 +20,9 @@ const ProfilePicture: React.FC = () => {
       const formData = new FormData();
       formData.append('file', selectedFile);
       axios
-        .put(
-          `api/v1/users/${myId}/image`,
-          { formData },
-          {
-            headers: { Authorization: `Bearer ${accessToken}` },
-          },
-        )
+        .put(`api/v1/users/${myId}/image`, formData, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        })
         .then((response: AxiosResponse<void>) => {
           alert('전송에 성공했습니다.');
         })

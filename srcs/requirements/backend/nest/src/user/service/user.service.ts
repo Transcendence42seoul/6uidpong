@@ -1,7 +1,7 @@
 import { ConflictException, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { PaginationOptions } from "src/utils/pagination/pagination.option";
-import { DataSource, EntityNotFoundError, Repository } from "typeorm";
+import { DataSource, Repository } from "typeorm";
 import { User } from "../entity/user.entity";
 
 @Injectable()

@@ -171,9 +171,10 @@ export class ChannelService {
     senderId: number,
     channelId: number,
     message: string,
+    client: Socket,
     server: Namespace
   ): Promise<void> {
-    await this.verifyService.verifySend(channelId, senderId);
+    await this.verifyService.verifySend(channelId, senderId, client);
     const channelUsers: ChannelUser[] = await this.channelUserService.find(
       channelId
     );

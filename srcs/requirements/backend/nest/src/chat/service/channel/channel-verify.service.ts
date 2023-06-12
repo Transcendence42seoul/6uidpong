@@ -40,10 +40,15 @@ export class ChannelVerifyService {
     }
   }
 
-  async verifySend(channelId: number, userId: number): Promise<void> {
+  async verifySend(
+    channelId: number,
+    userId: number,
+    client: Socket
+  ): Promise<void> {
     try {
       const mute: Mute = await this.muteService.findOne(channelId, userId);
       if (mute.limitedAt > new Date()) {
+        client.emit("muted");
         throw new WsException("can't send because muted user.");
       }
       await this.muteService.delete(channelId, userId);

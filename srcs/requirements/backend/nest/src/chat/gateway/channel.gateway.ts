@@ -76,6 +76,7 @@ export class ChannelGateway {
   @SubscribeMessage("send-channel")
   async send(
     @WsJwtPayload() jwt: JwtPayload,
+    @ConnectedSocket() client: Socket,
     @MessageBody("to")
     to: { channelId: number; message: string }
   ): Promise<void> {
@@ -83,6 +84,7 @@ export class ChannelGateway {
       jwt.id,
       to.channelId,
       to.message,
+      client,
       this.server
     );
   }

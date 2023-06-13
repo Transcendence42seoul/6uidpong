@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { useDispatch } from 'react-redux';
 
 import dispatchAuth from '../features/auth/authAction';
@@ -33,23 +33,23 @@ const useCallApi = () => {
     return axios.isAxiosError(error) && error.response?.status === 401;
   };
 
-  const callApi = async (config: AxiosConfig, retry = false) => {
+  const callApi = async (
+    config: AxiosConfig,
+    retry = false,
+  ): Promise<AxiosResponse<any>> => {
     try {
       return await httpRequest(config);
     } catch (error) {
-      if (!isUnauthorized(error)) {
-        throw error;
-      }
-      if (retry) {
+      if (!isUnauthorized(error) || retry) {
         dispatchAuth(null, dispatch);
-        return;
+        throw error;
       }
       const { data: refreshToken } = await httpRequest(
         { url: '/api/v1/auth/token/refresh' },
         false,
       );
       await dispatchAuth(refreshToken, dispatch);
-      callApi(config, true);
+      return callApi(config, true);
     }
   };
 

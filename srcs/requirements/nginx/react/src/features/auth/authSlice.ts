@@ -25,6 +25,10 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     setAuth: (state, { payload }) => {
+      if (!payload) {
+        state.tokenInfo = undefined;
+        return;
+      }
       state.id = payload.id;
       state.is2FA = payload.is2FA;
       state.accessToken = payload.accessToken;

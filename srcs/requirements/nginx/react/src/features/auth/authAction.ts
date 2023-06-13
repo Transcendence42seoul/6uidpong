@@ -2,7 +2,7 @@ import { Dispatch } from 'redux';
 
 import { AuthState, setAuth } from './authSlice';
 
-const dispatchAuth = async (data: AuthState, dispatch: Dispatch) => {
+const dispatchAuth = async (data: AuthState | null, dispatch: Dispatch) => {
   dispatch(setAuth(data));
 };
 

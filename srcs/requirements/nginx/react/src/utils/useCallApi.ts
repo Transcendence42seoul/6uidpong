@@ -33,19 +33,23 @@ const useCallApi = () => {
     return axios.isAxiosError(error) && error.response?.status === 401;
   };
 
-  const callApi = async (config: AxiosConfig) => {
+  const callApi = async (config: AxiosConfig, retry = false) => {
     try {
       return await httpRequest(config);
     } catch (error) {
-      if (isUnauthorized(error)) {
-        const { data: refreshToken } = await httpRequest(
-          { url: '/api/v1/auth/token/refresh' },
-          false,
-        );
-        await dispatchAuth(refreshToken, dispatch);
-        return httpRequest(config);
+      if (!isUnauthorized(error)) {
+        throw error;
       }
-      throw error;
+      if (retry) {
+        dispatchAuth(null, dispatch);
+        return;
+      }
+      const { data: refreshToken } = await httpRequest(
+        { url: '/api/v1/auth/token/refresh' },
+        false,
+      );
+      await dispatchAuth(refreshToken, dispatch);
+      callApi(config, true);
     }
   };
 

@@ -7,17 +7,17 @@ interface TokenInfo {
 }
 
 export interface AuthState {
-  id: number | null;
-  is2FA: boolean | null;
-  accessToken: string | null;
-  tokenInfo: TokenInfo | null;
+  id: number | undefined;
+  is2FA: boolean | undefined;
+  accessToken: string | undefined;
+  tokenInfo: TokenInfo | undefined;
 }
 
 const initialState: AuthState = {
-  id: null,
-  is2FA: null,
-  accessToken: null,
-  tokenInfo: null,
+  id: undefined,
+  is2FA: undefined,
+  accessToken: undefined,
+  tokenInfo,
 };
 
 const authSlice = createSlice({
@@ -25,19 +25,10 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     setAuth: (state, { payload }) => {
-      if (!payload) {
-        state.id = null;
-        state.is2FA = null;
-        state.accessToken = null;
-        state.tokenInfo = null;
-        return;
-      }
       state.id = payload.id;
       state.is2FA = payload.is2FA;
       state.accessToken = payload.accessToken;
-      if (payload.accessToken) {
-        state.tokenInfo = jwt_decode<TokenInfo>(payload.accessToken);
-      }
+      state.tokenInfo = jwt_decode<TokenInfo>(payload.accessToken);
     },
   },
 });

@@ -17,7 +17,7 @@ const initialState: AuthState = {
   id: undefined,
   is2FA: undefined,
   accessToken: undefined,
-  tokenInfo,
+  tokenInfo: undefined,
 };
 
 const authSlice = createSlice({

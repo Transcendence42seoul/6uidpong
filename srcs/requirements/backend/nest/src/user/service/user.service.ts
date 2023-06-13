@@ -132,8 +132,6 @@ export class UserService {
     const uploadPath: string = `uploads/${id}`;
     if (!existsSync(uploadPath)) {
       mkdirSync(uploadPath, { recursive: true });
-    } else {
-      unlinkSync(`${uploadPath}/image.jpeg`);
     }
     writeFileSync(`${uploadPath}/image.jpeg`, file.buffer);
     await this.userRepository.update(id, {

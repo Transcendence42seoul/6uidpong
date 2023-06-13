@@ -45,6 +45,8 @@ const Nickname: React.FC = () => {
         setWarning('Sorry, only letters(English) and numbers are allowed.');
       } else if (nickname.length < 4 || nickname.length > 14) {
         setWarning('Sorry, your nickname must be between 4 and 14 characters.');
+      } else {
+        setWarning('');
       }
     }, 500);
     return () => {

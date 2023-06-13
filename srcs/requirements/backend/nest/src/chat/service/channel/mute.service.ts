@@ -11,7 +11,7 @@ export class MuteService {
     private readonly muteRepository: Repository<Mute>
   ) {}
 
-  async findOne(channelId: number, userId: number): Promise<Mute> {
+  async findOneOrFail(channelId: number, userId: number): Promise<Mute> {
     return await this.muteRepository.findOneByOrFail({ channelId, userId });
   }
 

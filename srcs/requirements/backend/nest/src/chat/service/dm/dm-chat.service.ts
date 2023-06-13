@@ -27,7 +27,7 @@ export class DmChatService {
     });
   }
 
-  async findOne(id: number): Promise<DmChat> {
+  async findOneOrFail(id: number): Promise<DmChat> {
     return await this.chatRepository.findOneOrFail({
       relations: {
         user: true,

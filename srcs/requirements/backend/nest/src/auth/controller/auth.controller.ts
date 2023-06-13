@@ -41,14 +41,14 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response
   ): Promise<CallbackResponse> {
     let user: User = await this.userService.findOne(req.user.id);
-    if (user) {
+    if (!user) {
+      user = await this.userService.insert(req.user);
+    } else {
       res.status(HttpStatus.OK);
       if (user.is2FA) {
         this.authService.send2FACode(user.id, user.email);
         return new CallbackResponse(true, user.id);
       }
-    } else {
-      user = await this.userService.insert(req.user);
     }
     res.cookie("refresh", await this.authService.genRefreshToken(user.id), {
       httpOnly: true,

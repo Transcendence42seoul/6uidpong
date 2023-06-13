@@ -83,7 +83,7 @@ export class ChannelService {
 
       await queryRunner.commitTransaction();
 
-      const newChannel: Channel = await this.roomService.findOne(
+      const newChannel: Channel = await this.roomService.findOneOrFail(
         identifiers[0].id
       );
       return new CreateResponse(newChannel);
@@ -228,7 +228,7 @@ export class ChannelService {
 
       await queryRunner.commitTransaction();
 
-      const chat: ChannelChat = await this.chatService.findOne(
+      const chat: ChannelChat = await this.chatService.findOneOrFail(
         identifiers[0].id
       );
       server
@@ -247,10 +247,8 @@ export class ChannelService {
     userId: number,
     server: Namespace
   ): Promise<void> {
-    const channelUser: ChannelUser = await this.channelUserService.findOne(
-      channelId,
-      userId
-    );
+    const channelUser: ChannelUser =
+      await this.channelUserService.findOneOrFail(channelId, userId);
     if (!channelUser.isOwner) {
       throw new WsException("permission denied.");
     }
@@ -264,10 +262,8 @@ export class ChannelService {
     client: Socket,
     server: Namespace
   ): Promise<void> {
-    const channelUser: ChannelUser = await this.channelUserService.findOne(
-      channelId,
-      userId
-    );
+    const channelUser: ChannelUser =
+      await this.channelUserService.findOneOrFail(channelId, userId);
     if (channelUser.isOwner) {
       throw new WsException(
         "The owner can't exit the channel. Please transfer ownership to another user and try again."
@@ -306,14 +302,14 @@ export class ChannelService {
     newOwnerId: number,
     server: Namespace
   ): Promise<void> {
-    const oldOwner: ChannelUser = await this.channelUserService.findOne(
+    const oldOwner: ChannelUser = await this.channelUserService.findOneOrFail(
       channelId,
       userId
     );
     if (!oldOwner.isOwner) {
       throw new WsException("permission denied.");
     }
-    const newOwner: ChannelUser = await this.channelUserService.findOne(
+    const newOwner: ChannelUser = await this.channelUserService.findOneOrFail(
       channelId,
       newOwnerId
     );
@@ -357,14 +353,14 @@ export class ChannelService {
     newAdminId: number,
     server: Namespace
   ): Promise<void> {
-    const owner: ChannelUser = await this.channelUserService.findOne(
+    const owner: ChannelUser = await this.channelUserService.findOneOrFail(
       channelId,
       userId
     );
     if (!owner.isOwner) {
       throw new WsException("permission denied.");
     }
-    const newAdmin: ChannelUser = await this.channelUserService.findOne(
+    const newAdmin: ChannelUser = await this.channelUserService.findOneOrFail(
       channelId,
       newAdminId
     );
@@ -406,11 +402,11 @@ export class ChannelService {
     targetId: number,
     server: Namespace
   ): Promise<void> {
-    const owner: ChannelUser = await this.channelUserService.findOne(
+    const owner: ChannelUser = await this.channelUserService.findOneOrFail(
       channelId,
       userId
     );
-    const target: ChannelUser = await this.channelUserService.findOne(
+    const target: ChannelUser = await this.channelUserService.findOneOrFail(
       channelId,
       targetId
     );
@@ -455,7 +451,7 @@ export class ChannelService {
     userIds: number[],
     server: Namespace
   ): Promise<void> {
-    const inviter: ChannelUser = await this.channelUserService.findOne(
+    const inviter: ChannelUser = await this.channelUserService.findOneOrFail(
       channelId,
       inviterId
     );
@@ -502,11 +498,11 @@ export class ChannelService {
     kickedId: number,
     server: Namespace
   ): Promise<void> {
-    const kicker: ChannelUser = await this.channelUserService.findOne(
+    const kicker: ChannelUser = await this.channelUserService.findOneOrFail(
       channelId,
       userId
     );
-    const kicked: ChannelUser = await this.channelUserService.findOne(
+    const kicked: ChannelUser = await this.channelUserService.findOneOrFail(
       channelId,
       kickedId
     );
@@ -560,11 +556,11 @@ export class ChannelService {
     time: number,
     server: Namespace
   ): Promise<void> {
-    const muter: ChannelUser = await this.channelUserService.findOne(
+    const muter: ChannelUser = await this.channelUserService.findOneOrFail(
       channelId,
       muterId
     );
-    const muted: ChannelUser = await this.channelUserService.findOne(
+    const muted: ChannelUser = await this.channelUserService.findOneOrFail(
       channelId,
       mutedId
     );
@@ -613,11 +609,11 @@ export class ChannelService {
     bannedId: number,
     server: Namespace
   ): Promise<void> {
-    const banner: ChannelUser = await this.channelUserService.findOne(
+    const banner: ChannelUser = await this.channelUserService.findOneOrFail(
       channelId,
       bannerId
     );
-    const banned: ChannelUser = await this.channelUserService.findOne(
+    const banned: ChannelUser = await this.channelUserService.findOneOrFail(
       channelId,
       bannedId
     );
@@ -670,7 +666,7 @@ export class ChannelService {
     channelId: number,
     unbannedId: number
   ): Promise<void> {
-    const unbanner: ChannelUser = await this.channelUserService.findOne(
+    const unbanner: ChannelUser = await this.channelUserService.findOneOrFail(
       channelId,
       unbannerId
     );
@@ -681,7 +677,7 @@ export class ChannelService {
   }
 
   async updatePassword(userId: number, channelId: number, password: string) {
-    const updater: ChannelUser = await this.channelUserService.findOne(
+    const updater: ChannelUser = await this.channelUserService.findOneOrFail(
       channelId,
       userId
     );

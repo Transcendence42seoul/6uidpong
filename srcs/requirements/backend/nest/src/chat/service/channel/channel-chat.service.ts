@@ -27,7 +27,7 @@ export class ChannelChatService {
     });
   }
 
-  async findOne(id: number): Promise<ChannelChat> {
+  async findOneOrFail(id: number): Promise<ChannelChat> {
     return await this.chatRepository.findOneOrFail({
       relations: {
         user: true,

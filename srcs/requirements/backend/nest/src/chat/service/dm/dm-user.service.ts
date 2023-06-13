@@ -10,7 +10,7 @@ export class DmUserService {
     private readonly dmUserRepository: Repository<DmUser>
   ) {}
 
-  async findOne(userId: number, interlocutorId: number): Promise<DmUser> {
+  async findOneOrFail(userId: number, interlocutorId: number): Promise<DmUser> {
     return await this.dmUserRepository
       .createQueryBuilder("room_user")
       .innerJoin(
@@ -30,10 +30,7 @@ export class DmUserService {
       .getOneOrFail();
   }
 
-  async findOneNotFail(
-    userId: number,
-    interlocutorId: number
-  ): Promise<DmUser> {
+  async findOne(userId: number, interlocutorId: number): Promise<DmUser> {
     return await this.dmUserRepository
       .createQueryBuilder("room_user")
       .innerJoin(

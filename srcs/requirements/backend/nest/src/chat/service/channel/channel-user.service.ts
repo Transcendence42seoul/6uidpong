@@ -47,7 +47,7 @@ export class ChannelUserService {
     });
   }
 
-  async findOne(channelId: number, userId: number): Promise<ChannelUser> {
+  async findOneOrFail(channelId: number, userId: number): Promise<ChannelUser> {
     return this.channelUserRepository.findOneOrFail({
       relations: {
         user: true,

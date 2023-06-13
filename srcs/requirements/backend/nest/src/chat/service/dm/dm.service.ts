@@ -39,7 +39,7 @@ export class DmService {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      let dmUser: DmUser = await this.dmUserService.findOneNotFail(
+      let dmUser: DmUser = await this.dmUserService.findOne(
         userId,
         interlocutorId
       );
@@ -111,7 +111,7 @@ export class DmService {
     server: Namespace
   ): Promise<void> {
     await this.blockService.verify(senderId, recipientId);
-    const recipient: DmUser = await this.dmUserService.findOne(
+    const recipient: DmUser = await this.dmUserService.findOneOrFail(
       recipientId,
       senderId
     );
@@ -163,7 +163,7 @@ export class DmService {
 
       await queryRunner.commitTransaction();
 
-      const chat: DmChat = await this.chatService.findOne(
+      const chat: DmChat = await this.chatService.findOneOrFail(
         insertResult.identifiers[0].id
       );
       server
@@ -182,7 +182,7 @@ export class DmService {
     interlocutorId: number,
     client: Socket
   ): Promise<void> {
-    const interUser: DmUser = await this.dmUserService.findOne(
+    const interUser: DmUser = await this.dmUserService.findOneOrFail(
       interlocutorId,
       userId
     );

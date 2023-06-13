@@ -77,7 +77,7 @@ export class ChannelRoomService {
       .getRawMany();
   }
 
-  async findOne(channelId: number): Promise<Channel> {
+  async findOneOrFail(channelId: number): Promise<Channel> {
     return await this.channelRepository.findOneOrFail({
       where: {
         id: channelId,

@@ -22,7 +22,7 @@ export class ChannelVerifyService {
     password: string,
     client: Socket
   ): Promise<void> {
-    const channel: Channel = await this.roomService.findOne(channelId);
+    const channel: Channel = await this.roomService.findOneOrFail(channelId);
     if (!channel.isPublic) {
       throw new WsException("You can't join a private channel.");
     }
@@ -46,7 +46,10 @@ export class ChannelVerifyService {
     client: Socket
   ): Promise<void> {
     try {
-      const mute: Mute = await this.muteService.findOne(channelId, userId);
+      const mute: Mute = await this.muteService.findOneOrFail(
+        channelId,
+        userId
+      );
       if (mute.limitedAt > new Date()) {
         client.emit("muted");
         throw new WsException("can't send because muted user.");

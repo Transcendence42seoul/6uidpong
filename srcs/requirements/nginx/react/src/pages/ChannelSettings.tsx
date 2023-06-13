@@ -18,9 +18,9 @@ const ChannelSettings: React.FC = () => {
 
   const [isPasswordEnabled, setIsPasswordEnabled] = useState<boolean>(false);
   const [isPublic, setIsPublic] = useState<boolean>(true);
-  const [isValid, setIsValid] = useState<boolean>(true);
   const [password, setPassword] = useState<string>('');
   const [title, setTitle] = useState<string>('');
+  const [warning, setWarning] = useState<string>('');
 
   const handleCancelClick = () => {
     navigate(-1);
@@ -71,18 +71,30 @@ const ChannelSettings: React.FC = () => {
   };
 
   useEffect(() => {
-    if (channelId || !isValid) return;
+    if (channelId || warning) return;
     const duplicateHandler = (isDuplicated: boolean) => {
-      setIsValid(!isDuplicated);
+      if (isDuplicated) {
+        setWarning('That title is taken. Try another.');
+      }
     };
     socket?.emit('channel-title-duplicated', title, duplicateHandler);
-  }, [isValid]);
+  }, [warning]);
 
   useEffect(() => {
     if (channelId || !title) return;
     const timeoutId = setTimeout(() => {
-      const regex = /^[a-zA-Z0-9!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]{4,30}$/;
-      setIsValid(regex.test(title));
+      const regex = /^[a-zA-Z0-9!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]+$/;
+      if (!regex.test(title)) {
+        setWarning(
+          'Sorry, only letters(English), numbers and special charaters are allowed.',
+        );
+      } else if (title.length < 4 || title.length > 30) {
+        setWarning(
+          'Sorry, the channel title must be between 4 and 30 characters.',
+        );
+      } else {
+        setWarning('');
+      }
     }, 500);
     return () => {
       clearTimeout(timeoutId);
@@ -101,15 +113,10 @@ const ChannelSettings: React.FC = () => {
             onChange={handleTitleChange}
             disabled={!!channelId}
             className={`focus:shadow-outline mt-2 w-full rounded px-3 py-2 leading-tight text-gray-700 focus:outline-none ${
-              isValid ? 'border' : 'border-2 border-red-500'
+              warning ? 'border-2 border-red-500' : 'border'
             }`}
           />
-          {!isValid && (
-            <p className="pl-2.5 text-left text-xs text-red-500">
-              Sorry, only letters(English), numbers and special characters are
-              allowed between 4 and 30 characters long.
-            </p>
-          )}
+          <p className="pl-2.5 text-left text-xs text-red-500">{warning}</p>
         </label>
         <div className="space-y-2">
           <label htmlFor="password">
@@ -168,7 +175,7 @@ const ChannelSettings: React.FC = () => {
           <HoverButton
             onClick={handleConfirmClick}
             className="border bg-blue-800 p-2 hover:text-blue-800"
-            disabled={!isValid}
+            disabled={!warning}
           >
             Confirm
           </HoverButton>

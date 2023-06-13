@@ -31,7 +31,7 @@ export class ConnectionService {
 
   async disconnect(socketId: string): Promise<void> {
     const user: User = await this.userService.findBySocketId(socketId);
-    if (typeof user === null) {
+    if (!user) {
       return;
     }
     const queryRunner = this.dataSource.createQueryRunner();

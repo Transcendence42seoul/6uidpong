@@ -81,7 +81,7 @@ const GameStart: React.FC = () => {
 
     if (cvs) {
       const ctx = cvs.getContext('2d');
-      if (ctx === null) return;
+      if (!ctx) return;
 
       cvs.width = GameInfo.width;
       cvs.height = GameInfo.height;

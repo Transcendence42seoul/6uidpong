@@ -103,8 +103,8 @@ export class UserService {
     requesterId: number
   ): Promise<UserProfileResponse> {
     const user: User = await this.userRepository.findOneBy({ id: targetId });
-    if (typeof user === null) {
-      throw new NotFoundException("user not exists.");
+    if (!user) {
+      throw new NotFoundException();
     }
     const block: Block = await this.blockService.findOne(requesterId, targetId);
     const friend: Friend = await this.friendService.findOne(

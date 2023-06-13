@@ -31,10 +31,12 @@ import Main from './pages/Main';
 import MyPage from './pages/MyPage';
 import ProfileSettings from './pages/ProfileSettings';
 import redirect from './utils/redirect';
+import useCallApi from './utils/useCallApi';
 
 import { isTest, mockAuthState } from './mock'; // test
 
 const App: React.FC = () => {
+  const callApi = useCallApi();
   const dispatch = useDispatch();
 
   const { id, is2FA, accessToken, tokenInfo } = isTest
@@ -66,10 +68,12 @@ const App: React.FC = () => {
 
     const fetchAuth = async () => {
       const code = url.searchParams.get('code');
-      const { data, status } = await axios.post(
-        '/api/v1/auth/social/callback/forty-two',
-        { code },
-      );
+      const config = {
+        url: '/api/v1/auth/social/callback/forty-two',
+        method: 'post',
+        data: { code },
+      };
+      const { data, status } = await callApi(config);
       await dispatchAuth(data, dispatch);
       const pathname = status === 201 ? '/profile-settings' : '/';
       redirect(pathname, url);

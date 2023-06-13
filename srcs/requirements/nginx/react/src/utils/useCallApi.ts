@@ -42,7 +42,7 @@ const useCallApi = () => {
           { url: '/api/v1/auth/token/refresh' },
           false,
         );
-        dispatchAuth(refreshToken, dispatch);
+        await dispatchAuth(refreshToken, dispatch);
         return httpRequest(config);
       }
       throw error;

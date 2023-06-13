@@ -47,7 +47,7 @@ const useCallApi = () => {
       const retryConfig = { url: '/api/v1/auth/token/refresh' };
       const { data: refreshToken } = await callApi(retryConfig, true);
       await dispatchAuth(refreshToken, dispatch);
-      return callApi(config);
+      return callApi(config, true);
     }
   };
 

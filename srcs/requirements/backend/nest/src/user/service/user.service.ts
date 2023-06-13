@@ -119,12 +119,6 @@ export class UserService {
   }
 
   async updateNickname(id: number, nickname: string): Promise<void> {
-    const user: User = await this.userRepository.findOneBy({
-      nickname,
-    });
-    if (user) {
-      throw new ConflictException();
-    }
     await this.userRepository.update(id, { nickname });
   }
 
@@ -176,5 +170,9 @@ export class UserService {
       "Content-Type": "image/jpeg",
     });
     fileStream.pipe(res);
+  }
+
+  async findOneByNickname(nickname: string): Promise<User> {
+    return await this.userRepository.findOneBy({ nickname });
   }
 }

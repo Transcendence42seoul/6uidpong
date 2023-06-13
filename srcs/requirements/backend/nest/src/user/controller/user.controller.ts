@@ -20,6 +20,7 @@ import {
   MaxFileSizeValidator,
   FileTypeValidator,
   Res,
+  ConflictException,
 } from "@nestjs/common";
 import { UserService } from "../service/user.service";
 import { JwtAccessGuard } from "src/auth/guard/jwt-access.guard";
@@ -80,10 +81,20 @@ export class UserController {
 
   @Get("/:id/image")
   async findImage(
-    @Res() res: Response,
+    @Res({ passthrough: true }) res: Response,
     @Param("id", ParseIntPipe) id: number
   ): Promise<void> {
     await this.userService.streamImage(res, id);
+  }
+
+  @Post("/check-nickname")
+  @UseGuards(JwtAccessGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async checkNickname(@Body("nickname") nickname: string): Promise<void> {
+    const user: User = await this.userService.findOneByNickname(nickname);
+    if (user) {
+      throw new ConflictException();
+    }
   }
 
   @Put("/:id/nickname")

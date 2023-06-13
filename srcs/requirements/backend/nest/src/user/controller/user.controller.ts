@@ -81,7 +81,7 @@ export class UserController {
 
   @Get("/:id/image")
   async findImage(
-    @Res({ passthrough: true }) res: Response,
+    @Res() res: Response,
     @Param("id", ParseIntPipe) id: number
   ): Promise<void> {
     await this.userService.streamImage(res, id);

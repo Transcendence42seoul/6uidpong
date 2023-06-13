@@ -175,7 +175,7 @@ const ChannelSettings: React.FC = () => {
           <HoverButton
             onClick={handleConfirmClick}
             className="border bg-blue-800 p-2 hover:text-blue-800"
-            disabled={!warning}
+            disabled={!!warning}
           >
             Confirm
           </HoverButton>

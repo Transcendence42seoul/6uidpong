@@ -1,7 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { WsException } from "@nestjs/websockets";
-import { JsonWebTokenError } from "jsonwebtoken";
 import { Namespace, Socket } from "socket.io";
 import { User } from "src/user/entity/user.entity";
 import { UserService } from "src/user/service/user.service";
@@ -23,7 +22,7 @@ export class ConnectionService {
     const payload = await this.jwtService.verifyAsync(token, {
       secret: process.env.JWT_ACCESS_SECRET_KEY,
     });
-    const user: User = await this.userService.findOne(payload.id);
+    const user: User = await this.userService.findOneOrFail(payload.id);
     if (user.socketId !== "") {
       server.in(user.socketId).disconnectSockets(true);
     }

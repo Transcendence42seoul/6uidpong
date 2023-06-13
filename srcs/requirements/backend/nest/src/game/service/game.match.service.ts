@@ -185,9 +185,7 @@ export class GameMatchService {
     server: Namespace
   ): Promise<void> {
     const master = await this.userService.findBySocketId(client.id);
-    const participant: User | undefined = await this.userService.findOne(
-      opponent
-    );
+    const participant: User = await this.userService.findOneOrFail(opponent);
     if (await this.handleInviteCheck(master, participant, server)) {
       return;
     }
@@ -217,7 +215,9 @@ export class GameMatchService {
 
   async handleInviteFail(client: Socket, roomId: number, server: Namespace) {
     const roomIndex = this.rooms.findIndex((room) => room.roomId === roomId);
-    const user = await this.userService.findOne(this.rooms[roomIndex].masterId);
+    const user = await this.userService.findOneOrFail(
+      this.rooms[roomIndex].masterId
+    );
     this.rooms.splice(roomId, 1);
     this.roomSecrets.splice(roomId, 1);
     server.to(user.gameSocketId).emit("invite-dismissed");

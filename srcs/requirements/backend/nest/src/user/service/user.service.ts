@@ -5,7 +5,7 @@ import {
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { PaginationOptions } from "src/utils/pagination/pagination.option";
-import { DataSource, Repository } from "typeorm";
+import { Repository } from "typeorm";
 import { User } from "../entity/user.entity";
 import {
   existsSync,
@@ -29,8 +29,7 @@ export class UserService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly blockService: BlockService,
-    private readonly friendService: FriendService,
-    private readonly dataSource: DataSource
+    private readonly friendService: FriendService
   ) {}
 
   async findAll(options: PaginationOptions): Promise<Pagination<UserResponse>> {
@@ -49,6 +48,13 @@ export class UserService {
   }
 
   async findOne(id: number | string): Promise<User> {
+    if (typeof id === "number") {
+      return await this.userRepository.findOne({ where: { id } });
+    }
+    return await this.userRepository.findOne({ where: { socketId: id } });
+  }
+
+  async findOneOrFail(id: number | string): Promise<User> {
     if (typeof id === "number") {
       return await this.userRepository.findOneOrFail({ where: { id } });
     }
@@ -113,26 +119,13 @@ export class UserService {
   }
 
   async updateNickname(id: number, nickname: string): Promise<void> {
-    const queryRunner = this.dataSource.createQueryRunner();
-
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-    try {
-      const user: User = await queryRunner.manager.findOneBy(User, {
-        nickname,
-      });
-      if (user) {
-        throw new ConflictException();
-      }
-      await queryRunner.manager.update(User, id, { nickname });
-
-      await queryRunner.commitTransaction();
-    } catch (error) {
-      await queryRunner.rollbackTransaction();
-      throw error;
-    } finally {
-      await queryRunner.release();
+    const user: User = await this.userRepository.findOneBy({
+      nickname,
+    });
+    if (user) {
+      throw new ConflictException();
     }
+    await this.userRepository.update(id, { nickname });
   }
 
   async updateImage(id: number, file: Express.Multer.File): Promise<void> {

@@ -15,7 +15,6 @@ import { JwtRefreshGuard } from "../guard/jwt-refresh.guard";
 import { FtGuard } from "../guard/ft.guard";
 import { TwoFactorAuthRequest } from "../dto/two-factor-auth-request";
 import { User } from "src/user/entity/user.entity";
-import { EntityNotFoundError } from "typeorm";
 import { CallbackResponse } from "../dto/callback-response";
 import { AccessTokenResponse } from "../dto/access-token-response";
 
@@ -41,18 +40,14 @@ export class AuthController {
     @Req() req: any,
     @Res({ passthrough: true }) res: Response
   ): Promise<CallbackResponse> {
-    let user: User;
-    try {
-      user = await this.userService.findOne(req.user.id);
+    let user: User = await this.userService.findOne(req.user.id);
+    if (user) {
       res.status(HttpStatus.OK);
       if (user.is2FA) {
         this.authService.send2FACode(user.id, user.email);
         return new CallbackResponse(true, user.id);
       }
-    } catch (e) {
-      if (!(e instanceof EntityNotFoundError)) {
-        throw e;
-      }
+    } else {
       user = await this.userService.insert(req.user);
     }
     res.cookie("refresh", await this.authService.genRefreshToken(user.id), {

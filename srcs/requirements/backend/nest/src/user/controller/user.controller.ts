@@ -38,6 +38,7 @@ import { Friend } from "../entity/friend.entity";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { Express, Response } from "express";
 import { UserProfileResponse } from "../dto/user-profile-response";
+import { User } from "../entity/user.entity";
 
 @Controller("api/v1/users")
 export class UserController {
@@ -118,8 +119,8 @@ export class UserController {
   @UseGuards(JwtAccessGuard, PermissionGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async send2FACode(@Param("id", ParseIntPipe) id: number): Promise<void> {
-    const { email } = await this.userService.findOne(id);
-    await this.authService.send2FACode(id, email);
+    const user: User = await this.userService.findOneOrFail(id);
+    await this.authService.send2FACode(id, user.email);
   }
 
   @Put("/:id/is2FA")

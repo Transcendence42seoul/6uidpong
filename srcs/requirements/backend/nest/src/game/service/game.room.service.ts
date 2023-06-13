@@ -251,8 +251,8 @@ export class GameRoomService {
     loserScore: number
   ) {
     const { isLadder, createAt, endAt } = roomInfo;
-    const win = await this.userService.findOne(winUserId);
-    const lose = await this.userService.findOne(loseUserId);
+    const win = await this.userService.findOneOrFail(winUserId);
+    const lose = await this.userService.findOneOrFail(loseUserId);
 
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();

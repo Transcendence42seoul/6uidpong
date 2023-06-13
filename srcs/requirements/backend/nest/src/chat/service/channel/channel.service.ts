@@ -465,7 +465,7 @@ export class ChannelService {
     if (await this.banService.includes(channelId, userIds)) {
       throw new WsException("can't invite the user as they have been banned.");
     }
-    const invitee: User = await this.userService.findOne(userIds[0]);
+    const invitee: User = await this.userService.findOneOrFail(userIds[0]);
     const queryRunner = this.dataSource.createQueryRunner();
 
     await queryRunner.connect();

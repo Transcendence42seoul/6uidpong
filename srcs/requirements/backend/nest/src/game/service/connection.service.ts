@@ -22,7 +22,7 @@ export class ConnectionService {
     const payload = await this.jwtService.verifyAsync(token, {
       secret: process.env.JWT_ACCESS_SECRET_KEY,
     });
-    const user: User = await this.userService.findOne(payload.id);
+    const user: User = await this.userService.findOneOrFail(payload.id);
     if (user.gameSocketId !== "") {
       server.in(user.gameSocketId).disconnectSockets(true);
     }

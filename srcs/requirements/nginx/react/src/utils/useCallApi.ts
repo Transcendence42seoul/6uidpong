@@ -44,12 +44,10 @@ const useCallApi = () => {
         dispatchAuth(null, dispatch);
         throw error;
       }
-      const { data: refreshToken } = await httpRequest(
-        { url: '/api/v1/auth/token/refresh' },
-        false,
-      );
+      const retryConfig = { url: '/api/v1/auth/token/refresh' };
+      const { data: refreshToken } = await callApi(retryConfig, true);
       await dispatchAuth(refreshToken, dispatch);
-      return callApi(config, true);
+      return callApi(config);
     }
   };
 

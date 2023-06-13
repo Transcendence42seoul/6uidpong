@@ -12,8 +12,6 @@ import useCallApi from '../utils/useCallApi';
 import type Position from '../interfaces/Position';
 import type User from '../interfaces/User';
 
-import { isTest, mockUsers } from '../mock'; // test
-
 const FriendsList: React.FC = () => {
   const callApi = useCallApi();
   const navigate = useNavigate();
@@ -55,14 +53,14 @@ const FriendsList: React.FC = () => {
   };
 
   useEffect(() => {
-    const fetchFriendsData = async () => {
+    const fetchFriends = async () => {
       const config = {
         url: `/api/v1/users/${myId}/friends`,
       };
-      const data: User[] = isTest ? mockUsers : await callApi(config); // test
-      setFriends([...data]);
+      const { data: users } = await callApi(config);
+      setFriends([...users]);
     };
-    fetchFriendsData();
+    fetchFriends();
   }, []);
 
   return (

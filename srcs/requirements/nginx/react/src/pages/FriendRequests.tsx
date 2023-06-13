@@ -7,8 +7,6 @@ import useCallApi from '../utils/useCallApi';
 
 import type User from '../interfaces/User';
 
-import { isTest, mockFriendRequests } from '../mock'; // test
-
 const FriendRequests: React.FC = () => {
   const callApi = useCallApi();
 
@@ -37,14 +35,14 @@ const FriendRequests: React.FC = () => {
   };
 
   useEffect(() => {
-    const fetchFriendRequestsData = async () => {
+    const fetchRequestUsers = async () => {
       const config = {
         url: `/api/v1/users/${myId}/friend-requests`,
       };
-      const data: User[] = isTest ? mockFriendRequests : await callApi(config); // test
-      setRequestUsers([...data]);
+      const { data: users } = await callApi(config);
+      setRequestUsers([...users]);
     };
-    fetchFriendRequestsData();
+    fetchRequestUsers();
   }, []);
 
   return (

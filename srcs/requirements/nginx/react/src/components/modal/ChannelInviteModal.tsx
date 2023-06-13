@@ -10,8 +10,6 @@ import UserListWithSearchBar from '../container/UserListWithSearchBar';
 
 import type User from '../../interfaces/User';
 
-import { isTest, mockUsers } from '../../mock'; // test
-
 interface ChannelInviteModalProps {
   setShowModal: (showModal: boolean) => void;
 }
@@ -57,15 +55,15 @@ const ChannelInviteModal: React.FC<ChannelInviteModalProps> = ({
   };
 
   useEffect(() => {
-    const fetchUsersData = async () => {
+    const fetchAllUsers = async () => {
       const config = {
         url: '/api/v1/users/search',
         params: { nickname: '' },
       };
-      const data: User[] = isTest ? mockUsers : await callApi(config); // test
-      setAllUsers(data);
+      const { data: users } = await callApi(config);
+      setAllUsers([...users]);
     };
-    fetchUsersData();
+    fetchAllUsers();
   }, []);
 
   return (

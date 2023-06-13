@@ -11,7 +11,7 @@ import useCallApi from '../utils/useCallApi';
 
 import type User from '../interfaces/User';
 
-import { isTest, mockGameHistory, mockUsers } from '../mock'; // test
+import { isTest, mockGameHistory } from '../mock'; // test
 
 interface GameStats {
   isLadder: boolean;
@@ -44,14 +44,14 @@ const MyPage: React.FC = () => {
   const handleToggleChange = () => setIsLadder(!isLadder);
 
   useEffect(() => {
-    const fetchUserData = async () => {
+    const fetchMyInfo = async () => {
       const config = {
         url: `/api/v1/users/${myId}`,
       };
-      const data: User = isTest ? mockUsers[0] : await callApi(config); // test
-      setUser(data);
+      const { data: myInfo } = await callApi(config);
+      setUser(myInfo);
     };
-    fetchUserData();
+    fetchMyInfo();
   }, []);
 
   useEffect(() => {

@@ -7,8 +7,6 @@ import selectAuth from '../../features/auth/authSelector';
 
 import type User from '../../interfaces/User';
 
-import { isTest, mockUsers } from '../../mock'; // test
-
 interface UserSearchBarProps {
   onUserClick: (user: User) => void;
   className?: string;
@@ -63,16 +61,16 @@ const UserSearchBar: React.FC<UserSearchBarProps> = ({
   }, []);
 
   useEffect(() => {
-    const fetchUsersData = async () => {
+    const fetchSearchResults = async () => {
       const config = {
         url: '/api/v1/users/search',
         params: { nickname: searchTerm },
       };
-      const data: User[] = isTest ? mockUsers : await callApi(config); // test
-      handleSearchResults(data);
+      const { data: users } = await callApi(config);
+      handleSearchResults(users);
     };
     if (searchTerm) {
-      fetchUsersData();
+      fetchSearchResults();
     }
     handleShowSearchResults();
   }, [searchTerm]);

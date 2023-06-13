@@ -94,18 +94,18 @@ const UserProfile: React.FC<UserProfileProps> = ({
   }, [user]);
 
   useEffect(() => {
-    const fetchUserData = async () => {
+    const fetchUser = async () => {
       const config = {
         url: `/api/v1/users/${userId}`,
       };
-      const data: User = await callApi(config);
+      const { data } = await callApi(config);
       setUser(data);
     };
     if (!userId) {
       setUser(null);
       return;
     }
-    fetchUserData();
+    fetchUser();
   }, [userId]);
 
   return (

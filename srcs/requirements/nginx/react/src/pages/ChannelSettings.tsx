@@ -18,7 +18,7 @@ const ChannelSettings: React.FC = () => {
 
   const [isPasswordEnabled, setIsPasswordEnabled] = useState<boolean>(false);
   const [isPublic, setIsPublic] = useState<boolean>(true);
-  const [isValid, setIsValid] = useState<boolean>(false);
+  const [isValid, setIsValid] = useState<boolean>(true);
   const [password, setPassword] = useState<string>('');
   const [title, setTitle] = useState<string>('');
 
@@ -71,7 +71,7 @@ const ChannelSettings: React.FC = () => {
   };
 
   useEffect(() => {
-    if (!isValid) return;
+    if (channelId || !isValid) return;
     const duplicateHandler = (isDuplicated: boolean) => {
       setIsValid(!isDuplicated);
     };
@@ -79,7 +79,7 @@ const ChannelSettings: React.FC = () => {
   }, [isValid]);
 
   useEffect(() => {
-    if (!title) return;
+    if (channelId || !title) return;
     const timeoutId = setTimeout(() => {
       const regex = /^[a-zA-Z0-9!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]{4,30}$/;
       setIsValid(regex.test(title));

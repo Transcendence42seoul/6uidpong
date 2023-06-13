@@ -7,7 +7,7 @@ import redirect from '../../utils/redirect';
 import HoverButton from '../button/HoverButton';
 
 interface LoginAuthProps {
-  id: number | null;
+  id: number | undefined;
 }
 
 const LoginAuth: React.FC<LoginAuthProps> = ({ id }) => {

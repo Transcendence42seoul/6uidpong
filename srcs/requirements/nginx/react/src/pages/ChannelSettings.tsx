@@ -151,7 +151,7 @@ const ChannelSettings: React.FC = () => {
               />
               <div
                 className={`dot absolute left-1 top-1 h-5 w-5 rounded-full bg-white transition ${
-                  isPublic ? '' : 'translate-x-full transform'
+                  !isPublic && 'translate-x-full transform'
                 }`}
               />
             </div>

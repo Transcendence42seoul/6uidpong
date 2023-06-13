@@ -101,7 +101,7 @@ const GameRoom: React.FC = () => {
                 />
                 <div
                   className={`dot absolute left-1 top-1 h-5 w-5 rounded-full bg-white transition ${
-                    mode ? 'translate-x-full transform' : ''
+                    mode && 'translate-x-full transform'
                   }`}
                 />
               </div>

@@ -113,7 +113,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
       <ContentBox className="p-4">
         <h2
           className={`text-lg font-semibold ${
-            user ? '' : 'text-white text-opacity-0'
+            !user && 'text-white text-opacity-0'
           }`}
         >
           {user?.nickname ?? 'Waiting...'}
@@ -122,7 +122,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
           src={user?.image}
           alt="Profile"
           className={`m-2.5 h-32 w-32 border ${
-            user ? '' : 'bg-white bg-opacity-0 text-white text-opacity-0'
+            !user && 'bg-white bg-opacity-0 text-white text-opacity-0'
           }`}
         />
         {children ?? (

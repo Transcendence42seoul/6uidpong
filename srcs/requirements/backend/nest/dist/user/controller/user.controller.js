@@ -19,48 +19,32 @@ const jwt_access_guard_1 = require("../../auth/guard/jwt-access.guard");
 const auth_service_1 = require("../../auth/service/auth.service");
 const nickname_update_request_1 = require("../dto/nickname-update-request");
 const two_factor_auth_update_request_1 = require("../dto/two-factor-auth-update-request");
-const user_response_1 = require("../dto/user-response");
-const pagination_1 = require("../../utils/pagination/pagination");
 const friend_service_1 = require("../service/friend.service");
 const friend_request_service_1 = require("../service/friend-request.service");
 const friend_response_1 = require("../dto/friend-response");
 const friend_request_response_1 = require("../dto/friend-request-response");
 const permission_guard_1 = require("../../auth/guard/permission.guard");
-const block_service_1 = require("../../chat/service/dm/block.service");
-const user_profile_response_1 = require("../dto/user-profile-response");
 const platform_express_1 = require("@nestjs/platform-express");
 let UserController = class UserController {
-    constructor(userService, authService, friendService, friendRequestService, blockService) {
+    constructor(userService, authService, friendService, friendRequestService) {
         this.userService = userService;
         this.authService = authService;
         this.friendService = friendService;
         this.friendRequestService = friendRequestService;
-        this.blockService = blockService;
     }
     async findAllUser(page, size) {
-        const [users, total] = await this.userService.findAll({
+        return await this.userService.findAll({
             page,
             size,
         });
-        const dtos = users.map((user) => new user_response_1.UserResponse(user));
-        return new pagination_1.Pagination({ results: dtos, total });
     }
     async searchUser(nickname) {
-        const entities = await this.userService.search(nickname);
-        return entities.map((entity) => new user_response_1.UserResponse(entity));
+        return await this.userService.search(nickname);
     }
-    async findUser(req, id) {
-        try {
-            const user = await this.userService.findOne(id);
-            const block = await this.blockService.findOne(req.user.id, id);
-            const friend = await this.friendService.findOne(req.user.id, id);
-            return new user_profile_response_1.UserProfileResponse(user, block ? true : false, friend ? true : false);
-        }
-        catch (_a) {
-            throw new common_1.NotFoundException("user not exists.");
-        }
+    async findProfile(req, id) {
+        return await this.userService.findProfile(id, req.user.id);
     }
-    async streamImage(res, id) {
+    async findImage(res, id) {
         await this.userService.streamImage(res, id);
     }
     async updateNickname(id, body) {
@@ -104,6 +88,7 @@ let UserController = class UserController {
 };
 __decorate([
     (0, common_1.Get)(),
+    (0, common_1.UseGuards)(jwt_access_guard_1.JwtAccessGuard),
     __param(0, (0, common_1.Query)("page", new common_1.DefaultValuePipe(1), common_1.ParseIntPipe)),
     __param(1, (0, common_1.Query)("size", new common_1.DefaultValuePipe(10), common_1.ParseIntPipe)),
     __metadata("design:type", Function),
@@ -112,6 +97,7 @@ __decorate([
 ], UserController.prototype, "findAllUser", null);
 __decorate([
     (0, common_1.Get)("/search"),
+    (0, common_1.UseGuards)(jwt_access_guard_1.JwtAccessGuard),
     __param(0, (0, common_1.Query)("nickname")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -119,24 +105,24 @@ __decorate([
 ], UserController.prototype, "searchUser", null);
 __decorate([
     (0, common_1.Get)("/:id"),
+    (0, common_1.UseGuards)(jwt_access_guard_1.JwtAccessGuard),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Param)("id", common_1.ParseIntPipe)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, Number]),
     __metadata("design:returntype", Promise)
-], UserController.prototype, "findUser", null);
+], UserController.prototype, "findProfile", null);
 __decorate([
     (0, common_1.Get)("/:id/image"),
-    (0, common_1.HttpCode)(common_1.HttpStatus.NO_CONTENT),
     __param(0, (0, common_1.Res)()),
     __param(1, (0, common_1.Param)("id", common_1.ParseIntPipe)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, Number]),
     __metadata("design:returntype", Promise)
-], UserController.prototype, "streamImage", null);
+], UserController.prototype, "findImage", null);
 __decorate([
     (0, common_1.Put)("/:id/nickname"),
-    (0, common_1.UseGuards)(permission_guard_1.PermissionGuard),
+    (0, common_1.UseGuards)(jwt_access_guard_1.JwtAccessGuard, permission_guard_1.PermissionGuard),
     (0, common_1.HttpCode)(common_1.HttpStatus.NO_CONTENT),
     __param(0, (0, common_1.Param)("id", common_1.ParseIntPipe)),
     __param(1, (0, common_1.Body)()),
@@ -146,13 +132,13 @@ __decorate([
 ], UserController.prototype, "updateNickname", null);
 __decorate([
     (0, common_1.Put)("/:id/image"),
-    (0, common_1.UseGuards)(permission_guard_1.PermissionGuard),
+    (0, common_1.UseGuards)(jwt_access_guard_1.JwtAccessGuard, permission_guard_1.PermissionGuard),
     (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)("file")),
     (0, common_1.HttpCode)(common_1.HttpStatus.NO_CONTENT),
     __param(0, (0, common_1.Param)("id", common_1.ParseIntPipe)),
     __param(1, (0, common_1.UploadedFile)(new common_1.ParseFilePipe({
         validators: [
-            new common_1.MaxFileSizeValidator({ maxSize: 200 }),
+            new common_1.MaxFileSizeValidator({ maxSize: 200 * 1024 }),
             new common_1.FileTypeValidator({ fileType: "image/jpeg" }),
         ],
     }))),
@@ -162,7 +148,7 @@ __decorate([
 ], UserController.prototype, "updateImage", null);
 __decorate([
     (0, common_1.Put)("/:id/email/code"),
-    (0, common_1.UseGuards)(permission_guard_1.PermissionGuard),
+    (0, common_1.UseGuards)(jwt_access_guard_1.JwtAccessGuard, permission_guard_1.PermissionGuard),
     (0, common_1.HttpCode)(common_1.HttpStatus.NO_CONTENT),
     __param(0, (0, common_1.Param)("id", common_1.ParseIntPipe)),
     __metadata("design:type", Function),
@@ -171,7 +157,7 @@ __decorate([
 ], UserController.prototype, "send2FACode", null);
 __decorate([
     (0, common_1.Put)("/:id/is2FA"),
-    (0, common_1.UseGuards)(permission_guard_1.PermissionGuard),
+    (0, common_1.UseGuards)(jwt_access_guard_1.JwtAccessGuard, permission_guard_1.PermissionGuard),
     (0, common_1.HttpCode)(common_1.HttpStatus.NO_CONTENT),
     __param(0, (0, common_1.Param)("id", common_1.ParseIntPipe)),
     __param(1, (0, common_1.Body)()),
@@ -181,7 +167,7 @@ __decorate([
 ], UserController.prototype, "update2FA", null);
 __decorate([
     (0, common_1.Get)("/:id/friends"),
-    (0, common_1.UseGuards)(permission_guard_1.PermissionGuard),
+    (0, common_1.UseGuards)(jwt_access_guard_1.JwtAccessGuard, permission_guard_1.PermissionGuard),
     __param(0, (0, common_1.Param)("id", common_1.ParseIntPipe)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
@@ -189,7 +175,7 @@ __decorate([
 ], UserController.prototype, "findFriends", null);
 __decorate([
     (0, common_1.Post)("/:id/friends"),
-    (0, common_1.UseGuards)(permission_guard_1.PermissionGuard),
+    (0, common_1.UseGuards)(jwt_access_guard_1.JwtAccessGuard, permission_guard_1.PermissionGuard),
     (0, common_1.HttpCode)(common_1.HttpStatus.NO_CONTENT),
     __param(0, (0, common_1.Param)("id", common_1.ParseIntPipe)),
     __param(1, (0, common_1.Body)("friendId", common_1.ParseIntPipe)),
@@ -199,7 +185,7 @@ __decorate([
 ], UserController.prototype, "createFriend", null);
 __decorate([
     (0, common_1.Delete)("/:id/friends/:friendId"),
-    (0, common_1.UseGuards)(permission_guard_1.PermissionGuard),
+    (0, common_1.UseGuards)(jwt_access_guard_1.JwtAccessGuard, permission_guard_1.PermissionGuard),
     (0, common_1.HttpCode)(common_1.HttpStatus.NO_CONTENT),
     __param(0, (0, common_1.Param)("id", common_1.ParseIntPipe)),
     __param(1, (0, common_1.Param)("friendId", common_1.ParseIntPipe)),
@@ -209,7 +195,7 @@ __decorate([
 ], UserController.prototype, "deleteFriend", null);
 __decorate([
     (0, common_1.Get)("/:id/friend-requests"),
-    (0, common_1.UseGuards)(permission_guard_1.PermissionGuard),
+    (0, common_1.UseGuards)(jwt_access_guard_1.JwtAccessGuard, permission_guard_1.PermissionGuard),
     __param(0, (0, common_1.Param)("id", common_1.ParseIntPipe)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
@@ -217,7 +203,7 @@ __decorate([
 ], UserController.prototype, "findFriendRequests", null);
 __decorate([
     (0, common_1.Post)("/:id/friend-requests"),
-    (0, common_1.UseGuards)(permission_guard_1.PermissionGuard),
+    (0, common_1.UseGuards)(jwt_access_guard_1.JwtAccessGuard, permission_guard_1.PermissionGuard),
     (0, common_1.HttpCode)(common_1.HttpStatus.NO_CONTENT),
     __param(0, (0, common_1.Param)("id", common_1.ParseIntPipe)),
     __param(1, (0, common_1.Body)("toId", common_1.ParseIntPipe)),
@@ -227,7 +213,7 @@ __decorate([
 ], UserController.prototype, "createFriendRequest", null);
 __decorate([
     (0, common_1.Delete)("/:id/friend-requests/:fromId"),
-    (0, common_1.UseGuards)(permission_guard_1.PermissionGuard),
+    (0, common_1.UseGuards)(jwt_access_guard_1.JwtAccessGuard, permission_guard_1.PermissionGuard),
     (0, common_1.HttpCode)(common_1.HttpStatus.NO_CONTENT),
     __param(0, (0, common_1.Param)("id", common_1.ParseIntPipe)),
     __param(1, (0, common_1.Param)("fromId", common_1.ParseIntPipe)),
@@ -237,12 +223,10 @@ __decorate([
 ], UserController.prototype, "deleteFriendRequest", null);
 UserController = __decorate([
     (0, common_1.Controller)("api/v1/users"),
-    (0, common_1.UseGuards)(jwt_access_guard_1.JwtAccessGuard),
     __metadata("design:paramtypes", [user_service_1.UserService,
         auth_service_1.AuthService,
         friend_service_1.FriendService,
-        friend_request_service_1.FriendRequestService,
-        block_service_1.BlockService])
+        friend_request_service_1.FriendRequestService])
 ], UserController);
 exports.UserController = UserController;
 //# sourceMappingURL=user.controller.js.map

@@ -7,25 +7,44 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { PaginationOptions } from "src/utils/pagination/pagination.option";
 import { DataSource, Repository } from "typeorm";
 import { User } from "../entity/user.entity";
-import fs from "fs";
-import * as path from "path";
+import {
+  existsSync,
+  mkdirSync,
+  unlinkSync,
+  writeFileSync,
+  createReadStream,
+} from "fs";
 import { Response } from "express";
+import { Pagination } from "src/utils/pagination/pagination";
+import { UserResponse } from "../dto/user-response";
+import { UserProfileResponse } from "../dto/user-profile-response";
+import { BlockService } from "src/chat/service/dm/block.service";
+import { FriendService } from "./friend.service";
+import { Block } from "src/chat/entity/dm/block.entity";
+import { Friend } from "../entity/friend.entity";
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly blockService: BlockService,
+    private readonly friendService: FriendService,
     private readonly dataSource: DataSource
   ) {}
 
-  async findAll(options: PaginationOptions): Promise<[User[], number]> {
-    return await this.userRepository.findAndCount({
-      take: options.size,
-      skip: options.size * (options.page - 1),
-      order: {
-        nickname: "ASC",
-      },
+  async findAll(options: PaginationOptions): Promise<Pagination<UserResponse>> {
+    const [users, total]: [User[], number] =
+      await this.userRepository.findAndCount({
+        take: options.size,
+        skip: options.size * (options.page - 1),
+        order: {
+          nickname: "ASC",
+        },
+      });
+    return new Pagination<UserResponse>({
+      results: users.map((user) => new UserResponse(user)),
+      total,
     });
   }
 
@@ -40,8 +59,8 @@ export class UserService {
     return await this.userRepository.findBy(ids.map((id) => ({ id })));
   }
 
-  async search(nickname: string): Promise<User[]> {
-    return await this.userRepository
+  async search(nickname: string): Promise<UserResponse[]> {
+    const entities: User[] = await this.userRepository
       .createQueryBuilder()
       .select()
       .where("nickname ILIKE :includedNickname")
@@ -60,6 +79,7 @@ export class UserService {
         endNickname: `%${nickname}`,
       })
       .getMany();
+    return entities.map((entity) => new UserResponse(entity));
   }
 
   async insert(profile: any): Promise<User> {
@@ -70,6 +90,26 @@ export class UserService {
       image: profile.image.link,
     });
     return await this.userRepository.findOneBy({ id: profile.id });
+  }
+
+  async findProfile(
+    targetId: number,
+    requesterId: number
+  ): Promise<UserProfileResponse> {
+    const user: User = await this.userRepository.findOneBy({ id: targetId });
+    if (typeof user === null) {
+      throw new NotFoundException("user not exists.");
+    }
+    const block: Block = await this.blockService.findOne(requesterId, targetId);
+    const friend: Friend = await this.friendService.findOne(
+      requesterId,
+      targetId
+    );
+    return new UserProfileResponse(
+      user,
+      block ? true : false,
+      friend ? true : false
+    );
   }
 
   async updateNickname(id: number, nickname: string): Promise<void> {
@@ -97,17 +137,12 @@ export class UserService {
 
   async updateImage(id: number, file: Express.Multer.File): Promise<void> {
     const uploadPath: string = `uploads/${id}`;
-    if (!fs.existsSync(uploadPath)) {
-      fs.mkdirSync(uploadPath);
+    if (!existsSync(uploadPath)) {
+      mkdirSync(uploadPath, { recursive: true });
     } else {
-      const files: string[] = fs.readdirSync(uploadPath);
-      files.forEach((file) => {
-        const filePath = path.join(uploadPath, file);
-        fs.unlinkSync(filePath);
-      });
+      unlinkSync(`${uploadPath}/image.jpeg`);
     }
-    fs.writeFileSync(uploadPath, file.path);
-    fs.unlinkSync(file.path);
+    writeFileSync(`${uploadPath}/image.jpeg`, file.buffer);
     await this.userRepository.update(id, {
       image: `https://${process.env.HOST_NAME}/api/v1/users/${id}/image`,
     });
@@ -141,24 +176,14 @@ export class UserService {
   }
 
   async streamImage(res: Response, id: number): Promise<void> {
-    const imagePath: string = `uploads/${id}`;
-    if (!fs.existsSync(imagePath)) {
+    const imagePath: string = `uploads/${id}/image.jpeg`;
+    if (!existsSync(imagePath)) {
       throw new NotFoundException();
     }
-
-    const files: string[] = fs.readdirSync(imagePath);
-    if (files.length === 0) {
-      throw new NotFoundException();
-    }
-
-    const fileName: string = files[0];
-    const filePath = path.join(imagePath, fileName);
-    const fileStream = fs.createReadStream(filePath);
-
+    const fileStream = createReadStream(imagePath);
     res.set({
       "Content-Type": "image/jpeg",
     });
-
     fileStream.pipe(res);
   }
 }

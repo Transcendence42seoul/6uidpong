@@ -62,7 +62,6 @@ export class AuthController {
       sameSite: "strict",
       path: "/api/v1/auth/token/refresh",
     });
-
     return new CallbackResponse(
       false,
       user.id,
@@ -83,7 +82,6 @@ export class AuthController {
       sameSite: "strict",
       path: "/api/v1/auth/token/refresh",
     });
-
     return new AccessTokenResponse(
       await this.authService.genAccessToken(body.id)
     );

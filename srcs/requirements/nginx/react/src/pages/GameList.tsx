@@ -139,7 +139,7 @@ const GameList: React.FC = () => {
             {!isPrivate && (
               <button
                 className={`flex w-full items-center space-x-1 border p-1 text-lg text-gray-100 ${
-                  roomId === selectedGame?.roomId ? 'bg-indigo-600' : ''
+                  roomId === selectedGame?.roomId && 'bg-indigo-600'
                 }`}
                 onClick={() => handleGameClick(game)}
                 onDoubleClick={handleGameDoubleClick}

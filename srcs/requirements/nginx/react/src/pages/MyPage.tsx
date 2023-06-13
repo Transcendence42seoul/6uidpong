@@ -115,7 +115,7 @@ const MyPage: React.FC = () => {
               <div className="h-7 w-12 rounded bg-gray-300 transition" />
               <div
                 className={`dot absolute left-1 top-1 h-5 w-5 rounded bg-[#211f20] transition ${
-                  isLadder ? '' : 'translate-x-full transform'
+                  !isLadder && 'translate-x-full transform'
                 }`}
               />
             </div>

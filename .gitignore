@@ -1,6 +1,7 @@
 # Others
 .DS_Store
 .dist
+uploads
 
 # Logs
 logs

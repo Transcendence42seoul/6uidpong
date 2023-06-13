@@ -1,16 +1,13 @@
+import axios from 'axios';
 import React, { ChangeEvent, useCallback, useEffect, useState } from 'react';
 
-import selectAuth from '../../features/auth/authSelector';
 import useCallApi from '../../utils/useCallApi';
 
 const Nickname: React.FC = () => {
   const callApi = useCallApi();
 
-  const { tokenInfo } = selectAuth();
-  const myId = tokenInfo?.id;
-
-  const [isValid, setIsValid] = useState<boolean>(true);
   const [nickname, setNickname] = useState<string>('');
+  const [warning, setWarning] = useState<string>('');
 
   const handleNicknameChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
@@ -19,25 +16,36 @@ const Nickname: React.FC = () => {
     [],
   );
 
+  const isDuplicated = (error: any) => {
+    return axios.isAxiosError(error) && error.response?.status === 409;
+  };
+
   useEffect(() => {
-    if (!isValid) return;
+    if (warning) return;
     const config = {
-      url: `/api/v1/users/${myId}/nickname`,
-      method: 'put',
+      url: '/api/v1/users/check-nickname',
+      method: 'post',
       data: { nickname },
     };
     try {
       callApi(config);
     } catch (error) {
-      setIsValid(false);
+      if (!isDuplicated(error)) {
+        throw error;
+      }
+      setWarning('That nickname is taken. Try another.');
     }
-  }, [isValid]);
+  }, [warning]);
 
   useEffect(() => {
     if (!nickname) return;
     const timeoutId = setTimeout(() => {
-      const regex = /^[a-zA-Z0-9]{4,14}$/;
-      setIsValid(regex.test(nickname));
+      const regex = /^[a-zA-Z0-9]+$/;
+      if (!regex.test(nickname)) {
+        setWarning('Sorry, only letters(English) and numbers are allowed.');
+      } else if (nickname.length < 4 || nickname.length > 14) {
+        setWarning('Sorry, your nickname must be between 4 and 14 characters.');
+      }
     }, 500);
     return () => {
       clearTimeout(timeoutId);
@@ -45,23 +53,18 @@ const Nickname: React.FC = () => {
   }, [nickname]);
 
   return (
-    <label htmlFor="nickname" className="max-w-md space-y-1.5">
+    <label htmlFor="nickname" className="space-y-1.5">
       Nickname
       <input
         type="text"
         id="nickname"
         value={nickname}
         onChange={handleNicknameChange}
-        className={`mt-4 w-full rounded px-4 py-2 text-gray-900 focus:outline-none ${
-          isValid ? 'border' : 'border-2 border-red-500'
+        className={`focus:shadow-outline mt-2 w-full rounded border px-3 py-2 leading-tight text-gray-700 focus:outline-none ${
+          warning ? 'border-2 border-red-500' : 'border'
         }`}
       />
-      {!isValid && (
-        <p className="pl-2.5 text-left text-xs text-red-500">
-          Sorry, only letters(English) and numbers are allowed between 4 and 14
-          characters long.
-        </p>
-      )}
+      <p className="pl-2.5 text-left text-xs text-red-500">{warning}</p>
     </label>
   );
 };

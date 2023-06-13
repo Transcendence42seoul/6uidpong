@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useCallback, useState } from 'react';
+import React, { ChangeEvent, useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import HoverButton from '../components/button/HoverButton';
@@ -18,6 +18,7 @@ const ChannelSettings: React.FC = () => {
 
   const [isPasswordEnabled, setIsPasswordEnabled] = useState<boolean>(false);
   const [isPublic, setIsPublic] = useState<boolean>(true);
+  const [isValid, setIsValid] = useState<boolean>(false);
   const [password, setPassword] = useState<string>('');
   const [title, setTitle] = useState<string>('');
 
@@ -61,6 +62,25 @@ const ChannelSettings: React.FC = () => {
     setIsPublic(!isPublic);
   };
 
+  useEffect(() => {
+    if (!isValid) return;
+    const duplicateHandler = (isDuplicated: boolean) => {
+      setIsValid(!isDuplicated);
+    };
+    socket?.emit('channel-title-duplicated', title, duplicateHandler);
+  }, [isValid]);
+
+  useEffect(() => {
+    if (!title) return;
+    const timeoutId = setTimeout(() => {
+      const regex = /^[a-zA-Z0-9!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]{4,30}$/;
+      setIsValid(regex.test(title));
+    }, 500);
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [title]);
+
   return (
     <div className="flex items-center justify-center space-x-4 p-4">
       <ContentBox className="max-w-md space-y-6 px-6 pb-5 pt-4">
@@ -72,7 +92,9 @@ const ChannelSettings: React.FC = () => {
             value={title}
             onChange={handleTitleChange}
             disabled={!!channelId}
-            className="focus:shadow-outline mt-2 w-full rounded border px-3 py-2 leading-tight text-gray-700 focus:outline-none"
+            className={`focus:shadow-outline mt-2 w-full rounded px-3 py-2 leading-tight text-gray-700 focus:outline-none ${
+              isValid ? 'border' : 'border-2 border-red-500'
+            }`}
           />
         </label>
         <div className="space-y-2">
@@ -132,6 +154,7 @@ const ChannelSettings: React.FC = () => {
           <HoverButton
             onClick={handleConfirmClick}
             className="border bg-blue-800 p-2 hover:text-blue-800"
+            disabled={!isValid}
           >
             Confirm
           </HoverButton>

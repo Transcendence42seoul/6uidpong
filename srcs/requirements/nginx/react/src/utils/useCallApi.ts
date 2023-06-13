@@ -40,8 +40,11 @@ const useCallApi = () => {
     try {
       return await httpRequest(config);
     } catch (error) {
-      if (!isUnauthorized(error) || retry) {
-        dispatchAuth(null, dispatch);
+      if (!isUnauthorized(error)) {
+        throw error;
+      }
+      if (retry) {
+        await dispatchAuth(null, dispatch);
         throw error;
       }
       const retryConfig = { url: '/api/v1/auth/token/refresh' };

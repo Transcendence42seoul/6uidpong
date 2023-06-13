@@ -22,19 +22,22 @@ const Nickname: React.FC = () => {
 
   useEffect(() => {
     if (warning) return;
-    const config = {
-      url: '/api/v1/users/check-nickname',
-      method: 'post',
-      data: { nickname },
-    };
-    try {
-      callApi(config);
-    } catch (error) {
-      if (!isDuplicated(error)) {
-        throw error;
+    const validateNickname = async () => {
+      const config = {
+        url: '/api/v1/users/check-nickname',
+        method: 'post',
+        data: { nickname },
+      };
+      try {
+        await callApi(config);
+      } catch (error) {
+        if (!isDuplicated(error)) {
+          throw error;
+        }
+        setWarning('That nickname is taken. Try another.');
       }
-      setWarning('That nickname is taken. Try another.');
-    }
+    };
+    validateNickname();
   }, [warning]);
 
   useEffect(() => {

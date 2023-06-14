@@ -130,7 +130,7 @@ const ChannelManageModal: React.FC<ChannelManageModalProps> = ({
     <ModalContainer setShowModal={setShowModal} className="flex space-x-8">
       <UserListWithSeacrhBar users={members} onUserClick={onUserClick} />
       {selectedMember && (
-        <ContentBox className="max-h-96 max-w-xs border p-4">
+        <ContentBox className="max-h-96 max-w-xs border bg-black p-4">
           <h2 className="text-lg font-semibold">{selectedMember.nickname}</h2>
           <CircularImage
             src={selectedMember.image}

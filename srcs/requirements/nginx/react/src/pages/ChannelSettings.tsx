@@ -103,7 +103,7 @@ const ChannelSettings: React.FC = () => {
 
   return (
     <div className="flex items-center justify-center space-x-4 p-4">
-      <ContentBox className="max-w-md space-y-6 px-6 pb-5 pt-4">
+      <ContentBox className="max-w-md space-y-6 bg-black px-6 pb-5 pt-4">
         <label htmlFor="title" className="space-y-1.5">
           Title
           <input

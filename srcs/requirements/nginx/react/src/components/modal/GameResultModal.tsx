@@ -55,7 +55,7 @@ const GameResultModal: React.FC<GameResultModalProps> = ({
   return (
     <ModalContainer setShowModal={setShowModal}>
       <div>
-        <ContentBox className="space-y-6 rounded-none border-2 p-8 pb-4 shadow-md">
+        <ContentBox className="space-y-6 rounded-none border-2 bg-black p-8 pb-4 shadow-md">
           <div className="flex justify-between space-x-8">
             <div className="flex flex-col items-center space-y-2">
               <UserProfile userId={user1Id}> </UserProfile>

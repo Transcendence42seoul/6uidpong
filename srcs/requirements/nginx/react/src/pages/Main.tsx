@@ -16,7 +16,7 @@ const Main: React.FC = () => {
   return (
     <div className="flex min-h-screen items-center justify-center text-white">
       <div className="group relative mx-10 w-1/3">
-        <ContentBox className="border-8 p-7 group-hover:scale-105 group-hover:border-pink-300 group-hover:bg-pink-300 group-hover:opacity-70">
+        <ContentBox className="border-8 bg-black p-7 group-hover:scale-105 group-hover:border-pink-300 group-hover:bg-pink-300 group-hover:opacity-70">
           <img
             src={ImageSrc.GAME}
             alt="GAME"
@@ -42,7 +42,7 @@ const Main: React.FC = () => {
         </div>
       </div>
       <div className="group relative mx-10 w-1/3">
-        <ContentBox className="border-8 p-7 group-hover:scale-105 group-hover:border-pink-300 group-hover:bg-pink-300 group-hover:opacity-70">
+        <ContentBox className="border-8 bg-black p-7 group-hover:scale-105 group-hover:border-pink-300 group-hover:bg-pink-300 group-hover:opacity-70">
           <img
             src={ImageSrc.CHAT}
             alt="CHAT"

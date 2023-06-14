@@ -133,7 +133,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
           <div className="mt-2 space-y-1 text-sm">
             <p>Wins: {user?.winStat}</p>
             <p>Losses: {user?.loseStat}</p>
-            <p>Ladder Score: {user?.ladderScore}</p>
+            <p>Ladder: {user?.ladderScore}</p>
           </div>
         )}
         {children}

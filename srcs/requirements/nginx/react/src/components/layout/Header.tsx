@@ -39,7 +39,10 @@ const Header: React.FC = () => {
       </HoverButton>
       {selectedUserId && showUserProfileModal && (
         <ModalContainer setShowModal={setShowUserProfileModal} closeButton>
-          <UserProfile userId={selectedUserId} />
+          <UserProfile
+            userId={selectedUserId}
+            className="border border-white"
+          />
         </ModalContainer>
       )}
     </div>

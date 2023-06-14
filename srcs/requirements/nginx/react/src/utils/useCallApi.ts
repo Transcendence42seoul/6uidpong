@@ -15,13 +15,11 @@ interface AxiosConfig {
 const useCallApi = () => {
   const dispatch = useDispatch();
 
-  const { accessToken } = selectAuth();
+  let { accessToken } = selectAuth();
 
-  const httpRequest = (config: AxiosConfig, hasToken = true) => {
+  const httpRequest = (config: AxiosConfig) => {
     const headers = { ...config.headers };
-    if (hasToken) {
-      headers.Authorization = `Bearer ${accessToken}`;
-    }
+    headers.Authorization = `Bearer ${accessToken}`;
     return axios({
       ...config,
       method: config.method ?? 'get',
@@ -44,12 +42,13 @@ const useCallApi = () => {
         throw error;
       }
       if (retry) {
-        await dispatchAuth(null, dispatch);
+        dispatchAuth(null, dispatch);
         throw error;
       }
       const retryConfig = { url: '/api/v1/auth/token/refresh' };
-      const { data: refreshToken } = await callApi(retryConfig, true);
-      await dispatchAuth(refreshToken, dispatch);
+      const { data } = await callApi(retryConfig, true);
+      accessToken = data.accessToken;
+      dispatchAuth(data, dispatch);
       return callApi(config, true);
     }
   };

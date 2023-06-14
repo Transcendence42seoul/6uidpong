@@ -49,6 +49,9 @@ const ChannelList: React.FC = () => {
 
   useEffect(() => {
     socket?.on('send-channel', chatHandler);
+    return () => {
+      socket?.off('send-channel', chatHandler);
+    };
   }, [channels]);
 
   return (

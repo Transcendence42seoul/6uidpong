@@ -103,6 +103,9 @@ const DmRoomList: React.FC = () => {
 
   useEffect(() => {
     socket?.on('send-dm', chatHandler);
+    return () => {
+      socket?.off('send-dm', chatHandler);
+    };
   }, [rooms]);
 
   useEffect(() => {

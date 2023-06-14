@@ -116,11 +116,11 @@ const UserProfile: React.FC<UserProfileProps> = ({
     <div className={className}>
       <ContentBox className="bg-[#211f20] pt-4">
         <h2
-          className={`text-lg font-semibold ${
-            !user && 'text-white text-opacity-0'
+          className={`text-md font-semibold ${
+            !user && 'text-white text-opacity-100'
           }`}
         >
-          {user?.nickname ?? 'Waiting...'}
+          {user?.nickname ?? 'undefined-110729'}
         </h2>
         <CircularImage
           src={user?.image}

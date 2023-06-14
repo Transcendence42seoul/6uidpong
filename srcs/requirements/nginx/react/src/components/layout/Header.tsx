@@ -42,6 +42,8 @@ const Header: React.FC = () => {
           <UserProfile
             userId={selectedUserId}
             className="border border-white"
+            stats
+            footer
           />
         </ModalContainer>
       )}

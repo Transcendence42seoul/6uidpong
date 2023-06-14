@@ -118,7 +118,12 @@ const FriendsList: React.FC = () => {
       </ul>
       {selectedFriendId && showUserProfileModal && (
         <ModalContainer setShowModal={setShowUserProfileModal} closeButton>
-          <UserProfile userId={selectedFriendId} />
+          <UserProfile
+            userId={selectedFriendId}
+            className="border border-white"
+            stats
+            footer
+          />
         </ModalContainer>
       )}
     </div>

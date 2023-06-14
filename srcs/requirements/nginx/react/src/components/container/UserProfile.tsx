@@ -16,12 +16,16 @@ import type User from '../../interfaces/User';
 interface UserProfileProps {
   userId: number | undefined;
   className?: string;
+  stats?: boolean;
+  footer?: boolean;
   children?: React.ReactNode;
 }
 
 const UserProfile: React.FC<UserProfileProps> = ({
   userId,
   className = '',
+  stats = false,
+  footer = false,
   children = null,
 }) => {
   const callApi = useCallApi();
@@ -125,11 +129,16 @@ const UserProfile: React.FC<UserProfileProps> = ({
             !user && 'bg-white bg-opacity-0 text-white text-opacity-0'
           }`}
         />
-        {children ?? (
+        {stats && (
+          <div className="mt-2 space-y-1 text-sm">
+            <p>Wins: {user?.winStat}</p>
+            <p>Losses: {user?.loseStat}</p>
+            <p>Ladder Score: {user?.ladderScore}</p>
+          </div>
+        )}
+        {children}
+        {footer && (
           <div className="text-sm">
-            <p className="mt-2">Wins: {user?.winStat}</p>
-            <p className="mt-1">Losses: {user?.loseStat}</p>
-            <p className="mt-1">Ladder Score: {user?.ladderScore}</p>
             <HoverButton
               onClick={handleFriendClick}
               className="mt-5 w-full border-y py-2"

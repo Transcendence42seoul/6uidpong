@@ -56,7 +56,7 @@ const GameRoomSettings: React.FC = () => {
     return () => {
       gameSocket?.off('custom-room-created', gameHandler);
     };
-  }, []);
+  }, [gameSocket]);
 
   return (
     <div className="flex items-center justify-center space-x-4 p-4">

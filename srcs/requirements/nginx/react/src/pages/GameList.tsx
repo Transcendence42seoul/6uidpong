@@ -93,7 +93,7 @@ const GameList: React.FC = () => {
     return () => {
       gameSocket?.off('custom-room-list', gameListHandler);
     };
-  }, []);
+  }, [gameSocket]);
 
   useEffect(() => {
     const gameHandler = (game: Game) => {
@@ -110,7 +110,7 @@ const GameList: React.FC = () => {
       gameSocket?.off('user-join', gameHandler);
       gameSocket?.off('wrong-password', modalHandler);
     };
-  }, []);
+  }, [gameSocket]);
 
   return (
     <ListContainer className="mt-12 px-20">

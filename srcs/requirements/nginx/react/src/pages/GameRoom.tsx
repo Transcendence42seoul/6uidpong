@@ -61,14 +61,14 @@ const GameRoom: React.FC = () => {
       gameSocket?.off('user-exit', roomHandler);
       gameSocket?.off('user-join', roomHandler);
     };
-  }, []);
+  }, [gameSocket]);
 
   useEffect(() => {
     if (!gameStart) {
       gameSocket?.emit('exit-custom-room', roomId);
       navigate('/custom');
     }
-  }, [gameStart]);
+  }, [gameSocket, gameStart]);
 
   return (
     <div className="flex h-screen flex-col items-center justify-center">

@@ -104,15 +104,7 @@ export class GameMatchService {
       (room) => room.roomId === roomInfo.roomId
     );
     const roomSecret = this.roomSecrets[roomIndex];
-    if (roomSecret.participant === null || client === roomSecret.participant) {
-      client.emit("is-master", false);
-      return;
-    } else if (
-      client === roomSecret.master ||
-      roomSecret.participant !== null
-    ) {
-      client.emit("is-master", true);
-    }
+    if (!roomSecret?.participant) return;
     await this.GameRoomService.createRoom(
       roomSecret.master,
       roomSecret.participant,

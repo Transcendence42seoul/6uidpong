@@ -4,6 +4,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import HoverButton from '../components/button/HoverButton';
 import ContentBox from '../components/container/ContentBox';
 import UserProfile from '../components/container/UserProfile';
+import selectAuth from '../features/auth/authSelector';
 import { selectGameSocket } from '../features/socket/socketSelector';
 
 import type Game from '../interfaces/Game';
@@ -16,18 +17,25 @@ const GameRoom: React.FC = () => {
 
   const { gameId: roomIdString } = useParams<{ gameId: string }>();
   const roomId = Number(roomIdString);
+  const { tokenInfo } = selectAuth();
+  const myId = tokenInfo?.id;
 
   const { gameSocket } = selectGameSocket();
 
   const [gameStart, setGameStart] = useState<boolean>(true);
   const [mode, setMode] = useState<boolean>(false);
   const [room, setRoom] = useState<Game>(game);
+  const [isDisabled, setIsdisabled] = useState<boolean>(false);
 
   const exitGame = () => {
     setGameStart(false);
   };
 
   const startGame = () => {
+    if (!room.participantId) {
+      alert('사람 다 없음');
+      return;
+    }
     const { masterId, participantId } = room;
     navigate('/game-start', {
       state: { user1Id: masterId, user2Id: participantId },
@@ -37,17 +45,13 @@ const GameRoom: React.FC = () => {
   const handleStartClick = () => {
     const roomInfo = { roomId, mode };
     gameSocket?.emit('start-custom-room', roomInfo);
-    gameSocket?.on('is-master', (isMaster: boolean) => {
-      if (isMaster) startGame();
-    });
-    return () => {
-      gameSocket?.off('not-master');
-    };
+    startGame();
   };
 
   const handleExitClick = () => {
     exitGame();
   };
+
   const handleToggleChange = () => {
     const newMode = !mode;
     setMode(newMode);
@@ -66,10 +70,15 @@ const GameRoom: React.FC = () => {
   }, [mode]);
 
   useEffect(() => {
+    if (myId !== room.masterId) {
+      setIsdisabled(true);
+    }
+  }, [isDisabled]);
+
+  useEffect(() => {
     const roomHandler = (updatedRoom: Game) => {
       setRoom({ ...updatedRoom });
     };
-
     gameSocket?.on('game-start', startGame);
     gameSocket?.on('room-destroyed', exitGame);
     gameSocket?.on('invite-dismissed', exitGame);
@@ -113,6 +122,7 @@ const GameRoom: React.FC = () => {
                   id="toggle"
                   className="sr-only"
                   checked={!mode}
+                  disabled={isDisabled}
                   onChange={handleToggleChange}
                 />
                 <div
@@ -130,7 +140,11 @@ const GameRoom: React.FC = () => {
             <span>Destroy</span>
           </div>
           <div className="space-x-2">
-            <HoverButton className="border p-2" onClick={handleStartClick}>
+            <HoverButton
+              className="border p-2"
+              onClick={handleStartClick}
+              disabled={isDisabled}
+            >
               Start
             </HoverButton>
             <HoverButton className="border p-2" onClick={handleExitClick}>

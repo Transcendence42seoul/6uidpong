@@ -1,4 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useLocation } from 'react-router-dom';
+import GameInfoModal from '../components/modal/GameOpponentModal';
 
 import GameResultModal from '../components/modal/GameResultModal';
 import { selectGameSocket } from '../features/socket/socketSelector';
@@ -16,6 +18,8 @@ const GameInfo = {
 
 const GameStart: React.FC = () => {
   const { gameSocket } = selectGameSocket();
+  const location = useLocation();
+  const { user1Id, user2Id } = location.state;
 
   const ref = useRef<HTMLCanvasElement>(null);
   const [gameState, setGameState] = useState<GameState | null>(null);
@@ -23,8 +27,16 @@ const GameStart: React.FC = () => {
   const [downState, setDownState] = useState<boolean>(false);
   const [gameResult, setGameResult] = useState<GameState | null>(null);
   const [showResultModal, setShowResultModal] = useState<boolean>(false);
+  const [showInfoModal, setShowInfoModal] = useState<boolean>(false);
 
   useEffect(() => {
+    if (gameSocket) {
+      setShowInfoModal(true);
+      setTimeout(() => {
+        setShowInfoModal(false);
+      }, 3000);
+    }
+
     const resultHandler = (result: GameState) => {
       setGameResult(result);
       setShowResultModal(true);
@@ -141,6 +153,12 @@ const GameStart: React.FC = () => {
 
   return (
     <div className="flex items-center justify-center">
+      {showInfoModal && (
+        <GameInfoModal
+          playerId={{ user1Id, user2Id }}
+          setShowModal={setShowInfoModal}
+        />
+      )}
       <canvas ref={ref} width={GameInfo.width} height={GameInfo.height} />
       {gameResult && showResultModal && (
         <GameResultModal

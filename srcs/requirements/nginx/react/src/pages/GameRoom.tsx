@@ -28,13 +28,21 @@ const GameRoom: React.FC = () => {
   };
 
   const startGame = () => {
-    navigate('/game-start');
+    const { masterId, participantId } = room;
+    navigate('/game-start', {
+      state: { user1Id: masterId, user2Id: participantId },
+    });
   };
 
   const handleStartClick = () => {
     const roomInfo = { roomId, mode };
     gameSocket?.emit('start-custom-room', roomInfo);
-    startGame();
+    gameSocket?.on('is-master', (isMaster: boolean) => {
+      if (isMaster) startGame();
+    });
+    return () => {
+      gameSocket?.off('not-master');
+    };
   };
 
   const handleExitClick = () => {
@@ -61,7 +69,7 @@ const GameRoom: React.FC = () => {
       gameSocket?.off('user-exit', roomHandler);
       gameSocket?.off('user-join', roomHandler);
     };
-  }, [gameSocket]);
+  }, [gameSocket, room]);
 
   useEffect(() => {
     if (!gameStart) {

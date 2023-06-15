@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import LadderQueueModal from '../components/modal/LadderQueueModal';
 import ImageSrc from '../constants/ImageSrc';
 import { selectGameSocket } from '../features/socket/socketSelector';
 
@@ -19,16 +18,9 @@ interface RoomInfo {
 
 const Ladder: React.FC = () => {
   const { gameSocket } = selectGameSocket();
-  const [openModal, setOpenModal] = useState(false);
   const [time, setTime] = useState({ minutes: 0, seconds: 0 });
-  const [username, setUsername] = useState({ user1: '', user2: '' });
   const { minutes, seconds } = time;
-  const { user1, user2 } = username;
   const navigate = useNavigate();
-  const handleCloseModal = () => {
-    setOpenModal(false);
-    navigate('/game-start');
-  };
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -43,14 +35,8 @@ const Ladder: React.FC = () => {
 
     gameSocket?.emit('ladder-game-match');
     gameSocket?.on('game-start', (roomInfo: RoomInfo) => {
-      if (roomInfo !== undefined) {
-        setUsername({
-          user1: roomInfo.user1Nickname,
-          user2: roomInfo.user2Nickname,
-        });
-        setOpenModal(true);
-      }
-      handleCloseModal();
+      const { user1Id, user2Id } = roomInfo;
+      navigate('/game-start', { state: { user1Id, user2Id } });
     });
     return () => clearInterval(interval);
   }, []);
@@ -62,18 +48,7 @@ const Ladder: React.FC = () => {
   });
 
   return (
-    <div className="flex h-screen items-center justify-center">
-      <LadderQueueModal isOpen={openModal} onClose={handleCloseModal}>
-        {openModal && (
-          <div>
-            <img src={ImageSrc.MATCH_IMAGE} alt="MATCHING" className="h-full" />
-            <div>
-              <p>{user1}</p>
-              <p>{user2}</p>
-            </div>
-          </div>
-        )}
-      </LadderQueueModal>
+    <div>
       <div className="flex h-1/2 w-1/2 flex-col items-center justify-center border-4 border-white bg-black p-4 text-center text-white">
         <div className="mb-10 flex h-[60%] items-center justify-center">
           <img src={ImageSrc.MATCH_IMAGE} alt="MATCHING" className="h-full" />

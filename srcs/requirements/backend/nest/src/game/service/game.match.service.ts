@@ -81,15 +81,26 @@ export class GameMatchService {
     }
   }
 
-  async customGameStart(roomInfo: {
-    roomId: number;
-    mode: boolean;
-  }): Promise<void> {
+  async customGameStart(
+    client: Socket,
+    roomInfo: {
+      roomId: number;
+      mode: boolean;
+    }
+  ): Promise<void> {
     const roomIndex = this.rooms.findIndex(
       (room) => room.roomId === roomInfo.roomId
     );
     const roomSecret = this.roomSecrets[roomIndex];
-    if (!roomSecret?.participant) return;
+    if (roomSecret.participant === null || client === roomSecret.participant) {
+      client.emit("is-master", false);
+      return;
+    } else if (
+      client === roomSecret.master ||
+      roomSecret.participant !== null
+    ) {
+      client.emit("is-master", true);
+    }
     await this.GameRoomService.createRoom(
       roomSecret.master,
       roomSecret.participant,

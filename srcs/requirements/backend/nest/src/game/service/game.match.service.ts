@@ -28,6 +28,18 @@ export class GameMatchService {
     setInterval(this.handleLadderMatch.bind(this), 1000);
   }
 
+  changeMode(roomInfo: { roomId: number; newMode: boolean }): void {
+    const roomIndex = this.rooms.findIndex(
+      (room) => room.roomId === roomInfo.roomId
+    );
+    if (roomIndex !== -1) {
+      const roomSecret = this.roomSecrets[roomIndex];
+      if (roomSecret.participant) {
+        roomSecret.participant.emit("change-mode", roomInfo.newMode);
+      }
+    }
+  }
+
   async createCustomGame(
     client: Socket,
     roomInfo: {

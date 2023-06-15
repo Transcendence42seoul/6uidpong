@@ -40,6 +40,17 @@ export class GameMatchGateway {
     this.gameMatchService.createCustomGame(client, roomInfo);
   }
 
+  @SubscribeMessage("change-mode")
+  handleChangeMode(
+    @MessageBody()
+    roomInfo: {
+      roomId: number;
+      newMode: boolean;
+    }
+  ): void {
+    this.gameMatchService.changeMode(roomInfo);
+  }
+
   @SubscribeMessage("invite-game")
   handleInviteGame(
     @ConnectedSocket() client: Socket,

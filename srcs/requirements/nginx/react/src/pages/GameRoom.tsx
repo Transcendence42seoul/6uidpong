@@ -48,15 +48,28 @@ const GameRoom: React.FC = () => {
   const handleExitClick = () => {
     exitGame();
   };
-
   const handleToggleChange = () => {
-    setMode(!mode);
+    const newMode = !mode;
+    setMode(newMode);
+    const roomInfo = { roomId, newMode };
+    gameSocket?.emit('change-mode', roomInfo);
   };
+
+  useEffect(() => {
+    const handleChangeMode = (updateMode: boolean) => {
+      setMode(updateMode);
+    };
+    gameSocket?.on('change-mode', handleChangeMode);
+    return () => {
+      gameSocket?.on('change-mode', handleChangeMode);
+    };
+  }, [mode]);
 
   useEffect(() => {
     const roomHandler = (updatedRoom: Game) => {
       setRoom({ ...updatedRoom });
     };
+
     gameSocket?.on('game-start', startGame);
     gameSocket?.on('room-destroyed', exitGame);
     gameSocket?.on('invite-dismissed', exitGame);

@@ -7,6 +7,8 @@ import selectAuth from '../../features/auth/authSelector';
 
 import type User from '../../interfaces/User';
 
+import { isTest, mockUsers } from '../../mock'; // test
+
 interface UserSearchBarProps {
   onUserClick: (user: User) => void;
   className?: string;
@@ -73,6 +75,7 @@ const UserSearchBar: React.FC<UserSearchBarProps> = ({
       fetchSearchResults();
     }
     handleShowSearchResults();
+    setSearchResults(isTest ? mockUsers : searchResults); // test
   }, [searchTerm]);
 
   useEffect(() => {

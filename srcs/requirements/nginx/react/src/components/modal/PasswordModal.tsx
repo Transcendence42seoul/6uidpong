@@ -49,7 +49,7 @@ const PasswordModal: React.FC<PasswordModalProps> = ({
   return (
     <ModalContainer setShowModal={setShowModal}>
       <div>
-        <ContentBox className="space-y-4 p-4">
+        <ContentBox className="space-y-4 bg-black p-4">
           <label htmlFor="password" className="space-y-1.5">
             Password
             <input

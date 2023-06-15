@@ -67,7 +67,7 @@ const ChannelInviteModal: React.FC<ChannelInviteModalProps> = ({
   }, []);
 
   return (
-    <ModalContainer setShowModal={setShowModal}>
+    <ModalContainer setShowModal={setShowModal} className="flex space-x-8">
       <UserListWithSearchBar users={allUsers} onUserClick={onUserClick} />
       <UserList
         title="Invite"

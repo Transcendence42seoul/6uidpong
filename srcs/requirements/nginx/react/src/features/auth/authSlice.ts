@@ -29,10 +29,12 @@ const authSlice = createSlice({
         state.tokenInfo = undefined;
         return;
       }
-      state.id = payload.id;
-      state.is2FA = payload.is2FA;
-      state.accessToken = payload.accessToken;
-      state.tokenInfo = jwt_decode<TokenInfo>(payload.accessToken);
+      const { id, is2FA, accessToken } = payload;
+      state.id = id;
+      state.is2FA = is2FA;
+      if (!accessToken) return;
+      state.accessToken = accessToken;
+      state.tokenInfo = jwt_decode<TokenInfo>(accessToken);
     },
   },
 });

@@ -42,13 +42,13 @@ const ChannelList: React.FC = () => {
     };
     socket?.emit('find-my-channels', channelsHandler);
     setChannels(isTest ? mockChannels : channels); // test
-    return () => {
-      socket?.off('send-channel', chatHandler);
-    };
   }, []);
 
   useEffect(() => {
     socket?.on('send-channel', chatHandler);
+    return () => {
+      socket?.off('send-channel', chatHandler);
+    };
   }, [channels]);
 
   return (

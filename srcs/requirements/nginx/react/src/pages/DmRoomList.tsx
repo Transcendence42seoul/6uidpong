@@ -96,13 +96,15 @@ const DmRoomList: React.FC = () => {
     socket?.emit('find-rooms', roomsHandler);
     setRooms(isTest ? mockRooms : rooms); // test
     return () => {
-      socket?.off('send-dm', chatHandler);
       document.removeEventListener('click', handleOutsideClick);
     };
   }, []);
 
   useEffect(() => {
     socket?.on('send-dm', chatHandler);
+    return () => {
+      socket?.off('send-dm', chatHandler);
+    };
   }, [rooms]);
 
   useEffect(() => {

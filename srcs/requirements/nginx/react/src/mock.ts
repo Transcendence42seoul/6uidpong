@@ -1,3 +1,5 @@
+import type User from './interfaces/User';
+
 export const isTest = false;
 
 export const mockChannels = [
@@ -38,7 +40,7 @@ export const mockGames = [
   },
 ];
 
-export const mockUsers = [
+export const mockUsers: User[] = [
   {
     id: 110729,
     nickname: 'kijsong',
@@ -48,6 +50,8 @@ export const mockUsers = [
     winStat: 1,
     loseStat: 1,
     ladderScore: 1000,
+    isBlocked: false,
+    isFriend: false,
     isOwner: true,
     isAdmin: true,
   },
@@ -60,6 +64,8 @@ export const mockUsers = [
     winStat: 1,
     loseStat: 1,
     ladderScore: 1000,
+    isBlocked: true,
+    isFriend: false,
     isOwner: false,
     isAdmin: true,
   },
@@ -72,6 +78,8 @@ export const mockUsers = [
     winStat: 1,
     loseStat: 1,
     ladderScore: 1000,
+    isBlocked: false,
+    isFriend: true,
     isOwner: false,
     isAdmin: false,
   },

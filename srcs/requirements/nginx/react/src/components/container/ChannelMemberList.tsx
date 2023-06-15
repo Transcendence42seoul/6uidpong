@@ -10,6 +10,8 @@ import ModalContainer from './ModalContainer';
 import type Member from '../../interfaces/Member';
 import type SendResponse from '../../interfaces/SendResponse';
 
+import { isTest, mockUsers } from '../../mock'; // test
+
 interface ChannelMemberListProps {
   className?: string;
 }
@@ -40,6 +42,7 @@ const ChannelMemberList: React.FC<ChannelMemberListProps> = ({
       setMembers([...memberList]);
     };
     socket?.emit('find-channel-users', { channelId }, membersHandler);
+    setMembers(isTest ? mockUsers : members); // test
   };
 
   const handleSearchTermChange = (
@@ -85,7 +88,7 @@ const ChannelMemberList: React.FC<ChannelMemberListProps> = ({
         className="w-full border bg-black p-2 shadow focus:outline-none"
       />
       <ul
-        className="absolute z-10 flex w-full flex-col border-x border-b px-2.5 pb-2 pt-1.5 shadow-md"
+        className="absolute flex w-full flex-col border-x border-b px-2.5 pb-2 pt-1.5 shadow-md"
         ref={searchResultsRef}
       >
         {searchResults.map((member) => {
@@ -99,7 +102,7 @@ const ChannelMemberList: React.FC<ChannelMemberListProps> = ({
           return (
             <button
               key={nickname}
-              className="flex items-end space-x-2 border-b border-gray-300 py-1 hover:bg-gray-500"
+              className="flex items-end space-x-2 border-b border-gray-300 py-1 hover:bg-gray-500 focus:outline-none"
               onClick={() => handleMemberClick(member)}
             >
               <CircularImage src={image} alt={nickname} className="h-6 w-6" />

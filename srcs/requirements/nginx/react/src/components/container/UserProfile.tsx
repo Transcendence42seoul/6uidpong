@@ -16,12 +16,16 @@ import type User from '../../interfaces/User';
 interface UserProfileProps {
   userId: number | undefined;
   className?: string;
+  stats?: boolean;
+  footer?: boolean;
   children?: React.ReactNode;
 }
 
 const UserProfile: React.FC<UserProfileProps> = ({
   userId,
   className = '',
+  stats = false,
+  footer = false,
   children = null,
 }) => {
   const callApi = useCallApi();
@@ -110,9 +114,9 @@ const UserProfile: React.FC<UserProfileProps> = ({
 
   return (
     <div className={className}>
-      <ContentBox className="p-4">
+      <ContentBox className="bg-[#211f20] pt-4">
         <h2
-          className={`text-lg font-semibold ${
+          className={`text-md font-semibold ${
             !user && 'text-white text-opacity-0'
           }`}
         >
@@ -125,36 +129,35 @@ const UserProfile: React.FC<UserProfileProps> = ({
             !user && 'bg-white bg-opacity-0 text-white text-opacity-0'
           }`}
         />
-        {children ?? (
-          <div>
-            <p className="mt-1 text-sm">Wins: {user?.winStat}</p>
-            <p className="mt-1 text-sm">Losses: {user?.loseStat}</p>
-            <p className="mt-1 text-sm">Ladder Score: {user?.ladderScore}</p>
+        {stats && (
+          <div className="mt-2 space-y-1 text-sm">
+            <p>Wins: {user?.winStat}</p>
+            <p>Losses: {user?.loseStat}</p>
+            <p>Ladder: {user?.ladderScore}</p>
+          </div>
+        )}
+        {children}
+        {footer && (
+          <div className="text-sm">
             <HoverButton
               onClick={handleFriendClick}
-              className="mt-4 border-2 px-2 py-1"
+              className="mt-5 w-full border-y py-2"
             >
               {isFriend ? 'Delete Friend' : 'Friend Request'}
             </HoverButton>
-            <div className="mt-4 flex">
-              <button
-                className="mr-2 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-400"
-                onClick={handleGameClick}
-              >
+            <div>
+              <HoverButton className="px-4 py-2" onClick={handleGameClick}>
                 Game
-              </button>
-              <button
-                className="mr-2 rounded bg-green-500 px-4 py-2 text-white hover:bg-green-400"
+              </HoverButton>
+              <HoverButton
+                className="border-x px-4 py-2"
                 onClick={handleDmClick}
               >
                 DM
-              </button>
-              <button
-                className="rounded bg-red-500 px-4 py-2 text-white hover:bg-red-400"
-                onClick={handleBlockClick}
-              >
+              </HoverButton>
+              <HoverButton className="px-4 py-2" onClick={handleBlockClick}>
                 {isBlocked ? 'Unblock' : 'Block'}
-              </button>
+              </HoverButton>
             </div>
           </div>
         )}

@@ -9,7 +9,6 @@ import type Member from '../../interfaces/Member';
 
 interface ChannelMemberProfileProps {
   member: Member;
-  className?: string;
 }
 
 interface SendData {
@@ -22,7 +21,6 @@ interface SendData {
 
 const ChannelMemberProfile: React.FC<ChannelMemberProfileProps> = ({
   member,
-  className = '',
 }) => {
   const { channelId: channelIdString } = useParams<{ channelId: string }>();
   const channelId = Number(channelIdString);
@@ -60,39 +58,36 @@ const ChannelMemberProfile: React.FC<ChannelMemberProfileProps> = ({
   };
 
   return (
-    <UserProfile userId={userId} className={className}>
-      {isAdmin && (
-        <div className="m-4 flex w-full">
+    <UserProfile
+      userId={userId}
+      className="border border-white"
+      footer={!isAdmin}
+    >
+      {isOwner && (
+        <div className="mt-2 flex w-full flex-col text-sm">
           <HoverButton
-            onClick={handleMuteClick}
-            className="w-1/3 border border-red-800 p-2 text-red-800 hover:text-red-800"
+            onClick={handleAssignAdminClick}
+            className="border-y p-2"
           >
-            Mute
+            Assign Admin
           </HoverButton>
-          <HoverButton
-            onClick={handleKickClick}
-            className="w-1/3 border border-red-800 p-2 text-red-800 hover:text-red-800"
-          >
-            Kick
-          </HoverButton>
-          <HoverButton
-            onClick={handleBanClick}
-            className="w-1/3 border border-red-800 p-2 text-red-800 hover:text-red-800"
-          >
-            Ban
+          <HoverButton onClick={handleTransferOwnerClick} className="p-2">
+            Transfer Owner
           </HoverButton>
         </div>
       )}
-      {isOwner && (
-        <div className="flex w-full flex-col space-y-4">
-          <HoverButton onClick={handleAssignAdminClick} className="border p-2">
-            Assign Admin
+      {isAdmin && (
+        <div
+          className={`mx-4 flex w-full border-t text-sm ${!isOwner && 'mt-2'}`}
+        >
+          <HoverButton onClick={handleMuteClick} className="w-1/3 p-2">
+            Mute
           </HoverButton>
-          <HoverButton
-            onClick={handleTransferOwnerClick}
-            className="border bg-amber-800 p-2 hover:text-amber-800"
-          >
-            Transfer Owner
+          <HoverButton onClick={handleKickClick} className="w-1/3 border-x p-2">
+            Kick
+          </HoverButton>
+          <HoverButton onClick={handleBanClick} className="w-1/3 p-2">
+            Ban
           </HoverButton>
         </div>
       )}

@@ -72,7 +72,7 @@ const GameRoom: React.FC = () => {
 
   return (
     <div className="flex h-screen flex-col items-center justify-center">
-      <ContentBox className="space-y-4 rounded-none border-2 p-4">
+      <ContentBox className="space-y-4 rounded-none border-2 bg-black p-4">
         <h2 className="text-lg font-semibold">{room.title}</h2>
         <div className="flex items-center justify-between">
           <UserProfile userId={room.masterId}> </UserProfile>

@@ -11,7 +11,7 @@ const ContentBox: React.FC<ContentBoxProps> = ({
 }) => {
   return (
     <div
-      className={`flex flex-col items-center border-white bg-black text-center text-white ${className}`}
+      className={`flex flex-col items-center border-white text-center text-white ${className}`}
     >
       {children}
     </div>

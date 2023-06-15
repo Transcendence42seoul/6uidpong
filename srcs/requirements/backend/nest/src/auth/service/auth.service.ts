@@ -23,22 +23,10 @@ export class AuthService {
     };
     const accessToken: string = await this.jwtService.signAsync(payload, {
       secret: process.env.JWT_ACCESS_SECRET_KEY,
-      expiresIn: "2m",
-    });
-
-    return accessToken;
-  }
-
-  async genRefreshToken(userId: number): Promise<string> {
-    const payload: Object = {
-      id: userId,
-    };
-    const refreshToken: string = await this.jwtService.signAsync(payload, {
-      secret: process.env.JWT_REFRESH_SECRET_KEY,
       expiresIn: "7d",
     });
 
-    return refreshToken;
+    return accessToken;
   }
 
   async send2FACode(userId: number, email: string): Promise<void> {

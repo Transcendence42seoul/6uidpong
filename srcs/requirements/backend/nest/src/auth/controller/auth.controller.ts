@@ -11,7 +11,6 @@ import {
 import { Response } from "express";
 import { AuthService } from "../service/auth.service";
 import { UserService } from "src/user/service/user.service";
-import { JwtRefreshGuard } from "../guard/jwt-refresh.guard";
 import { FtGuard } from "../guard/ft.guard";
 import { TwoFactorAuthRequest } from "../dto/two-factor-auth-request";
 import { User } from "src/user/entity/user.entity";
@@ -50,13 +49,6 @@ export class AuthController {
         return new CallbackResponse(true, user.id);
       }
     }
-    res.cookie("refresh", await this.authService.genRefreshToken(user.id), {
-      httpOnly: true,
-      maxAge: 60 * 60 * 24 * 7,
-      secure: true,
-      sameSite: "strict",
-      path: "/api/v1/auth/token/refresh",
-    });
     return new CallbackResponse(
       false,
       user.id,
@@ -66,27 +58,11 @@ export class AuthController {
 
   @Post("/2fa")
   async TwoFactorAuthentication(
-    @Body() body: TwoFactorAuthRequest,
-    @Res({ passthrough: true }) res: Response
+    @Body() body: TwoFactorAuthRequest
   ): Promise<AccessTokenResponse> {
     await this.authService.validate2FACode(body.id, body.code);
-    res.cookie("refresh", await this.authService.genRefreshToken(body.id), {
-      httpOnly: true,
-      maxAge: 60 * 60 * 24 * 7,
-      secure: true,
-      sameSite: "strict",
-      path: "/api/v1/auth/token/refresh",
-    });
     return new AccessTokenResponse(
       await this.authService.genAccessToken(body.id)
-    );
-  }
-
-  @Get("/token/refresh")
-  @UseGuards(JwtRefreshGuard)
-  async refreshToken(@Req() req: any): Promise<AccessTokenResponse> {
-    return new AccessTokenResponse(
-      await this.authService.genAccessToken(req.user.id)
     );
   }
 }

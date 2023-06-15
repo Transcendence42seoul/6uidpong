@@ -31,7 +31,7 @@ export class GameConnectionGateway
     try {
       await this.connectionService.connect(client, this.server);
     } catch {
-      client.disconnect();
+      client.emit("logout");
     }
   }
 

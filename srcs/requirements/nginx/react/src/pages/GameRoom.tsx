@@ -65,7 +65,7 @@ const GameRoom: React.FC = () => {
     };
     gameSocket?.on('change-mode', handleChangeMode);
     return () => {
-      gameSocket?.on('change-mode', handleChangeMode);
+      gameSocket?.off('change-mode', handleChangeMode);
     };
   }, [mode]);
 

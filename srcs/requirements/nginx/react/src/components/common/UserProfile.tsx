@@ -124,10 +124,10 @@ const UserProfile: React.FC<UserProfileProps> = ({
         />
         <h2
           className={`text-md mx-3.5 mb-3.5 mt-2.5 font-semibold ${
-            !user && 'text-white text-opacity-100'
+            !user && 'text-white text-opacity-0'
           }`}
         >
-          {user?.nickname ?? 'undefined-110729'}
+          {user?.nickname ?? 'Waiting...'}
         </h2>
         {stats && (
           <div className="mb-2 space-y-1 text-sm">
@@ -138,7 +138,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
         )}
         {children}
         {footer && (
-          <div className="mt-2 text-sm">
+          <div className="mt-2 w-full text-sm">
             <HoverButton
               onClick={handleFriendClick}
               className="w-full border-y py-2"
@@ -146,16 +146,22 @@ const UserProfile: React.FC<UserProfileProps> = ({
               {isFriend ? 'Delete Friend' : 'Friend Request'}
             </HoverButton>
             <div>
-              <HoverButton className="px-4 py-2" onClick={handleGameClick}>
+              <HoverButton
+                className="w-[35%] px-4 py-2"
+                onClick={handleGameClick}
+              >
                 Game
               </HoverButton>
               <HoverButton
-                className="border-x px-4 py-2"
+                className="w-[25%] border-x px-4 py-2"
                 onClick={handleDmClick}
               >
                 DM
               </HoverButton>
-              <HoverButton className="px-4 py-2" onClick={handleBlockClick}>
+              <HoverButton
+                className="w-[40%] px-4 py-2"
+                onClick={handleBlockClick}
+              >
                 {isBlocked ? 'Unblock' : 'Block'}
               </HoverButton>
             </div>

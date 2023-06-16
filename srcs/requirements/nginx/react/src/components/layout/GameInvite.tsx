@@ -1,17 +1,17 @@
-import React, { useEffect } from 'react';
+import React, { Dispatch, SetStateAction, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { selectGameSocket } from '../../features/socket/socketSelector';
 
 import type Game from '../../interfaces/Game';
-import type NotificationInfo from '../../interfaces/NotificationInfo';
+import type GameInviteInfo from '../../interfaces/GameInviteInfo';
 
-interface NotificationProps {
-  info: NotificationInfo;
-  setInfo: (info: NotificationInfo | null) => void;
+interface GameInviteProps {
+  info: GameInviteInfo;
+  setInfo: Dispatch<SetStateAction<GameInviteInfo | null>>;
 }
 
-const Notification: React.FC<NotificationProps> = ({ info, setInfo }) => {
+const GameInvite: React.FC<GameInviteProps> = ({ info, setInfo }) => {
   const navigate = useNavigate();
 
   const { gameSocket } = selectGameSocket();
@@ -70,4 +70,4 @@ const Notification: React.FC<NotificationProps> = ({ info, setInfo }) => {
   );
 };
 
-export default Notification;
+export default GameInvite;

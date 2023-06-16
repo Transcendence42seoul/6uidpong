@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 
+import GameInvite from './components/layout/GameInvite';
 import Header from './components/layout/Header';
-import Notification from './components/layout/Notification';
 import { selectGameSocket } from './features/socket/socketSelector';
 
-import type NotificationInfo from './interfaces/NotificationInfo';
+import type GameInviteInfo from './interfaces/GameInviteInfo';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -13,11 +13,12 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { gameSocket } = selectGameSocket();
 
-  const [notificationInfo, setNotificationInfo] =
-    useState<NotificationInfo | null>(null);
+  const [gameInviteInfo, setGameInviteInfo] = useState<GameInviteInfo | null>(
+    null,
+  );
 
-  const infoHandler = (info: NotificationInfo) => {
-    setNotificationInfo({ ...info });
+  const infoHandler = (info: GameInviteInfo) => {
+    setGameInviteInfo({ ...info });
   };
 
   useEffect(() => {
@@ -28,8 +29,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     <>
       <Header />
       {children}
-      {notificationInfo && (
-        <Notification info={notificationInfo} setInfo={setNotificationInfo} />
+      {gameInviteInfo && (
+        <GameInvite info={gameInviteInfo} setInfo={setGameInviteInfo} />
       )}
     </>
   );

@@ -1,8 +1,8 @@
-import React, { FormEvent } from 'react';
+import React from 'react';
 
 interface MessageFormProps {
   children: React.ReactNode;
-  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
+  onSubmit: React.FormEventHandler<HTMLFormElement>;
 }
 
 const MessageForm: React.FC<MessageFormProps> = ({ children, onSubmit }) => (

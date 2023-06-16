@@ -15,7 +15,7 @@ interface AxiosConfig {
 const useCallApi = () => {
   const dispatch = useDispatch();
 
-  let { accessToken } = selectAuth();
+  const { accessToken } = selectAuth();
 
   const httpRequest = (config: AxiosConfig) => {
     const headers = { ...config.headers };
@@ -27,29 +27,12 @@ const useCallApi = () => {
     });
   };
 
-  const isUnauthorized = (error: any) => {
-    return axios.isAxiosError(error) && error.response?.status === 401;
-  };
-
-  const callApi = async (
-    config: AxiosConfig,
-    retry = false,
-  ): Promise<AxiosResponse<any>> => {
+  const callApi = async (config: AxiosConfig) => {
     try {
       return await httpRequest(config);
     } catch (error) {
-      if (!isUnauthorized(error)) {
-        throw error;
-      }
-      if (retry) {
-        dispatchAuth(null, dispatch);
-        throw error;
-      }
-      const retryConfig = { url: '/api/v1/auth/token/refresh' };
-      const { data } = await callApi(retryConfig, true);
-      accessToken = data.accessToken;
-      dispatchAuth(data, dispatch);
-      return callApi(config, true);
+      dispatchAuth(null, dispatch);
+      throw error;
     }
   };
 

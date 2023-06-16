@@ -114,7 +114,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
 
   return (
     <div className={className}>
-      <ContentBox className="bg-[#211f20] pt-7">
+      <ContentBox className="pt-7">
         <CircularImage
           src={user?.image}
           alt="Profile"

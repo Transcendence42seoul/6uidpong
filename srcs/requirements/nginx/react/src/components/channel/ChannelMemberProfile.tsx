@@ -60,7 +60,7 @@ const ChannelMemberProfile: React.FC<ChannelMemberProfileProps> = ({
   return (
     <UserProfile
       userId={userId}
-      className="border border-white"
+      className="border border-white bg-[#211f20]"
       footer={!isAdmin}
     >
       {isOwner && (

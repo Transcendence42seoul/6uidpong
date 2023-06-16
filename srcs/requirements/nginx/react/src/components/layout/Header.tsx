@@ -41,7 +41,7 @@ const Header: React.FC = () => {
         <ModalContainer setShowModal={setShowUserProfileModal} closeButton>
           <UserProfile
             userId={selectedUserId}
-            className="border border-white"
+            className="border border-white bg-[#211f20]"
             stats
             footer
           />

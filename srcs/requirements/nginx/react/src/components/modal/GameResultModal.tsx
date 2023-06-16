@@ -58,7 +58,7 @@ const GameResultModal: React.FC<GameResultModalProps> = ({
         <ContentBox className="space-y-6 rounded-none border-2 bg-black p-8 pb-4 shadow-md">
           <div className="flex justify-between space-x-8">
             <div className="flex flex-col items-center space-y-2">
-              <UserProfile userId={user1Id}> </UserProfile>
+              <UserProfile userId={user1Id} />
               <p className="text-lg">Score: {score1}</p>
               <p
                 className={`text-2xl font-semibold ${
@@ -70,7 +70,7 @@ const GameResultModal: React.FC<GameResultModalProps> = ({
             </div>
             <div className="border-r border-white" />
             <div className="flex flex-col items-center space-y-2">
-              <UserProfile userId={user2Id}> </UserProfile>
+              <UserProfile userId={user2Id} />
               <p className="text-lg">Score: {score2}</p>
               <p
                 className={`text-2xl font-semibold ${

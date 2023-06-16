@@ -114,23 +114,23 @@ const UserProfile: React.FC<UserProfileProps> = ({
 
   return (
     <div className={className}>
-      <ContentBox className="bg-[#211f20] pt-4">
-        <h2
-          className={`text-md font-semibold ${
-            !user && 'text-white text-opacity-0'
-          }`}
-        >
-          {user?.nickname ?? 'Waiting...'}
-        </h2>
+      <ContentBox className="bg-[#211f20] pt-7">
         <CircularImage
           src={user?.image}
           alt="Profile"
-          className={`m-2.5 h-32 w-32 border ${
+          className={`h-32 w-32 border ${
             !user && 'bg-white bg-opacity-0 text-white text-opacity-0'
           }`}
         />
+        <h2
+          className={`text-md mx-3.5 mb-3.5 mt-2.5 font-semibold ${
+            !user && 'text-white text-opacity-100'
+          }`}
+        >
+          {user?.nickname ?? 'undefined-110729'}
+        </h2>
         {stats && (
-          <div className="mt-2 space-y-1 text-sm">
+          <div className="mb-2 space-y-1 text-sm">
             <p>Wins: {user?.winStat}</p>
             <p>Losses: {user?.loseStat}</p>
             <p>Ladder: {user?.ladderScore}</p>
@@ -138,10 +138,10 @@ const UserProfile: React.FC<UserProfileProps> = ({
         )}
         {children}
         {footer && (
-          <div className="text-sm">
+          <div className="mt-2 text-sm">
             <HoverButton
               onClick={handleFriendClick}
-              className="mt-5 w-full border-y py-2"
+              className="w-full border-y py-2"
             >
               {isFriend ? 'Delete Friend' : 'Friend Request'}
             </HoverButton>

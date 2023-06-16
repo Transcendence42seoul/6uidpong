@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import CircularImage from '../components/common/CircularImage';
 import ContentBox from '../components/common/ContentBox';
 import HoverButton from '../components/common/HoverButton';
+import ToggleSwitch from '../components/common/ToggleSwitch';
 import selectAuth from '../features/auth/authSelector';
 import { selectGameSocket } from '../features/socket/socketSelector';
 import useCallApi from '../utils/useCallApi';
@@ -101,27 +102,22 @@ const MyPage: React.FC = () => {
         </HoverButton>
       </div>
       <div className="w-full text-gray-50">
-        <div className="m-2 flex items-center space-x-2.5">
-          <span>Ladder</span>
-          <label htmlFor="toggle" className="flex cursor-pointer items-center">
-            <div className="relative">
-              <input
-                type="checkbox"
-                id="toggle"
-                className="sr-only"
-                checked={isLadder}
-                onChange={handleToggleChange}
-              />
-              <div className="h-7 w-12 rounded bg-gray-300 transition" />
-              <div
-                className={`dot absolute left-1 top-1 h-5 w-5 rounded bg-[#211f20] transition ${
-                  !isLadder && 'translate-x-full transform'
-                }`}
-              />
-            </div>
-          </label>
-          <span>Custom</span>
-        </div>
+        <ToggleSwitch
+          checked={!isLadder}
+          leftText="Ladder"
+          rightText="Custom"
+          setChecked={setIsLadder}
+          className="m-2"
+        >
+          <div>
+            <div className="h-7 w-12 rounded bg-gray-300 transition" />
+            <div
+              className={`dot absolute left-1 top-1 h-5 w-5 rounded bg-[#211f20] transition ${
+                !isLadder && 'translate-x-full transform'
+              }`}
+            />
+          </div>
+        </ToggleSwitch>
         {gameHistory
           .filter((game) => game.isLadder === isLadder)
           .map((game) => {

@@ -28,12 +28,16 @@ const ChannelList: React.FC = () => {
     setChannels([...channels]);
   };
 
-  const handleAllChannelsClick = () => {
+  const handleAllClick = () => {
     navigate('/all-channels');
   };
 
   const handleChannelDoubleClick = ({ id }: Channel) => {
     navigate(`/channel/${id}`);
+  };
+
+  const handleCreateChannelClick = () => {
+    navigate('/channel-settings');
   };
 
   useEffect(() => {
@@ -56,10 +60,16 @@ const ChannelList: React.FC = () => {
       <div className="flex items-end">
         <ListTitle className="mb-4 ml-4">My Channels</ListTitle>
         <HoverButton
-          onClick={handleAllChannelsClick}
-          className="mb-3.5 ml-auto border px-2.5 py-2 text-sm"
+          onClick={handleAllClick}
+          className="mb-3.5 ml-3.5 border px-2 py-1.5 text-sm"
         >
-          All Channels
+          ALL
+        </HoverButton>
+        <HoverButton
+          onClick={handleCreateChannelClick}
+          className="mb-3.5 ml-auto border px-2.5 py-1.5 text-sm"
+        >
+          Create
         </HoverButton>
       </div>
       {channels.map((channel) => {

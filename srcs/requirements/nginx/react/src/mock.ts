@@ -1,6 +1,6 @@
 import type User from './interfaces/User';
 
-export const isTest = false;
+export const isTest = true;
 
 export const mockChannels = [
   {

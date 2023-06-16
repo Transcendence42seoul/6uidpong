@@ -49,7 +49,7 @@ const Ladder: React.FC = () => {
   });
 
   return (
-    <div>
+    <div className="flex h-screen items-center justify-center">
       <div className="flex h-1/2 w-1/2 flex-col items-center justify-center border-4 border-white bg-black p-4 text-center text-white">
         <div className="mb-10 flex h-[60%] items-center justify-center">
           <img src={ImageSrc.MATCH_IMAGE} alt="MATCHING" className="h-full" />

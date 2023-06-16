@@ -10,10 +10,10 @@ import type GameState from '../interfaces/GameState';
 const GameInfo = {
   width: 1200,
   height: 800,
-  paddleX: 10,
-  paddleY: 80,
-  maxY: (800 - 80) / 2,
-  ballr: 10,
+  paddleX: 15,
+  paddleY: 120,
+  maxY: (800 - 120) / 2,
+  ballr: 15,
 };
 
 const GameStart: React.FC = () => {

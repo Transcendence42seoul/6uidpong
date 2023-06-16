@@ -10,10 +10,10 @@ import { GameResult } from "../entity/game.entity";
 const GameInfo = {
   width: 1200,
   height: 800,
-  paddlex: 10,
-  paddley: 80,
-  maxy: (800 - 80) / 2,
-  ballrad: 10,
+  paddlex: 15,
+  paddley: 120,
+  maxy: (800 - 120) / 2,
+  ballrad: 15,
 };
 
 @Injectable()

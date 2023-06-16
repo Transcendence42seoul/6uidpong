@@ -6,7 +6,7 @@ interface ToggleSwitchProps {
   rightText: string;
   setChecked: Dispatch<SetStateAction<boolean>>;
   className?: string;
-  children?: React.ReactNode;
+  color?: boolean;
 }
 
 const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
@@ -15,8 +15,16 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
   rightText,
   setChecked,
   className = '',
-  children = null,
+  color = false,
 }) => {
+  const innerClassName = color
+    ? 'rounded-full bg-white'
+    : 'rounded bg-[#211f20]';
+
+  const outerClassName = color
+    ? `rounded-full ${checked ? 'bg-red-300' : 'bg-blue-300'}`
+    : 'rounded bg-gray-300';
+
   const handleToggleChange = () => {
     setChecked((prevState: boolean) => !prevState);
   };
@@ -33,20 +41,12 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
             checked={checked}
             onChange={handleToggleChange}
           />
-          {children ?? (
-            <div>
-              <div
-                className={`h-7 w-12 rounded-full transition ${
-                  checked ? 'bg-red-300' : 'bg-blue-300'
-                }`}
-              />
-              <div
-                className={`dot absolute left-1 top-1 h-5 w-5 rounded-full bg-white transition ${
-                  checked && 'translate-x-full transform'
-                }`}
-              />
-            </div>
-          )}
+          <div className={`h-7 w-12 transition ${outerClassName}`} />
+          <div
+            className={`dot absolute left-1 top-1 h-5 w-5 transition ${innerClassName} ${
+              checked && 'translate-x-full transform'
+            }`}
+          />
         </div>
       </label>
       <span>{rightText}</span>

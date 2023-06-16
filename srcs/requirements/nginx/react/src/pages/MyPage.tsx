@@ -108,16 +108,7 @@ const MyPage: React.FC = () => {
           rightText="Custom"
           setChecked={setIsLadder}
           className="m-2"
-        >
-          <div>
-            <div className="h-7 w-12 rounded bg-gray-300 transition" />
-            <div
-              className={`dot absolute left-1 top-1 h-5 w-5 rounded bg-[#211f20] transition ${
-                !isLadder && 'translate-x-full transform'
-              }`}
-            />
-          </div>
-        </ToggleSwitch>
+        />
         {gameHistory
           .filter((game) => game.isLadder === isLadder)
           .map((game) => {

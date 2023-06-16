@@ -148,6 +148,7 @@ const ChannelSettings: React.FC = () => {
           leftText="Public"
           rightText="Private"
           setChecked={setIsPublic}
+          color
         />
         <div className="flex space-x-4">
           <HoverButton

@@ -112,7 +112,7 @@ const DmRoomList: React.FC = () => {
   }, [showMenu]);
 
   return (
-    <ListContainer className="justify-center">
+    <ListContainer>
       <ListTitle className="mb-4 ml-4">Direct Messages</ListTitle>
       {rooms
         .sort(

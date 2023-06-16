@@ -10,7 +10,9 @@ const ListContainer: React.FC<ListContainerProps> = ({
   className = '',
 }) => {
   return (
-    <div className={`flex min-h-screen flex-col items-center ${className}`}>
+    <div
+      className={`mt-20 flex min-h-screen flex-col items-center ${className}`}
+    >
       <ul className="w-full max-w-3xl">{children}</ul>
     </div>
   );

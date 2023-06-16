@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { Routes, Route } from 'react-router-dom';
-import { io } from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 
 import LoginAuth from './components/login/LoginAuth';
 import dispatchAuth from './features/auth/authAction';
@@ -44,22 +44,29 @@ const App: React.FC = () => {
 
   const [loading, setLoading] = useState<boolean>(false);
 
+  let socket: Socket | null = null;
+  let gameSocket: Socket | null = null;
+
   const handleLoading = async () => {
     setLoading(true);
   };
 
   const initSocket = async () => {
-    const socket = io('/chat', { auth: { token: accessToken } });
+    socket = io('/chat', { auth: { token: accessToken } });
     socket.on('connect', () => {
-      socket.emit('connection');
+      socket?.emit('connection');
     });
     await dispatchSocket({ socket }, dispatch);
 
-    const gameSocket = io('/game', { auth: { token: accessToken } });
+    gameSocket = io('/game', { auth: { token: accessToken } });
     gameSocket.on('connect', () => {
-      gameSocket.emit('connection');
+      gameSocket?.emit('connection');
     });
     await dispatchGameSocket({ gameSocket }, dispatch);
+  };
+
+  const logout = () => {
+    dispatchAuth(null, dispatch);
   };
 
   useEffect(() => {
@@ -87,6 +94,14 @@ const App: React.FC = () => {
       fetchData();
     }
   }, []);
+
+  useEffect(() => {
+    socket?.on('logout', logout);
+  }, [socket]);
+
+  useEffect(() => {
+    gameSocket?.on('logout', logout);
+  }, [gameSocket]);
 
   if (!tokenInfo) {
     if (is2FA) {

@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import selectAuth from '../../features/auth/authSelector';
 import { selectGameSocket } from '../../features/socket/socketSelector';
 import HoverButton from '../common/HoverButton';
 import ContentBox from '../common/ContentBox';
@@ -22,22 +21,18 @@ const GameResultModal: React.FC<GameResultModalProps> = ({
 }) => {
   const navigate = useNavigate();
 
-  const { tokenInfo } = selectAuth();
-  const myId = tokenInfo?.id;
-
   const { gameSocket } = selectGameSocket();
 
   const { user1Id, user2Id, score1, score2 } = gameResult;
-  const opponentId = myId === user1Id ? user2Id : user1Id;
 
   const p1Win = score1 > score2;
 
-  const handleHomeClick = () => {
-    navigate('/');
+  const handleGameListClick = () => {
+    navigate('/custom');
   };
 
-  const handleRematchClick = () => {
-    gameSocket?.emit('invite-game', opponentId);
+  const handleHomeClick = () => {
+    navigate('/');
   };
 
   useEffect(() => {
@@ -58,7 +53,7 @@ const GameResultModal: React.FC<GameResultModalProps> = ({
         <ContentBox className="space-y-6 rounded-none border-2 bg-black p-8 pb-4 shadow-md">
           <div className="flex justify-between space-x-8">
             <div className="flex flex-col items-center space-y-2">
-              <UserProfile userId={user1Id}> </UserProfile>
+              <UserProfile userId={user1Id} />
               <p className="text-lg">Score: {score1}</p>
               <p
                 className={`text-2xl font-semibold ${
@@ -70,7 +65,7 @@ const GameResultModal: React.FC<GameResultModalProps> = ({
             </div>
             <div className="border-r border-white" />
             <div className="flex flex-col items-center space-y-2">
-              <UserProfile userId={user2Id}> </UserProfile>
+              <UserProfile userId={user2Id} />
               <p className="text-lg">Score: {score2}</p>
               <p
                 className={`text-2xl font-semibold ${
@@ -85,8 +80,8 @@ const GameResultModal: React.FC<GameResultModalProps> = ({
             <HoverButton onClick={handleHomeClick} className="border p-2">
               Home
             </HoverButton>
-            <HoverButton onClick={handleRematchClick} className="border p-2">
-              Rematch
+            <HoverButton onClick={handleGameListClick} className="border p-2">
+              Game List
             </HoverButton>
           </div>
         </ContentBox>

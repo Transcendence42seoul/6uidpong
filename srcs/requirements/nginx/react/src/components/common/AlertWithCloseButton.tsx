@@ -2,7 +2,7 @@ import React from 'react';
 
 interface AlertWithCloseButtonProps {
   message: string;
-  onClose: () => void;
+  onClose: React.MouseEventHandler<SVGSVGElement>;
 }
 
 const AlertWithCloseButton: React.FC<AlertWithCloseButtonProps> = ({

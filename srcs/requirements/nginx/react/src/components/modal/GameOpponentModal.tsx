@@ -25,11 +25,13 @@ const GameInfoModal: React.FC<GameInfoModalProps> = ({
         <ContentBox className="space-y-6 rounded-none border-2 bg-black p-8 pb-4 shadow-md">
           <div className="flex justify-between space-x-8">
             <div className="flex flex-col items-center space-y-2">
-              <UserProfile userId={user1Id}> </UserProfile>
+              <UserProfile userId={user1Id} stats />
             </div>
             <div className="border-r border-white" />
             <div className="flex flex-col items-center space-y-2">
-              <UserProfile userId={user2Id}> </UserProfile>
+              <UserProfile userId={user2Id} stats>
+                {' '}
+              </UserProfile>
             </div>
           </div>
           <div className="space-x-2" />

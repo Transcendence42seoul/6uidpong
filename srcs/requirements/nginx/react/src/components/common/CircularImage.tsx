@@ -3,7 +3,7 @@ import React from 'react';
 interface CircularImageProps {
   src: string | undefined;
   alt: string;
-  onClick?: () => void;
+  onClick?: React.MouseEventHandler<HTMLButtonElement>;
   className?: string;
 }
 

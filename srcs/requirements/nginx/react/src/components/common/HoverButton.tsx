@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface HoverButtonProps {
-  onClick: () => void;
+  onClick: React.MouseEventHandler<HTMLButtonElement>;
   children: React.ReactNode;
   className?: string;
   disabled?: boolean;

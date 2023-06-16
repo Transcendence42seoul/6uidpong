@@ -105,9 +105,9 @@ const GameRoom: React.FC = () => {
       <ContentBox className="space-y-4 rounded-none border-2 bg-black p-4">
         <h2 className="text-lg font-semibold">{room.title}</h2>
         <div className="flex items-center justify-between">
-          <UserProfile userId={room.masterId}> </UserProfile>
+          <UserProfile userId={room.masterId} stats />
           <span className="text-lg">vs</span>
-          <UserProfile userId={room.participantId}> </UserProfile>
+          <UserProfile userId={room.participantId} stats />
         </div>
         <div className="space-y-3">
           <div className="flex items-center space-x-2.5">

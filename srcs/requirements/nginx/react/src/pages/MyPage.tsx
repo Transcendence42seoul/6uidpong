@@ -42,7 +42,6 @@ const MyPage: React.FC = () => {
   const handleBlockListClick = () => navigate('/block-list');
   const handleChangeProfileClick = () => navigate('/profile-settings');
   const handleFriendsListClick = () => navigate('/friends-list');
-  const handleToggleChange = () => setIsLadder(!isLadder);
 
   useEffect(() => {
     const fetchMyInfo = async () => {
@@ -86,7 +85,7 @@ const MyPage: React.FC = () => {
           <h3 className="mb-2 text-xl font-semibold">Stats</h3>
           <p className="mb-1.5">Wins: {user?.winStat}</p>
           <p className="mb-1.5">Losses: {user?.loseStat}</p>
-          <p>Ladder Score: {user?.ladderScore}</p>
+          <p>Ladder: {user?.ladderScore}</p>
         </ContentBox>
         <HoverButton
           onClick={handleFriendsListClick}

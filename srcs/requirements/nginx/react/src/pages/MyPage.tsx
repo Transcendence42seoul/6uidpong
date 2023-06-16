@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 // import { v4 as uuidv4 } from 'uuid';
 
-import HoverButton from '../components/button/HoverButton';
-import CircularImage from '../components/container/CircularImage';
-import ContentBox from '../components/container/ContentBox';
+import CircularImage from '../components/common/CircularImage';
+import ContentBox from '../components/common/ContentBox';
+import HoverButton from '../components/common/HoverButton';
 import selectAuth from '../features/auth/authSelector';
 import { selectGameSocket } from '../features/socket/socketSelector';
 import useCallApi from '../utils/useCallApi';

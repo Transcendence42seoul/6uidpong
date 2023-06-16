@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 
-import HoverButton from '../components/button/HoverButton';
-import CircularImage from '../components/container/CircularImage';
-import ListTitle from '../components/container/ListTitle';
+import CircularImage from '../components/common/CircularImage';
+import HoverButton from '../components/common/HoverButton';
+import ListTitle from '../components/common/ListTitle';
 import selectSocket from '../features/socket/socketSelector';
 
 import type User from '../interfaces/User';

@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux';
 
 import dispatchAuth from '../../features/auth/authAction';
 import redirect from '../../utils/redirect';
-import HoverButton from '../button/HoverButton';
+import HoverButton from '../common/HoverButton';
 
 interface LoginAuthProps {
   id: number | undefined;

@@ -2,8 +2,8 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 
 import selectSocket from '../../features/socket/socketSelector';
-import HoverButton from '../button/HoverButton';
-import UserProfile from './UserProfile';
+import HoverButton from '../common/HoverButton';
+import UserProfile from '../common/UserProfile';
 
 import type Member from '../../interfaces/Member';
 

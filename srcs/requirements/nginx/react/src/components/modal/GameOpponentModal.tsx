@@ -1,7 +1,7 @@
 import React from 'react';
-import ContentBox from '../container/ContentBox';
+import ContentBox from '../common/ContentBox';
 import ModalContainer from '../container/ModalContainer';
-import UserProfile from '../container/UserProfile';
+import UserProfile from '../common/UserProfile';
 
 interface PlayerId {
   user1Id: number;

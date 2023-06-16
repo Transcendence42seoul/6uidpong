@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import CircularImage from '../components/container/CircularImage';
+import CircularImage from '../components/common/CircularImage';
+import ListInfoPanel from '../components/common/ListInfoPanel';
+import ListTitle from '../components/common/ListTitle';
 import ListContainer from '../components/container/ListContainer';
-import ListInfoPanel from '../components/container/ListInfoPanel';
-import ListTitle from '../components/container/ListTitle';
 import selectSocket from '../features/socket/socketSelector';
 import formatTime from '../utils/formatTime';
 

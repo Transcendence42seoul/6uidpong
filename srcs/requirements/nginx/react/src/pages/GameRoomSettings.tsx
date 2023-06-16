@@ -1,8 +1,8 @@
 import React, { ChangeEvent, useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import HoverButton from '../components/button/HoverButton';
-import ContentBox from '../components/container/ContentBox';
+import ContentBox from '../components/common/ContentBox';
+import HoverButton from '../components/common/HoverButton';
 import { selectGameSocket } from '../features/socket/socketSelector';
 
 import type Game from '../interfaces/Game';

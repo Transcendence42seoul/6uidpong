@@ -4,8 +4,8 @@ import { useParams } from 'react-router-dom';
 import selectSocket from '../../features/socket/socketSelector';
 import startsWithIgnoreCase from '../../utils/startsWithIgnoreCase';
 import ChannelMemberProfile from './ChannelMemberProfile';
-import CircularImage from './CircularImage';
-import ModalContainer from './ModalContainer';
+import CircularImage from '../common/CircularImage';
+import ModalContainer from '../container/ModalContainer';
 
 import type Member from '../../interfaces/Member';
 import type SendResponse from '../../interfaces/SendResponse';

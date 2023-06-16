@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import selectSocket from '../../features/socket/socketSelector';
-import HoverButton from '../button/HoverButton';
+import HoverButton from '../common/HoverButton';
 import ChannelManageModal from '../modal/ChannelManageModal';
-import ContentBox from './ContentBox';
+import ContentBox from '../common/ContentBox';
 
 interface ChannelManagePanelProps {
   channelId: number;

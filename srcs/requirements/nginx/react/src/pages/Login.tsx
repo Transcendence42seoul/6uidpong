@@ -1,6 +1,6 @@
 import React from 'react';
 
-import HoverButton from '../components/button/HoverButton';
+import HoverButton from '../components/common/HoverButton';
 
 const Login: React.FC = () => {
   const handleLoginClick = () => {

@@ -3,10 +3,10 @@ import { useParams } from 'react-router-dom';
 
 import selectSocket from '../../features/socket/socketSelector';
 import useCallApi from '../../utils/useCallApi';
-import HoverButton from '../button/HoverButton';
+import HoverButton from '../common/HoverButton';
 import ModalContainer from '../container/ModalContainer';
-import UserList from '../container/UserList';
-import UserListWithSearchBar from '../container/UserListWithSearchBar';
+import UserList from '../common/UserList';
+import UserListWithSearchBar from '../common/UserListWithSearchBar';
 
 import type User from '../../interfaces/User';
 

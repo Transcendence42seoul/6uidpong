@@ -1,10 +1,9 @@
-import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { Routes, Route } from 'react-router-dom';
 import { io } from 'socket.io-client';
 
-import LoginAuth from './components/custom/LoginAuth';
+import LoginAuth from './components/login/LoginAuth';
 import dispatchAuth from './features/auth/authAction';
 import selectAuth from './features/auth/authSelector';
 import dispatchSocket, {

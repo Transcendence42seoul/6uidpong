@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 
 import selectSocket from '../../features/socket/socketSelector';
-import HoverButton from '../button/HoverButton';
-import CircularImage from '../container/CircularImage';
-import ContentBox from '../container/ContentBox';
+import HoverButton from '../common/HoverButton';
+import CircularImage from '../common/CircularImage';
+import ContentBox from '../common/ContentBox';
 import ModalContainer from '../container/ModalContainer';
-import UserList from '../container/UserList';
-import UserListWithSeacrhBar from '../container/UserListWithSearchBar';
+import UserList from '../common/UserList';
+import UserListWithSeacrhBar from '../common/UserListWithSearchBar';
 
 import type User from '../../interfaces/User';
 

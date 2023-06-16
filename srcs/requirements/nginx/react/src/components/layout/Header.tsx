@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import HoverButton from '../button/HoverButton';
+import HoverButton from '../common/HoverButton';
 import ModalContainer from '../container/ModalContainer';
-import UserProfile from '../container/UserProfile';
-import UserSearchBar from '../container/UserSearchBar';
+import UserProfile from '../common/UserProfile';
+import UserSearchBar from '../common/UserSearchBar';
 
 import type User from '../../interfaces/User';
 

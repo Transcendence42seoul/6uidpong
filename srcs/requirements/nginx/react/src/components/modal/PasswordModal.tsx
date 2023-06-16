@@ -1,8 +1,8 @@
 import React, { ChangeEvent, useCallback, useEffect, useState } from 'react';
 
-import HoverButton from '../button/HoverButton';
+import HoverButton from '../common/HoverButton';
 import ModalContainer from '../container/ModalContainer';
-import ContentBox from '../container/ContentBox';
+import ContentBox from '../common/ContentBox';
 
 interface PasswordModalProps {
   isWrongPassword: boolean;

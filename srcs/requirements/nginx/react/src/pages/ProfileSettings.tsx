@@ -1,9 +1,9 @@
 import React from 'react';
 
-import ContentBox from '../components/container/ContentBox';
-import Nickname from '../components/custom/Nickname';
-import ProfilePicture from '../components/custom/ProfilePicture';
-import TwoFactorAuth from '../components/custom/TwoFactorAuth';
+import ContentBox from '../components/common/ContentBox';
+import TwoFactorAuth from '../components/login/TwoFactorAuth';
+import Nickname from '../components/profile/Nickname';
+import ProfilePicture from '../components/profile/ProfilePicture';
 
 const ProfileSettings: React.FC = () => {
   return (

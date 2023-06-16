@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import HoverButton from '../components/button/HoverButton';
-import CircularImage from '../components/container/CircularImage';
-import ListTitle from '../components/container/ListTitle';
+import CircularImage from '../components/common/CircularImage';
+import HoverButton from '../components/common/HoverButton';
+import ListTitle from '../components/common/ListTitle';
 import ModalContainer from '../components/container/ModalContainer';
-import UserProfile from '../components/container/UserProfile';
+import UserProfile from '../components/common/UserProfile';
 import selectAuth from '../features/auth/authSelector';
 import useCallApi from '../utils/useCallApi';
 

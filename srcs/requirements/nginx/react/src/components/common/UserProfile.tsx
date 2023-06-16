@@ -6,7 +6,7 @@ import selectSocket, {
   selectGameSocket,
 } from '../../features/socket/socketSelector';
 import useCallApi from '../../utils/useCallApi';
-import HoverButton from '../button/HoverButton';
+import HoverButton from './HoverButton';
 import CircularImage from './CircularImage';
 import ContentBox from './ContentBox';
 

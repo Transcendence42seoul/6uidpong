@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import HoverButton from '../components/button/HoverButton';
+import HoverButton from '../components/common/HoverButton';
+import ListTitle from '../components/common/ListTitle';
 import ListContainer from '../components/container/ListContainer';
-import ListTitle from '../components/container/ListTitle';
 import PasswordModal from '../components/modal/PasswordModal';
 import ImageSrc from '../constants/ImageSrc';
 import { selectGameSocket } from '../features/socket/socketSelector';

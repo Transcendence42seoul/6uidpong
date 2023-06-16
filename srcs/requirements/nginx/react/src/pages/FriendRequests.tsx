@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
-import CircularImage from '../components/container/CircularImage';
-import ListTitle from '../components/container/ListTitle';
+import CircularImage from '../components/common/CircularImage';
+import ListTitle from '../components/common/ListTitle';
 import selectAuth from '../features/auth/authSelector';
 import useCallApi from '../utils/useCallApi';
 

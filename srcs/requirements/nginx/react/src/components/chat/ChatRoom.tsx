@@ -10,9 +10,9 @@ import React, {
 import selectAuth from '../../features/auth/authSelector';
 import selectSocket from '../../features/socket/socketSelector';
 import formatTime from '../../utils/formatTime';
-import AlertWithCloseButton from '../alert/AlertWithCloseButton';
+import AlertWithCloseButton from '../common/AlertWithCloseButton';
 import ChatContainer from './ChatContainer';
-import CircularImage from './CircularImage';
+import CircularImage from '../common/CircularImage';
 import Message from './Message';
 import MessageBox from './MessageBox';
 import MessageForm from './MessageForm';

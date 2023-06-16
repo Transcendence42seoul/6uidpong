@@ -1,9 +1,9 @@
 import React, { ChangeEvent, useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import HoverButton from '../components/button/HoverButton';
-import ChannelManagePanel from '../components/container/ChannelManagePanel';
-import ContentBox from '../components/container/ContentBox';
+import ChannelManagePanel from '../components/channel/ChannelManagePanel';
+import ContentBox from '../components/common/ContentBox';
+import HoverButton from '../components/common/HoverButton';
 import selectSocket from '../features/socket/socketSelector';
 
 import type Channel from '../interfaces/Channel';

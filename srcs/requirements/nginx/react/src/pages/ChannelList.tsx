@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import HoverButton from '../components/button/HoverButton';
+import HoverButton from '../components/common/HoverButton';
+import ListInfoPanel from '../components/common/ListInfoPanel';
+import ListTitle from '../components/common/ListTitle';
 import ListContainer from '../components/container/ListContainer';
-import ListInfoPanel from '../components/container/ListInfoPanel';
-import ListTitle from '../components/container/ListTitle';
 import selectSocket from '../features/socket/socketSelector';
 
 import type Channel from '../interfaces/Channel';

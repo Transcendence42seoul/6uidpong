@@ -3,10 +3,10 @@ import { useNavigate } from 'react-router-dom';
 
 import selectAuth from '../../features/auth/authSelector';
 import { selectGameSocket } from '../../features/socket/socketSelector';
-import HoverButton from '../button/HoverButton';
-import ContentBox from '../container/ContentBox';
+import HoverButton from '../common/HoverButton';
+import ContentBox from '../common/ContentBox';
 import ModalContainer from '../container/ModalContainer';
-import UserProfile from '../container/UserProfile';
+import UserProfile from '../common/UserProfile';
 
 import type Game from '../../interfaces/Game';
 import type GameState from '../../interfaces/GameState';

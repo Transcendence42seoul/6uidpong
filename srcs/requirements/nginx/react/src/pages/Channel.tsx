@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
-import HoverButton from '../components/button/HoverButton';
-import ChannelMemberList from '../components/container/ChannelMemberList';
-import ChatRoom from '../components/container/ChatRoom';
+import ChannelMemberList from '../components/channel/ChannelMemberList';
+import ChatRoom from '../components/chat/ChatRoom';
+import HoverButton from '../components/common/HoverButton';
 import ChannelInviteModal from '../components/modal/ChannelInviteModal';
 import selectSocket from '../features/socket/socketSelector';
 

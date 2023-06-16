@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 
-import ChatRoom from '../components/container/ChatRoom';
+import ChatRoom from '../components/chat/ChatRoom';
 
 interface LocationState {
   interlocutorId: number;

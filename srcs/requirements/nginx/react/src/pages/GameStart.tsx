@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import GameInfoModal from '../components/modal/GameOpponentModal';
 
+import GameInfoModal from '../components/modal/GameOpponentModal';
 import GameResultModal from '../components/modal/GameResultModal';
 import { selectGameSocket } from '../features/socket/socketSelector';
 

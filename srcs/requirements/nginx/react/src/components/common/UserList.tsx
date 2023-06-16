@@ -1,6 +1,6 @@
 import React from 'react';
 
-import HoverButton from '../button/HoverButton';
+import HoverButton from './HoverButton';
 import CircularImage from './CircularImage';
 
 import type User from '../../interfaces/User';

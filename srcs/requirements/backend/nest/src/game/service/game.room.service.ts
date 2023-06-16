@@ -191,11 +191,15 @@ export class GameRoomService {
       state.score1 += 1;
       state.paddle1 = 0;
       state.paddle2 = 0;
+      state.keyState1 = 0;
+      state.keyState2 = 0;
       state.ball = this.InitBallState();
     } else if (state.ball.x <= -(GameInfo.width / 2 - GameInfo.ballrad)) {
       state.score2 += 1;
       state.paddle1 = 0;
       state.paddle2 = 0;
+      state.keyState1 = 0;
+      state.keyState2 = 0;
       state.ball = this.InitBallState();
     }
 
@@ -432,7 +436,10 @@ export class GameRoomService {
 
   async handleGameLeave(client: Socket, gameState: GameState) {
     const user = await this.userService.findBySocketId(client.id);
-    const roomInfo = this.roomInfos[gameState.roomId];
+    const roomIndex = this.roomInfos.findIndex(
+      (room) => room.roomId === gameState.roomId
+    );
+    const roomInfo = this.roomInfos[roomIndex];
     if (user.id === gameState.user1Id) {
       gameState.score1 = 0;
       gameState.score2 = 5;

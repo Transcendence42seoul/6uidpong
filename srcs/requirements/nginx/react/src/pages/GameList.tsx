@@ -10,6 +10,8 @@ import { selectGameSocket } from '../features/socket/socketSelector';
 
 import type Game from '../interfaces/Game';
 
+import { isTest, mockGames } from '../mock'; // test
+
 const GameList: React.FC = () => {
   const navigate = useNavigate();
 
@@ -90,6 +92,7 @@ const GameList: React.FC = () => {
     };
     gameSocket?.on('custom-room-list', gameListHandler);
     gameSocket?.emit('custom-room-list');
+    setSearchResults(isTest ? mockGames : games); // test
     return () => {
       gameSocket?.off('custom-room-list', gameListHandler);
     };
@@ -113,7 +116,7 @@ const GameList: React.FC = () => {
   }, [gameSocket]);
 
   return (
-    <ListContainer className="mt-12 px-20">
+    <ListContainer>
       <div className="flex-col items-center">
         <ListTitle className="mb-2.5 ml-2">Custom Games</ListTitle>
         <div className="flex">
@@ -138,7 +141,7 @@ const GameList: React.FC = () => {
           <li key={roomId}>
             {!isPrivate && (
               <button
-                className={`flex w-full items-center space-x-1 border p-1 text-lg text-gray-100 ${
+                className={`flex w-full items-center space-x-1 border px-2 py-1.5 text-lg text-gray-100 ${
                   roomId === selectedGame?.roomId && 'bg-indigo-600'
                 }`}
                 onClick={() => handleGameClick(game)}

@@ -8,7 +8,6 @@ import {
 } from "@nestjs/websockets";
 import { Namespace, Socket } from "socket.io";
 import { WsJwtAccessGuard } from "src/chat/guard/ws-jwt-access.guard";
-import { GameState, keyCode } from "../dto/game.dto";
 import { GameRoomService } from "../service/game.room.service";
 
 @WebSocketGateway(80, {
@@ -49,11 +48,17 @@ export class GameRoomGateway {
     this.gameRoomService.handleKeyState(client, keyInfo, 1);
   }
 
-  @SubscribeMessage("game-leave")
-  handleGameLeave(
+  @SubscribeMessage("leave-game")
+  async handleGameLeave(
     @ConnectedSocket() client: Socket,
-    @MessageBody() gameState: GameState
-  ): void {
-    this.gameRoomService.handleGameLeave(client, gameState);
+    @MessageBody()
+    roomInfo: {
+      roomId: number;
+      user1Id: number;
+      user2Id: number;
+    }
+  ): Promise<void> {
+    const smallRoomInfo = roomInfo;
+    await this.gameRoomService.handleGameLeave(client, smallRoomInfo);
   }
 }

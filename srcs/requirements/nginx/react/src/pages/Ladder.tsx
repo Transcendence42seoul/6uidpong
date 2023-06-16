@@ -3,19 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 import ImageSrc from '../constants/ImageSrc';
 import { selectGameSocket } from '../features/socket/socketSelector';
-
-interface RoomInfo {
-  user1Id: number;
-  user2Id: number;
-  user1Nickname: string;
-  user2Nickname: string;
-  paddle1: number;
-  paddle2: number;
-  ballx: number;
-  bally: number;
-  score1: number;
-  score2: number;
-}
+import GameState from '../interfaces/GameState';
 
 const Ladder: React.FC = () => {
   const { gameSocket } = selectGameSocket();
@@ -35,9 +23,9 @@ const Ladder: React.FC = () => {
     }, 1000);
 
     gameSocket?.emit('ladder-game-match');
-    gameSocket?.on('game-start', (roomInfo: RoomInfo) => {
-      const { user1Id, user2Id } = roomInfo;
-      navigate('/game-start', { state: { user1Id, user2Id } });
+    gameSocket?.on('game-start', (roomInfo: GameState) => {
+      const { roomId, user1Id, user2Id } = roomInfo;
+      navigate('/game-start', { state: { roomId, user1Id, user2Id } });
     });
     return () => clearInterval(interval);
   }, []);

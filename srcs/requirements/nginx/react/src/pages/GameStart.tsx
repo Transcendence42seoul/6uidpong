@@ -19,7 +19,7 @@ const GameInfo = {
 const GameStart: React.FC = () => {
   const { gameSocket } = selectGameSocket();
   const location = useLocation();
-  const { user1Id, user2Id } = location.state;
+  const { roomId, user1Id, user2Id } = location.state;
 
   const ref = useRef<HTMLCanvasElement>(null);
   const [gameState, setGameState] = useState<GameState | null>(null);
@@ -28,6 +28,7 @@ const GameStart: React.FC = () => {
   const [gameResult, setGameResult] = useState<GameState | null>(null);
   const [showResultModal, setShowResultModal] = useState<boolean>(false);
   const [showInfoModal, setShowInfoModal] = useState<boolean>(false);
+  const roomInfo = { roomId, user1Id, user2Id };
 
   useEffect(() => {
     if (gameSocket) {
@@ -36,7 +37,6 @@ const GameStart: React.FC = () => {
         setShowInfoModal(false);
       }, 3000);
     }
-
     const resultHandler = (result: GameState) => {
       setGameResult(result);
       setShowResultModal(true);
@@ -44,7 +44,7 @@ const GameStart: React.FC = () => {
     gameSocket?.on('game-end', resultHandler);
     return () => {
       gameSocket?.off('game-end', resultHandler);
-      gameSocket?.emit('leave-game', gameState);
+      gameSocket?.emit('leave-game', roomInfo);
     };
   }, []);
 

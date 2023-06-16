@@ -316,7 +316,6 @@ export class GameRoomService {
     loseScore: number
   ) {
     const { roomId, user1, user2, broadcast } = roomInfo;
-
     user1.emit("game-end", userGameRoomState);
     user1.leave(roomId.toString());
     user1.data.roomId = null;
@@ -434,20 +433,43 @@ export class GameRoomService {
     }
   }
 
-  async handleGameLeave(client: Socket, gameState: GameState) {
+  async handleGameLeave(
+    client: Socket,
+    smallRoomInfo: {
+      roomId: number;
+      user1Id: number;
+      user2Id: number;
+    }
+  ) {
     const user = await this.userService.findBySocketId(client.id);
-    const roomIndex = this.roomInfos.findIndex(
-      (room) => room.roomId === gameState.roomId
+    console.log(client.id);
+    console.log(
+      this.roomInfos[smallRoomInfo.roomId].roomId,
+      "\n",
+      this.roomInfos[smallRoomInfo.roomId].user1Id,
+      "\n",
+      this.roomInfos[smallRoomInfo.roomId].user2Id
     );
-    const roomInfo = this.roomInfos[roomIndex];
-    if (user.id === gameState.user1Id) {
-      gameState.score1 = 0;
-      gameState.score2 = 5;
-      this.endGame(roomInfo, gameState, 5, 0);
-    } else if (user.id === gameState.user2Id) {
-      gameState.score2 = 0;
-      gameState.score1 = 5;
-      this.endGame(roomInfo, gameState, 5, 0);
+    const roomInfo = this.roomInfos[smallRoomInfo.roomId];
+    const state: GameState = {
+      roomId: smallRoomInfo.roomId,
+      user1Id: smallRoomInfo.user1Id,
+      user2Id: smallRoomInfo.user2Id,
+      paddle1: 0,
+      paddle2: 0,
+      ballx: 0,
+      bally: 0,
+      score1: 0,
+      score2: 0,
+    };
+    if (user.id === smallRoomInfo.user1Id) {
+      state.score1 = 0;
+      state.score2 = 5;
+      this.endGame(roomInfo, state, 5, 0);
+    } else if (user.id === smallRoomInfo.user2Id) {
+      state.score2 = 0;
+      state.score1 = 5;
+      this.endGame(roomInfo, state, 5, 0);
     }
   }
 }

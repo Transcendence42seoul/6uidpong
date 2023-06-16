@@ -38,7 +38,7 @@ const GameRoom: React.FC = () => {
     }
     const { masterId, participantId } = room;
     navigate('/game-start', {
-      state: { user1Id: masterId, user2Id: participantId },
+      state: { roomId, user1Id: masterId, user2Id: participantId },
     });
   };
 

@@ -60,7 +60,7 @@ const FriendRequests: React.FC = () => {
           onClick={handleFriendsListClick}
           className="ml-auto border p-1.5"
         >
-          Incoming Requests
+          Friends List
         </HoverButton>
       </div>
       <ul className="space-y-2">

@@ -3,6 +3,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import ChannelMemberList from '../components/channel/ChannelMemberList';
 import ChatRoom from '../components/chat/ChatRoom';
+import Alert from '../components/common/Alert';
 import HoverButton from '../components/common/HoverButton';
 import ChannelInviteModal from '../components/modal/ChannelInviteModal';
 import selectSocket from '../features/socket/socketSelector';
@@ -18,6 +19,8 @@ const Channel: React.FC = () => {
 
   const { socket } = selectSocket();
 
+  const [alertMessage, setAlertMessage] = useState<string>('');
+  const [showAlert, setShowAlert] = useState<boolean>(false);
   const [showInviteModal, setShowInviteModal] = useState<boolean>(false);
 
   const join = {
@@ -35,9 +38,13 @@ const Channel: React.FC = () => {
     data: { channelId },
   };
 
+  const exitChannel = () => {
+    navigate('/channel');
+  };
+
   const handleExitClick = () => {
     socket?.emit('exit', { channelId });
-    navigate('/channel');
+    exitChannel();
   };
 
   const handleInviteClick = () => {
@@ -51,16 +58,27 @@ const Channel: React.FC = () => {
   };
 
   useEffect(() => {
-    const channelIdHandler = ({ id }: { id: number }) => {
-      navigate('/channel');
+    const banHandler = () => {
+      setAlertMessage('You are banned.');
+      exitChannel();
     };
-    socket?.on('banned-channel', channelIdHandler);
-    socket?.on('kicked-channel', channelIdHandler);
+    const kickHandler = () => {
+      setAlertMessage('You are kicked.');
+      exitChannel();
+    };
+    socket?.on('banned-channel', banHandler);
+    socket?.on('kicked-channel', kickHandler);
     return () => {
-      socket?.off('banned-channel', channelIdHandler);
-      socket?.off('kicked-channel', channelIdHandler);
+      socket?.off('banned-channel', banHandler);
+      socket?.off('kicked-channel', kickHandler);
     };
   }, []);
+
+  useEffect(() => {
+    if (alertMessage && !showAlert) {
+      setShowAlert((prevState) => !prevState);
+    }
+  }, [alertMessage]);
 
   return (
     <div className="flex space-x-1 px-4">
@@ -87,6 +105,9 @@ const Channel: React.FC = () => {
         </div>
         <ChatRoom join={join} leave={leave} send={send} />
       </div>
+      {showAlert && (
+        <Alert message={alertMessage} setShowAlert={setShowAlert} />
+      )}
       {showInviteModal && (
         <ChannelInviteModal setShowModal={setShowInviteModal} />
       )}

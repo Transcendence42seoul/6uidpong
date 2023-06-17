@@ -53,8 +53,6 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send }) => {
     [],
   );
 
-  const handleAlertClose = () => setShowAlert(false);
-
   const handleInputMsgSubmit = useCallback(
     (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
@@ -109,15 +107,6 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send }) => {
       current.scrollTop = scrollHeight - clientHeight;
     }
   }, [chats.length]);
-
-  useEffect(() => {
-    if (showAlert) {
-      const timeoutId = setTimeout(() => {
-        setShowAlert(false);
-      }, 2500);
-      return () => clearTimeout(timeoutId);
-    }
-  }, [showAlert]);
 
   return (
     <div className="mx-auto max-w-[1024px] p-4 pt-2">
@@ -193,7 +182,10 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send }) => {
         <button className="bg-black p-2 text-white">Send</button>
       </MessageForm>
       {showAlert && (
-        <Alert message="You can't send DM to user who blocked you." />
+        <Alert
+          message="You can't send DM to user who blocked you."
+          setShowAlert={setShowAlert}
+        />
       )}
     </div>
   );

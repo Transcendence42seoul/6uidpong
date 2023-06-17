@@ -5,9 +5,12 @@ import ChannelMemberList from '../components/channel/ChannelMemberList';
 import ChatRoom from '../components/chat/ChatRoom';
 import HoverButton from '../components/common/HoverButton';
 import ChannelInviteModal from '../components/modal/ChannelInviteModal';
+import ChannelRole from '../constants/ChannelRole';
 import selectSocket from '../features/socket/socketSelector';
 
 const Channel: React.FC = () => {
+  const { MEMBER, ADMIN } = ChannelRole;
+
   const { state } = useLocation();
   const password = state?.password;
 
@@ -18,6 +21,7 @@ const Channel: React.FC = () => {
 
   const { socket } = selectSocket();
 
+  const [role, setRole] = useState<number>(MEMBER);
   const [showInviteModal, setShowInviteModal] = useState<boolean>(false);
 
   const join = {
@@ -52,7 +56,7 @@ const Channel: React.FC = () => {
 
   const handleSettingsClick = () => {
     navigate('/channel-settings', {
-      state: { channelId },
+      state: { channelId, role },
     });
   };
 
@@ -73,13 +77,15 @@ const Channel: React.FC = () => {
 
   return (
     <div className="flex space-x-1 px-4">
-      <ChannelMemberList />
+      <ChannelMemberList role={role} setRole={setRole} />
       <div className="w-full max-w-[1024px]">
         <div className="flex justify-between space-x-1.5 px-4">
-          <HoverButton onClick={handleSettingsClick} className="border p-1.5">
-            Settings
-          </HoverButton>
-          <div className="space-x-1.5">
+          {role >= ADMIN && (
+            <HoverButton onClick={handleSettingsClick} className="border p-1.5">
+              Settings
+            </HoverButton>
+          )}
+          <div className={`space-x-1.5 ${role < ADMIN && 'ml-auto'}`}>
             <HoverButton
               onClick={handleInviteClick}
               className="border bg-blue-800 p-1.5 hover:text-blue-800"

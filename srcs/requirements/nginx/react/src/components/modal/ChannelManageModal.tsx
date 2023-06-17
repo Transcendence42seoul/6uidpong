@@ -9,9 +9,11 @@ import UserList from '../common/UserList';
 import UserListWithSeacrhBar from '../common/UserListWithSearchBar';
 
 import type User from '../../interfaces/User';
+import ChannelRole from '../../constants/ChannelRole';
 
 interface ChannelManageModalProps {
   channelId: number;
+  role: number;
   setShowModal: (showModal: boolean) => void;
 }
 
@@ -25,8 +27,11 @@ interface SendData {
 
 const ChannelManageModal: React.FC<ChannelManageModalProps> = ({
   channelId,
+  role,
   setShowModal,
 }) => {
+  const { OWNER } = ChannelRole;
+
   const { socket } = selectSocket();
 
   const [admins, setAdmins] = useState<User[]>([]);
@@ -157,18 +162,22 @@ const ChannelManageModal: React.FC<ChannelManageModalProps> = ({
               Ban
             </HoverButton>
           </div>
-          <HoverButton
-            onClick={handleAssignAdminClick}
-            className="mb-4 w-full border p-2"
-          >
-            Assign Admin
-          </HoverButton>
-          <HoverButton
-            onClick={handleTransferOwnerClick}
-            className="w-full border bg-amber-800 p-2 hover:text-amber-800"
-          >
-            Transfer Owner
-          </HoverButton>
+          {role === OWNER && (
+            <div>
+              <HoverButton
+                onClick={handleAssignAdminClick}
+                className="mb-4 w-full border p-2"
+              >
+                Assign Admin
+              </HoverButton>
+              <HoverButton
+                onClick={handleTransferOwnerClick}
+                className="w-full border bg-amber-800 p-2 hover:text-amber-800"
+              >
+                Transfer Owner
+              </HoverButton>
+            </div>
+          )}
         </ContentBox>
       )}
       <div className="space-y-4">
@@ -178,11 +187,13 @@ const ChannelManageModal: React.FC<ChannelManageModalProps> = ({
             users={banList}
             onDeleteClick={onDeleteBanClick}
           />
-          <UserList
-            title="Admin"
-            users={admins}
-            onDeleteClick={onDeleteAdminClick}
-          />
+          {role === OWNER && (
+            <UserList
+              title="Admin"
+              users={admins}
+              onDeleteClick={onDeleteAdminClick}
+            />
+          )}
         </div>
         <HoverButton onClick={handleCloseClick} className="w-full border p-2">
           Close

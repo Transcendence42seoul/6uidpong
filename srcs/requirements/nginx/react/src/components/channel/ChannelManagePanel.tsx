@@ -8,10 +8,12 @@ import ContentBox from '../common/ContentBox';
 
 interface ChannelManagePanelProps {
   channelId: number;
+  role: number;
 }
 
 const ChannelManagePanel: React.FC<ChannelManagePanelProps> = ({
   channelId,
+  role,
 }) => {
   const navigate = useNavigate();
 
@@ -45,6 +47,7 @@ const ChannelManagePanel: React.FC<ChannelManagePanelProps> = ({
       {showManageModal && (
         <ChannelManageModal
           channelId={channelId}
+          role={role}
           setShowModal={setShowManageModal}
         />
       )}

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
+import selectAuth from '../../features/auth/authSelector';
 import selectSocket from '../../features/socket/socketSelector';
 import startsWithIgnoreCase from '../../utils/startsWithIgnoreCase';
 import ChannelMemberProfile from './ChannelMemberProfile';
@@ -13,14 +14,19 @@ import type SendResponse from '../../interfaces/SendResponse';
 import { isTest, mockUsers } from '../../mock'; // test
 
 interface ChannelMemberListProps {
-  className?: string;
+  role: number;
+  setRole: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const ChannelMemberList: React.FC<ChannelMemberListProps> = ({
-  className = '',
+  role,
+  setRole,
 }) => {
   const { channelId: channelIdString } = useParams<{ channelId: string }>();
   const channelId = Number(channelIdString);
+
+  const { tokenInfo } = selectAuth();
+  const myId = tokenInfo?.id;
 
   const { socket } = selectSocket();
 
@@ -32,6 +38,14 @@ const ChannelMemberList: React.FC<ChannelMemberListProps> = ({
   const [showMemberProfileModal, setShowMemberProfileModal] =
     useState<boolean>(false);
 
+  const setMyRole = (memberList: Member[]) => {
+    const myInfo = memberList.find((member) => member.id === myId);
+    if (!myInfo) return;
+    const { isAdmin, isOwner } = myInfo;
+    const myRole = Number(isAdmin) + Number(isOwner);
+    setRole(myRole);
+  };
+
   const handleMemberClick = (member: Member) => {
     setSelectedMember(member);
     setShowMemberProfileModal(true);
@@ -40,6 +54,7 @@ const ChannelMemberList: React.FC<ChannelMemberListProps> = ({
   const handleMembers = () => {
     const membersHandler = (memberList: Member[]) => {
       setMembers([...memberList]);
+      setMyRole(memberList);
     };
     socket?.emit('find-channel-users', { channelId }, membersHandler);
     setMembers(isTest ? mockUsers : members); // test
@@ -79,7 +94,7 @@ const ChannelMemberList: React.FC<ChannelMemberListProps> = ({
   }, [members, searchTerm]);
 
   return (
-    <div className={`relative text-gray-50 ${className}`}>
+    <div className="relative text-gray-50">
       <input
         type="text"
         placeholder="Search members"
@@ -92,12 +107,12 @@ const ChannelMemberList: React.FC<ChannelMemberListProps> = ({
         ref={searchResultsRef}
       >
         {searchResults.map((member) => {
-          const { nickname, image, isOwner, isAdmin } = member;
-          let role = '';
-          if (isOwner) {
-            role = 'Owner';
-          } else if (isAdmin) {
-            role = 'Admin';
+          const { nickname, image } = member;
+          let memberRole = '';
+          if (member.isOwner) {
+            memberRole = 'Owner';
+          } else if (member.isAdmin) {
+            memberRole = 'Admin';
           }
           return (
             <button
@@ -107,14 +122,14 @@ const ChannelMemberList: React.FC<ChannelMemberListProps> = ({
             >
               <CircularImage src={image} alt={nickname} className="h-6 w-6" />
               <span className="w-2/3 truncate text-left">{nickname}</span>
-              <span className="ml-auto text-sm">{role}</span>
+              <span className="ml-auto text-sm">{memberRole}</span>
             </button>
           );
         })}
       </ul>
       {selectedMember && showMemberProfileModal && (
         <ModalContainer setShowModal={setShowMemberProfileModal} closeButton>
-          <ChannelMemberProfile member={selectedMember} />
+          <ChannelMemberProfile member={selectedMember} role={role} />
         </ModalContainer>
       )}
     </div>

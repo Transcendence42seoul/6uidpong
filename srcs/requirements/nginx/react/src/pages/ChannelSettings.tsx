@@ -12,6 +12,7 @@ import type Channel from '../interfaces/Channel';
 const ChannelSettings: React.FC = () => {
   const { state } = useLocation();
   const channelId = state?.channelId;
+  const role = state?.role;
 
   const navigate = useNavigate();
 
@@ -163,7 +164,7 @@ const ChannelSettings: React.FC = () => {
           </HoverButton>
         </div>
       </ContentBox>
-      {channelId && <ChannelManagePanel channelId={channelId} />}
+      {channelId && <ChannelManagePanel channelId={channelId} role={role} />}
     </div>
   );
 };

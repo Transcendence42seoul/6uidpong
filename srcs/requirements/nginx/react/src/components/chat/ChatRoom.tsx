@@ -32,9 +32,9 @@ interface ChatRoomProps {
 interface JoinResponse {
   newMsgCount: number;
   chats: Chat[];
-  channelId?: number;
   interlocutorId?: number;
   isBlocked?: boolean;
+  channelId?: number;
 }
 
 const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send }) => {

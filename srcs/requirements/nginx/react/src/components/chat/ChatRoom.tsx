@@ -10,7 +10,7 @@ import React, {
 import selectAuth from '../../features/auth/authSelector';
 import selectSocket from '../../features/socket/socketSelector';
 import formatTime from '../../utils/formatTime';
-import AlertWithCloseButton from '../common/AlertWithCloseButton';
+import Alert from '../common/Alert';
 import ChatContainer from './ChatContainer';
 import CircularImage from '../common/CircularImage';
 import Message from './Message';
@@ -193,10 +193,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send }) => {
         <button className="bg-black p-2 text-white">Send</button>
       </MessageForm>
       {showAlert && (
-        <AlertWithCloseButton
-          message="You can't send DM to user who blocked you."
-          onClose={handleAlertClose}
-        />
+        <Alert message="You can't send DM to user who blocked you." />
       )}
     </div>
   );

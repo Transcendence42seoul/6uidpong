@@ -38,7 +38,7 @@ const GameInvite: React.FC<GameInviteProps> = ({ info, setInfo }) => {
   }, [gameSocket]);
 
   return (
-    <div className="fixed bottom-0 right-0 m-6">
+    <div className="fixed bottom-16 right-0 m-6">
       <div className="rounded-xl bg-white p-3 shadow-lg">
         <div className="ml-2 flex space-x-2">
           <span className="text-sm">{`${master} invites you to a game.`}</span>

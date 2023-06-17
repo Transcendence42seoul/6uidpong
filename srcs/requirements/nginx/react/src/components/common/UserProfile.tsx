@@ -37,7 +37,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
   const { gameSocket } = selectGameSocket();
   const { socket } = selectSocket();
 
-  const [isBlocked, setIsBlocked] = useState<boolean>(false);
+  const [isBlocked, setIsBlocked] = useState<boolean>(true);
   const [isFriend, setIsFriend] = useState<boolean>(false);
   const [user, setUser] = useState<User | null>(null);
 
@@ -159,7 +159,9 @@ const UserProfile: React.FC<UserProfileProps> = ({
                 DM
               </HoverButton>
               <HoverButton
-                className="w-[40%] px-4 py-2"
+                className={`w-[40%] ${
+                  isBlocked ? 'px-2 py-2.5 text-xs' : 'px-4 py-2'
+                }`}
                 onClick={handleBlockClick}
               >
                 {isBlocked ? 'Unblock' : 'Block'}

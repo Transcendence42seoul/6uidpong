@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
+import Alert from '../components/common/Alert';
 import HoverButton from '../components/common/HoverButton';
 import ListInfoPanel from '../components/common/ListInfoPanel';
 import ListTitle from '../components/common/ListTitle';
@@ -13,11 +14,15 @@ import type SendResponse from '../interfaces/SendResponse';
 import { isTest, mockChannels } from '../mock'; // test
 
 const ChannelList: React.FC = () => {
+  const { state } = useLocation();
+  const alert = state?.alert;
+
   const navigate = useNavigate();
 
   const { socket } = selectSocket();
 
   const [channels, setChannels] = useState<Channel[]>([]);
+  const [showAlert, setShowAlert] = useState<boolean>(!!alert);
 
   const chatHandler = ({ channelId }: SendResponse) => {
     const channelToUpdate = channels.find(
@@ -89,6 +94,7 @@ const ChannelList: React.FC = () => {
           </li>
         );
       })}
+      {showAlert && <Alert message={alert} setShowAlert={setShowAlert} />}
     </ListContainer>
   );
 };

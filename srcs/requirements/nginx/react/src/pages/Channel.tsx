@@ -19,8 +19,6 @@ const Channel: React.FC = () => {
 
   const { socket } = selectSocket();
 
-  const [alertMessage, setAlertMessage] = useState<string>('');
-  const [showAlert, setShowAlert] = useState<boolean>(false);
   const [showInviteModal, setShowInviteModal] = useState<boolean>(false);
 
   const join = {
@@ -38,8 +36,10 @@ const Channel: React.FC = () => {
     data: { channelId },
   };
 
-  const exitChannel = () => {
-    navigate('/channel');
+  const exitChannel = (alert?: string) => {
+    navigate('/channel', {
+      state: { alert },
+    });
   };
 
   const handleExitClick = () => {
@@ -59,12 +59,10 @@ const Channel: React.FC = () => {
 
   useEffect(() => {
     const banHandler = () => {
-      setAlertMessage('You are banned.');
-      exitChannel();
+      exitChannel('You are banned.');
     };
     const kickHandler = () => {
-      setAlertMessage('You are kicked.');
-      exitChannel();
+      exitChannel('You are kicked.');
     };
     socket?.on('banned-channel', banHandler);
     socket?.on('kicked-channel', kickHandler);
@@ -73,12 +71,6 @@ const Channel: React.FC = () => {
       socket?.off('kicked-channel', kickHandler);
     };
   }, []);
-
-  useEffect(() => {
-    if (alertMessage && !showAlert) {
-      setShowAlert((prevState) => !prevState);
-    }
-  }, [alertMessage]);
 
   return (
     <div className="flex space-x-1 px-4">
@@ -105,9 +97,6 @@ const Channel: React.FC = () => {
         </div>
         <ChatRoom join={join} leave={leave} send={send} />
       </div>
-      {showAlert && (
-        <Alert message={alertMessage} setShowAlert={setShowAlert} />
-      )}
       {showInviteModal && (
         <ChannelInviteModal setShowModal={setShowInviteModal} />
       )}

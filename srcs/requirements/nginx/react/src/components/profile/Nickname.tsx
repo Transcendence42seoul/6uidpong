@@ -1,6 +1,6 @@
-import axios from 'axios';
 import React, { ChangeEvent, useCallback, useEffect, useState } from 'react';
 
+import HttpStatus from '../../utils/HttpStatus';
 import useCallApi from '../../utils/useCallApi';
 
 const Nickname: React.FC = () => {
@@ -16,10 +16,6 @@ const Nickname: React.FC = () => {
     [],
   );
 
-  const isDuplicated = (error: any) => {
-    return axios.isAxiosError(error) && error.response?.status === 409;
-  };
-
   useEffect(() => {
     if (warning) return;
     const validateNickname = async () => {
@@ -31,7 +27,7 @@ const Nickname: React.FC = () => {
       try {
         await callApi(config);
       } catch (error) {
-        if (!isDuplicated(error)) {
+        if (!HttpStatus.isConflict(error)) {
           throw error;
         }
         setWarning('That nickname is taken. Try another.');

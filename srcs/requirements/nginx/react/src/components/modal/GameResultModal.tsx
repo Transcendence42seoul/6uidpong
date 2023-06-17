@@ -81,7 +81,7 @@ const GameResultModal: React.FC<GameResultModalProps> = ({
               Home
             </HoverButton>
             <HoverButton onClick={handleGameListClick} className="border p-2">
-              Game List
+              Game
             </HoverButton>
           </div>
         </ContentBox>

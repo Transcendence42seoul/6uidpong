@@ -68,7 +68,9 @@ const UserListWithSearchBar: React.FC<UserListWithSearchBarProps> = ({
                 alt={nickname}
                 className="h-6 w-6 align-bottom"
               />
-              <span className="w-[90%] truncate text-left">{nickname}</span>
+              <span className="w-[90%] truncate text-left text-black">
+                {nickname}
+              </span>
             </button>
           );
         })}

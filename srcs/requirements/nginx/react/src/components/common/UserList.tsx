@@ -35,7 +35,7 @@ const UserList: React.FC<UserListProps> = ({
             >
               <div className="flex items-center space-x-2.5">
                 <CircularImage src={image} alt={nickname} className="h-6 w-6" />
-                <span className="text-sm">{nickname}</span>
+                <span className="text-sm text-black">{nickname}</span>
               </div>
               <HoverButton
                 onClick={() => handleDeleteClick(user)}

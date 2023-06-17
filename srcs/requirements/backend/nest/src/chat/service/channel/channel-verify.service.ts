@@ -1,12 +1,12 @@
-import { Injectable } from "@nestjs/common";
-import { WsException } from "@nestjs/websockets";
-import { Channel } from "src/chat/entity/channel/channel.entity";
-import { Mute } from "src/chat/entity/channel/mute.entity";
-import { BanService } from "./ban.service";
-import { ChannelRoomService } from "./channel-room.service";
-import { MuteService } from "./mute.service";
-import * as bcryptjs from "bcryptjs";
-import { Socket } from "socket.io";
+import { Injectable } from '@nestjs/common';
+import { WsException } from '@nestjs/websockets';
+import { Channel } from 'src/chat/entity/channel/channel.entity';
+import { Mute } from 'src/chat/entity/channel/mute.entity';
+import { BanService } from './ban.service';
+import { ChannelRoomService } from './channel-room.service';
+import { MuteService } from './mute.service';
+import * as bcryptjs from 'bcryptjs';
+import { Socket } from 'socket.io';
 
 @Injectable()
 export class ChannelVerifyService {
@@ -27,16 +27,16 @@ export class ChannelVerifyService {
       throw new WsException("You can't join a private channel.");
     }
     if (await this.banService.includes(channelId, [userId])) {
-      client.emit("join-banned");
+      client.emit('join-banned');
       throw new WsException("can't join because banned.");
     }
     if (
       channel.password?.length > 0 &&
-      (typeof password === "undefined" ||
+      (typeof password === 'undefined' ||
         !(await bcryptjs.compare(password, channel.password)))
     ) {
-      client.emit("incorrect-password");
-      throw new WsException("incorrect password.");
+      client.emit('incorrect-password');
+      throw new WsException('incorrect password.');
     }
   }
 
@@ -45,16 +45,14 @@ export class ChannelVerifyService {
     userId: number,
     client: Socket
   ): Promise<void> {
-    try {
-      const mute: Mute = await this.muteService.findOneOrFail(
-        channelId,
-        userId
-      );
-      if (mute.limitedAt > new Date()) {
-        client.emit("muted");
-        throw new WsException("can't send because muted user.");
-      }
-      await this.muteService.delete(channelId, userId);
-    } catch {}
+    const mute: Mute = await this.muteService.findOne(channelId, userId);
+    if (!mute) {
+      return;
+    }
+    if (mute.limitedAt > new Date()) {
+      client.emit('muted');
+      throw new WsException("can't send because muted user.");
+    }
+    await this.muteService.delete(channelId, userId);
   }
 }

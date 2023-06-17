@@ -24,28 +24,16 @@ export class GameRoomGateway {
 
   constructor(private gameRoomService: GameRoomService) {}
 
-  @SubscribeMessage("keyup")
-  keyup(
+  @SubscribeMessage("keyState")
+  handleKeyState(
     @ConnectedSocket() client: Socket,
     @MessageBody()
     keyInfo: {
       roomId: number;
-      code: number;
+      message: string;
     }
   ): void {
-    this.gameRoomService.handleKeyState(client, keyInfo, -1);
-  }
-
-  @SubscribeMessage("keydown")
-  keydown(
-    @ConnectedSocket() client: Socket,
-    @MessageBody()
-    keyInfo: {
-      roomId: number;
-      code: number;
-    }
-  ): void {
-    this.gameRoomService.handleKeyState(client, keyInfo, 1);
+    this.gameRoomService.handleKeyState(client, keyInfo);
   }
 
   @SubscribeMessage("leave-game")

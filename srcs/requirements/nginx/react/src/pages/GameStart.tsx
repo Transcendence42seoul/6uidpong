@@ -25,6 +25,7 @@ const GameStart: React.FC = () => {
   const [gameState, setGameState] = useState<GameState | null>(null);
   const [upState, setUpState] = useState<boolean>(false);
   const [downState, setDownState] = useState<boolean>(false);
+  const [keyState, setKeyState] = useState<boolean>(false);
   const [gameResult, setGameResult] = useState<GameState | null>(null);
   const [showResultModal, setShowResultModal] = useState<boolean>(false);
   const [showInfoModal, setShowInfoModal] = useState<boolean>(false);
@@ -44,25 +45,52 @@ const GameStart: React.FC = () => {
     gameSocket?.on('game-end', resultHandler);
     return () => {
       gameSocket?.off('game-end', resultHandler);
-      gameSocket?.emit('leave-game', roomInfo);
+      if (!showResultModal) gameSocket?.emit('leave-game', roomInfo);
     };
   }, []);
 
   useEffect(() => {
-    if (upState) {
-      gameSocket?.emit('keydown', { roomId: gameState?.roomId, code: -1 });
-    } else {
-      gameSocket?.emit('keyup', { roomId: gameState?.roomId, code: -1 });
+    if (keyState) {
+      if (upState) {
+        const keyInfo = { roomId, message: 'arrowUp' };
+        gameSocket?.emit('keyState', keyInfo);
+      } else if (downState) {
+        const keyInfo = { roomId, message: 'arrowDown' };
+        gameSocket?.emit('keyState', keyInfo);
+      }
+    } else if (!keyState) {
+      const keyInfo = { roomId, message: 'keyUnPressed' };
+      gameSocket?.emit('keyState', keyInfo);
     }
-  }, [upState]);
+  }, [keyState, upState, downState]);
 
   useEffect(() => {
-    if (downState) {
-      gameSocket?.emit('keydown', { roomId: gameState?.roomId, code: 1 });
-    } else {
-      gameSocket?.emit('keyup', { roomId: gameState?.roomId, code: 1 });
+    setKeyState(false);
+    const keyInfo = { roomId, message: 'keyUnPressed' };
+    gameSocket?.emit('keystate', keyInfo);
+  }, [gameState?.score1, gameState?.score2]);
+
+  document.addEventListener('keydown', (key) => {
+    if (key.repeat) return;
+    if (key.keyCode === 38) {
+      setUpState(true);
+      setKeyState(true);
+    } else if (key.keyCode === 40) {
+      setDownState(true);
+      setKeyState(true);
     }
-  }, [downState]);
+  });
+
+  document.addEventListener('keyup', (key) => {
+    if (key.repeat) return;
+    if (key.keyCode === 38) {
+      setUpState(false);
+      setKeyState(false);
+    } else if (key.keyCode === 40) {
+      setDownState(false);
+      setKeyState(false);
+    }
+  });
 
   useEffect(() => {
     const handleGameStateChange = (state: GameState) => {
@@ -70,24 +98,6 @@ const GameStart: React.FC = () => {
     };
 
     gameSocket?.on('game-state', handleGameStateChange);
-
-    document.addEventListener('keydown', (key) => {
-      if (key.repeat) return;
-      if (key.keyCode === 38) {
-        setUpState(true);
-      } else if (key.keyCode === 40) {
-        setDownState(true);
-      }
-    });
-
-    document.addEventListener('keyup', (key) => {
-      if (key.repeat) return;
-      if (key.keyCode === 38) {
-        setUpState(false);
-      } else if (key.keyCode === 40) {
-        setDownState(false);
-      }
-    });
 
     const cvs = ref.current;
 

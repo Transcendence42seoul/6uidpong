@@ -174,11 +174,8 @@ export class GameMatchService {
   async handleLadderMatch() {
     let length = this.queue.length;
     while (length >= 2) {
-      console.log("start");
       const player1 = this.queue[0];
       const player2 = this.queue[1];
-      console.log(player1);
-      console.log(player2);
       if (await this.isDisconnectedSocket(player1, player2)) continue;
       await this.GameRoomService.createRoom(player1, player2, false, true);
       this.queue.splice(0, 2);

@@ -419,16 +419,27 @@ export class GameRoomService {
     client: Socket,
     keyInfo: {
       roomId: number;
-      code: number;
-    },
-    keyState: number
+      message: string;
+    }
   ) {
     const roomInfo: gameRoomInfo = this.roomInfos[keyInfo.roomId];
     if (roomInfo) {
       if (roomInfo.user1 === client) {
-        roomInfo.state.keyState1 += keyInfo.code * keyState;
+        if (keyInfo.message === "arrowUp") {
+          roomInfo.state.keyState1--;
+        } else if (keyInfo.message === "arrowDown") {
+          roomInfo.state.keyState1++;
+        } else if (keyInfo.message === "keyUnPressed") {
+          roomInfo.state.keyState1 = 0;
+        }
       } else if (roomInfo.user2 === client) {
-        roomInfo.state.keyState2 += keyInfo.code * keyState;
+        if (keyInfo.message === "arrowUp") {
+          roomInfo.state.keyState2--;
+        } else if (keyInfo.message === "arrowDown") {
+          roomInfo.state.keyState2++;
+        } else if (keyInfo.message === "keyUnPressed") {
+          roomInfo.state.keyState2 = 0;
+        }
       }
     }
   }
@@ -443,6 +454,9 @@ export class GameRoomService {
   ) {
     const user = await this.userService.findBySocketId(client.id);
     const roomInfo = this.roomInfos[smallRoomInfo.roomId];
+    if (!roomInfo) {
+      return;
+    }
     const state: GameState = {
       roomId: smallRoomInfo.roomId,
       user1Id: smallRoomInfo.user1Id,

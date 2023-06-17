@@ -3,7 +3,6 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import ChannelMemberList from '../components/channel/ChannelMemberList';
 import ChatRoom from '../components/chat/ChatRoom';
-import Alert from '../components/common/Alert';
 import HoverButton from '../components/common/HoverButton';
 import ChannelInviteModal from '../components/modal/ChannelInviteModal';
 import selectSocket from '../features/socket/socketSelector';

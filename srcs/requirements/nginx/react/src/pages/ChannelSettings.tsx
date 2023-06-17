@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import ChannelManagePanel from '../components/channel/ChannelManagePanel';
@@ -55,14 +55,14 @@ const ChannelSettings: React.FC = () => {
   };
 
   const handlePasswordChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
+    (event: React.ChangeEvent<HTMLInputElement>) => {
       setPassword(event.target.value);
     },
     [],
   );
 
   const handleTitleChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
+    (event: React.ChangeEvent<HTMLInputElement>) => {
       setTitle(event.target.value);
     },
     [],

@@ -143,22 +143,13 @@ const ChannelManageModal: React.FC<ChannelManageModalProps> = ({
             className="m-2 h-32 w-32"
           />
           <div className="m-4 flex w-full">
-            <HoverButton
-              onClick={handleMuteClick}
-              className="w-1/3 border border-red-800 p-2 text-red-800 hover:text-red-800"
-            >
+            <HoverButton onClick={handleMuteClick} className="w-1/3 border p-2">
               Mute
             </HoverButton>
-            <HoverButton
-              onClick={handleKickClick}
-              className="w-1/3 border border-red-800 p-2 text-red-800 hover:text-red-800"
-            >
+            <HoverButton onClick={handleKickClick} className="w-1/3 border p-2">
               Kick
             </HoverButton>
-            <HoverButton
-              onClick={handleBanClick}
-              className="w-1/3 border border-red-800 p-2 text-red-800 hover:text-red-800"
-            >
+            <HoverButton onClick={handleBanClick} className="w-1/3 border p-2">
               Ban
             </HoverButton>
           </div>
@@ -172,7 +163,7 @@ const ChannelManageModal: React.FC<ChannelManageModalProps> = ({
               </HoverButton>
               <HoverButton
                 onClick={handleTransferOwnerClick}
-                className="w-full border bg-amber-800 p-2 hover:text-amber-800"
+                className="w-full border p-2"
               >
                 Transfer Owner
               </HoverButton>

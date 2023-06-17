@@ -1,11 +1,4 @@
-import React, {
-  ChangeEvent,
-  FormEvent,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import selectAuth from '../../features/auth/authSelector';
 import selectSocket from '../../features/socket/socketSelector';
@@ -59,14 +52,14 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send }) => {
   };
 
   const handleInputMsgChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
+    (event: React.ChangeEvent<HTMLInputElement>) => {
       setInputMsg(event.target.value);
     },
     [],
   );
 
   const handleInputMsgSubmit = useCallback(
-    (event: FormEvent<HTMLFormElement>) => {
+    (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
       if (!inputMsg) return;
       const { channelId, interlocutorId } = send.data;

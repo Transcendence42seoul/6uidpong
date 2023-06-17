@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import HttpStatus from '../../utils/HttpStatus';
 import useCallApi from '../../utils/useCallApi';
@@ -10,7 +10,7 @@ const Nickname: React.FC = () => {
   const [warning, setWarning] = useState<string>('');
 
   const handleNicknameChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
+    (event: React.ChangeEvent<HTMLInputElement>) => {
       setNickname(event.target.value);
     },
     [],

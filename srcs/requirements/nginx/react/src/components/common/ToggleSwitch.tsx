@@ -1,10 +1,10 @@
-import React, { Dispatch, SetStateAction } from 'react';
+import React from 'react';
 
 interface ToggleSwitchProps {
   checked: boolean;
   leftText: string;
   rightText: string;
-  setChecked: Dispatch<SetStateAction<boolean>>;
+  setChecked: React.Dispatch<React.SetStateAction<boolean>>;
   className?: string;
   color?: boolean;
 }

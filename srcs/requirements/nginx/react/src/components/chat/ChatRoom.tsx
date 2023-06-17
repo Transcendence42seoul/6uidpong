@@ -49,7 +49,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send }) => {
   const [inputMsg, setInputMsg] = useState<string>('');
   const [interlocutor, setInterlocutor] = useState<number | null>(null);
   const [newMsgCount, setNewMsgCount] = useState<number>(0);
-  const [showAlert, setShowAlert] = useState<boolean>(true);
+  const [showAlert, setShowAlert] = useState<boolean>(false);
 
   const addChat = (chat: Chat) => {
     setChats((prevChats) => [...prevChats, chat]);
@@ -201,10 +201,13 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send }) => {
         })}
       </ChatContainer>
       <MessageForm onSubmit={handleInputMsgSubmit}>
-        <input type="text" value={inputMsg} onChange={handleInputMsgChange} />
-        <button className="bg-black p-2 text-white" disabled={blocked}>
-          Send
-        </button>
+        <input
+          type="text"
+          value={inputMsg}
+          onChange={handleInputMsgChange}
+          disabled={blocked}
+        />
+        <button className="bg-black p-2 text-white">Send</button>
       </MessageForm>
       {showAlert && (
         <Alert

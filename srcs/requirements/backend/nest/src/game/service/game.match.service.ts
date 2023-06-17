@@ -149,19 +149,8 @@ export class GameMatchService {
     while (this.queue.length >= 2) {
       const player1 = this.queue[0];
       const player2 = this.queue[1];
-      if (
-        (player1 === undefined || player1.disconnected) &&
-        (player2 === undefined || player2.disconnected)
-      ) {
-        this.queue.splice(0, 2);
-      } else if (player1 === undefined || player1.disconnected) {
-        this.queue.splice(0, 1);
-      } else if (player2 === undefined || player2.disconnected) {
-        this.queue.splice(1, 1);
-      } else {
-        await this.GameRoomService.createRoom(player1, player2, false, true);
-        this.queue.splice(0, 2);
-      }
+      await this.GameRoomService.createRoom(player1, player2, false, true);
+      this.queue.splice(0, 2);
     }
   }
 
@@ -173,10 +162,7 @@ export class GameMatchService {
     if (participant.status === "game") {
       server.to(master.gameSocketId).emit("participant-already-ingame");
       return true;
-    } else if (participant.status === "offline") {
-      server.to(master.gameSocketId).emit("participant-offline");
-    }
-    for (let i = 0; i < this.rooms.length; i++) {
+    } else    for (let i = 0; i < this.rooms.length; i++) {
       if (
         this.rooms[i].masterId === master.id ||
         this.rooms[i].participantId === participant.id

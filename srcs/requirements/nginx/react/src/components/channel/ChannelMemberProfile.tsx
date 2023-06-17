@@ -2,6 +2,7 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 
 import ChannelRole from '../../constants/ChannelRole';
+import selectAuth from '../../features/auth/authSelector';
 import selectSocket from '../../features/socket/socketSelector';
 import HoverButton from '../common/HoverButton';
 import UserProfile from '../common/UserProfile';
@@ -30,9 +31,13 @@ const ChannelMemberProfile: React.FC<ChannelMemberProfileProps> = ({
   const { channelId: channelIdString } = useParams<{ channelId: string }>();
   const channelId = Number(channelIdString);
 
+  const { tokenInfo } = selectAuth();
+  const myId = tokenInfo?.id;
+
   const { socket } = selectSocket();
 
   const { id: userId } = member;
+  const isMe = userId === myId;
 
   const sendData: SendData = {
     info: {
@@ -66,9 +71,9 @@ const ChannelMemberProfile: React.FC<ChannelMemberProfileProps> = ({
     <UserProfile
       userId={userId}
       className="border border-white bg-[#211f20]"
-      footer={role === MEMBER}
+      footer={!isMe && role === MEMBER}
     >
-      {role === OWNER && (
+      {!isMe && role === OWNER && (
         <div className="mt-2 flex w-full flex-col text-sm">
           <HoverButton
             onClick={handleAssignAdminClick}
@@ -81,7 +86,7 @@ const ChannelMemberProfile: React.FC<ChannelMemberProfileProps> = ({
           </HoverButton>
         </div>
       )}
-      {role >= ADMIN && (
+      {!isMe && role >= ADMIN && (
         <div
           className={`mx-4 flex w-full border-t text-sm ${
             role === ADMIN && 'mt-2'

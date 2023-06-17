@@ -90,7 +90,7 @@ const UserSearchBar: React.FC<UserSearchBarProps> = ({
         value={searchTerm}
         onChange={handleSearchTermChange}
         onClick={handleShowSearchResults}
-        className="w-full rounded border border-white p-2 shadow"
+        className="w-full rounded border border-white p-2 shadow focus:outline-none"
       />
       {showSearchResults && (
         <ul

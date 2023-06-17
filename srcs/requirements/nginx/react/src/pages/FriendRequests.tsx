@@ -58,9 +58,9 @@ const FriendRequests: React.FC = () => {
         <ListTitle className="ml-2 text-gray-100">Friend Requests</ListTitle>
         <HoverButton
           onClick={handleFriendsListClick}
-          className="ml-auto border p-1.5"
+          className="ml-auto border py-1.5 pl-2.5 pr-1.5"
         >
-          Friends List
+          Friends
         </HoverButton>
       </div>
       <ul className="space-y-2">

@@ -110,16 +110,22 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send }) => {
   }, []);
 
   useEffect(() => {
-    const blockHandler = (blockUser: number) => {
-      if (interlocutor === blockUser) {
-        setBlocked(true);
+    if (blocked && !showAlert) {
+      setShowAlert((prevState) => !prevState);
+    }
+  }, [blocked]);
+
+  useEffect(() => {
+    const blockHandler = ({ userId: blockUser }: { userId: number }) => {
+      if (!blocked && blockUser === interlocutor) {
+        setBlocked((prevState) => !prevState);
       }
     };
     socket?.on('block', blockHandler);
     return () => {
       socket?.off('block', blockHandler);
     };
-  }, []);
+  }, [interlocutor]);
 
   useEffect(() => {
     const { current } = chatContainer;

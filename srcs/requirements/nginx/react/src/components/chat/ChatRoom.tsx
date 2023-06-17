@@ -44,10 +44,12 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send }) => {
   const { socket } = selectSocket();
 
   const chatContainer = useRef<HTMLDivElement>(null);
+  const [alert, setAlert] = useState<string>('');
   const [blocked, setBlocked] = useState<boolean>(false);
   const [chats, setChats] = useState<Chat[]>([]);
   const [inputMsg, setInputMsg] = useState<string>('');
   const [interlocutor, setInterlocutor] = useState<number | null>(null);
+  const [muted, setMuted] = useState<boolean>(false);
   const [newMsgCount, setNewMsgCount] = useState<number>(0);
   const [showAlert, setShowAlert] = useState<boolean>(false);
 
@@ -110,22 +112,23 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send }) => {
   }, []);
 
   useEffect(() => {
+    const muteHandler = () => {
+      if (!muted) {
+        setAlert('You are muted.');
+        setMuted((prevState) => !prevState);
+      }
+    };
+    socket?.on('muted', muteHandler);
+    return () => {
+      socket?.off('muted', muteHandler);
+    };
+  }, []);
+
+  useEffect(() => {
     if (blocked && !showAlert) {
       setShowAlert((prevState) => !prevState);
     }
   }, [blocked]);
-
-  useEffect(() => {
-    const blockHandler = ({ userId: blockUser }: { userId: number }) => {
-      if (!blocked && blockUser === interlocutor) {
-        setBlocked((prevState) => !prevState);
-      }
-    };
-    socket?.on('block', blockHandler);
-    return () => {
-      socket?.off('block', blockHandler);
-    };
-  }, [interlocutor]);
 
   useEffect(() => {
     const { current } = chatContainer;
@@ -136,6 +139,25 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send }) => {
       current.scrollTop = scrollHeight - clientHeight;
     }
   }, [chats.length]);
+
+  useEffect(() => {
+    const blockHandler = ({ userId: blockUser }: { userId: number }) => {
+      if (!blocked && blockUser === interlocutor) {
+        setAlert("You can't send DM to user who blocked you.");
+        setBlocked((prevState) => !prevState);
+      }
+    };
+    socket?.on('block', blockHandler);
+    return () => {
+      socket?.off('block', blockHandler);
+    };
+  }, [interlocutor]);
+
+  useEffect(() => {
+    if (muted && !showAlert) {
+      setShowAlert((prevState) => !prevState);
+    }
+  }, [muted]);
 
   return (
     <div className="mx-auto max-w-[1024px] p-4 pt-2">
@@ -215,12 +237,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send }) => {
         />
         <button className="bg-black p-2 text-white">Send</button>
       </MessageForm>
-      {showAlert && (
-        <Alert
-          message="You can't send DM to user who blocked you."
-          setShowAlert={setShowAlert}
-        />
-      )}
+      {showAlert && <Alert message={alert} setShowAlert={setShowAlert} />}
     </div>
   );
 };

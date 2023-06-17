@@ -29,6 +29,14 @@ interface ChatRoomProps {
   send: SocketEvent;
 }
 
+interface JoinResponse {
+  newMsgCount: number;
+  chats: Chat[];
+  channelId?: number;
+  interlocutorId?: number;
+  isBlocked?: boolean;
+}
+
 const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send }) => {
   const { tokenInfo } = selectAuth();
   const myId = tokenInfo?.id;
@@ -36,10 +44,12 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send }) => {
   const { socket } = selectSocket();
 
   const chatContainer = useRef<HTMLDivElement>(null);
+  const [blocked, setBlocked] = useState<boolean>(false);
   const [chats, setChats] = useState<Chat[]>([]);
   const [inputMsg, setInputMsg] = useState<string>('');
+  const [interlocutor, setInterlocutor] = useState<number | null>(null);
   const [newMsgCount, setNewMsgCount] = useState<number>(0);
-  const [showAlert, setShowAlert] = useState<boolean>(false);
+  const [showAlert, setShowAlert] = useState<boolean>(true);
 
   const addChat = (chat: Chat) => {
     setChats((prevChats) => [...prevChats, chat]);
@@ -75,13 +85,14 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send }) => {
     const chatsHandler = ({
       newMsgCount: newMsgCnt,
       chats: prevChats,
-    }: {
-      newMsgCount: number;
-      chats: Chat[];
-    }) => {
-      if (showAlert) return;
+      interlocutorId = undefined,
+      isBlocked = undefined,
+    }: JoinResponse) => {
       setNewMsgCount(newMsgCnt);
       setChats([...prevChats]);
+      if (!interlocutorId) return;
+      setInterlocutor(interlocutorId);
+      setBlocked(!!isBlocked);
     };
     socket?.emit(join.name, join.data, chatsHandler);
     setChats(isTest ? mockChats : chats); // test
@@ -95,6 +106,18 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send }) => {
     socket?.on(send.name, chatHandler);
     return () => {
       socket?.off(send.name, chatHandler);
+    };
+  }, []);
+
+  useEffect(() => {
+    const blockHandler = (blockUser: number) => {
+      if (interlocutor === blockUser) {
+        setBlocked(true);
+      }
+    };
+    socket?.on('block', blockHandler);
+    return () => {
+      socket?.off('block', blockHandler);
     };
   }, []);
 
@@ -179,7 +202,9 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send }) => {
       </ChatContainer>
       <MessageForm onSubmit={handleInputMsgSubmit}>
         <input type="text" value={inputMsg} onChange={handleInputMsgChange} />
-        <button className="bg-black p-2 text-white">Send</button>
+        <button className="bg-black p-2 text-white" disabled={blocked}>
+          Send
+        </button>
       </MessageForm>
       {showAlert && (
         <Alert

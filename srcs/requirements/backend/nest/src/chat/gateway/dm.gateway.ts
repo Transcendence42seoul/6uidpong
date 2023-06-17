@@ -80,9 +80,10 @@ export class DmGateway {
   @SubscribeMessage("block")
   async block(
     @WsJwtPayload() jwt: JwtPayload,
+    @ConnectedSocket() client: Socket,
     @MessageBody("interlocutorId") interlocutorId: number
   ): Promise<void> {
-    await this.dmService.block(jwt.id, interlocutorId);
+    await this.dmService.block(jwt.id, interlocutorId, client);
   }
 
   @SubscribeMessage("unblock")

@@ -14,6 +14,8 @@ import { BlockService } from "./block.service";
 import { DmChatService } from "./dm-chat.service";
 import { DmRoomService } from "./dm-room.service";
 import { DmUserService } from "./dm-user.service";
+import { UserService } from "src/user/service/user.service";
+import { User } from "src/user/entity/user.entity";
 
 @Injectable()
 export class DmService {
@@ -22,6 +24,7 @@ export class DmService {
     private readonly chatService: DmChatService,
     private readonly dmUserService: DmUserService,
     private readonly blockService: BlockService,
+    private readonly userService: UserService,
     private readonly dataSource: DataSource
   ) {}
 
@@ -90,7 +93,7 @@ export class DmService {
         userId
       );
       return new JoinResponse(
-        dmUser.roomId,
+        interlocutorId,
         dmUser.newMsgCount,
         block ? true : false,
         chats
@@ -199,7 +202,7 @@ export class DmService {
     return blocks.map((block) => new BlockResponse(block));
   }
 
-  async block(userId: number, interlocutorId: number): Promise<void> {
+  async block(userId: number, interlocutorId: number, client: Socket): Promise<void> {
     const queryRunner = this.dataSource.createQueryRunner();
 
     await queryRunner.connect();
@@ -220,6 +223,8 @@ export class DmService {
         },
       ]);
       await queryRunner.commitTransaction();
+      const interlocutor: User = await this.userService.findOneOrFail(interlocutorId);
+      client.to(interlocutor.socketId).emit("block", { userId });
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;

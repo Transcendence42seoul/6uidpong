@@ -3,17 +3,17 @@ import { ChatResponse } from "./chat-response";
 
 export class JoinResponse {
   constructor(
-    roomId: number,
+    interlocutorId: number,
     newMsgCount: number,
     isBlocked: boolean,
     entities: DmChat[]
   ) {
-    this.roomId = roomId;
+    this.interlocutorId = interlocutorId;
     this.newMsgCount = newMsgCount;
     this.isBlocked = isBlocked;
     this.chats = entities.map((entity) => new ChatResponse(entity));
   }
-  readonly roomId: number;
+  readonly interlocutorId: number;
 
   readonly newMsgCount: number;
 

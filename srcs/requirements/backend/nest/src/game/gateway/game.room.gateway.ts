@@ -58,7 +58,9 @@ export class GameRoomGateway {
       user2Id: number;
     }
   ): Promise<void> {
-    const smallRoomInfo = roomInfo;
-    await this.gameRoomService.handleGameLeave(client, smallRoomInfo);
+    try {
+      const smallRoomInfo = roomInfo;
+      await this.gameRoomService.handleGameLeave(client, smallRoomInfo);
+    } catch {}
   }
 }

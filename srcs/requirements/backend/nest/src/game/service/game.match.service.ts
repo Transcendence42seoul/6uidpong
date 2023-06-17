@@ -159,15 +159,14 @@ export class GameMatchService {
   }
 
   handleLadderMatch() {
-    const length = this.queue.length;
-    let i = 1;
-    while (i < length) {
+    let length = this.queue.length;
+    while (length >= 2) {
       const player1 = this.queue[0];
       const player2 = this.queue[1];
       if (this.isDisconnectedSocket(player1, player2)) continue;
       this.GameRoomService.createRoom(player1, player2, false, true);
       this.queue.splice(0, 2);
-      i += 2;
+      length = this.queue.length;
     }
   }
 

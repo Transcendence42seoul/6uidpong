@@ -442,14 +442,6 @@ export class GameRoomService {
     }
   ) {
     const user = await this.userService.findBySocketId(client.id);
-    console.log(client.id);
-    console.log(
-      this.roomInfos[smallRoomInfo.roomId].roomId,
-      "\n",
-      this.roomInfos[smallRoomInfo.roomId].user1Id,
-      "\n",
-      this.roomInfos[smallRoomInfo.roomId].user2Id
-    );
     const roomInfo = this.roomInfos[smallRoomInfo.roomId];
     const state: GameState = {
       roomId: smallRoomInfo.roomId,

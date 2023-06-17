@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import CircularImage from '../components/common/CircularImage';
+import HoverButton from '../components/common/HoverButton';
 import ListTitle from '../components/common/ListTitle';
 import selectAuth from '../features/auth/authSelector';
 import useCallApi from '../utils/useCallApi';
@@ -9,6 +11,7 @@ import type User from '../interfaces/User';
 
 const FriendRequests: React.FC = () => {
   const callApi = useCallApi();
+  const navigate = useNavigate();
 
   const { tokenInfo } = selectAuth();
   const myId = tokenInfo?.id;
@@ -23,6 +26,10 @@ const FriendRequests: React.FC = () => {
     };
     callApi(config);
     setRequestUsers([...requestUsers.filter((user) => user.id !== friendId)]);
+  };
+
+  const handleFriendsListClick = () => {
+    navigate('/friends-list');
   };
 
   const handleRejectClick = (fromId: number) => {
@@ -47,9 +54,15 @@ const FriendRequests: React.FC = () => {
 
   return (
     <div className="p-4">
-      <ListTitle className="mb-3.5 ml-2 text-gray-100">
-        Friend Requests
-      </ListTitle>
+      <div className="mb-4 flex items-end">
+        <ListTitle className="ml-2 text-gray-100">Friend Requests</ListTitle>
+        <HoverButton
+          onClick={handleFriendsListClick}
+          className="ml-auto border p-1.5"
+        >
+          Incoming Requests
+        </HoverButton>
+      </div>
       <ul className="space-y-2">
         {requestUsers.map((user) => {
           const { id, nickname, image } = user;

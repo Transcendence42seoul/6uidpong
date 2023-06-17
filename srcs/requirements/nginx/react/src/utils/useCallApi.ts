@@ -1,24 +1,16 @@
-import axios, { AxiosResponse } from 'axios';
+import axios, { AxiosRequestConfig } from 'axios';
 import { useDispatch } from 'react-redux';
 
 import dispatchAuth from '../features/auth/authAction';
 import selectAuth from '../features/auth/authSelector';
-
-interface AxiosConfig {
-  url: string;
-  method?: string;
-  headers?: any;
-  params?: any;
-  data?: any;
-}
 
 const useCallApi = () => {
   const dispatch = useDispatch();
 
   const { accessToken } = selectAuth();
 
-  const httpRequest = (config: AxiosConfig) => {
-    const headers = { ...config.headers };
+  const httpRequest = (config: AxiosRequestConfig) => {
+    const headers: any = { ...config.headers };
     headers.Authorization = `Bearer ${accessToken}`;
     return axios({
       ...config,
@@ -27,7 +19,7 @@ const useCallApi = () => {
     });
   };
 
-  const callApi = async (config: AxiosConfig) => {
+  const callApi = async (config: AxiosRequestConfig) => {
     try {
       return await httpRequest(config);
     } catch (error) {

@@ -1,3 +1,4 @@
+import { AxiosRequestConfig } from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -59,20 +60,20 @@ const UserProfile: React.FC<UserProfileProps> = ({
   };
 
   const handleFriendClick = () => {
+    let config: AxiosRequestConfig;
     if (isFriend) {
-      const config = {
+      config = {
         url: `/api/v1/users/${myId}/friends/${userId}`,
         method: 'delete',
       };
-      callApi(config);
     } else {
-      const config = {
+      config = {
         url: `/api/v1/users/${myId}/friend-requests`,
         method: 'post',
         data: { toId: userId },
       };
-      callApi(config);
     }
+    callApi(config);
   };
 
   const handleGameClick = () => {

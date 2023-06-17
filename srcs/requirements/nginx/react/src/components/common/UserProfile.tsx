@@ -131,8 +131,8 @@ const UserProfile: React.FC<UserProfileProps> = ({
         </h2>
         {stats && (
           <div className="mb-2 space-y-1 text-sm">
-            <p>Wins: {user?.winStat}</p>
-            <p>Losses: {user?.loseStat}</p>
+            <p>Win: {user?.winStat}</p>
+            <p>Loss: {user?.loseStat}</p>
             <p>Ladder: {user?.ladderScore}</p>
           </div>
         )}

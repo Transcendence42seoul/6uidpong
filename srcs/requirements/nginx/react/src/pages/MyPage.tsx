@@ -83,8 +83,8 @@ const MyPage: React.FC = () => {
         </HoverButton>
         <ContentBox className="w-full max-w-md border p-4">
           <h3 className="mb-2 text-xl font-semibold">Stats</h3>
-          <p className="mb-1.5">Wins: {user?.winStat}</p>
-          <p className="mb-1.5">Losses: {user?.loseStat}</p>
+          <p className="mb-1.5">Win: {user?.winStat}</p>
+          <p className="mb-1.5">Loss: {user?.loseStat}</p>
           <p>Ladder: {user?.ladderScore}</p>
         </ContentBox>
         <HoverButton

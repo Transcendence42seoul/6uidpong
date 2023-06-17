@@ -145,6 +145,19 @@ export class GameMatchService {
   }
 
   isDisconnectedSocket(player1: Socket, player2: Socket): boolean {
+    if (
+      player1.disconnected === undefined &&
+      player2.disconnected === undefined
+    ) {
+      this.queue.splice(0, 2);
+      return true;
+    } else if (player2.disconnected === undefined) {
+      this.queue.splice(1, 1);
+      return true;
+    } else if (player1.disconnected === undefined) {
+      this.queue.splice(0, 1);
+      return true;
+    }
     if (player1.disconnected && player2.disconnected) {
       this.queue.splice(0, 2);
       return true;
@@ -158,13 +171,16 @@ export class GameMatchService {
     return false;
   }
 
-  handleLadderMatch() {
+  async handleLadderMatch() {
     let length = this.queue.length;
     while (length >= 2) {
+      console.log("start");
       const player1 = this.queue[0];
       const player2 = this.queue[1];
-      if (this.isDisconnectedSocket(player1, player2)) continue;
-      this.GameRoomService.createRoom(player1, player2, false, true);
+      console.log(player1);
+      console.log(player2);
+      if (await this.isDisconnectedSocket(player1, player2)) continue;
+      await this.GameRoomService.createRoom(player1, player2, false, true);
       this.queue.splice(0, 2);
       length = this.queue.length;
     }

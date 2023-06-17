@@ -5,13 +5,17 @@ import { Namespace, Socket } from "socket.io";
 import { User } from "src/user/entity/user.entity";
 import { UserService } from "src/user/service/user.service";
 import { DataSource } from "typeorm";
+import { GameMatchService } from "./game.match.service";
+import { GameRoomService } from "./game.room.service";
 
 @Injectable()
 export class ConnectionService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly userService: UserService,
-    private readonly dataSource: DataSource
+    private readonly dataSource: DataSource,
+    private readonly gameMatchService: GameMatchService,
+    private readonly gameRoomService: GameRoomService
   ) {}
 
   async connect(client: Socket, server: Namespace): Promise<void> {
@@ -24,15 +28,8 @@ export class ConnectionService {
     });
     const user: User = await this.userService.findOneOrFail(payload.id);
     if (user.gameSocketId !== "") {
+      this.gameMatchService.clear(user);
       server.in(user.gameSocketId).disconnectSockets(true);
-    }
-    await this.userService.updateGameSocket(user.id, client.id);
-  }
-
-  async disconnect(socketId: string): Promise<void> {
-    const user: User = await this.userService.findBySocketId(socketId);
-    if (!user) {
-      return;
     }
     const queryRunner = this.dataSource.createQueryRunner();
 
@@ -41,8 +38,36 @@ export class ConnectionService {
     try {
       await queryRunner.manager.update(
         User,
+        { id: user.id },
+        { gameSocketId: client.id }
+      );
+
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  async disconnect(socketId: string): Promise<void> {
+    const user: User = await this.userService.findBySocketId(socketId);
+    if (!user) {
+      return;
+    }
+    this.gameMatchService.clear(user);
+    this.gameRoomService.clear(user.id);
+
+    const queryRunner = this.dataSource.createQueryRunner();
+
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      await queryRunner.manager.update(
+        User,
         {
-          id: user.id,
+          gameSocketId: socketId,
         },
         {
           gameSocketId: "",
@@ -52,7 +77,7 @@ export class ConnectionService {
         await queryRunner.manager.update(
           User,
           {
-            id: user.id,
+            gameSocketId: socketId,
           },
           {
             status: "offline",

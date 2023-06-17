@@ -86,6 +86,7 @@ export class GameMatchService {
           roomSecret.participant.emit("room-destroyed");
       } else {
         room.participantId = undefined;
+        roomSecret.participant = undefined;
         roomSecret.master.emit("user-exit", room);
       }
     } else {
@@ -144,42 +145,23 @@ export class GameMatchService {
     }
   }
 
-  isDisconnectedSocket(player1: Socket, player2: Socket): boolean {
-    if (
-      player1.disconnected === undefined &&
-      player2.disconnected === undefined
-    ) {
-      this.queue.splice(0, 2);
-      return true;
-    } else if (player2.disconnected === undefined) {
-      this.queue.splice(1, 1);
-      return true;
-    } else if (player1.disconnected === undefined) {
-      this.queue.splice(0, 1);
-      return true;
-    }
-    if (player1.disconnected && player2.disconnected) {
-      this.queue.splice(0, 2);
-      return true;
-    } else if (player2.disconnected) {
-      this.queue.splice(1, 1);
-      return true;
-    } else if (player1.disconnected) {
-      this.queue.splice(0, 1);
-      return true;
-    }
-    return false;
-  }
-
   async handleLadderMatch() {
-    let length = this.queue.length;
-    while (length >= 2) {
+    while (this.queue.length >= 2) {
       const player1 = this.queue[0];
       const player2 = this.queue[1];
-      if (await this.isDisconnectedSocket(player1, player2)) continue;
-      await this.GameRoomService.createRoom(player1, player2, false, true);
-      this.queue.splice(0, 2);
-      length = this.queue.length;
+      if (
+        (player1 === undefined || player1.disconnected) &&
+        (player2 === undefined || player2.disconnected)
+      ) {
+        this.queue.splice(0, 2);
+      } else if (player1 === undefined || player1.disconnected) {
+        this.queue.splice(0, 1);
+      } else if (player2 === undefined || player2.disconnected) {
+        this.queue.splice(1, 1);
+      } else {
+        await this.GameRoomService.createRoom(player1, player2, false, true);
+        this.queue.splice(0, 2);
+      }
     }
   }
 
@@ -289,5 +271,29 @@ export class GameMatchService {
       },
     });
     return matches.map((match) => new GameResultResponse(match));
+  }
+
+  clear(user: User): void {
+    for (let i = 0; i < this.queue.length; i++) {
+      if (this.queue[i].id === user.socketId) {
+        this.queue.splice(i, 1);
+        break;
+      }
+    }
+    for (let i = 0; i < this.rooms.length; i++) {
+      if (this.rooms[i].masterId === user.id) {
+        this.rooms.splice(i, 1);
+        if (this.roomSecrets[i].participant) {
+          this.roomSecrets[i].participant.emit("room-destroyed");
+        }
+        this.roomSecrets.splice(i, 1);
+        break;
+      } else if (this.rooms[i].participantId === user.id) {
+        this.roomSecrets[i].master.emit("user-exit", this.rooms[i]);
+        this.rooms[i].participantId = undefined;
+        this.roomSecrets[i].participant = undefined;
+        break;
+      }
+    }
   }
 }

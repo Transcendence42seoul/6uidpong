@@ -356,6 +356,7 @@ export class GameRoomService {
   ) {
     const player1 = await this.userService.findBySocketId(user1.id);
     const player2 = await this.userService.findBySocketId(user2.id);
+    console.log(user1.id, user2.id);
     await this.userService.updateStatus(player1.id);
     await this.userService.updateStatus(player2.id);
 
@@ -476,6 +477,40 @@ export class GameRoomService {
       state.score2 = 0;
       state.score1 = 5;
       this.endGame(roomInfo, state, 5, 0);
+    }
+  }
+
+  clear(userId: number): void {
+    for (let i = 0; i < this.roomInfos.length; i++) {
+      if (this.roomInfos[i]?.user1Id === userId) {
+        const state: GameState = {
+          roomId: this.roomInfos[i].roomId,
+          user1Id: this.roomInfos[i].user1Id,
+          user2Id: this.roomInfos[i].user2Id,
+          paddle1: 0,
+          paddle2: 0,
+          ballx: 0,
+          bally: 0,
+          score1: 0,
+          score2: 5,
+        };
+        this.endGame(this.roomInfos[i], state, 0, 5);
+        break;
+      } else if (this.roomInfos[i]?.user2Id === userId) {
+        const state: GameState = {
+          roomId: this.roomInfos[i].roomId,
+          user1Id: this.roomInfos[i].user1Id,
+          user2Id: this.roomInfos[i].user2Id,
+          paddle1: 0,
+          paddle2: 0,
+          ballx: 0,
+          bally: 0,
+          score1: 5,
+          score2: 0,
+        };
+        this.endGame(this.roomInfos[i], state, 5, 0);
+        break;
+      }
     }
   }
 }

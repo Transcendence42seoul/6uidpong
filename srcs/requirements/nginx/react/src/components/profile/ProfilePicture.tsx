@@ -1,5 +1,5 @@
-import axios, { AxiosResponse, AxiosError } from 'axios';
-import React, { useState, ChangeEvent } from 'react';
+import axios from 'axios';
+import React, { useState } from 'react';
 
 import selectAuth from '../../features/auth/authSelector';
 import HoverButton from '../common/HoverButton';
@@ -9,7 +9,7 @@ const ProfilePicture: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const myId = tokenInfo?.id;
 
-  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
       setSelectedFile(event.target.files[0]);
     }

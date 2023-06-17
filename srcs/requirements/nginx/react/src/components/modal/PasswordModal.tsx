@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import HoverButton from '../common/HoverButton';
 import ModalContainer from '../container/ModalContainer';
@@ -33,7 +33,7 @@ const PasswordModal: React.FC<PasswordModalProps> = ({
   };
 
   const handlePasswordChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
+    (event: React.ChangeEvent<HTMLInputElement>) => {
       setPassword(event.target.value);
     },
     [],

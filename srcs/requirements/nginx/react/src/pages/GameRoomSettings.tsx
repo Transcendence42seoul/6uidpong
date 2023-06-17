@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import ContentBox from '../components/common/ContentBox';
@@ -33,14 +33,14 @@ const GameRoomSettings: React.FC = () => {
   };
 
   const handlePasswordChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
+    (event: React.ChangeEvent<HTMLInputElement>) => {
       setPassword(event.target.value);
     },
     [],
   );
 
   const handleTitleChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
+    (event: React.ChangeEvent<HTMLInputElement>) => {
       setTitle(event.target.value);
     },
     [],

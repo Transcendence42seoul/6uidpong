@@ -5,8 +5,8 @@ import { Namespace, Socket } from "socket.io";
 import { User } from "src/user/entity/user.entity";
 import { UserService } from "src/user/service/user.service";
 import { DataSource } from "typeorm";
-import { GameMatchService } from "./game.match.service";
-import { GameRoomService } from "./game.room.service";
+import { GameMatchService } from "./match.service";
+import { GameRoomService } from "./room.service";
 
 @Injectable()
 export class ConnectionService {

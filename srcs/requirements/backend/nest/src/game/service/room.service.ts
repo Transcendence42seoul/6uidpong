@@ -6,6 +6,7 @@ import { setTimeout } from "timers";
 import { DataSource } from "typeorm";
 import { Ball, GameRoomState, GameState, gameRoomInfo } from "../dto/game.dto";
 import { GameResult } from "../entity/game.entity";
+import { GameMatchService } from "./match.service";
 
 const GameInfo = {
   width: 1200,
@@ -38,21 +39,6 @@ export class GameRoomService {
       dx: this.randomSpeed(),
       dy: this.randomSpeed(),
     };
-  }
-
-  makeStartState(roomInfo: gameRoomInfo) {
-    const StartState: GameState = {
-      roomId: roomInfo.roomId,
-      user1Id: roomInfo.user1Id,
-      user2Id: roomInfo.user2Id,
-      paddle1: roomInfo.state.paddle1,
-      paddle2: roomInfo.state.paddle2,
-      ballx: roomInfo.state.ball.x,
-      bally: roomInfo.state.ball.y,
-      score1: roomInfo.state.score1,
-      score2: roomInfo.state.score2,
-    };
-    return StartState;
   }
 
   makeUserState(
@@ -110,6 +96,93 @@ export class GameRoomService {
       broadcast: null,
     };
     return roomInfo;
+  }
+
+  makeStartState(roomInfo: gameRoomInfo) {
+    const StartState: GameState = {
+      roomId: roomInfo.roomId,
+      user1Id: roomInfo.user1Id,
+      user2Id: roomInfo.user2Id,
+      paddle1: roomInfo.state.paddle1,
+      paddle2: roomInfo.state.paddle2,
+      ballx: roomInfo.state.ball.x,
+      bally: roomInfo.state.ball.y,
+      score1: roomInfo.state.score1,
+      score2: roomInfo.state.score2,
+    };
+    return StartState;
+  }
+
+  async createRoom(
+    user1: number,
+    user2: number,
+    user1Socket: Socket,
+    user2Socket: Socket,
+    mode: boolean,
+    isLadder: boolean
+  ) {
+    const player1 = await this.userService.findOne(user1);
+    const player2 = await this.userService.findOne(user2);
+    await this.userService.updateStatus(player1.id);
+    await this.userService.updateStatus(player2.id);
+
+    const roomInfo: gameRoomInfo = await this.InitRoomState(
+      user1Socket,
+      user2Socket,
+      user1,
+      user2,
+      player1.nickname,
+      player2.nickname,
+      mode,
+      isLadder
+    );
+    const roomId = roomInfo.roomId;
+
+    await user1Socket.join(roomId.toString());
+    await user2Socket.join(roomId.toString());
+    user1Socket.data = { ...user1Socket.data, roomId: roomId };
+    user2Socket.data = { ...user2Socket.data, roomId: roomId };
+
+    const startState: GameState = this.makeStartState(roomInfo);
+    user1Socket.emit("game-start", startState);
+    user2Socket.emit("game-start", startState);
+
+    let timerId: NodeJS.Timeout | null;
+
+    let intervalId = setInterval(() => {
+      if (user1Socket.disconnected === undefined || user1Socket.disconnected) {
+        if (timerId) {
+          clearTimeout(timerId);
+          startState.score1 = 0;
+          startState.score2 = 5;
+          this.endGame(roomInfo, startState, 5, 0);
+          clearInterval(intervalId);
+        }
+      } else if (
+        user2Socket.disconnected === undefined ||
+        user2Socket.disconnected
+      ) {
+        if (timerId) {
+          clearTimeout(timerId);
+          startState.score1 = 5;
+          startState.score2 = 0;
+          this.endGame(roomInfo, startState, 5, 0);
+          clearInterval(intervalId);
+        }
+      }
+    }, 50);
+
+    timerId = setTimeout(() => {
+      clearInterval(intervalId);
+      this.broadcastState = this.broadcastState.bind(this);
+      this.roomInfos[roomId] = roomInfo;
+      const broadcast = setInterval(
+        this.broadcastState,
+        20,
+        this.roomInfos[roomId]
+      );
+      this.roomInfos[roomId].broadcast = broadcast;
+    }, 3000);
   }
 
   broadcastState(roomInfo: gameRoomInfo) {
@@ -239,6 +312,45 @@ export class GameRoomService {
     user2.emit("game-state", userGameRoomState);
   }
 
+  private async endGame(
+    roomInfo: gameRoomInfo,
+    userGameRoomState: GameState,
+    winScore: number,
+    loseScore: number
+  ) {
+    const { roomId, user1, user2, broadcast } = roomInfo;
+    user1.emit("game-end", userGameRoomState);
+    user1.leave(roomId.toString());
+    user1.data.roomId = null;
+    user2.emit("game-end", userGameRoomState);
+    user2.leave(roomId.toString());
+    user2.data.roomId = null;
+    clearInterval(broadcast);
+
+    this.roomInfos[roomId] = null;
+    if (userGameRoomState.score1 === winScore) {
+      const winUserId = userGameRoomState.user1Id;
+      const loseUserId = userGameRoomState.user2Id;
+      await this.gameResult(
+        winUserId,
+        loseUserId,
+        roomInfo,
+        winScore,
+        loseScore
+      );
+    } else if (userGameRoomState.score2 === winScore) {
+      const winUserId = userGameRoomState.user2Id;
+      const loseUserId = userGameRoomState.user1Id;
+      await this.gameResult(
+        winUserId,
+        loseUserId,
+        roomInfo,
+        winScore,
+        loseScore
+      );
+    }
+  }
+
   calculateLadderScore(): number {
     const min = 13;
     const max = 21;
@@ -309,113 +421,6 @@ export class GameRoomService {
     }
   }
 
-  private async endGame(
-    roomInfo: gameRoomInfo,
-    userGameRoomState: GameState,
-    winScore: number,
-    loseScore: number
-  ) {
-    const { roomId, user1, user2, broadcast } = roomInfo;
-    user1.emit("game-end", userGameRoomState);
-    user1.leave(roomId.toString());
-    user1.data.roomId = null;
-    user2.emit("game-end", userGameRoomState);
-    user2.leave(roomId.toString());
-    user2.data.roomId = null;
-    clearInterval(broadcast);
-
-    this.roomInfos[roomId] = null;
-    if (userGameRoomState.score1 === winScore) {
-      const winUserId = userGameRoomState.user1Id;
-      const loseUserId = userGameRoomState.user2Id;
-      await this.gameResult(
-        winUserId,
-        loseUserId,
-        roomInfo,
-        winScore,
-        loseScore
-      );
-    } else if (userGameRoomState.score2 === winScore) {
-      const winUserId = userGameRoomState.user2Id;
-      const loseUserId = userGameRoomState.user1Id;
-      await this.gameResult(
-        winUserId,
-        loseUserId,
-        roomInfo,
-        winScore,
-        loseScore
-      );
-    }
-  }
-
-  async createRoom(
-    user1: Socket,
-    user2: Socket,
-    mode: boolean,
-    isLadder: boolean
-  ) {
-    const player1 = await this.userService.findBySocketId(user1.id);
-    const player2 = await this.userService.findBySocketId(user2.id);
-    console.log(user1.id, user2.id);
-    await this.userService.updateStatus(player1.id);
-    await this.userService.updateStatus(player2.id);
-
-    const roomInfo: gameRoomInfo = await this.InitRoomState(
-      user1,
-      user2,
-      player1.id,
-      player2.id,
-      player1.nickname,
-      player2.nickname,
-      mode,
-      isLadder
-    );
-    const roomId = roomInfo.roomId;
-
-    await user1.join(roomId.toString());
-    await user2.join(roomId.toString());
-    user1.data = { ...user1.data, roomId: roomId };
-    user2.data = { ...user2.data, roomId: roomId };
-
-    const startState: GameState = this.makeStartState(roomInfo);
-    user1.emit("game-start", startState);
-    user2.emit("game-start", startState);
-
-    let timerId: NodeJS.Timeout | null;
-
-    let intervalId = setInterval(() => {
-      if (user1.disconnected === undefined || user1.disconnected) {
-        if (timerId) {
-          clearTimeout(timerId);
-          startState.score1 = 0;
-          startState.score2 = 5;
-          this.endGame(roomInfo, startState, 5, 0);
-          clearInterval(intervalId);
-        }
-      } else if (user2.disconnected === undefined || user2.disconnected) {
-        if (timerId) {
-          clearTimeout(timerId);
-          startState.score1 = 5;
-          startState.score2 = 0;
-          this.endGame(roomInfo, startState, 5, 0);
-          clearInterval(intervalId);
-        }
-      }
-    }, 50);
-
-    timerId = setTimeout(() => {
-      clearInterval(intervalId);
-      this.broadcastState = this.broadcastState.bind(this);
-      this.roomInfos[roomId] = roomInfo;
-      const broadcast = setInterval(
-        this.broadcastState,
-        20,
-        this.roomInfos[roomId]
-      );
-      this.roomInfos[roomId].broadcast = broadcast;
-    }, 3000);
-  }
-
   handleKeyState(
     client: Socket,
     keyInfo: {
@@ -446,6 +451,7 @@ export class GameRoomService {
   }
 
   async handleGameLeave(
+    userId: number,
     client: Socket,
     smallRoomInfo: {
       roomId: number;
@@ -453,7 +459,7 @@ export class GameRoomService {
       user2Id: number;
     }
   ) {
-    const user = await this.userService.findBySocketId(client.id);
+    const user = await this.userService.findOne(userId);
     const roomInfo = this.roomInfos[smallRoomInfo.roomId];
     if (!roomInfo) {
       return;

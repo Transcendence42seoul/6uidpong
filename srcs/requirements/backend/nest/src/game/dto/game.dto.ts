@@ -24,6 +24,19 @@ export class GameResultResponse {
   readonly endAt: Date;
 }
 
+// room
+export interface GameState {
+  roomId: number;
+  user1Id: number;
+  user2Id: number;
+  paddle1: number;
+  paddle2: number;
+  ballx: number;
+  bally: number;
+  score1: number;
+  score2: number;
+}
+
 export interface Ball {
   x: number;
   y: number;
@@ -37,18 +50,6 @@ export interface GameRoomState {
   paddle1: number;
   paddle2: number;
   ball: Ball;
-  score1: number;
-  score2: number;
-}
-
-export interface GameState {
-  roomId: number;
-  user1Id: number;
-  user2Id: number;
-  paddle1: number;
-  paddle2: number;
-  ballx: number;
-  bally: number;
   score1: number;
   score2: number;
 }
@@ -69,10 +70,7 @@ export interface gameRoomInfo {
   endAt: Date;
 }
 
-export interface keyCode {
-  keyCode: number;
-}
-
+// match
 export interface customRoomInfo {
   roomId: number;
   title: string;
@@ -80,11 +78,6 @@ export interface customRoomInfo {
   isPrivate: boolean;
   masterId: number;
   participantId: number | undefined;
-}
-
-export interface roomSecretInfo {
-  roomId: number;
-  master: Socket;
-  participant: Socket | undefined;
-  password: string | null;
+  masterSocket: Socket;
+  participantSocket: Socket | null;
 }

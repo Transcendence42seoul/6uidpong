@@ -5,9 +5,7 @@ import { typeORMConfig } from "./configs/typeorm.config";
 import { UserModule } from "./user/module/user.module";
 import { ChatModule } from "./chat/module/chat.module";
 import { ScheduleModule } from "@nestjs/schedule";
-import { GameModule } from "./game/module/game.match.module";
-import { GameRoomModule } from "./game/module/game.room.module";
-
+import { GameModule } from "./game/module/game.module";
 @Module({
   imports: [
     ScheduleModule.forRoot(),
@@ -16,7 +14,6 @@ import { GameRoomModule } from "./game/module/game.room.module";
     UserModule,
     ChatModule,
     GameModule,
-    GameRoomModule,
   ],
 })
 export class AppModule {}

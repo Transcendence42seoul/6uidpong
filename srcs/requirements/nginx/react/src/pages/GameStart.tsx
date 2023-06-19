@@ -42,7 +42,9 @@ const GameStart: React.FC = () => {
       setGameResult(result);
       setShowResultModal(true);
     };
+
     gameSocket?.on('game-end', resultHandler);
+
     return () => {
       gameSocket?.off('game-end', resultHandler);
       if (!showResultModal) gameSocket?.emit('leave-game', roomInfo);
@@ -70,27 +72,29 @@ const GameStart: React.FC = () => {
     gameSocket?.emit('keystate', keyInfo);
   }, [gameState?.score1, gameState?.score2]);
 
-  document.addEventListener('keydown', (key) => {
-    if (key.repeat) return;
-    if (key.keyCode === 38) {
-      setUpState(true);
-      setKeyState(true);
-    } else if (key.keyCode === 40) {
-      setDownState(true);
-      setKeyState(true);
-    }
-  });
+  useEffect(() => {
+    document.addEventListener('keydown', (key) => {
+      if (key.repeat) return;
+      if (key.keyCode === 38) {
+        setUpState(true);
+        setKeyState(true);
+      } else if (key.keyCode === 40) {
+        setDownState(true);
+        setKeyState(true);
+      }
+    });
 
-  document.addEventListener('keyup', (key) => {
-    if (key.repeat) return;
-    if (key.keyCode === 38) {
-      setUpState(false);
-      setKeyState(false);
-    } else if (key.keyCode === 40) {
-      setDownState(false);
-      setKeyState(false);
-    }
-  });
+    document.addEventListener('keyup', (key) => {
+      if (key.repeat) return;
+      if (key.keyCode === 38) {
+        setUpState(false);
+        setKeyState(false);
+      } else if (key.keyCode === 40) {
+        setDownState(false);
+        setKeyState(false);
+      }
+    });
+  }, [document]);
 
   useEffect(() => {
     const handleGameStateChange = (state: GameState) => {

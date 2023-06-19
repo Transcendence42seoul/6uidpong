@@ -52,7 +52,7 @@ export class GameMatchGateway {
       roomId: roomId,
       password: null,
     };
-    this.gameMatchService.joinCustomGame(jwt.id, client, roomInfo, this.server);
+    this.gameMatchService.joinCustomGame(jwt.id, client, roomInfo);
   }
 
   @SubscribeMessage("invite-failed")
@@ -91,7 +91,7 @@ export class GameMatchGateway {
       password: string | null;
     }
   ): void {
-    this.gameMatchService.joinCustomGame(jwt.id, client, roomInfo, this.server);
+    this.gameMatchService.joinCustomGame(jwt.id, client, roomInfo);
   }
 
   @SubscribeMessage("exit-custom-room")

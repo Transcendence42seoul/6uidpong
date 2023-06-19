@@ -6,7 +6,6 @@ import { setTimeout } from "timers";
 import { DataSource } from "typeorm";
 import { Ball, GameRoomState, GameState, gameRoomInfo } from "../dto/game.dto";
 import { GameResult } from "../entity/game.entity";
-import { GameMatchService } from "./match.service";
 
 const GameInfo = {
   width: 1200,
@@ -62,10 +61,8 @@ export class GameRoomService {
   }
 
   private async InitRoomState(
-    user1: Socket,
-    user2: Socket,
-    player1: number,
-    player2: number,
+    user1: [number, Socket],
+    user2: [number, Socket],
     player1Nickname: string,
     player2Nickname: string,
     mode: boolean,
@@ -78,8 +75,6 @@ export class GameRoomService {
       isLadder: isLadder,
       user1: user1,
       user2: user2,
-      user1Id: player1,
-      user2Id: player2,
       player1Nickname: player1Nickname,
       player2Nickname: player2Nickname,
       state: {
@@ -101,8 +96,8 @@ export class GameRoomService {
   makeStartState(roomInfo: gameRoomInfo) {
     const StartState: GameState = {
       roomId: roomInfo.roomId,
-      user1Id: roomInfo.user1Id,
-      user2Id: roomInfo.user2Id,
+      user1Id: roomInfo.user1[0],
+      user2Id: roomInfo.user2[0],
       paddle1: roomInfo.state.paddle1,
       paddle2: roomInfo.state.paddle2,
       ballx: roomInfo.state.ball.x,
@@ -114,21 +109,17 @@ export class GameRoomService {
   }
 
   async createRoom(
-    user1: number,
-    user2: number,
-    user1Socket: Socket,
-    user2Socket: Socket,
+    user1: [number, Socket],
+    user2: [number, Socket],
     mode: boolean,
     isLadder: boolean
   ) {
-    const player1 = await this.userService.findOne(user1);
-    const player2 = await this.userService.findOne(user2);
+    const player1 = await this.userService.findOne(user1[0]);
+    const player2 = await this.userService.findOne(user2[0]);
     await this.userService.updateStatus(player1.id);
     await this.userService.updateStatus(player2.id);
 
     const roomInfo: gameRoomInfo = await this.InitRoomState(
-      user1Socket,
-      user2Socket,
       user1,
       user2,
       player1.nickname,
@@ -138,19 +129,14 @@ export class GameRoomService {
     );
     const roomId = roomInfo.roomId;
 
-    await user1Socket.join(roomId.toString());
-    await user2Socket.join(roomId.toString());
-    user1Socket.data = { ...user1Socket.data, roomId: roomId };
-    user2Socket.data = { ...user2Socket.data, roomId: roomId };
-
     const startState: GameState = this.makeStartState(roomInfo);
-    user1Socket.emit("game-start", startState);
-    user2Socket.emit("game-start", startState);
+    user1[1].emit("game-start", startState);
+    user2[1].emit("game-start", startState);
 
     let timerId: NodeJS.Timeout | null;
 
     let intervalId = setInterval(() => {
-      if (user1Socket.disconnected === undefined || user1Socket.disconnected) {
+      if (user1[1].disconnected === undefined || user1[1].disconnected) {
         if (timerId) {
           clearTimeout(timerId);
           startState.score1 = 0;
@@ -158,10 +144,7 @@ export class GameRoomService {
           this.endGame(roomInfo, startState, 5, 0);
           clearInterval(intervalId);
         }
-      } else if (
-        user2Socket.disconnected === undefined ||
-        user2Socket.disconnected
-      ) {
+      } else if (user2[1].disconnected === undefined || user2[1].disconnected) {
         if (timerId) {
           clearTimeout(timerId);
           startState.score1 = 5;
@@ -186,7 +169,7 @@ export class GameRoomService {
   }
 
   broadcastState(roomInfo: gameRoomInfo) {
-    const { roomId, user1, user2, user1Id, user2Id, state, mode } = roomInfo;
+    const { roomId, user1, user2, state, mode } = roomInfo;
 
     state.paddle1 += state.keyState1 * 4 * 3;
     state.paddle2 += state.keyState2 * 4 * 3;
@@ -277,17 +260,17 @@ export class GameRoomService {
     }
 
     const userGameRoomState: GameState = this.makeUserState(
-      user1Id,
-      user2Id,
+      user1[0],
+      user2[0],
       state,
       roomId
     );
 
-    if (user1.disconnected === undefined || user1.disconnected) {
+    if (user1[1].disconnected === undefined || user1[1].disconnected) {
       userGameRoomState.score1 = 0;
       userGameRoomState.score2 = 5;
       this.endGame(roomInfo, userGameRoomState, 5, 0);
-    } else if (user2.disconnected === undefined || user2.disconnected) {
+    } else if (user2[1].disconnected === undefined || user2[1].disconnected) {
       userGameRoomState.score1 = 5;
       userGameRoomState.score2 = 0;
       this.endGame(roomInfo, userGameRoomState, 5, 0);
@@ -308,8 +291,8 @@ export class GameRoomService {
         userGameRoomState.score1
       );
     }
-    user1.emit("game-state", userGameRoomState);
-    user2.emit("game-state", userGameRoomState);
+    user1[1].emit("game-state", userGameRoomState);
+    user2[1].emit("game-state", userGameRoomState);
   }
 
   private async endGame(
@@ -319,12 +302,8 @@ export class GameRoomService {
     loseScore: number
   ) {
     const { roomId, user1, user2, broadcast } = roomInfo;
-    user1.emit("game-end", userGameRoomState);
-    user1.leave(roomId.toString());
-    user1.data.roomId = null;
-    user2.emit("game-end", userGameRoomState);
-    user2.leave(roomId.toString());
-    user2.data.roomId = null;
+    user1[1].emit("game-end", userGameRoomState);
+    user2[1].emit("game-end", userGameRoomState);
     clearInterval(broadcast);
 
     this.roomInfos[roomId] = null;
@@ -430,7 +409,7 @@ export class GameRoomService {
   ) {
     const roomInfo: gameRoomInfo = this.roomInfos[keyInfo.roomId];
     if (roomInfo) {
-      if (roomInfo.user1 === client) {
+      if (roomInfo.user1[1] === client) {
         if (keyInfo.message === "arrowUp") {
           roomInfo.state.keyState1--;
         } else if (keyInfo.message === "arrowDown") {
@@ -438,7 +417,7 @@ export class GameRoomService {
         } else if (keyInfo.message === "keyUnPressed") {
           roomInfo.state.keyState1 = 0;
         }
-      } else if (roomInfo.user2 === client) {
+      } else if (roomInfo.user2[1] === client) {
         if (keyInfo.message === "arrowUp") {
           roomInfo.state.keyState2--;
         } else if (keyInfo.message === "arrowDown") {
@@ -488,11 +467,11 @@ export class GameRoomService {
 
   clear(userId: number): void {
     for (let i = 0; i < this.roomInfos.length; i++) {
-      if (this.roomInfos[i]?.user1Id === userId) {
+      if (this.roomInfos[i]?.user1[0] === userId) {
         const state: GameState = {
           roomId: this.roomInfos[i].roomId,
-          user1Id: this.roomInfos[i].user1Id,
-          user2Id: this.roomInfos[i].user2Id,
+          user1Id: this.roomInfos[i].user1[0],
+          user2Id: this.roomInfos[i].user2[0],
           paddle1: 0,
           paddle2: 0,
           ballx: 0,
@@ -502,11 +481,11 @@ export class GameRoomService {
         };
         this.endGame(this.roomInfos[i], state, 0, 5);
         break;
-      } else if (this.roomInfos[i]?.user2Id === userId) {
+      } else if (this.roomInfos[i]?.user2[0] === userId) {
         const state: GameState = {
           roomId: this.roomInfos[i].roomId,
-          user1Id: this.roomInfos[i].user1Id,
-          user2Id: this.roomInfos[i].user2Id,
+          user1Id: this.roomInfos[i].user1[0],
+          user2Id: this.roomInfos[i].user2[0],
           paddle1: 0,
           paddle2: 0,
           ballx: 0,

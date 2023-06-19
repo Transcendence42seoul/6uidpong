@@ -58,10 +58,8 @@ export interface gameRoomInfo {
   roomId: number;
   mode: boolean;
   isLadder: boolean;
-  user1: Socket;
-  user2: Socket;
-  user1Id: number;
-  user2Id: number;
+  user1: [number, Socket];
+  user2: [number, Socket];
   player1Nickname: string;
   player2Nickname: string;
   state: GameRoomState;
@@ -78,6 +76,11 @@ export interface customRoomInfo {
   isPrivate: boolean;
   masterId: number;
   participantId: number | undefined;
-  masterSocket: Socket;
-  participantSocket: Socket | null;
+}
+
+export interface roomSecret {
+  roomId: number;
+  master: [number, Socket];
+  participant: [number | undefined, Socket | undefined];
+  password: string | null;
 }

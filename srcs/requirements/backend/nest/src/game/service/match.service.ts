@@ -86,7 +86,7 @@ export class GameMatchService {
       roomId,
     });
     this.roomSecrets.push(roomSecret);
-    client.emit("invited-room-crated", room);
+    client.emit("invite-room-created", room);
   }
 
   async handleInviteFail(roomId: number, server: Namespace) {
@@ -124,7 +124,7 @@ export class GameMatchService {
       roomId,
       master: [userId, client],
       participant: [undefined, undefined],
-      password: null,
+      password: roomInfo.password,
     };
     this.roomSecrets.push(roomSecret);
     client.emit("custom-room-created", room);

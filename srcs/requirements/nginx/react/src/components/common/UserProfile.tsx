@@ -40,6 +40,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
 
   const [isBlocked, setIsBlocked] = useState<boolean>(true);
   const [isFriend, setIsFriend] = useState<boolean>(false);
+  const [requestSent, setRequestSent] = useState<boolean>(false);
   const [user, setUser] = useState<User | null>(null);
 
   const handleBlockClick = () => {
@@ -67,6 +68,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
         method: 'delete',
       };
     } else {
+      setRequestSent(true);
       config = {
         url: `/api/v1/users/${myId}/friend-requests`,
         method: 'post',
@@ -96,6 +98,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
     if (!user) return;
     setIsBlocked(user.isBlocked);
     setIsFriend(user.isFriend);
+    setRequestSent(user.isFriendRequest);
   }, [user]);
 
   useEffect(() => {
@@ -140,12 +143,14 @@ const UserProfile: React.FC<UserProfileProps> = ({
         {children}
         {footer && (
           <div className="mt-2 w-full text-sm">
-            <HoverButton
-              onClick={handleFriendClick}
-              className="w-full border-y py-2"
-            >
-              {isFriend ? 'Delete Friend' : 'Friend Request'}
-            </HoverButton>
+            {!requestSent && (
+              <HoverButton
+                onClick={handleFriendClick}
+                className="w-full border-y py-2"
+              >
+                {isFriend ? 'Delete Friend' : 'Friend Request'}
+              </HoverButton>
+            )}
             <div>
               <HoverButton
                 className="w-[35%] px-4 py-2"

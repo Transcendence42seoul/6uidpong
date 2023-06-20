@@ -8,6 +8,7 @@ interface User {
   ladderScore: number;
   isBlocked: boolean;
   isFriend: boolean;
+  isFriendRequest: boolean;
   isOwner: boolean;
   isAdmin: boolean;
 }

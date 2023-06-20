@@ -1,10 +1,15 @@
 import React, { useCallback, useEffect, useState } from 'react';
 
+import selectAuth from '../../features/auth/authSelector';
 import HttpStatus from '../../utils/HttpStatus';
 import useCallApi from '../../utils/useCallApi';
+import HoverButton from '../common/HoverButton';
 
 const Nickname: React.FC = () => {
   const callApi = useCallApi();
+
+  const { tokenInfo } = selectAuth();
+  const myId = tokenInfo?.id;
 
   const [nickname, setNickname] = useState<string>('');
   const [warning, setWarning] = useState<string>('');
@@ -15,6 +20,15 @@ const Nickname: React.FC = () => {
     },
     [],
   );
+
+  const handleOkClick = () => {
+    const config = {
+      url: `/api/v1/users/${myId}/nickname`,
+      method: 'put',
+      data: { nickname },
+    };
+    callApi(config);
+  };
 
   useEffect(() => {
     if (warning) return;
@@ -54,19 +68,24 @@ const Nickname: React.FC = () => {
   }, [nickname]);
 
   return (
-    <label htmlFor="nickname" className="space-y-1.5">
+    <form className="space-y-1.5">
       Nickname
-      <input
-        type="text"
-        id="nickname"
-        value={nickname}
-        onChange={handleNicknameChange}
-        className={`focus:shadow-outline mt-2 w-full rounded border px-3 py-2 leading-tight text-gray-700 focus:outline-none ${
-          warning ? 'border-2 border-red-500' : 'border'
-        }`}
-      />
+      <div className="flex items-end leading-tight">
+        <input
+          type="text"
+          id="nickname"
+          value={nickname}
+          onChange={handleNicknameChange}
+          className={`focus:shadow-outline mt-2 w-full border px-3 py-2 text-gray-700 focus:outline-none ${
+            warning ? 'border-2 border-red-500' : 'border'
+          }`}
+        />
+        <HoverButton onClick={handleOkClick} className="h-full border p-2">
+          OK
+        </HoverButton>
+      </div>
       <p className="pl-2.5 text-left text-xs text-red-500">{warning}</p>
-    </label>
+    </form>
   );
 };
 

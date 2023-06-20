@@ -1,7 +1,10 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import selectAuth from '../../features/auth/authSelector';
-import selectSocket from '../../features/socket/socketSelector';
+import selectSocket, {
+  selectGameSocket,
+} from '../../features/socket/socketSelector';
 import formatTime from '../../utils/formatTime';
 import Alert from '../common/Alert';
 import ChatContainer from './ChatContainer';
@@ -11,6 +14,8 @@ import MessageBox from './MessageBox';
 import MessageForm from './MessageForm';
 
 import type Chat from '../../interfaces/Chat';
+import type Game from '../../interfaces/Game';
+import type Member from '../../interfaces/Member';
 import type SendResponse from '../../interfaces/SendResponse';
 import type SocketEvent from '../../interfaces/SocketEvent';
 
@@ -22,6 +27,11 @@ interface ChatRoomProps {
   send: SocketEvent;
 }
 
+interface Command {
+  action: string;
+  target: string[];
+}
+
 interface JoinResponse {
   newMsgCount: number;
   chats: Chat[];
@@ -31,9 +41,12 @@ interface JoinResponse {
 }
 
 const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send }) => {
+  const navigate = useNavigate();
+
   const { tokenInfo } = selectAuth();
   const myId = tokenInfo?.id;
 
+  const { gameSocket } = selectGameSocket();
   const { socket } = selectSocket();
 
   const chatContainer = useRef<HTMLDivElement>(null);
@@ -51,6 +64,41 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send }) => {
     setNewMsgCount(0);
   };
 
+  const isCommand = () => {
+    return inputMsg.startsWith('/');
+  };
+
+  const validateCommand = (command: Command) => {
+    const { action, target } = command;
+    if (action !== 'game') return null;
+    if (interlocutor ? target.length !== 0 : target.length !== 1) return null;
+    return command;
+  };
+
+  const parseCommand = () => {
+    const tokens = inputMsg.split(' ');
+    const action = tokens[0].substring(1);
+    const target = tokens.slice(1);
+    return validateCommand({ action, target });
+  };
+
+  const perform = ({ target }: Command) => {
+    if (interlocutor) {
+      gameSocket?.emit('invite-game', interlocutor);
+      return;
+    }
+    const { channelId } = join.data.info;
+    const membersHandler = (members: Member[]) => {
+      const opponent = members.find((member) => member.nickname === target[0]);
+      if (!opponent) {
+        setAlert('You can only invite the user in the channel.');
+        return;
+      }
+      gameSocket?.emit('invite-game', opponent.id);
+    };
+    socket?.emit('find-channel-users', { channelId }, membersHandler);
+  };
+
   const handleInputMsgChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       setInputMsg(event.target.value);
@@ -62,6 +110,15 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send }) => {
     (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
       if (!inputMsg) return;
+      if (isCommand()) {
+        const command = parseCommand();
+        if (!command) {
+          setAlert('Invalid command.');
+          return;
+        }
+        perform(command);
+        return;
+      }
       const { channelId, interlocutorId } = send.data;
       const sendData = {
         to: {
@@ -118,10 +175,22 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send }) => {
   }, []);
 
   useEffect(() => {
-    if (blocked && !showAlert) {
+    const gameHandler = (game: Game) => {
+      navigate(`/custom/${game.roomId}`, {
+        state: { game },
+      });
+    };
+    gameSocket?.on('invite-room-created', gameHandler);
+    return () => {
+      gameSocket?.off('invite-room-created', gameHandler);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (alert && !showAlert) {
       setShowAlert((prevState) => !prevState);
     }
-  }, [blocked]);
+  }, [alert]);
 
   useEffect(() => {
     const { current } = chatContainer;
@@ -145,12 +214,6 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send }) => {
       socket?.off('block', blockHandler);
     };
   }, [interlocutor]);
-
-  useEffect(() => {
-    if (muted && !showAlert) {
-      setShowAlert((prevState) => !prevState);
-    }
-  }, [muted]);
 
   return (
     <div className="mx-auto max-w-[1024px] p-4 pt-2">

@@ -30,7 +30,7 @@ export class FriendRequestService {
   }
 
   async findOne(fromId: number, toId: number): Promise<FriendRequest> {
-    return await this.friendRequestRepository.findOne({fromId, toId});
+    return await this.friendRequestRepository.findOneBy({ fromId, toId });
   }
 
   async insert(fromId: number, toId: number): Promise<FriendRequest> {

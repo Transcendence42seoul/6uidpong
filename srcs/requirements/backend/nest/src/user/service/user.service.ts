@@ -7,13 +7,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { PaginationOptions } from "src/utils/pagination/pagination.option";
 import { Repository } from "typeorm";
 import { User } from "../entity/user.entity";
-import {
-  existsSync,
-  mkdirSync,
-  unlinkSync,
-  writeFileSync,
-  createReadStream,
-} from "fs";
+import { existsSync, mkdirSync, writeFileSync, createReadStream } from "fs";
 import { Response } from "express";
 import { Pagination } from "src/utils/pagination/pagination";
 import { UserResponse } from "../dto/user-response";
@@ -22,6 +16,8 @@ import { BlockService } from "src/chat/service/dm/block.service";
 import { FriendService } from "./friend.service";
 import { Block } from "src/chat/entity/dm/block.entity";
 import { Friend } from "../entity/friend.entity";
+import { FriendRequestService } from "./friend-request.service";
+import { FriendRequest } from "../entity/friend-request.entity";
 
 @Injectable()
 export class UserService {
@@ -30,7 +26,7 @@ export class UserService {
     private readonly userRepository: Repository<User>,
     private readonly blockService: BlockService,
     private readonly friendService: FriendService,
-    private readonly friendRequestService: friendRequestService,
+    private readonly friendRequestService: FriendRequestService
   ) {}
 
   async findAll(options: PaginationOptions): Promise<Pagination<UserResponse>> {
@@ -112,12 +108,13 @@ export class UserService {
       requesterId,
       targetId
     );
-    const friendRequest: FriendRequest = await this.friendRequestService.findOne(requesterId, targetId);
+    const friendRequest: FriendRequest =
+      await this.friendRequestService.findOne(requesterId, targetId);
     return new UserProfileResponse(
       user,
       block ? true : false,
       friend ? true : false,
-      friendRequest ? true : false,
+      friendRequest ? true : false
     );
   }
 

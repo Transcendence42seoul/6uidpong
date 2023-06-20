@@ -1,13 +1,11 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { selectGameSocket } from '../../features/socket/socketSelector';
 import HoverButton from '../common/HoverButton';
 import ContentBox from '../common/ContentBox';
 import ModalContainer from '../container/ModalContainer';
 import UserProfile from '../common/UserProfile';
 
-import type Game from '../../interfaces/Game';
 import type GameState from '../../interfaces/GameState';
 
 interface GameResultModalProps {
@@ -21,31 +19,11 @@ const GameResultModal: React.FC<GameResultModalProps> = ({
 }) => {
   const navigate = useNavigate();
 
-  const { gameSocket } = selectGameSocket();
-
   const { user1Id, user2Id, score1, score2 } = gameResult;
-
   const p1Win = score1 > score2;
 
-  const handleGameListClick = () => {
-    navigate('/custom');
-  };
-
-  const handleHomeClick = () => {
-    navigate('/');
-  };
-
-  useEffect(() => {
-    const gameHandler = (game: Game) => {
-      navigate(`/custom/${game.roomId}`, {
-        state: { game },
-      });
-    };
-    gameSocket?.on('invite-room-created', gameHandler);
-    return () => {
-      gameSocket?.off('invite-room-created', gameHandler);
-    };
-  }, []);
+  const handleGameListClick = () => navigate('/custom');
+  const handleHomeClick = () => navigate('/');
 
   return (
     <ModalContainer setShowModal={setShowModal}>

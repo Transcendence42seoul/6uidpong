@@ -29,7 +29,8 @@ export class UserService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly blockService: BlockService,
-    private readonly friendService: FriendService
+    private readonly friendService: FriendService,
+    private readonly friendRequestService: friendRequestService,
   ) {}
 
   async findAll(options: PaginationOptions): Promise<Pagination<UserResponse>> {
@@ -111,10 +112,12 @@ export class UserService {
       requesterId,
       targetId
     );
+    const friendRequest: FriendRequest = await this.friendRequestService.findOne(requesterId, targetId);
     return new UserProfileResponse(
       user,
       block ? true : false,
-      friend ? true : false
+      friend ? true : false,
+      friendRequest ? true : false,
     );
   }
 

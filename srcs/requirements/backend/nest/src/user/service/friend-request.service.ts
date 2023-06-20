@@ -29,6 +29,10 @@ export class FriendRequestService {
     });
   }
 
+  async findOne(fromId: number, toId: number): Promise<FriendRequest> {
+    return await this.friendRequestRepository.findOne({fromId, toId});
+  }
+
   async insert(fromId: number, toId: number): Promise<FriendRequest> {
     await this.blockService.verify(fromId, toId);
     const friend: Friend = await this.friendService.findOne(fromId, toId);

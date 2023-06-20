@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 
 interface ModalContainerProps {
   setShowModal: (showModal: boolean) => void;
@@ -13,6 +14,9 @@ const ModalContainer: React.FC<ModalContainerProps> = ({
   className = '',
   closeButton = false,
 }) => {
+  const location = useLocation();
+  const initialRender = useRef(true);
+
   const handleCloseClick = () => {
     setShowModal(false);
   };
@@ -29,6 +33,14 @@ const ModalContainer: React.FC<ModalContainerProps> = ({
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
+
+  useEffect(() => {
+    if (initialRender.current) {
+      initialRender.current = false;
+      return;
+    }
+    setShowModal(false);
+  }, [location]);
 
   return (
     <div className="fixed inset-0 z-50 flex justify-center bg-gray-900 bg-opacity-60 pt-40">

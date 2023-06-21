@@ -18,7 +18,7 @@ const ChannelSettings: React.FC = () => {
 
   const { socket } = selectSocket();
 
-  const [disabled, setDisabled] = useState<boolean>(true);
+  const [disabled, setDisabled] = useState<boolean>(!channelId);
   const [isPasswordEnabled, setIsPasswordEnabled] = useState<boolean>(false);
   const [isPublic, setIsPublic] = useState<boolean>(true);
   const [password, setPassword] = useState<string>('');

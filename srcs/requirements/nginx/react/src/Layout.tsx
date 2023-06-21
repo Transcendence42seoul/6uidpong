@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 
 import GameInvite from './components/layout/GameInvite';
 import Header from './components/layout/Header';
-import { selectGameSocket } from './features/socket/socketSelector';
+import SocketContext from './context/SocketContext';
 
 import type GameInviteInfo from './interfaces/GameInviteInfo';
 
@@ -11,7 +11,7 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const { gameSocket } = selectGameSocket();
+  const { gameSocket } = useContext(SocketContext);
 
   const [gameInviteInfo, setGameInviteInfo] = useState<GameInviteInfo | null>(
     null,

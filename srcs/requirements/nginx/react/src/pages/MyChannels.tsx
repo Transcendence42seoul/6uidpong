@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import Alert from '../components/common/Alert';
@@ -6,7 +6,7 @@ import HoverButton from '../components/common/HoverButton';
 import ListInfoPanel from '../components/common/ListInfoPanel';
 import ListTitle from '../components/common/ListTitle';
 import ListContainer from '../components/container/ListContainer';
-import selectSocket from '../features/socket/socketSelector';
+import SocketContext from '../context/SocketContext';
 
 import type Channel from '../interfaces/Channel';
 import type SendResponse from '../interfaces/SendResponse';
@@ -19,7 +19,7 @@ const MyChannels: React.FC = () => {
 
   const navigate = useNavigate();
 
-  const { socket } = selectSocket();
+  const { socket } = useContext(SocketContext);
 
   const [channels, setChannels] = useState<Channel[]>([]);
   const [showAlert, setShowAlert] = useState<boolean>(!!alert);

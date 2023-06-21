@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 
 import ChannelRole from '../../constants/ChannelRole';
+import SocketContext from '../../context/SocketContext';
 import selectAuth from '../../features/auth/authSelector';
-import selectSocket from '../../features/socket/socketSelector';
 import HoverButton from '../common/HoverButton';
 import CircularImage from '../common/CircularImage';
 import ContentBox from '../common/ContentBox';
@@ -36,7 +36,7 @@ const ChannelManageModal: React.FC<ChannelManageModalProps> = ({
   const { tokenInfo } = selectAuth();
   const myId = tokenInfo?.id;
 
-  const { socket } = selectSocket();
+  const { socket } = useContext(SocketContext);
 
   const [admins, setAdmins] = useState<User[]>([]);
   const [banList, setBanList] = useState<User[]>([]);

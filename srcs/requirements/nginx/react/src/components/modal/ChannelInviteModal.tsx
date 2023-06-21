@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-import selectSocket from '../../features/socket/socketSelector';
+import SocketContext from '../../context/SocketContext';
 import useCallApi from '../../utils/useCallApi';
 import HoverButton from '../common/HoverButton';
 import ModalContainer from '../container/ModalContainer';
@@ -23,7 +23,7 @@ const ChannelInviteModal: React.FC<ChannelInviteModalProps> = ({
   const { channelId: channelIdString } = useParams<{ channelId: string }>();
   const channelId = Number(channelIdString);
 
-  const { socket } = selectSocket();
+  const { socket } = useContext(SocketContext);
 
   const [memberIds, setMemberIds] = useState<number[]>([]);
   const [nonmembers, setNonmembers] = useState<User[]>([]);

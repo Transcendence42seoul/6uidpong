@@ -1,9 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import GameInfoModal from '../components/modal/GameOpponentModal';
 
 import GameResultModal from '../components/modal/GameResultModal';
-import { selectGameSocket } from '../features/socket/socketSelector';
+import SocketContext from '../context/SocketContext';
 
 import type GameState from '../interfaces/GameState';
 
@@ -17,7 +17,8 @@ const GameInfo = {
 };
 
 const GameStart: React.FC = () => {
-  const { gameSocket } = selectGameSocket();
+  const { gameSocket } = useContext(SocketContext);
+
   const location = useLocation();
   const { roomId, user1Id, user2Id } = location.state;
 

@@ -1,11 +1,8 @@
 import { AxiosRequestConfig } from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import selectAuth from '../../features/auth/authSelector';
-import selectSocket, {
-  selectGameSocket,
-} from '../../features/socket/socketSelector';
 import useCallApi from '../../utils/useCallApi';
 import HoverButton from './HoverButton';
 import CircularImage from './CircularImage';
@@ -13,6 +10,7 @@ import ContentBox from './ContentBox';
 
 import type Game from '../../interfaces/Game';
 import type User from '../../interfaces/User';
+import SocketContext from '../../context/SocketContext';
 
 interface UserProfileProps {
   userId: number | undefined;
@@ -35,8 +33,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
   const { tokenInfo } = selectAuth();
   const myId = tokenInfo?.id;
 
-  const { gameSocket } = selectGameSocket();
-  const { socket } = selectSocket();
+  const { socket, gameSocket } = useContext(SocketContext);
 
   const [isBlocked, setIsBlocked] = useState<boolean>(true);
   const [isFriend, setIsFriend] = useState<boolean>(false);

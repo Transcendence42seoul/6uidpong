@@ -1,10 +1,13 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import selectAuth from '../../features/auth/authSelector';
-import selectSocket, {
-  selectGameSocket,
-} from '../../features/socket/socketSelector';
 import formatTime from '../../utils/formatTime';
 import Alert from '../common/Alert';
 import ChatContainer from './ChatContainer';
@@ -20,6 +23,7 @@ import type SendResponse from '../../interfaces/SendResponse';
 import type SocketEvent from '../../interfaces/SocketEvent';
 
 import { isTest, mockChats } from '../../mock'; // test
+import SocketContext from '../../context/SocketContext';
 
 interface ChatRoomProps {
   join: SocketEvent;
@@ -46,8 +50,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send }) => {
   const { tokenInfo } = selectAuth();
   const myId = tokenInfo?.id;
 
-  const { gameSocket } = selectGameSocket();
-  const { socket } = selectSocket();
+  const { socket, gameSocket } = useContext(SocketContext);
 
   const chatContainer = useRef<HTMLDivElement>(null);
   const [alert, setAlert] = useState<string>('');

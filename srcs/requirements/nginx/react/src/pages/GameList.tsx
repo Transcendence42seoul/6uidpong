@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import HoverButton from '../components/common/HoverButton';
@@ -6,7 +6,7 @@ import ListTitle from '../components/common/ListTitle';
 import ListContainer from '../components/container/ListContainer';
 import PasswordModal from '../components/modal/PasswordModal';
 import ImageSrc from '../constants/ImageSrc';
-import { selectGameSocket } from '../features/socket/socketSelector';
+import SocketContext from '../context/SocketContext';
 
 import type Game from '../interfaces/Game';
 
@@ -15,7 +15,7 @@ import { isTest, mockGames } from '../mock'; // test
 const GameList: React.FC = () => {
   const navigate = useNavigate();
 
-  const { gameSocket } = selectGameSocket();
+  const { gameSocket } = useContext(SocketContext);
 
   const [games, setGames] = useState<Game[]>([]); // test
   const [isWrongPassword, setIsWrongPassword] = useState<boolean>(false);

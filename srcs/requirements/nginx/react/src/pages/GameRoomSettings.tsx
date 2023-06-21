@@ -1,16 +1,16 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import ContentBox from '../components/common/ContentBox';
 import HoverButton from '../components/common/HoverButton';
-import { selectGameSocket } from '../features/socket/socketSelector';
+import SocketContext from '../context/SocketContext';
 
 import type Game from '../interfaces/Game';
 
 const GameRoomSettings: React.FC = () => {
   const navigate = useNavigate();
 
-  const { gameSocket } = selectGameSocket();
+  const { gameSocket } = useContext(SocketContext);
 
   const [disabled, setDisabled] = useState<boolean>(true);
   const [isPasswordEnabled, setIsPasswordEnabled] = useState<boolean>(false);

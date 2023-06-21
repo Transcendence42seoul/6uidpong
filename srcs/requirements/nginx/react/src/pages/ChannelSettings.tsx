@@ -1,11 +1,11 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import ChannelManagePanel from '../components/channel/ChannelManagePanel';
 import ContentBox from '../components/common/ContentBox';
 import HoverButton from '../components/common/HoverButton';
 import ToggleSwitch from '../components/common/ToggleSwitch';
-import selectSocket from '../features/socket/socketSelector';
+import SocketContext from '../context/SocketContext';
 
 import type Channel from '../interfaces/Channel';
 
@@ -16,7 +16,7 @@ const ChannelSettings: React.FC = () => {
 
   const navigate = useNavigate();
 
-  const { socket } = selectSocket();
+  const { socket } = useContext(SocketContext);
 
   const [disabled, setDisabled] = useState<boolean>(!channelId);
   const [isPasswordEnabled, setIsPasswordEnabled] = useState<boolean>(false);

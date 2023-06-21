@@ -1,12 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import Alert from '../components/common/Alert';
 
 import ContentBox from '../components/common/ContentBox';
 import HoverButton from '../components/common/HoverButton';
 import UserProfile from '../components/common/UserProfile';
+import SocketContext from '../context/SocketContext';
 import selectAuth from '../features/auth/authSelector';
-import { selectGameSocket } from '../features/socket/socketSelector';
 
 import type Game from '../interfaces/Game';
 
@@ -20,7 +20,7 @@ const GameRoom: React.FC = () => {
   const { tokenInfo } = selectAuth();
   const myId = tokenInfo?.id;
 
-  const { gameSocket } = selectGameSocket();
+  const { gameSocket } = useContext(SocketContext);
 
   const isStart = useRef<boolean>(false);
   const [gameStart, setGameStart] = useState<boolean>(true);
@@ -30,8 +30,6 @@ const GameRoom: React.FC = () => {
   const [showAlert, setShowAlert] = useState<boolean>(false);
 
   useEffect(() => {
-    console.log(tokenInfo);
-
     return () => {
       if (!isStart.current) gameSocket?.emit('exit-custom-room', roomId);
     };

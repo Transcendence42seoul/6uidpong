@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 
 import CircularImage from '../components/common/CircularImage';
 import HoverButton from '../components/common/HoverButton';
 import ListTitle from '../components/common/ListTitle';
-import selectSocket from '../features/socket/socketSelector';
+import SocketContext from '../context/SocketContext';
 
 import type User from '../interfaces/User';
 
 const BlockList: React.FC = () => {
-  const { socket } = selectSocket();
+  const { socket } = useContext(SocketContext);
 
   const [blockedUsers, setBlockedUsers] = useState<User[]>([]);
 

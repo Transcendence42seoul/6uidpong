@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import selectSocket from '../../features/socket/socketSelector';
+import SocketContext from '../../context/SocketContext';
 import HoverButton from '../common/HoverButton';
 import ChannelManageModal from '../modal/ChannelManageModal';
 import ContentBox from '../common/ContentBox';
@@ -17,7 +17,7 @@ const ChannelManagePanel: React.FC<ChannelManagePanelProps> = ({
 }) => {
   const navigate = useNavigate();
 
-  const { socket } = selectSocket();
+  const { socket } = useContext(SocketContext);
 
   const [showManageModal, setShowManageModal] = useState<boolean>(false);
 

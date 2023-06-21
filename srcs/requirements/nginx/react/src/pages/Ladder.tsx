@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import ImageSrc from '../constants/ImageSrc';
-import { selectGameSocket } from '../features/socket/socketSelector';
+import SocketContext from '../context/SocketContext';
 import GameState from '../interfaces/GameState';
 
 const Ladder: React.FC = () => {
-  const { gameSocket } = selectGameSocket();
+  const { gameSocket } = useContext(SocketContext);
   const [time, setTime] = useState({ minutes: 0, seconds: 0 });
   const { minutes, seconds } = time;
   const navigate = useNavigate();

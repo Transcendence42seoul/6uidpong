@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import HoverButton from '../components/common/HoverButton';
@@ -7,7 +7,7 @@ import ListTitle from '../components/common/ListTitle';
 import ListContainer from '../components/container/ListContainer';
 import PasswordModal from '../components/modal/PasswordModal';
 import ImageSrc from '../constants/ImageSrc';
-import selectSocket from '../features/socket/socketSelector';
+import SocketContext from '../context/SocketContext';
 
 import type Channel from '../interfaces/Channel';
 
@@ -16,7 +16,7 @@ import { isTest, mockChannels } from '../mock'; // test
 const AllChannels: React.FC = () => {
   const navigate = useNavigate();
 
-  const { socket } = selectSocket();
+  const { socket } = useContext(SocketContext);
 
   const [channels, setChannels] = useState<Channel[]>([]);
   const [selectedChannelId, setSelectedChannelId] = useState<number | null>(

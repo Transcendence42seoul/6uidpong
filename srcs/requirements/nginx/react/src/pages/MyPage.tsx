@@ -1,13 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-// import { v4 as uuidv4 } from 'uuid';
 
 import CircularImage from '../components/common/CircularImage';
 import ContentBox from '../components/common/ContentBox';
 import HoverButton from '../components/common/HoverButton';
 import ToggleSwitch from '../components/common/ToggleSwitch';
+import SocketContext from '../context/SocketContext';
 import selectAuth from '../features/auth/authSelector';
-import { selectGameSocket } from '../features/socket/socketSelector';
 import useCallApi from '../utils/useCallApi';
 
 import type User from '../interfaces/User';
@@ -33,7 +32,7 @@ const MyPage: React.FC = () => {
   const { tokenInfo } = selectAuth();
   const myId = tokenInfo?.id;
 
-  const { gameSocket } = selectGameSocket();
+  const { gameSocket } = useContext(SocketContext);
 
   const [gameHistory, setGameHistory] = useState<GameStats[]>([]);
   const [isLadder, setIsLadder] = useState<boolean>(true);

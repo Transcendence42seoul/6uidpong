@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useParams } from 'react-router-dom';
 
 import ChannelRole from '../../constants/ChannelRole';
+import SocketContext from '../../context/SocketContext';
 import selectAuth from '../../features/auth/authSelector';
-import selectSocket from '../../features/socket/socketSelector';
 import HoverButton from '../common/HoverButton';
 import UserProfile from '../common/UserProfile';
 
@@ -34,7 +34,7 @@ const ChannelMemberProfile: React.FC<ChannelMemberProfileProps> = ({
   const { tokenInfo } = selectAuth();
   const myId = tokenInfo?.id;
 
-  const { socket } = selectSocket();
+  const { socket } = useContext(SocketContext);
 
   const { id: userId } = member;
   const isMe = userId === myId;

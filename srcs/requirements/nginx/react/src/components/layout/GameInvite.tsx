@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { selectGameSocket } from '../../features/socket/socketSelector';
+import SocketContext from '../../context/SocketContext';
 import Notification from '../common/Notification';
 
 import type Game from '../../interfaces/Game';
@@ -15,7 +15,7 @@ interface GameInviteProps {
 const GameInvite: React.FC<GameInviteProps> = ({ info, setInfo }) => {
   const navigate = useNavigate();
 
-  const { gameSocket } = selectGameSocket();
+  const { gameSocket } = useContext(SocketContext);
 
   const { master, roomId } = info;
 

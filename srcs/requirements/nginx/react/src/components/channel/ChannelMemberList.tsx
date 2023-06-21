@@ -1,8 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
+import SocketContext from '../../context/SocketContext';
 import selectAuth from '../../features/auth/authSelector';
-import selectSocket from '../../features/socket/socketSelector';
 import startsWithIgnoreCase from '../../utils/startsWithIgnoreCase';
 import ChannelMemberProfile from './ChannelMemberProfile';
 import CircularImage from '../common/CircularImage';
@@ -28,7 +28,7 @@ const ChannelMemberList: React.FC<ChannelMemberListProps> = ({
   const { tokenInfo } = selectAuth();
   const myId = tokenInfo?.id;
 
-  const { socket } = selectSocket();
+  const { socket } = useContext(SocketContext);
 
   const searchResultsRef = useRef<HTMLUListElement>(null);
   const [members, setMembers] = useState<Member[]>([]);

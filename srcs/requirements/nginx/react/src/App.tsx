@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 import { Routes, Route } from 'react-router-dom';
 import { io, Socket } from 'socket.io-client';
@@ -34,6 +34,7 @@ import redirect from './utils/redirect';
 import useCallApi from './utils/useCallApi';
 
 import { isTest, mockAuthState } from './mock'; // test
+import SocketContext from './context/SocketContext';
 
 const App: React.FC = () => {
   const callApi = useCallApi();
@@ -116,29 +117,35 @@ const App: React.FC = () => {
 
   initSocket();
 
+  const sockets = useMemo(() => {
+    return { socket, gameSocket };
+  }, [socket, gameSocket]);
+
   return (
-    <Layout>
-      <Routes>
-        <Route path="/" element={<Main />} />
-        <Route path="/all-channels" element={<AllChannels />} />
-        <Route path="/block-list" element={<BlockList />} />
-        <Route path="/channel" element={<MyChannels />} />
-        <Route path="/channel-settings" element={<ChannelSettings />} />
-        <Route path="/channel/:channelId" element={<Channel />} />
-        <Route path="/custom" element={<GameList />} />
-        <Route path="/custom-settings" element={<GameRoomSettings />} />
-        <Route path="/custom/:gameId" element={<GameRoom />} />
-        <Route path="/dm" element={<DmRoomList />} />
-        <Route path="/dm/:roomId" element={<DmRoom />} />
-        <Route path="/friend-requests" element={<FriendRequests />} />
-        <Route path="/friends-list" element={<FriendsList />} />
-        <Route path="/my-page" element={<MyPage />} />
-        <Route path="/profile-settings" element={<ProfileSettings />} />
-        <Route path="/ladder" element={<Ladder />} />
-        <Route path="/game-start" element={<GameStart />} />
-        <Route path="*" element={<Error />} />
-      </Routes>
-    </Layout>
+    <SocketContext.Provider value={sockets}>
+      <Layout>
+        <Routes>
+          <Route path="/" element={<Main />} />
+          <Route path="/all-channels" element={<AllChannels />} />
+          <Route path="/block-list" element={<BlockList />} />
+          <Route path="/channel" element={<MyChannels />} />
+          <Route path="/channel-settings" element={<ChannelSettings />} />
+          <Route path="/channel/:channelId" element={<Channel />} />
+          <Route path="/custom" element={<GameList />} />
+          <Route path="/custom-settings" element={<GameRoomSettings />} />
+          <Route path="/custom/:gameId" element={<GameRoom />} />
+          <Route path="/dm" element={<DmRoomList />} />
+          <Route path="/dm/:roomId" element={<DmRoom />} />
+          <Route path="/friend-requests" element={<FriendRequests />} />
+          <Route path="/friends-list" element={<FriendsList />} />
+          <Route path="/my-page" element={<MyPage />} />
+          <Route path="/profile-settings" element={<ProfileSettings />} />
+          <Route path="/ladder" element={<Ladder />} />
+          <Route path="/game-start" element={<GameStart />} />
+          <Route path="*" element={<Error />} />
+        </Routes>
+      </Layout>
+    </SocketContext.Provider>
   );
 };
 

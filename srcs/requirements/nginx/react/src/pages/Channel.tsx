@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import ChannelMemberList from '../components/channel/ChannelMemberList';
@@ -7,7 +7,7 @@ import HoverButton from '../components/common/HoverButton';
 import ChannelErrorModal from '../components/modal/ChannelErrorModal';
 import ChannelInviteModal from '../components/modal/ChannelInviteModal';
 import ChannelRole from '../constants/ChannelRole';
-import selectSocket from '../features/socket/socketSelector';
+import SocketContext from '../context/SocketContext';
 
 const Channel: React.FC = () => {
   const { MEMBER, ADMIN, OWNER } = ChannelRole;
@@ -20,7 +20,7 @@ const Channel: React.FC = () => {
   const { channelId: channelIdString } = useParams<{ channelId: string }>();
   const channelId = Number(channelIdString);
 
-  const { socket } = selectSocket();
+  const { socket } = useContext(SocketContext);
 
   const [error, setError] = useState<string>('');
   const [role, setRole] = useState<number>(MEMBER);

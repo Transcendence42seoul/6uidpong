@@ -1,11 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import CircularImage from '../components/common/CircularImage';
 import ListInfoPanel from '../components/common/ListInfoPanel';
 import ListTitle from '../components/common/ListTitle';
 import ListContainer from '../components/container/ListContainer';
-import selectSocket from '../features/socket/socketSelector';
+import SocketContext from '../context/SocketContext';
 import formatTime from '../utils/formatTime';
 
 import type Position from '../interfaces/Position';
@@ -26,7 +26,7 @@ interface Room {
 const DmRoomList: React.FC = () => {
   const navigate = useNavigate();
 
-  const { socket } = selectSocket();
+  const { socket } = useContext(SocketContext);
 
   const menuRef = useRef<HTMLUListElement>(null);
   const [rooms, setRooms] = useState<Room[]>([]);

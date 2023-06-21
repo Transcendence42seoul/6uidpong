@@ -77,8 +77,12 @@ const FriendsList: React.FC = () => {
       <ul className="space-y-2">
         {friends.map((friend) => {
           const { id, nickname, image, status } = friend;
-          const statusColor =
-            status === 'offline' ? 'bg-red-400' : 'bg-green-400';
+          let statusColor = 'bg-red-400';
+          if (status === 'online') {
+            statusColor = 'bg-green-400';
+          } else if (status === 'game') {
+            statusColor = 'bg-yellow-400';
+          }
           return (
             <li
               key={id}

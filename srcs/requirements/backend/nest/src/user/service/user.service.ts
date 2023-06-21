@@ -90,7 +90,7 @@ export class UserService {
       id: profile.id,
       nickname: `undefined-${profile.id}`,
       email: profile.email,
-      image: profile.image.link,
+      image: profile.image ? profile.image.link : "",
     });
     return await this.userRepository.findOneBy({ id: profile.id });
   }

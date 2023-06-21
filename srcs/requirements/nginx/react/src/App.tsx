@@ -4,11 +4,9 @@ import { Routes, Route } from 'react-router-dom';
 import { io, Socket } from 'socket.io-client';
 
 import LoginAuth from './components/login/LoginAuth';
+import SocketContext from './context/SocketContext';
 import dispatchAuth from './features/auth/authAction';
 import selectAuth from './features/auth/authSelector';
-import dispatchSocket, {
-  dispatchGameSocket,
-} from './features/socket/socketAction';
 import Layout from './Layout';
 import AllChannels from './pages/AllChannels';
 import BlockList from './pages/BlockList';
@@ -34,7 +32,6 @@ import redirect from './utils/redirect';
 import useCallApi from './utils/useCallApi';
 
 import { isTest, mockAuthState } from './mock'; // test
-import SocketContext from './context/SocketContext';
 
 const App: React.FC = () => {
   const callApi = useCallApi();
@@ -58,17 +55,16 @@ const App: React.FC = () => {
     socket.on('connect', () => {
       socket?.emit('connection');
     });
-    await dispatchSocket({ socket }, dispatch);
 
     gameSocket = io('/game', { auth: { token: accessToken } });
     gameSocket.on('connect', () => {
       gameSocket?.emit('connection');
     });
-    await dispatchGameSocket({ gameSocket }, dispatch);
   };
 
   const logout = () => {
-    dispatchAuth(null, dispatch);
+    socket = null;
+    gameSocket = null;
   };
 
   useEffect(() => {

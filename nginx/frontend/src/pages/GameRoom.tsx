@@ -87,7 +87,6 @@ const GameRoom: React.FC = () => {
   useEffect(() => {
     const roomHandler = (updatedRoom: Game) => {
       setRoom({ ...updatedRoom });
-      console.log(room);
     };
     gameSocket?.on('game-start', startGame);
     gameSocket?.on('room-destroyed', exitGame);

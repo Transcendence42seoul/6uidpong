@@ -147,9 +147,7 @@ export class GameMatchService {
       } else if (this.roomSecrets[roomIndex].password === roomInfo.password) {
         room.participantId = userId;
         this.roomSecrets[roomIndex].participant = [userId, client];
-        console.log(room.participantId);
         this.roomSecrets[roomIndex].master[1].emit("user-join", room);
-        console.log(room.participantId);
         client.emit("user-join", room);
       } else {
         client.emit("wrong-password", roomInfo.roomId);

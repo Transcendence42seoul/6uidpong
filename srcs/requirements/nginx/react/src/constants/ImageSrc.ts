@@ -2,6 +2,9 @@ class ImageSrc {
   static readonly CHAT =
     'https://cdn-icons-png.flaticon.com/512/465/465227.png';
 
+  static readonly ERROR =
+    'https://cdn.dribbble.com/users/9961626/screenshots/17020877/media/28439af62e6180f44051751194b272e5.png';
+
   static readonly GAME =
     'https://cdn-icons-png.flaticon.com/512/746/746020.png';
 

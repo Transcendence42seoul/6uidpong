@@ -102,20 +102,21 @@ const ChannelSettings: React.FC = () => {
   return (
     <div className="flex items-center justify-center space-x-4 p-4">
       <ContentBox className="max-w-md space-y-6 bg-black px-6 pb-5 pt-4">
-        <label htmlFor="title" className="space-y-1.5">
-          Title
-          <input
-            type="text"
-            id="title"
-            value={title}
-            onChange={handleTitleChange}
-            disabled={!!channelId}
-            className={`focus:shadow-outline mt-2 w-full rounded px-3 py-2 leading-tight text-gray-700 focus:outline-none ${
-              warning ? 'border-2 border-red-500' : 'border'
-            }`}
-          />
-          <p className="pl-2.5 text-left text-xs text-red-500">{warning}</p>
-        </label>
+        {!channelId && (
+          <label htmlFor="title" className="space-y-1.5">
+            Title
+            <input
+              type="text"
+              id="title"
+              value={title}
+              onChange={handleTitleChange}
+              className={`focus:shadow-outline mt-2 w-full rounded px-3 py-2 leading-tight text-gray-700 focus:outline-none ${
+                warning ? 'border-2 border-red-500' : 'border'
+              }`}
+            />
+            <p className="pl-2.5 text-left text-xs text-red-500">{warning}</p>
+          </label>
+        )}
         <div className="space-y-2">
           <label htmlFor="password">
             Password
@@ -144,13 +145,15 @@ const ChannelSettings: React.FC = () => {
             Enable
           </label>
         </div>
-        <ToggleSwitch
-          checked={!isPublic}
-          leftText="Public"
-          rightText="Private"
-          setChecked={setIsPublic}
-          color
-        />
+        {!channelId && (
+          <ToggleSwitch
+            checked={!isPublic}
+            leftText="Public"
+            rightText="Private"
+            setChecked={setIsPublic}
+            color
+          />
+        )}
         <div className="flex space-x-4">
           <HoverButton
             onClick={handleConfirmClick}

@@ -129,14 +129,14 @@ export class GameMatchService {
     client.emit("custom-room-created", room);
   }
 
-  async joinCustomGame(
+  joinCustomGame(
     userId: number,
     client: Socket,
     roomInfo: {
       roomId: number;
       password: string | null;
     }
-  ): Promise<void> {
+  ): void {
     const roomIndex = this.rooms.findIndex(
       (room) => room.roomId === roomInfo.roomId
     );
@@ -148,9 +148,9 @@ export class GameMatchService {
         room.participantId = userId;
         this.roomSecrets[roomIndex].participant = [userId, client];
         console.log(room.participantId);
-        await this.roomSecrets[roomIndex].master[1].emit("user-join", room);
+        this.roomSecrets[roomIndex].master[1].emit("user-join", room);
         console.log(room.participantId);
-        await client.emit("user-join", room);
+        client.emit("user-join", room);
       } else {
         client.emit("wrong-password", roomInfo.roomId);
       }

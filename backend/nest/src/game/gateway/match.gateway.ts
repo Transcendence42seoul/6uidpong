@@ -43,16 +43,16 @@ export class GameMatchGateway {
   }
 
   @SubscribeMessage("invite-success")
-  async handleInviteSuccess(
+  handleInviteSuccess(
     @WsJwtPayload() jwt: JwtPayload,
     @ConnectedSocket() client: Socket,
     @MessageBody() roomId: number
-  ): Promise<void> {
+  ): void {
     const roomInfo = {
       roomId: roomId,
       password: null,
     };
-    await this.gameMatchService.joinCustomGame(jwt.id, client, roomInfo);
+    this.gameMatchService.joinCustomGame(jwt.id, client, roomInfo);
   }
 
   @SubscribeMessage("invite-failed")
@@ -81,7 +81,7 @@ export class GameMatchGateway {
   }
 
   @SubscribeMessage("join-custom-room")
-  async joinCustomGame(
+  joinCustomGame(
     @WsJwtPayload() jwt: JwtPayload,
     @ConnectedSocket()
     client: Socket,
@@ -90,7 +90,7 @@ export class GameMatchGateway {
       roomId: number;
       password: string | null;
     }
-  ): Promise<void> {
+  ): void {
     this.gameMatchService.joinCustomGame(jwt.id, client, roomInfo);
   }
 

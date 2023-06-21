@@ -38,7 +38,7 @@ export class BlockService {
     return await this.blockRepository.countBy([
       { userId: user1Id, blockedUserId: user2Id }, 
       { userId: user2Id, blockedUserId: user1Id }
-    ]);
+    ]) ? true : false;
   }
 
   async delete(userId: number, interlocutorId: number): Promise<void> {

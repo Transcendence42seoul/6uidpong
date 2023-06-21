@@ -16,7 +16,7 @@ import Channel from './pages/Channel';
 import ChannelSettings from './pages/ChannelSettings';
 import DmRoom from './pages/DmRoom';
 import DmRoomList from './pages/DmRoomList';
-import ErrorPage from './pages/Error';
+import Error from './pages/Error';
 import FriendRequests from './pages/FriendRequests';
 import FriendsList from './pages/FriendsList';
 import GameList from './pages/GameList';
@@ -130,13 +130,13 @@ const App: React.FC = () => {
         <Route path="/custom/:gameId" element={<GameRoom />} />
         <Route path="/dm" element={<DmRoomList />} />
         <Route path="/dm/:roomId" element={<DmRoom />} />
-        <Route path="/error" element={<ErrorPage />} />
         <Route path="/friend-requests" element={<FriendRequests />} />
         <Route path="/friends-list" element={<FriendsList />} />
         <Route path="/my-page" element={<MyPage />} />
         <Route path="/profile-settings" element={<ProfileSettings />} />
         <Route path="/ladder" element={<Ladder />} />
         <Route path="/game-start" element={<GameStart />} />
+        <Route path="*" element={<Error />} />
       </Routes>
     </Layout>
   );

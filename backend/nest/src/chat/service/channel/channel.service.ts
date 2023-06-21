@@ -289,7 +289,7 @@ export class ChannelService {
       );
       await queryRunner.commitTransaction();
 
-      client.emit("channel-exit");
+      client.emit("exit-channel");
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;

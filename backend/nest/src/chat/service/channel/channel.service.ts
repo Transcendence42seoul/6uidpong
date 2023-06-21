@@ -167,7 +167,7 @@ export class ChannelService {
         channelUser.createdAt
       );
       const channelUsers: ChannelUser[] = await this.channelUserService.find(channelId);
-      return new JoinResponse(channelId, channelUser.newMsgCount, chats, channelUsers);
+      return new JoinResponse(channelId, channelUser.newMsgCount, chats, channelUsers.map((channelUser) => new UserResponse(channelUser)));
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;

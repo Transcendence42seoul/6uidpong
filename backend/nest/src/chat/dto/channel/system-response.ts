@@ -1,9 +1,9 @@
-import { ChannelUser } from "src/chat/entity/channel/channel-user.entity";
 import { ChannelChat } from "src/chat/entity/channel/chat.entity";
 import { ChatResponse } from "./chat-response";
+import { UserResponse } from "./user-response";
 
 export class SystemResponse {
-  constructor(channelId: number, chat: ChannelChat, channelUsers: ChannelUser[]) {
+  constructor(channelId: number, chat: ChannelChat, channelUsers: UserResponse[]) {
     this.channelId = channelId;
     this.chatResponse = new ChatResponse(chat);
     this.channelUsers = channelUsers;
@@ -13,5 +13,5 @@ export class SystemResponse {
 
   readonly chatResponse: ChatResponse;
 
-  readonly channelUsers: ChannelUser[];
+  readonly channelUsers: UserResponse[];
 }

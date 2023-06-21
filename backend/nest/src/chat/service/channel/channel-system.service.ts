@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { Namespace } from "socket.io";
 import { SystemResponse } from "src/chat/dto/channel/system-response";
+import { UserResponse } from "src/chat/dto/channel/user-response";
 import { ChannelUser } from "src/chat/entity/channel/channel-user.entity";
 import { ChannelChat } from "src/chat/entity/channel/chat.entity";
 import { EntityManager, InsertResult } from "typeorm";
@@ -58,6 +59,6 @@ export class ChannelSystemService {
     });
     server
       .to(onlineSockets)
-      .emit("channel-system", new SystemResponse(channelId, chat, channelUsers));
+      .emit("channel-system", new SystemResponse(channelId, chat, channelUsers.map((channelUser) => new UserResponse(channelUser))));
   }
 }

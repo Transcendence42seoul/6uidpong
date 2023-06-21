@@ -8,6 +8,7 @@ import ModalContainer from '../container/ModalContainer';
 import UserList from '../common/UserList';
 import UserListWithSearchBar from '../common/UserListWithSearchBar';
 
+import type Member from '../../interfaces/Member';
 import type User from '../../interfaces/User';
 
 interface ChannelInviteModalProps {
@@ -24,8 +25,25 @@ const ChannelInviteModal: React.FC<ChannelInviteModalProps> = ({
 
   const { socket } = selectSocket();
 
-  const [allUsers, setAllUsers] = useState<User[]>([]);
+  const [memberIds, setMemberIds] = useState<number[]>([]);
+  const [nonmembers, setNonmembers] = useState<User[]>([]);
   const [selectedUsers, setSelectedUsers] = useState<Set<User>>(new Set());
+
+  const fetchAllUsers = async () => {
+    const config = {
+      url: '/api/v1/users/search',
+      params: { nickname: '' },
+    };
+    const { data: users } = await callApi(config);
+    return users;
+  };
+
+  const fetchMemberIds = () => {
+    const membersHandler = (members: Member[]) => {
+      setMemberIds(members.map((member) => member.id));
+    };
+    socket?.emit('find-channel-users', { channelId }, membersHandler);
+  };
 
   const handleCancelClick = () => {
     setShowModal(false);
@@ -55,20 +73,21 @@ const ChannelInviteModal: React.FC<ChannelInviteModalProps> = ({
   };
 
   useEffect(() => {
-    const fetchAllUsers = async () => {
-      const config = {
-        url: '/api/v1/users/search',
-        params: { nickname: '' },
-      };
-      const { data: users } = await callApi(config);
-      setAllUsers([...users]);
-    };
-    fetchAllUsers();
+    fetchMemberIds();
   }, []);
+
+  useEffect(() => {
+    if (memberIds.length === 0) return;
+    const handleNonmembers = async () => {
+      const users: User[] = await fetchAllUsers();
+      setNonmembers([...users.filter((user) => !memberIds.includes(user.id))]);
+    };
+    handleNonmembers();
+  }, [memberIds]);
 
   return (
     <ModalContainer setShowModal={setShowModal} className="flex space-x-8">
-      <UserListWithSearchBar users={allUsers} onUserClick={onUserClick} />
+      <UserListWithSearchBar users={nonmembers} onUserClick={onUserClick} />
       <UserList
         title="Invite"
         users={selectedUsers}

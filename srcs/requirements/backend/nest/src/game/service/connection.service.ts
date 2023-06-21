@@ -21,7 +21,6 @@ export class ConnectionService {
   async connect(client: Socket, server: Namespace): Promise<void> {
     const { token } = client.handshake.auth;
     if (typeof token === "undefined") {
-      console.log('aaa');
       throw new WsException("");
     }
     const payload = await this.jwtService.verifyAsync(token, {

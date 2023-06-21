@@ -455,9 +455,6 @@ export class ChannelService {
       channelId,
       inviterId
     );
-    if (!inviter.isAdmin) {
-      throw new WsException("permission denied.");
-    }
     if (await this.banService.includes(channelId, userIds)) {
       throw new WsException("can't invite the user as they have been banned.");
     }

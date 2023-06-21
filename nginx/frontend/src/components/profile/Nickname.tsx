@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 
 import selectAuth from '../../features/auth/authSelector';
 import useCallApi from '../../utils/useCallApi';
+import Notification from '../common/Notification';
 
 const Nickname: React.FC = () => {
   const callApi = useCallApi();
@@ -11,6 +12,8 @@ const Nickname: React.FC = () => {
 
   const [disabled, setDisabled] = useState<boolean>(true);
   const [nickname, setNickname] = useState<string>('');
+  const [notification, setNotification] = useState<string>('');
+  const [showNotification, setShowNotification] = useState<boolean>(false);
   const [warning, setWarning] = useState<string>('');
 
   const handleNicknameChange = useCallback(
@@ -27,6 +30,7 @@ const Nickname: React.FC = () => {
       data: { nickname },
     };
     callApi(config);
+    setNotification('Nickname has been changed.');
   };
 
   const validateNickname = async () => {
@@ -62,6 +66,10 @@ const Nickname: React.FC = () => {
     };
   }, [nickname]);
 
+  useEffect(() => {
+    setShowNotification(!!notification);
+  }, [notification]);
+
   return (
     <form className="space-y-1.5">
       Nickname
@@ -86,6 +94,11 @@ const Nickname: React.FC = () => {
         </button>
       </div>
       <p className="pl-2.5 text-left text-xs text-red-500">{warning}</p>
+      {showNotification && (
+        <Notification setShowNotification={setShowNotification}>
+          {notification}
+        </Notification>
+      )}
     </form>
   );
 };

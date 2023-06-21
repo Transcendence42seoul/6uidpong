@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import ContentBox from '../components/common/ContentBox';
@@ -21,6 +21,7 @@ const GameRoom: React.FC = () => {
 
   const { gameSocket } = selectGameSocket();
 
+  const isStart = useRef<boolean>(false);
   const [gameStart, setGameStart] = useState<boolean>(true);
   const [mode, setMode] = useState<boolean>(false);
   const [room, setRoom] = useState<Game>(game);
@@ -28,7 +29,7 @@ const GameRoom: React.FC = () => {
 
   useEffect(() => {
     return () => {
-      gameSocket?.emit('exit-custom-room', roomId);
+      if (!isStart.current) gameSocket?.emit('exit-custom-room', roomId);
     };
   }, []);
 
@@ -41,6 +42,7 @@ const GameRoom: React.FC = () => {
       alert('사람 다 없음');
       return;
     }
+    isStart.current = true;
     const { masterId, participantId } = room;
     navigate('/game-start', {
       state: { roomId, user1Id: masterId, user2Id: participantId },

@@ -10,9 +10,8 @@ import { selectGameSocket } from '../features/socket/socketSelector';
 import type Game from '../interfaces/Game';
 
 const GameRoom: React.FC = () => {
-  const { state } = useLocation();
-  const { game } = state;
-
+  const location = useLocation();
+  const { game } = location.state;
   const navigate = useNavigate();
 
   const { gameId: roomIdString } = useParams<{ gameId: string }>();
@@ -26,6 +25,12 @@ const GameRoom: React.FC = () => {
   const [mode, setMode] = useState<boolean>(false);
   const [room, setRoom] = useState<Game>(game);
   const [isDisabled, setIsdisabled] = useState<boolean>(false);
+
+  useEffect(() => {
+    return () => {
+      gameSocket?.emit('exit-custom-room', roomId);
+    };
+  }, []);
 
   const exitGame = () => {
     setGameStart(false);

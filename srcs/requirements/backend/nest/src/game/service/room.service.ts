@@ -216,7 +216,6 @@ export class GameRoomService {
       }
     }
 
-    //  paddle
     if (
       state.ball.x <=
         -(GameInfo.width / 2 - GameInfo.paddlex - GameInfo.ballrad) &&
@@ -242,7 +241,6 @@ export class GameRoomService {
       state.ball.dx *= -1;
     }
 
-    //end
     if (state.ball.x >= GameInfo.width / 2 - GameInfo.ballrad) {
       state.score1 += 1;
       state.paddle1 = 0;

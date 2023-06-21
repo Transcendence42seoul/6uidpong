@@ -27,7 +27,11 @@ const Ladder: React.FC = () => {
       const { roomId, user1Id, user2Id } = roomInfo;
       navigate('/game-start', { state: { roomId, user1Id, user2Id } });
     });
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      gameSocket?.off('game-start');
+      gameSocket?.emit('ladder-game-match-cancel');
+    };
   }, []);
   const formattedMinutes = minutes.toLocaleString('en-US', {
     minimumIntegerDigits: 2,

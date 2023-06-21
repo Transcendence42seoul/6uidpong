@@ -144,4 +144,5 @@ export class GameMatchGateway {
   ): Promise<GameResultResponse[]> {
     return await this.gameMatchService.handleFindMatches(jwt.id);
   }
+
 }

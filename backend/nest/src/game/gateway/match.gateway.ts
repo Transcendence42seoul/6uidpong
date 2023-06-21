@@ -43,21 +43,21 @@ export class GameMatchGateway {
   }
 
   @SubscribeMessage("invite-success")
-  handleInviteSuccess(
+  async handleInviteSuccess(
     @WsJwtPayload() jwt: JwtPayload,
     @ConnectedSocket() client: Socket,
     @MessageBody() roomId: number
-  ): void {
+  ): Promise<void> {
     const roomInfo = {
       roomId: roomId,
       password: null,
     };
-    this.gameMatchService.joinCustomGame(jwt.id, client, roomInfo);
+    await this.gameMatchService.joinCustomGame(jwt.id, client, roomInfo);
   }
 
   @SubscribeMessage("invite-failed")
-  handleInviteFail(@MessageBody() roomId: number): void {
-    this.gameMatchService.handleInviteFail(roomId, this.server);
+  async handleInviteFail(@MessageBody() roomId: number): Promise<void> {
+    await this.gameMatchService.handleInviteFail(roomId, this.server);
   }
 
   // 일반 cutsom 방 생성
@@ -67,7 +67,7 @@ export class GameMatchGateway {
   }
 
   @SubscribeMessage("create-custom-room")
-  createCustomGame(
+  async createCustomGame(
     @WsJwtPayload() jwt: JwtPayload,
     @ConnectedSocket()
     client: Socket,
@@ -76,12 +76,12 @@ export class GameMatchGateway {
       title: string;
       password: string | null;
     }
-  ): void {
-    this.gameMatchService.createCustomGame(jwt.id, client, roomInfo);
+  ): Promise<void> {
+    await this.gameMatchService.createCustomGame(jwt.id, client, roomInfo);
   }
 
   @SubscribeMessage("join-custom-room")
-  joinCustomGame(
+  async joinCustomGame(
     @WsJwtPayload() jwt: JwtPayload,
     @ConnectedSocket()
     client: Socket,
@@ -90,39 +90,39 @@ export class GameMatchGateway {
       roomId: number;
       password: string | null;
     }
-  ): void {
+  ): Promise<void> {
     this.gameMatchService.joinCustomGame(jwt.id, client, roomInfo);
   }
 
   @SubscribeMessage("exit-custom-room")
-  exitCustomGame(
+  async exitCustomGame(
     @WsJwtPayload() jwt: JwtPayload,
     @MessageBody() roomId: number
-  ): void {
-    this.gameMatchService.exitCustomGame(jwt.id, roomId, this.server);
+  ): Promise<void> {
+    await this.gameMatchService.exitCustomGame(jwt.id, roomId, this.server);
   }
 
   @SubscribeMessage("change-mode")
-  handleChangeMode(
+  async handleChangeMode(
     @MessageBody()
     roomInfo: {
       roomId: number;
       newMode: boolean;
     }
-  ): void {
-    this.gameMatchService.changeMode(roomInfo, this.server);
+  ): Promise<void> {
+    await this.gameMatchService.changeMode(roomInfo, this.server);
   }
 
   @SubscribeMessage("start-custom-room")
-  startCustomGame(
+  async sstartCustomGame(
     @ConnectedSocket() client: Socket,
     @MessageBody()
     roomInfo: {
       roomId: number;
       mode: boolean;
     }
-  ): void {
-    this.gameMatchService.customGameStart(client, roomInfo);
+  ): Promise<void> {
+    await this.gameMatchService.customGameStart(client, roomInfo);
   }
 
   @SubscribeMessage("ladder-game-match")

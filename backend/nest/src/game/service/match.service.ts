@@ -85,7 +85,6 @@ export class GameMatchService {
       master: master.nickname,
       roomId,
     });
-    this.roomSecrets.push(roomSecret);
     client.emit("invite-room-created", room);
   }
 
@@ -148,8 +147,10 @@ export class GameMatchService {
       } else if (this.roomSecrets[roomIndex].password === roomInfo.password) {
         room.participantId = userId;
         this.roomSecrets[roomIndex].participant = [userId, client];
-        this.roomSecrets[roomIndex].master[1].emit("user-join", room);
-        client.emit("user-join", room);
+        console.log(room.participantId);
+        await this.roomSecrets[roomIndex].master[1].emit("user-join", room);
+        console.log(room.participantId);
+        await client.emit("user-join", room);
       } else {
         client.emit("wrong-password", roomInfo.roomId);
       }

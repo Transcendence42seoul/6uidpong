@@ -87,6 +87,7 @@ const GameRoom: React.FC = () => {
   useEffect(() => {
     const roomHandler = (updatedRoom: Game) => {
       setRoom({ ...updatedRoom });
+      console.log(room);
     };
     gameSocket?.on('game-start', startGame);
     gameSocket?.on('room-destroyed', exitGame);
@@ -100,7 +101,7 @@ const GameRoom: React.FC = () => {
       gameSocket?.off('user-exit', roomHandler);
       gameSocket?.off('user-join', roomHandler);
     };
-  }, [gameSocket, room]);
+  }, [gameSocket, room, setRoom]);
 
   useEffect(() => {
     if (!gameStart) {

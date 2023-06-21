@@ -278,7 +278,7 @@ export class ChannelService {
     try {
       const primaryKey = { channelId, userId };
       const systemMessage: string = `${channelUser.user.nickname} has left`;
-
+      
       await queryRunner.manager.delete(ChannelUser, primaryKey);
       await this.systemService.send(
         queryRunner.manager,
@@ -287,8 +287,9 @@ export class ChannelService {
         systemMessage,
         server
       );
-
       await queryRunner.commitTransaction();
+
+      client.emit("channel-exit");
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;

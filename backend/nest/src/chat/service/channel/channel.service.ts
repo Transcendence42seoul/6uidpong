@@ -39,11 +39,11 @@ export class ChannelService {
   ) {}
 
   async findAllChannels(userId: number): Promise<AllChannelResponse[]> {
-    return this.roomService.findAll(userId);
+    return await this.roomService.findAll(userId);
   }
 
   async findMyChannels(userId: number): Promise<MyChannelResponse[]> {
-    return this.roomService.find(userId);
+    return await this.roomService.find(userId);
   }
 
   async isDuplicated(title: string): Promise<boolean> {

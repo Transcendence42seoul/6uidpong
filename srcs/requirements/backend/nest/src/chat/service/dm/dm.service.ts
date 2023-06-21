@@ -88,14 +88,13 @@ export class DmService {
         dmUser.roomId,
         dmUser.createdAt
       );
-      const block: Block = await this.blockService.findOne(
-        interlocutorId,
-        userId
-      );
       return new JoinResponse(
         interlocutorId,
         dmUser.newMsgCount,
-        block ? true : false,
+        await this.blockService.isBlocked(
+          interlocutorId,
+          userId
+        ),
         chats
       );
     } catch (error) {

@@ -33,6 +33,17 @@ const GameStart: React.FC = () => {
   const roomInfo = { roomId, user1Id, user2Id };
 
   useEffect(() => {
+    const handleBack = () => {
+      gameSocket?.emit('leave-game', roomInfo);
+    };
+
+    window.addEventListener('popstate', handleBack);
+    return () => {
+      window.removeEventListener('popstate', handleBack);
+    };
+  }, []);
+
+  useEffect(() => {
     if (gameSocket) {
       setShowInfoModal(true);
       setTimeout(() => {

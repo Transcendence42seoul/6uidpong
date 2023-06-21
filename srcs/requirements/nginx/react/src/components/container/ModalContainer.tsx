@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 
 interface ModalContainerProps {
-  setShowModal: (showModal: boolean) => void;
+  setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
   children: React.ReactNode;
   className?: string;
   closeButton?: boolean;

@@ -10,7 +10,7 @@ import type GameState from '../../interfaces/GameState';
 
 interface GameResultModalProps {
   gameResult: GameState;
-  setShowModal: (showModal: boolean) => void;
+  setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const GameResultModal: React.FC<GameResultModalProps> = ({

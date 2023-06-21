@@ -15,7 +15,7 @@ import type User from '../../interfaces/User';
 interface ChannelManageModalProps {
   channelId: number;
   role: number;
-  setShowModal: (showModal: boolean) => void;
+  setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 interface SendData {

@@ -10,7 +10,7 @@ interface PlayerId {
 
 interface GameInfoModalProps {
   playerId: PlayerId;
-  setShowModal: (showModal: boolean) => void;
+  setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const GameInfoModal: React.FC<GameInfoModalProps> = ({

@@ -12,7 +12,7 @@ import type Member from '../../interfaces/Member';
 import type User from '../../interfaces/User';
 
 interface ChannelInviteModalProps {
-  setShowModal: (showModal: boolean) => void;
+  setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const ChannelInviteModal: React.FC<ChannelInviteModalProps> = ({

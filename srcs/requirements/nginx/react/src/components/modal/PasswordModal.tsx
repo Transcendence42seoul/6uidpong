@@ -7,7 +7,7 @@ import ContentBox from '../common/ContentBox';
 interface PasswordModalProps {
   isWrongPassword: boolean;
   onConfirmClick: (password: string) => void;
-  setShowModal: (showModal: boolean) => void;
+  setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const PasswordModal: React.FC<PasswordModalProps> = ({

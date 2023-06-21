@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux';
 
 import dispatchAuth from '../features/auth/authAction';
 import selectAuth from '../features/auth/authSelector';
+import HttpStatus from './HttpStatus';
 
 const useCallApi = () => {
   const dispatch = useDispatch();
@@ -23,7 +24,9 @@ const useCallApi = () => {
     try {
       return await httpRequest(config);
     } catch (error) {
-      dispatchAuth(null, dispatch);
+      if (!HttpStatus.isConflict(error)) {
+        dispatchAuth(null, dispatch);
+      }
       throw error;
     }
   };

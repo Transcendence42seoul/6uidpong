@@ -1,9 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 
 import selectAuth from '../../features/auth/authSelector';
-import HttpStatus from '../../utils/HttpStatus';
 import useCallApi from '../../utils/useCallApi';
-import HoverButton from '../common/HoverButton';
 
 const Nickname: React.FC = () => {
   const callApi = useCallApi();
@@ -11,6 +9,7 @@ const Nickname: React.FC = () => {
   const { tokenInfo } = selectAuth();
   const myId = tokenInfo?.id;
 
+  const [disabled, setDisabled] = useState<boolean>(true);
   const [nickname, setNickname] = useState<string>('');
   const [warning, setWarning] = useState<string>('');
 
@@ -30,27 +29,23 @@ const Nickname: React.FC = () => {
     callApi(config);
   };
 
-  useEffect(() => {
-    if (warning) return;
-    const validateNickname = async () => {
-      const config = {
-        url: '/api/v1/users/check-nickname',
-        method: 'post',
-        data: { nickname },
-      };
-      try {
-        await callApi(config);
-      } catch (error) {
-        if (!HttpStatus.isConflict(error)) {
-          throw error;
-        }
-        setWarning('That nickname is taken. Try another.');
-      }
+  const validateNickname = async () => {
+    const config = {
+      url: '/api/v1/users/check-nickname',
+      method: 'post',
+      data: { nickname },
     };
-    validateNickname();
-  }, [warning]);
+    try {
+      await callApi(config);
+      setWarning('');
+      setDisabled(false);
+    } catch (error) {
+      setWarning('That nickname is taken. Try another.');
+    }
+  };
 
   useEffect(() => {
+    setDisabled(true);
     if (!nickname) return;
     const timeoutId = setTimeout(() => {
       const regex = /^[a-zA-Z0-9]+$/;
@@ -59,7 +54,7 @@ const Nickname: React.FC = () => {
       } else if (nickname.length < 4 || nickname.length > 14) {
         setWarning('Sorry, your nickname must be between 4 and 14 characters.');
       } else {
-        setWarning('');
+        validateNickname();
       }
     }, 500);
     return () => {
@@ -80,9 +75,15 @@ const Nickname: React.FC = () => {
             warning ? 'border-2 border-red-500' : 'border'
           }`}
         />
-        <HoverButton onClick={handleOkClick} className="h-full border p-2">
+        <button
+          onClick={handleOkClick}
+          className={`h-full border p-2 ${
+            disabled ? 'text-gray-400' : 'hover:bg-white hover:text-black'
+          }`}
+          disabled={disabled}
+        >
           OK
-        </HoverButton>
+        </button>
       </div>
       <p className="pl-2.5 text-left text-xs text-red-500">{warning}</p>
     </form>

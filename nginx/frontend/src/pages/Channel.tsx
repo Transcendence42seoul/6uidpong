@@ -53,7 +53,6 @@ const Channel: React.FC = () => {
 
   const handleExitClick = () => {
     socket?.emit('exit', { channelId });
-    exitChannel();
   };
 
   const handleInviteClick = () => {

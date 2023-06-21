@@ -5,7 +5,7 @@ RUN apk update && \
 
 WORKDIR /app
 
-COPY react .
+COPY frontend .
 
 RUN npm install && \
     npm run build

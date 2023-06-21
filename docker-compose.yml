@@ -33,7 +33,7 @@ services:
 
   backend:
     build:
-      context: requirements/backend/
+      context: backend/
       dockerfile: Dockerfile
     container_name: backend
     environment:
@@ -52,12 +52,10 @@ services:
     networks:
       - transcendence
     restart: always
-    # volumes:
-    #   - ./requirements/backend/nest:/app
 
   nginx:
     build:
-      context: requirements/nginx/
+      context: nginx/
       dockerfile: Dockerfile
     container_name: nginx
     depends_on:

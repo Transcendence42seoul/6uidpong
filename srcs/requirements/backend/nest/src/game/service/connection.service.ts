@@ -74,17 +74,15 @@ export class ConnectionService {
           gameSocketId: "",
         }
       );
-      if (user.status === "game") {
-        await queryRunner.manager.update(
-          User,
-          {
-            gameSocketId: socketId,
-          },
-          {
-            status: "offline",
-          }
-        );
-      }
+      await queryRunner.manager.update(
+        User,
+        {
+          gameSocketId: socketId,
+        },
+        {
+          status: "offline",
+        }
+      );
       await queryRunner.commitTransaction();
     } catch (error) {
       await queryRunner.rollbackTransaction();

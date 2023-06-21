@@ -63,6 +63,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
   const handleFriendClick = () => {
     let config: AxiosRequestConfig;
     if (isFriend) {
+      setIsFriend(false);
       config = {
         url: `/api/v1/users/${myId}/friends/${userId}`,
         method: 'delete',
@@ -146,12 +147,12 @@ const UserProfile: React.FC<UserProfileProps> = ({
             {!requestSent && (
               <HoverButton
                 onClick={handleFriendClick}
-                className="w-full border-y py-2"
+                className="w-full border-t py-2"
               >
                 {isFriend ? 'Delete Friend' : 'Friend Request'}
               </HoverButton>
             )}
-            <div>
+            <div className="border-t">
               <HoverButton
                 className="w-[35%] px-4 py-2"
                 onClick={handleGameClick}

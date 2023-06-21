@@ -7,6 +7,7 @@ import React, {
 } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import SocketContext from '../../context/SocketContext';
 import selectAuth from '../../features/auth/authSelector';
 import formatTime from '../../utils/formatTime';
 import Alert from '../common/Alert';
@@ -21,14 +22,15 @@ import type Game from '../../interfaces/Game';
 import type Member from '../../interfaces/Member';
 import type SendResponse from '../../interfaces/SendResponse';
 import type SocketEvent from '../../interfaces/SocketEvent';
+import type SystemResponse from '../../interfaces/SystemResponse';
 
 import { isTest, mockChats } from '../../mock'; // test
-import SocketContext from '../../context/SocketContext';
 
 interface ChatRoomProps {
   join: SocketEvent;
   leave: SocketEvent;
   send: SocketEvent;
+  setMembers?: React.Dispatch<React.SetStateAction<Member[]>>;
 }
 
 interface Command {
@@ -42,9 +44,15 @@ interface JoinResponse {
   interlocutorId?: number;
   isBlocked?: boolean;
   channelId?: number;
+  channelUsers?: Member[];
 }
 
-const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send }) => {
+const ChatRoom: React.FC<ChatRoomProps> = ({
+  join,
+  leave,
+  send,
+  setMembers = undefined,
+}) => {
   const navigate = useNavigate();
 
   const { tokenInfo } = selectAuth();
@@ -146,12 +154,16 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send }) => {
       chats: prevChats,
       interlocutorId = undefined,
       isBlocked = undefined,
+      channelUsers: members = undefined,
     }: JoinResponse) => {
       setNewMsgCount(newMsgCnt);
       setChats([...prevChats]);
-      if (!interlocutorId) return;
-      setInterlocutor(interlocutorId);
-      setBlocked(!!isBlocked);
+      if (interlocutorId && isBlocked !== undefined) {
+        setInterlocutor(interlocutorId);
+        setBlocked(isBlocked);
+      } else if (setMembers && members) {
+        setMembers([...members]);
+      }
     };
     socket?.emit(join.name, join.data, chatsHandler);
     setChats(isTest ? mockChats : chats); // test
@@ -162,7 +174,16 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send }) => {
 
   useEffect(() => {
     const chatHandler = ({ chatResponse: chat }: SendResponse) => addChat(chat);
+    const systemChatHandler = ({
+      chatResponse: chat,
+      channelUsers: members,
+    }: SystemResponse) => {
+      if (!setMembers) return;
+      addChat(chat);
+      setMembers([...members]);
+    };
     socket?.on(send.name, chatHandler);
+    socket?.on('channel-system', systemChatHandler);
     return () => {
       socket?.off(send.name, chatHandler);
     };

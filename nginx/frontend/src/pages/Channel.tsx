@@ -9,6 +9,8 @@ import ChannelInviteModal from '../components/modal/ChannelInviteModal';
 import ChannelRole from '../constants/ChannelRole';
 import SocketContext from '../context/SocketContext';
 
+import type Member from '../interfaces/Member';
+
 const Channel: React.FC = () => {
   const { MEMBER, ADMIN, OWNER } = ChannelRole;
 
@@ -23,6 +25,7 @@ const Channel: React.FC = () => {
   const { socket } = useContext(SocketContext);
 
   const [error, setError] = useState<string>('');
+  const [members, setMembers] = useState<Member[]>([]);
   const [role, setRole] = useState<number>(MEMBER);
   const [showErrorModal, setShowErrorModal] = useState<boolean>(false);
   const [showInviteModal, setShowInviteModal] = useState<boolean>(false);
@@ -77,10 +80,12 @@ const Channel: React.FC = () => {
     };
     socket?.on('banned-channel', banHandler);
     socket?.on('delete-channel', deleteHandler);
+    socket?.on('exit-channel', exitChannel);
     socket?.on('kicked-channel', kickHandler);
     return () => {
       socket?.off('banned-channel', banHandler);
       socket?.off('delete-channel', deleteHandler);
+      socket?.off('exit-channel', exitChannel);
       socket?.off('kicked-channel', kickHandler);
     };
   }, []);
@@ -108,7 +113,7 @@ const Channel: React.FC = () => {
 
   return (
     <div className="flex space-x-1 px-4">
-      <ChannelMemberList role={role} setRole={setRole} />
+      <ChannelMemberList members={members} role={role} setRole={setRole} />
       <div className="w-full max-w-[1024px]">
         <div className="flex justify-between space-x-1.5 px-4">
           {role >= ADMIN && (
@@ -133,7 +138,12 @@ const Channel: React.FC = () => {
             )}
           </div>
         </div>
-        <ChatRoom join={join} leave={leave} send={send} />
+        <ChatRoom
+          join={join}
+          leave={leave}
+          send={send}
+          setMembers={setMembers}
+        />
       </div>
       {showErrorModal && (
         <ChannelErrorModal message={error} setShowModal={setShowErrorModal} />

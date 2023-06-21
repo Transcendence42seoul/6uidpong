@@ -1,7 +1,5 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useEffect, useRef, useState } from 'react';
 
-import SocketContext from '../../context/SocketContext';
 import selectAuth from '../../features/auth/authSelector';
 import startsWithIgnoreCase from '../../utils/startsWithIgnoreCase';
 import ChannelMemberProfile from './ChannelMemberProfile';
@@ -9,55 +7,31 @@ import CircularImage from '../common/CircularImage';
 import ModalContainer from '../container/ModalContainer';
 
 import type Member from '../../interfaces/Member';
-import type SendResponse from '../../interfaces/SendResponse';
-
-import { isTest, mockUsers } from '../../mock'; // test
 
 interface ChannelMemberListProps {
+  members: Member[];
   role: number;
   setRole: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const ChannelMemberList: React.FC<ChannelMemberListProps> = ({
+  members,
   role,
   setRole,
 }) => {
-  const { channelId: channelIdString } = useParams<{ channelId: string }>();
-  const channelId = Number(channelIdString);
-
   const { tokenInfo } = selectAuth();
   const myId = tokenInfo?.id;
 
-  const { socket } = useContext(SocketContext);
-
   const searchResultsRef = useRef<HTMLUListElement>(null);
-  const [members, setMembers] = useState<Member[]>([]);
   const [searchResults, setSearchResults] = useState<Member[]>(members);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
   const [showMemberProfileModal, setShowMemberProfileModal] =
     useState<boolean>(false);
 
-  const setMyRole = (memberList: Member[]) => {
-    const myInfo = memberList.find((member) => member.id === myId);
-    if (!myInfo) return;
-    const { isAdmin, isOwner } = myInfo;
-    const myRole = Number(isAdmin) + Number(isOwner);
-    setRole(myRole);
-  };
-
   const handleMemberClick = (member: Member) => {
     setSelectedMember(member);
     setShowMemberProfileModal(true);
-  };
-
-  const handleMembers = async () => {
-    const membersHandler = async (memberList: Member[]) => {
-      setMembers([...memberList]);
-      setMyRole(memberList);
-    };
-    socket?.emit('find-channel-users', { channelId }, membersHandler);
-    setMembers(isTest ? mockUsers : members); // test
   };
 
   const handleSearchTermChange = (
@@ -74,19 +48,11 @@ const ChannelMemberList: React.FC<ChannelMemberListProps> = ({
   };
 
   useEffect(() => {
-    const chatHandler = async ({ chatResponse: chat }: SendResponse) => {
-      if (chat.isSystem) {
-        await handleMembers();
-      }
-    };
-    socket?.on('send-channel', chatHandler);
-    return () => {
-      socket?.off('send-channel', chatHandler);
-    };
-  }, []);
-
-  useEffect(() => {
-    handleMembers();
+    const myInfo = members.find((member) => member.id === myId);
+    if (!myInfo) return;
+    const { isAdmin, isOwner } = myInfo;
+    const myRole = Number(isAdmin) + Number(isOwner);
+    setRole(myRole);
   }, []);
 
   useEffect(() => {

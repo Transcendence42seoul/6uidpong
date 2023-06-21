@@ -45,7 +45,7 @@ export class AuthController {
     } else {
       res.status(HttpStatus.OK);
       if (user.is2FA) {
-        this.authService.send2FACode(user.id, user.email);
+        await this.authService.send2FACode(user.id, user.email);
         return new CallbackResponse(true, user.id);
       }
     }

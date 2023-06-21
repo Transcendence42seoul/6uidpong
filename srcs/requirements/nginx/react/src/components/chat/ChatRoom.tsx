@@ -193,6 +193,12 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send }) => {
   }, [alert]);
 
   useEffect(() => {
+    if (blocked) {
+      setAlert("You can't send DM to the user who blocked you.");
+    }
+  }, [blocked]);
+
+  useEffect(() => {
     const { current } = chatContainer;
     if (!current) return;
 
@@ -205,7 +211,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send }) => {
   useEffect(() => {
     const blockHandler = ({ userId: blockUser }: { userId: number }) => {
       if (!blocked && blockUser === interlocutor) {
-        setAlert("You can't send DM to user who blocked you.");
+        setAlert("You can't send DM to the user who blocked you.");
         setBlocked((prevState) => !prevState);
       }
     };
@@ -213,7 +219,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send }) => {
     return () => {
       socket?.off('block', blockHandler);
     };
-  }, [interlocutor]);
+  }, [blocked, interlocutor]);
 
   return (
     <div className="mx-auto max-w-[1024px] p-4 pt-2">

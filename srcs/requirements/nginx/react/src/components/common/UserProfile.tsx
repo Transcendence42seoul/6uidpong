@@ -13,6 +13,7 @@ import ContentBox from './ContentBox';
 
 import type Game from '../../interfaces/Game';
 import type User from '../../interfaces/User';
+import Alert from './Alert';
 
 interface UserProfileProps {
   userId: number | undefined;
@@ -34,6 +35,8 @@ const UserProfile: React.FC<UserProfileProps> = ({
 
   const { tokenInfo } = selectAuth();
   const myId = tokenInfo?.id;
+  const [inRoom, setInRoom] = useState<boolean>(true);
+  const [inGame, setInGame] = useState<boolean>(true);
 
   const { gameSocket } = selectGameSocket();
   const { socket } = selectSocket();
@@ -89,8 +92,18 @@ const UserProfile: React.FC<UserProfileProps> = ({
         state: { game },
       });
     };
+    const alreadyInGame = () => {
+      setInGame(true);
+    };
+    const alreadyInRoom = () => {
+      setInRoom(true);
+    };
+    gameSocket?.on('participant-already-ingame', alreadyInGame);
+    gameSocket?.on('participant-already-in-game-room', alreadyInRoom);
     gameSocket?.on('invite-room-created', gameHandler);
     return () => {
+      gameSocket?.off('invite-room-created', gameHandler);
+      gameSocket?.off('participant-already-in-game-room', alreadyInRoom);
       gameSocket?.off('invite-room-created', gameHandler);
     };
   }, []);
@@ -177,6 +190,12 @@ const UserProfile: React.FC<UserProfileProps> = ({
           </div>
         )}
       </ContentBox>
+      {inGame && (
+        <Alert message="User is already in game" setShowAlert={setInGame} />
+      )}
+      {inRoom && (
+        <Alert message="User is already in game" setShowAlert={setInRoom} />
+      )}
     </div>
   );
 };

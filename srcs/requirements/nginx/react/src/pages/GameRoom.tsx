@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import Alert from '../components/common/Alert';
 
 import ContentBox from '../components/common/ContentBox';
 import HoverButton from '../components/common/HoverButton';
@@ -26,6 +27,7 @@ const GameRoom: React.FC = () => {
   const [mode, setMode] = useState<boolean>(false);
   const [room, setRoom] = useState<Game>(game);
   const [isDisabled, setIsdisabled] = useState<boolean>(false);
+  const [showAlert, setShowAlert] = useState<boolean>(false);
 
   useEffect(() => {
     return () => {
@@ -39,7 +41,7 @@ const GameRoom: React.FC = () => {
 
   const startGame = () => {
     if (!room.participantId) {
-      alert('사람 다 없음');
+      setShowAlert(true);
       return;
     }
     isStart.current = true;
@@ -160,6 +162,9 @@ const GameRoom: React.FC = () => {
           </div>
         </div>
       </ContentBox>
+      {showAlert && (
+        <Alert message="User is not full" setShowAlert={setShowAlert} />
+      )}
     </div>
   );
 };

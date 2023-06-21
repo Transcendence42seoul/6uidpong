@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
+import ChannelRole from '../../constants/ChannelRole';
+import selectAuth from '../../features/auth/authSelector';
 import selectSocket from '../../features/socket/socketSelector';
 import HoverButton from '../common/HoverButton';
 import CircularImage from '../common/CircularImage';
@@ -9,7 +11,6 @@ import UserList from '../common/UserList';
 import UserListWithSeacrhBar from '../common/UserListWithSearchBar';
 
 import type User from '../../interfaces/User';
-import ChannelRole from '../../constants/ChannelRole';
 
 interface ChannelManageModalProps {
   channelId: number;
@@ -31,6 +32,9 @@ const ChannelManageModal: React.FC<ChannelManageModalProps> = ({
   setShowModal,
 }) => {
   const { OWNER } = ChannelRole;
+
+  const { tokenInfo } = selectAuth();
+  const myId = tokenInfo?.id;
 
   const { socket } = selectSocket();
 
@@ -117,7 +121,7 @@ const ChannelManageModal: React.FC<ChannelManageModalProps> = ({
 
   useEffect(() => {
     const membersHandler = (users: User[]) => {
-      setMembers([...users]);
+      setMembers([...users.filter((user) => user.id !== myId)]);
     };
     socket?.emit('find-channel-users', { channelId }, membersHandler);
   }, []);

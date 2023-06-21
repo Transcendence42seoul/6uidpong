@@ -1,13 +1,18 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import ContentBox from '../components/common/ContentBox';
 import HoverButton from '../components/common/HoverButton';
 import ImageSrc from '../constants/ImageSrc';
+import selectAuth from '../features/auth/authSelector';
 
 const Main: React.FC = () => {
   const navigate = useNavigate();
+  const { tokenInfo } = selectAuth();
 
+  useEffect(() => {
+    console.log(tokenInfo);
+  }, []);
   const handleChannelClick = () => navigate('/channel');
   const handleCustomClick = () => navigate('/custom');
   const handleDmClick = () => navigate('/dm');

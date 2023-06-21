@@ -30,6 +30,8 @@ const GameRoom: React.FC = () => {
   const [showAlert, setShowAlert] = useState<boolean>(false);
 
   useEffect(() => {
+    console.log(tokenInfo);
+
     return () => {
       if (!isStart.current) gameSocket?.emit('exit-custom-room', roomId);
     };

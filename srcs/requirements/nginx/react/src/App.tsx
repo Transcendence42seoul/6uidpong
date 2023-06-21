@@ -13,7 +13,6 @@ import Layout from './Layout';
 import AllChannels from './pages/AllChannels';
 import BlockList from './pages/BlockList';
 import Channel from './pages/Channel';
-import ChannelList from './pages/ChannelList';
 import ChannelSettings from './pages/ChannelSettings';
 import DmRoom from './pages/DmRoom';
 import DmRoomList from './pages/DmRoomList';
@@ -27,6 +26,7 @@ import Ladder from './pages/Ladder';
 import Loading from './pages/Loading';
 import Login from './pages/Login';
 import Main from './pages/Main';
+import MyChannels from './pages/MyChannels';
 import MyPage from './pages/MyPage';
 import ProfileSettings from './pages/ProfileSettings';
 import redirect from './utils/redirect';
@@ -121,7 +121,7 @@ const App: React.FC = () => {
         <Route path="/" element={<Main />} />
         <Route path="/all-channels" element={<AllChannels />} />
         <Route path="/block-list" element={<BlockList />} />
-        <Route path="/channel" element={<ChannelList />} />
+        <Route path="/channel" element={<MyChannels />} />
         <Route path="/channel-settings" element={<ChannelSettings />} />
         <Route path="/channel/:channelId" element={<Channel />} />
         <Route path="/custom" element={<GameList />} />

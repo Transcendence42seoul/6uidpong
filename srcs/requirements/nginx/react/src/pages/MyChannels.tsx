@@ -13,7 +13,7 @@ import type SendResponse from '../interfaces/SendResponse';
 
 import { isTest, mockChannels } from '../mock'; // test
 
-const ChannelList: React.FC = () => {
+const MyChannels: React.FC = () => {
   const { state } = useLocation();
   const alert = state?.alert;
 
@@ -99,4 +99,4 @@ const ChannelList: React.FC = () => {
   );
 };
 
-export default ChannelList;
+export default MyChannels;

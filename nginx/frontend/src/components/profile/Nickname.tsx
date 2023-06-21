@@ -23,7 +23,8 @@ const Nickname: React.FC = () => {
     [],
   );
 
-  const handleOkClick = () => {
+  const handleOkClick = (event: React.MouseEvent) => {
+    event.preventDefault();
     const config = {
       url: `/api/v1/users/${myId}/nickname`,
       method: 'put',
@@ -31,6 +32,7 @@ const Nickname: React.FC = () => {
     };
     callApi(config);
     setNotification('Nickname has been changed.');
+    setDisabled(true);
   };
 
   const validateNickname = async () => {

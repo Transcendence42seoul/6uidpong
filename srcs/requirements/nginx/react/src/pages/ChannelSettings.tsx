@@ -47,8 +47,10 @@ const ChannelSettings: React.FC = () => {
   const handleConfirmClick = async () => {
     if (channelId) {
       const updatePasswordData = {
-        channelId,
-        password,
+        info: {
+          channelId,
+          password,
+        },
       };
       socket?.emit('update-password', updatePasswordData);
       return;

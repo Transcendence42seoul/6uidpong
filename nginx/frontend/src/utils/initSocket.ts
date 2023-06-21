@@ -3,9 +3,9 @@ import { io, Socket } from 'socket.io-client';
 let socket: Socket | null = null;
 let gameSocket: Socket | null = null;
 
-const connectSocket = (namespace: string, token?: string) => {
+export const initSocket = (token?: string) => {
   if (!socket) {
-    socket = io(namespace, { auth: { token } });
+    socket = io('/chat', { auth: { token } });
     socket.on('connect', () => {
       socket?.emit('connection');
     });
@@ -13,10 +13,12 @@ const connectSocket = (namespace: string, token?: string) => {
   return socket;
 };
 
-const initSocket = (token?: string) => {
-  socket = connectSocket('/chat', token);
-  gameSocket = connectSocket('/game', token);
-  return { socket, gameSocket };
+export const initGameSocket = (token?: string) => {
+  if (!gameSocket) {
+    gameSocket = io('/game', { auth: { token } });
+    gameSocket.on('connect', () => {
+      gameSocket?.emit('connection');
+    });
+  }
+  return gameSocket;
 };
-
-export default initSocket;

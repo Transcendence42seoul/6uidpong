@@ -28,11 +28,9 @@ import Main from './pages/Main';
 import MyChannels from './pages/MyChannels';
 import MyPage from './pages/MyPage';
 import ProfileSettings from './pages/ProfileSettings';
-import initSocket from './utils/initSocket';
+import { initSocket, initGameSocket } from './utils/initSocket';
 import redirect from './utils/redirect';
 import useCallApi from './utils/useCallApi';
-
-import type Sockets from './interfaces/Sockets';
 
 import { isTest, mockAuthState } from './mock'; // test
 
@@ -46,7 +44,8 @@ const App: React.FC = () => {
 
   const [loading, setLoading] = useState<boolean>(false);
 
-  let { socket, gameSocket }: Sockets = initSocket(accessToken);
+  let socket: Socket | null = initSocket(accessToken);
+  let gameSocket: Socket | null = initGameSocket(accessToken);
 
   const handleLoading = async () => {
     setLoading(true);

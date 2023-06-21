@@ -158,15 +158,15 @@ const ChannelSettings: React.FC = () => {
           />
         )}
         <div className="flex space-x-4">
-          <HoverButton
+          <button
             onClick={handleConfirmClick}
             className={`border bg-blue-800 p-2 ${
-              disabled ? 'text-gray-400' : 'hover:text-blue-800'
+              disabled ? 'text-gray-400' : 'hover:bg-white hover:text-blue-800'
             }`}
             disabled={disabled}
           >
             Confirm
-          </HoverButton>
+          </button>
           <HoverButton onClick={handleCancelClick} className="border p-2">
             Cancel
           </HoverButton>

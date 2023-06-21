@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-import selectAuth from '../../features/auth/authSelector';
 import startsWithIgnoreCase from '../../utils/startsWithIgnoreCase';
 import ChannelMemberProfile from './ChannelMemberProfile';
 import CircularImage from '../common/CircularImage';
@@ -11,17 +10,12 @@ import type Member from '../../interfaces/Member';
 interface ChannelMemberListProps {
   members: Member[];
   role: number;
-  setRole: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const ChannelMemberList: React.FC<ChannelMemberListProps> = ({
   members,
   role,
-  setRole,
 }) => {
-  const { tokenInfo } = selectAuth();
-  const myId = tokenInfo?.id;
-
   const searchResultsRef = useRef<HTMLUListElement>(null);
   const [searchResults, setSearchResults] = useState<Member[]>(members);
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -46,14 +40,6 @@ const ChannelMemberList: React.FC<ChannelMemberListProps> = ({
     });
     setSearchResults([...results]);
   };
-
-  useEffect(() => {
-    const myInfo = members.find((member) => member.id === myId);
-    if (!myInfo) return;
-    const { isAdmin, isOwner } = myInfo;
-    const myRole = Number(isAdmin) + Number(isOwner);
-    setRole(myRole);
-  }, []);
 
   useEffect(() => {
     handleSearchResults();

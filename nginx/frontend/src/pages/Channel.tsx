@@ -8,6 +8,7 @@ import ChannelErrorModal from '../components/modal/ChannelErrorModal';
 import ChannelInviteModal from '../components/modal/ChannelInviteModal';
 import ChannelRole from '../constants/ChannelRole';
 import SocketContext from '../context/SocketContext';
+import selectAuth from '../features/auth/authSelector';
 
 import type Member from '../interfaces/Member';
 
@@ -21,6 +22,9 @@ const Channel: React.FC = () => {
 
   const { channelId: channelIdString } = useParams<{ channelId: string }>();
   const channelId = Number(channelIdString);
+
+  const { tokenInfo } = selectAuth();
+  const myId = tokenInfo?.id;
 
   const { socket } = useContext(SocketContext);
 
@@ -110,9 +114,18 @@ const Channel: React.FC = () => {
     }
   }, [error]);
 
+  useEffect(() => {
+    if (members.length === 0) return;
+    const myInfo = members.find((member) => member.id === myId);
+    if (!myInfo) return;
+    const { isAdmin, isOwner } = myInfo;
+    const myRole = Number(isAdmin) + Number(isOwner);
+    setRole(myRole);
+  }, [members]);
+
   return (
     <div className="flex space-x-1 px-4">
-      <ChannelMemberList members={members} role={role} setRole={setRole} />
+      <ChannelMemberList members={members} role={role} />
       <div className="w-full max-w-[1024px]">
         <div className="flex justify-between space-x-1.5 px-4">
           {role >= ADMIN && (

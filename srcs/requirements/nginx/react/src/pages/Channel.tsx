@@ -4,12 +4,13 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import ChannelMemberList from '../components/channel/ChannelMemberList';
 import ChatRoom from '../components/chat/ChatRoom';
 import HoverButton from '../components/common/HoverButton';
+import ChannelErrorModal from '../components/modal/ChannelErrorModal';
 import ChannelInviteModal from '../components/modal/ChannelInviteModal';
 import ChannelRole from '../constants/ChannelRole';
 import selectSocket from '../features/socket/socketSelector';
 
 const Channel: React.FC = () => {
-  const { MEMBER, ADMIN } = ChannelRole;
+  const { MEMBER, ADMIN, OWNER } = ChannelRole;
 
   const { state } = useLocation();
   const password = state?.password;
@@ -21,7 +22,9 @@ const Channel: React.FC = () => {
 
   const { socket } = selectSocket();
 
+  const [error, setError] = useState<string>('');
   const [role, setRole] = useState<number>(MEMBER);
+  const [showErrorModal, setShowErrorModal] = useState<boolean>(false);
   const [showInviteModal, setShowInviteModal] = useState<boolean>(false);
 
   const join = {
@@ -82,6 +85,27 @@ const Channel: React.FC = () => {
     };
   }, []);
 
+  useEffect(() => {
+    const joinBannedHandler = () => {
+      setError('You are banned.');
+    };
+    const incorrectHandler = () => {
+      setError('Wrong password.');
+    };
+    socket?.on('join-banned', joinBannedHandler);
+    socket?.on('incorrect-password', incorrectHandler);
+    return () => {
+      socket?.off('join-banned', joinBannedHandler);
+      socket?.off('incorrect-password', incorrectHandler);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (error) {
+      setShowErrorModal(true);
+    }
+  }, [error]);
+
   return (
     <div className="flex space-x-1 px-4">
       <ChannelMemberList role={role} setRole={setRole} />
@@ -99,16 +123,21 @@ const Channel: React.FC = () => {
             >
               Invite
             </HoverButton>
-            <HoverButton
-              onClick={handleExitClick}
-              className="border bg-red-800 p-1.5 hover:text-red-800"
-            >
-              Exit
-            </HoverButton>
+            {role < OWNER && (
+              <HoverButton
+                onClick={handleExitClick}
+                className="border bg-red-800 p-1.5 hover:text-red-800"
+              >
+                Exit
+              </HoverButton>
+            )}
           </div>
         </div>
         <ChatRoom join={join} leave={leave} send={send} />
       </div>
+      {showErrorModal && (
+        <ChannelErrorModal message={error} setShowModal={setShowErrorModal} />
+      )}
       {showInviteModal && (
         <ChannelInviteModal setShowModal={setShowInviteModal} />
       )}

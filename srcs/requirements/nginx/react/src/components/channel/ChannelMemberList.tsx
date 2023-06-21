@@ -51,8 +51,8 @@ const ChannelMemberList: React.FC<ChannelMemberListProps> = ({
     setShowMemberProfileModal(true);
   };
 
-  const handleMembers = () => {
-    const membersHandler = (memberList: Member[]) => {
+  const handleMembers = async () => {
+    const membersHandler = async (memberList: Member[]) => {
       setMembers([...memberList]);
       setMyRole(memberList);
     };
@@ -74,9 +74,9 @@ const ChannelMemberList: React.FC<ChannelMemberListProps> = ({
   };
 
   useEffect(() => {
-    const chatHandler = ({ chatResponse: chat }: SendResponse) => {
+    const chatHandler = async ({ chatResponse: chat }: SendResponse) => {
       if (chat.isSystem) {
-        handleMembers();
+        await handleMembers();
       }
     };
     socket?.on('send-channel', chatHandler);

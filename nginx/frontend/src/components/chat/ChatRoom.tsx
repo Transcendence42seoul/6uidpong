@@ -86,6 +86,10 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ join, leave, send }) => {
   };
 
   const perform = ({ target }: Command) => {
+    if (interlocutor === myId) {
+      setAlert("You can't invite yourself.");
+      return;
+    }
     if (interlocutor) {
       gameSocket?.emit('invite-game', interlocutor);
       return;

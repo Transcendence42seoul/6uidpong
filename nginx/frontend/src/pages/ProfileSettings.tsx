@@ -14,9 +14,7 @@ const ProfileSettings: React.FC = () => {
       <ContentBox className="mb-4 w-full max-w-md flex-col border bg-black p-4">
         <ProfilePicture />
       </ContentBox>
-      <ContentBox className="mb-4 w-full max-w-md flex-col border bg-black p-4">
-        <TwoFactorAuth />
-      </ContentBox>
+      <TwoFactorAuth />
     </div>
   );
 };

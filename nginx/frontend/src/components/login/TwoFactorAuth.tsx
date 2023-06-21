@@ -56,7 +56,12 @@ const TwoFactorAuth: React.FC = () => {
 
   return (
     <>
-      <HoverButton onClick={handleSetIs2faVerified}>인증 활성화</HoverButton>
+      <HoverButton
+        onClick={handleSetIs2faVerified}
+        className="w-full max-w-md border p-4"
+      >
+        Activate Authentication
+      </HoverButton>
       <Modal isOpen={openModal} onClose={handleCloseModal}>
         <div style={{ pointerEvents: 'auto' }}>
           {openModal && (

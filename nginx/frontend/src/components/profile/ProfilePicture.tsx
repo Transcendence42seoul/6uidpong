@@ -35,7 +35,7 @@ const ProfilePicture: React.FC = () => {
 
   return (
     <>
-      <h1>프로필 사진 추가</h1>
+      <h1>Image</h1>
       <input
         type="file"
         accept="image/jpeg"
@@ -44,7 +44,9 @@ const ProfilePicture: React.FC = () => {
         onChange={handleFileChange}
         className="my-4 w-full max-w-md rounded-md border border-gray-400 px-4 py-2 text-gray-900 placeholder-gray-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-pink-500"
       />
-      <HoverButton onClick={handleUpload}>Upload</HoverButton>
+      <HoverButton onClick={handleUpload} className="border p-2">
+        Upload
+      </HoverButton>
     </>
   );
 };

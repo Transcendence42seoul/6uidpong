@@ -18,11 +18,27 @@ const ChannelSettings: React.FC = () => {
 
   const { socket } = selectSocket();
 
+  const [disabled, setDisabled] = useState<boolean>(true);
   const [isPasswordEnabled, setIsPasswordEnabled] = useState<boolean>(false);
   const [isPublic, setIsPublic] = useState<boolean>(true);
   const [password, setPassword] = useState<string>('');
   const [title, setTitle] = useState<string>('');
   const [warning, setWarning] = useState<string>('');
+
+  const channelHandler = ({ id }: Channel) => {
+    navigate(`/channel/${id}`, {
+      state: { password },
+    });
+  };
+
+  const duplicateHandler = (isDuplicated: boolean) => {
+    if (isDuplicated) {
+      setWarning('That title is taken. Try another.');
+      return;
+    }
+    setWarning('');
+    setDisabled(false);
+  };
 
   const handleCancelClick = () => {
     navigate(-1);
@@ -41,11 +57,6 @@ const ChannelSettings: React.FC = () => {
       title,
       password: isPasswordEnabled ? password : undefined,
       isPublic,
-    };
-    const channelHandler = ({ id }: Channel) => {
-      navigate(`/channel/${id}`, {
-        state: { password },
-      });
     };
     socket?.emit('create-channel', channel, channelHandler);
   };
@@ -69,17 +80,9 @@ const ChannelSettings: React.FC = () => {
   );
 
   useEffect(() => {
-    if (channelId || warning) return;
-    const duplicateHandler = (isDuplicated: boolean) => {
-      if (isDuplicated) {
-        setWarning('That title is taken. Try another.');
-      }
-    };
-    socket?.emit('channel-title-duplicated', title, duplicateHandler);
-  }, [warning]);
-
-  useEffect(() => {
-    if (channelId || !title) return;
+    if (channelId) return;
+    setDisabled(true);
+    if (!title) return;
     const timeoutId = setTimeout(() => {
       const regex = /^[a-zA-Z0-9!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]+$/;
       if (!regex.test(title)) {
@@ -91,7 +94,7 @@ const ChannelSettings: React.FC = () => {
           'Sorry, the channel title must be between 4 and 30 characters.',
         );
       } else {
-        setWarning('');
+        socket?.emit('channel-title-duplicated', { title }, duplicateHandler);
       }
     }, 500);
     return () => {
@@ -155,13 +158,15 @@ const ChannelSettings: React.FC = () => {
           />
         )}
         <div className="flex space-x-4">
-          <HoverButton
+          <button
             onClick={handleConfirmClick}
-            className="border bg-blue-800 p-2 hover:text-blue-800"
-            disabled={!!warning}
+            className={`border bg-blue-800 p-2 ${
+              disabled ? 'text-gray-400' : 'hover:text-blue-800'
+            }`}
+            disabled={disabled}
           >
             Confirm
-          </HoverButton>
+          </button>
           <HoverButton onClick={handleCancelClick} className="border p-2">
             Cancel
           </HoverButton>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 import { Routes, Route } from 'react-router-dom';
-import { io, Socket } from 'socket.io-client';
+import { Socket } from 'socket.io-client';
 
 import LoginAuth from './components/login/LoginAuth';
 import SocketContext from './context/SocketContext';
@@ -28,8 +28,11 @@ import Main from './pages/Main';
 import MyChannels from './pages/MyChannels';
 import MyPage from './pages/MyPage';
 import ProfileSettings from './pages/ProfileSettings';
+import initSocket from './utils/initSocket';
 import redirect from './utils/redirect';
 import useCallApi from './utils/useCallApi';
+
+import type Sockets from './interfaces/Sockets';
 
 import { isTest, mockAuthState } from './mock'; // test
 
@@ -43,23 +46,10 @@ const App: React.FC = () => {
 
   const [loading, setLoading] = useState<boolean>(false);
 
-  let socket: Socket | null = null;
-  let gameSocket: Socket | null = null;
+  let { socket, gameSocket }: Sockets = initSocket(accessToken);
 
   const handleLoading = async () => {
     setLoading(true);
-  };
-
-  const initSocket = async () => {
-    socket = io('/chat', { auth: { token: accessToken } });
-    socket.on('connect', () => {
-      socket?.emit('connection');
-    });
-
-    gameSocket = io('/game', { auth: { token: accessToken } });
-    gameSocket.on('connect', () => {
-      gameSocket?.emit('connection');
-    });
   };
 
   const logout = () => {
@@ -110,8 +100,6 @@ const App: React.FC = () => {
     }
     return <Login />;
   }
-
-  initSocket();
 
   const sockets = useMemo(() => {
     return { socket, gameSocket };

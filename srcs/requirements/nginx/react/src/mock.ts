@@ -189,8 +189,8 @@ export const mockTokenInfo = {
 };
 
 export const mockAuthState = {
-  id: null,
-  is2FA: null,
-  accessToken: null,
+  id: undefined,
+  is2FA: undefined,
+  accessToken: undefined,
   tokenInfo: mockTokenInfo,
 };

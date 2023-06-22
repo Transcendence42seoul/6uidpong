@@ -123,7 +123,7 @@ export class GameMatchService {
       roomId,
       master: [userId, client],
       participant: [undefined, undefined],
-      password: roomInfo.password,
+      password: roomInfo.password ? roomInfo.password : null,
     };
     this.roomSecrets.push(roomSecret);
     client.emit("custom-room-created", room);

@@ -9,6 +9,7 @@ interface User {
   isBlocked: boolean;
   isFriend: boolean;
   isFriendRequest: boolean;
+  showFriendRequest: boolean;
   isOwner: boolean;
   isAdmin: boolean;
 }

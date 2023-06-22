@@ -38,6 +38,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
   const [isBlocked, setIsBlocked] = useState<boolean>(true);
   const [isFriend, setIsFriend] = useState<boolean>(false);
   const [requestSent, setRequestSent] = useState<boolean>(false);
+  const [showFriendRequest, setShowFriendRequest] = useState<boolean>(false);
   const [user, setUser] = useState<User | null>(null);
 
   const handleBlockClick = () => {
@@ -97,6 +98,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
     setIsBlocked(user.isBlocked);
     setIsFriend(user.isFriend);
     setRequestSent(user.isFriendRequest);
+    setShowFriendRequest(user.showFriendRequest);
   }, [user]);
 
   useEffect(() => {
@@ -141,7 +143,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
         {children}
         {footer && (
           <div className="mt-2 w-full text-sm">
-            {!requestSent && (
+            {!requestSent && showFriendRequest && (
               <HoverButton
                 onClick={handleFriendClick}
                 className="w-full border-t py-2"

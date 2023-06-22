@@ -107,11 +107,13 @@ export class UserService {
       requesterId,
       targetId
     );
+    const block: Block = await this.blockService.findOne(requesterId, targetId);
     const friendRequest: FriendRequest =
       await this.friendRequestService.findOne(requesterId, targetId);
     return new UserProfileResponse(
       user,
-      await this.blockService.isBlocked(requesterId, targetId),
+      block ? true : false,
+      !(await this.blockService.isBlocked(requesterId, targetId)),
       friend ? true : false,
       friendRequest ? true : false
     );

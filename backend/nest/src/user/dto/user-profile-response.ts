@@ -1,7 +1,7 @@
 import { User } from "../entity/user.entity";
 
 export class UserProfileResponse {
-  constructor(entity: User, isBlocked: boolean, isFriend: boolean, isFriendRequest: boolean) {
+  constructor(entity: User, isBlocked: boolean, showFriendRequest: boolean, isFriend: boolean, isFriendRequest: boolean) {
     this.id = entity.id;
     this.nickname = entity.nickname;
     this.email = entity.email;
@@ -12,6 +12,7 @@ export class UserProfileResponse {
     this.loseStat = entity.loseStat;
     this.ladderScore = entity.ladderScore;
     this.isBlocked = isBlocked;
+    this.showFriendRequest = showFriendRequest;
     this.isFriend = isFriend;
     this.isFriendRequest = isFriendRequest;
   }
@@ -34,6 +35,8 @@ export class UserProfileResponse {
   readonly ladderScore: number;
 
   readonly isBlocked: boolean;
+
+  readonly showFriendRequest: boolean;
 
   readonly isFriend: boolean;
 

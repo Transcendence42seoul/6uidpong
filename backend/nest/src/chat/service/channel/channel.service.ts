@@ -246,7 +246,7 @@ export class ChannelService {
   async deleteChannel(
     channelId: number,
     userId: number,
-    server: Namespace
+    client: Socket
   ): Promise<void> {
     const channelUser: ChannelUser =
       await this.channelUserService.findOneOrFail(channelId, userId);
@@ -254,7 +254,8 @@ export class ChannelService {
       throw new WsException("permission denied.");
     }
     await this.roomService.delete(channelId);
-    server.to("c" + channelId).emit("delete-channel", { id: channelId });
+    client.to("c" + channelId).emit("delete-channel", { id: channelId });
+    client.emit("exit-channel");
   }
 
   async exit(

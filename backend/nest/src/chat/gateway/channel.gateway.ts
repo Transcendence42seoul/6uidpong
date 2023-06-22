@@ -100,10 +100,11 @@ export class ChannelGateway {
   @SubscribeMessage("delete-channel")
   async deleteChannel(
     @WsJwtPayload() jwt: JwtPayload,
+    @ConnectedSocket() client: Socket,
     @MessageBody("channelId")
     channelId: number
   ): Promise<void> {
-    await this.channelService.deleteChannel(channelId, jwt.id, this.server);
+    await this.channelService.deleteChannel(channelId, jwt.id, client);
   }
 
   @SubscribeMessage("leave-channel")

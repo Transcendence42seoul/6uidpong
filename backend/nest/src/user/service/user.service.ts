@@ -103,7 +103,6 @@ export class UserService {
     if (!user) {
       throw new NotFoundException();
     }
-    const block: Block = await this.blockService.findOne(requesterId, targetId);
     const friend: Friend = await this.friendService.findOne(
       requesterId,
       targetId
@@ -112,7 +111,7 @@ export class UserService {
       await this.friendRequestService.findOne(requesterId, targetId);
     return new UserProfileResponse(
       user,
-      block ? true : false,
+      await this.blockService.isBlocked(requesterId, targetId),
       friend ? true : false,
       friendRequest ? true : false
     );

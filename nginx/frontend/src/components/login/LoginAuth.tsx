@@ -21,10 +21,10 @@ const LoginAuth: React.FC<LoginAuthProps> = ({ id }) => {
         code,
       });
       await dispatchAuth(data, dispatch);
-      alert('인증 완료');
+      alert('Authentification succeed.');
       redirect('/');
     } catch {
-      alert('인증번호 틀린듯?');
+      alert('Authentification failed.');
     }
   };
 

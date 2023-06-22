@@ -21,16 +21,9 @@ const TwoFactorAuth: React.FC = () => {
   const handleSetIs2faVerified = () => {
     setOpenModal(true);
     // 이메일 보내는 POST 요청 처리
-    axios
-      .put(`/api/v1/users/${myId}/email/code`, null, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      })
-      .then((response: AxiosResponse<void>) => {
-        // 이메일이 성공적으로 보내진 경우, 인증코드 작성 창이 나타나도록 상태 변경
-      })
-      .catch((error: AxiosError) => {
-        alert('이메일 잘못된듯');
-      });
+    axios.put(`/api/v1/users/${myId}/email/code`, null, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
   };
 
   const handleVerifyVerificationCode = () => {
@@ -46,11 +39,11 @@ const TwoFactorAuth: React.FC = () => {
       )
       .then((response: AxiosResponse<boolean>) => {
         // 인증코드가 올바른 경우, 추가 로직 처리
-        alert('2차 인증 완료!');
+        alert('Authentification succeed.');
         handleCloseModal();
       })
       .catch((error: AxiosError) => {
-        alert('인증 실패');
+        alert('Authentification failed.');
       });
   };
 

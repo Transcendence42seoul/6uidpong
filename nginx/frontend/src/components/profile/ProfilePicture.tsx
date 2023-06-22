@@ -27,9 +27,9 @@ const ProfilePicture: React.FC = () => {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-      alert('전송에 성공했습니다.');
+      alert('Image has been changed.');
     } catch (e) {
-      alert('전송에 실패했습니다.');
+      alert('Image change failed.');
     }
   };
 

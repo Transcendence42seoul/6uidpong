@@ -29,22 +29,24 @@ const LoginAuth: React.FC<LoginAuthProps> = ({ id }) => {
   };
 
   return (
-    <>
-      <h1 className="mt-5 text-2xl font-bold text-white">Verification Code</h1>
-      <input
-        type="text"
-        name="code"
-        value={code}
-        onChange={(event) => setCode(event.target.value)}
-        className="my-4 w-full max-w-md rounded-md border border-gray-400 px-4 py-2 text-gray-900 placeholder-gray-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-pink-500"
-      />
-      <HoverButton
-        onClick={handleVerificationCode}
-        className="my-2 w-full max-w-md rounded border p-2.5"
-      >
-        Submit
-      </HoverButton>
-    </>
+    <div className="flex flex-col items-center pt-16">
+      <h1 className="my-4 text-xl font-bold text-white">Verification Code</h1>
+      <div className="flex">
+        <input
+          type="text"
+          name="code"
+          value={code}
+          onChange={(event) => setCode(event.target.value)}
+          className="rounded border border-gray-400 px-4 py-2.5 text-gray-900 focus:border-transparent focus:outline-none"
+        />
+        <HoverButton
+          onClick={handleVerificationCode}
+          className="rounded border p-2.5"
+        >
+          Submit
+        </HoverButton>
+      </div>
+    </div>
   );
 };
 

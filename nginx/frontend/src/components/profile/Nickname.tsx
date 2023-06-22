@@ -51,6 +51,7 @@ const Nickname: React.FC = () => {
   };
 
   useEffect(() => {
+    setNotification('');
     setDisabled(true);
     if (!nickname) return;
     const timeoutId = setTimeout(() => {

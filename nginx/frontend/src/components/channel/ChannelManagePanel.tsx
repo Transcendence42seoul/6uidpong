@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import SocketContext from '../../context/SocketContext';
@@ -21,14 +21,26 @@ const ChannelManagePanel: React.FC<ChannelManagePanelProps> = ({
 
   const [showManageModal, setShowManageModal] = useState<boolean>(false);
 
+  const exitChannel = (alert?: string) => {
+    navigate('/channel', {
+      state: { alert },
+    });
+  };
+
   const handleDeleteChannelClick = () => {
     socket?.emit('delete-channel', { channelId });
-    navigate('/channel');
   };
 
   const handleManageMembersClick = () => {
     setShowManageModal(true);
   };
+
+  useEffect(() => {
+    socket?.on('exit-channel', exitChannel);
+    return () => {
+      socket?.off('exit-channel', exitChannel);
+    };
+  }, []);
 
   return (
     <ContentBox className="w-full max-w-sm space-y-4 bg-black p-7">
